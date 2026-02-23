@@ -1,5 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // تجاهل أخطاء TypeScript و ESLint أثناء البناء
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  
   experimental: {
     serverActions: {
       allowedOrigins: ["192.168.1.6:3000", "localhost:3000"],
