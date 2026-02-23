@@ -1,0 +1,232 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+model User {
+  name             String
+  email            String         @unique
+  password         String
+  category         String
+  paymentType      String
+  expiryDate       DateTime
+  status           String
+  createdAt        DateTime       @default(now())
+  id               Int            @id @default(autoincrement())
+  phone            String?
+  subscriptionType String?
+  examCategory     String?
+  examResults      ExamResult[]
+  subscriptions    Subscription[]
+
+  @@index([email])
+  @@index([status])
+  @@index([expiryDate])
+}
+
+model Subscription {
+  id               Int      @id @default(autoincrement())
+  userId           Int
+  subscriptionType String
+  category         String
+  examCategory     String?
+  expiryDate       DateTime
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, subscriptionType, category])
+  @@index([userId])
+  @@index([isActive])
+  @@index([expiryDate])
+}
+
+model ExamResult {
+  id             Int      @id @default(autoincrement())
+  userEmail      String
+  lessonTitle    String
+  category       String
+  score          Int
+  totalQuestions Int
+  percentage     Float
+  passed         Boolean
+  completedAt    DateTime @default(now())
+  answers        Json
+  user           User     @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+}
+
+model QuestionA {
+  id            Int      @id @default(autoincrement())
+  text          String
+  textNL        String?
+  textFR        String?
+  textAR        String?
+  videoUrls     String[]
+  audioUrl      String?
+  explanationNL String?
+  explanationFR String?
+  explanationAR String?
+  answer1       String?
+  answer2       String?
+  answer3       String?
+  correctAnswer Int?
+  lessonId      Int
+  createdAt     DateTime @default(now())
+  lesson        LessonA  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([lessonId])
+}
+
+model QuestionB {
+  id            Int      @id @default(autoincrement())
+  text          String
+  textNL        String?
+  textFR        String?
+  textAR        String?
+  videoUrls     String[]
+  audioUrl      String?
+  explanationNL String?
+  explanationFR String?
+  explanationAR String?
+  answer1       String?
+  answer2       String?
+  answer3       String?
+  correctAnswer Int?
+  lessonId      Int
+  createdAt     DateTime @default(now())
+  lesson        LessonB  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([lessonId])
+}
+
+model QuestionC {
+  id            Int      @id @default(autoincrement())
+  text          String
+  textNL        String?
+  textFR        String?
+  textAR        String?
+  videoUrls     String[]
+  audioUrl      String?
+  explanationNL String?
+  explanationFR String?
+  explanationAR String?
+  answer1       String?
+  answer2       String?
+  answer3       String?
+  correctAnswer Int?
+  lessonId      Int
+  createdAt     DateTime @default(now())
+  lesson        LessonC  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([lessonId])
+}
+
+model LessonA {
+  id           Int         @id @default(autoincrement())
+  title        String
+  questionType String?
+  description  String?
+  videoUrl     String?
+  createdAt    DateTime    @default(now())
+  questions    QuestionA[]
+  examQuestions ExamQuestionA[] @relation("ExamQuestionsA")
+}
+
+model LessonB {
+  id           Int         @id @default(autoincrement())
+  title        String
+  questionType String?
+  description  String?
+  videoUrl     String?
+  createdAt    DateTime    @default(now())
+  questions    QuestionB[]
+  examQuestions ExamQuestionB[] @relation("ExamQuestionsB")
+}
+
+model LessonC {
+  id           Int         @id @default(autoincrement())
+  title        String
+  questionType String?
+  description  String?
+  videoUrl     String?
+  createdAt    DateTime    @default(now())
+  questions    QuestionC[]
+  examQuestions ExamQuestionC[] @relation("ExamQuestionsC")
+}
+
+model PraktijkLesson {
+  id           Int         @id @default(autoincrement())
+  title        String
+  type         String      // "training" or "hazard"
+  description  String?
+  createdAt    DateTime    @default(now())
+  questions    PraktijkQuestion[]
+}
+
+model PraktijkQuestion {
+  id            Int      @id @default(autoincrement())
+  text          String
+  textNL        String?
+  textFR        String?
+  textAR        String?
+  videoUrls     String[]
+  audioUrl      String?
+  explanationNL String?
+  explanationFR String?
+  explanationAR String?
+  lessonId      Int
+  createdAt     DateTime @default(now())
+  lesson        PraktijkLesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([lessonId])
+}
+
+model ExamQuestionA {
+  id            Int      @id @default(autoincrement())
+  text          String
+  textNL        String?
+  videoUrls     String[]
+  audioUrl      String?
+  answer1       String?
+  answer2       String?
+  answer3       String?
+  correctAnswer Int?
+  lessonId      Int
+  createdAt     DateTime @default(now())
+  lesson        LessonA  @relation("ExamQuestionsA", fields: [lessonId], references: [id], onDelete: Cascade)
+}
+
+model ExamQuestionB {
+  id            Int      @id @default(autoincrement())
+  text          String
+  textNL        String?
+  videoUrls     String[]
+  audioUrl      String?
+  answer1       String?
+  answer2       String?
+  answer3       String?
+  correctAnswer Int?
+  lessonId      Int
+  createdAt     DateTime @default(now())
+  lesson        LessonB  @relation("ExamQuestionsB", fields: [lessonId], references: [id], onDelete: Cascade)
+}
+
+model ExamQuestionC {
+  id            Int      @id @default(autoincrement())
+  text          String
+  textNL        String?
+  videoUrls     String[]
+  audioUrl      String?
+  answer1       String?
+  answer2       String?
+  answer3       String?
+  correctAnswer Int?
+  lessonId      Int
+  createdAt     DateTime @default(now())
+  lesson        LessonC  @relation("ExamQuestionsC", fields: [lessonId], references: [id], onDelete: Cascade)
+}

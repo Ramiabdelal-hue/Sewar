@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ألوانك الخاصة */
+:root {
+  --background: #ffffff;
+  --brand-red: #E30613;
+  --brand-orange: #F28C00;
+}
+
+/* إضافة أي custom CSS بعد Tailwind */
+body {
+  background-color: var(--background);
+  font-family: sans-serif;
+}
