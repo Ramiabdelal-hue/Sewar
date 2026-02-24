@@ -1005,48 +1005,88 @@ export default function AdminQuestionsPage() {
                 </div>
               )}
 
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    📹 رفع فيديو
-                  </label>
-                  <FileUploader
-                    type="video"
-                    onUploadComplete={(url, publicId) => {
-                      setNewQuestion({
-                        ...newQuestion,
-                        videoUrls: [...newQuestion.videoUrls, url],
-                      });
-                    }}
-                    maxSizeMB={100}
-                  />
-                  {newQuestion.videoUrls.length > 0 && (
-                    <div className="mt-3">
-                      <p className="text-sm text-green-600 font-medium mb-2">
-                        ✅ تم رفع {newQuestion.videoUrls.length} فيديو
-                      </p>
-                      <div className="space-y-2">
-                        {newQuestion.videoUrls.map((url, idx) => (
-                          <div key={idx} className="flex items-center gap-2 bg-green-50 p-2 rounded-lg">
-                            <video src={url} className="w-20 h-14 object-cover rounded" />
-                            <span className="text-xs text-gray-600 flex-1">فيديو {idx + 1}</span>
-                            <button
-                              onClick={() => {
-                                setNewQuestion({
-                                  ...newQuestion,
-                                  videoUrls: newQuestion.videoUrls.filter((_, i) => i !== idx),
-                                });
-                              }}
-                              className="text-red-500 hover:text-red-700 font-bold"
-                            >
-                              ×
-                            </button>
-                          </div>
-                        ))}
+              {/* رفع الملفات - حسب نوع السؤال */}
+              {questionType === "Praktijk" ? (
+                // Praktijk: فيديو + صوت
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      📹 رفع فيديو
+                    </label>
+                    <FileUploader
+                      type="video"
+                      onUploadComplete={(url, publicId) => {
+                        setNewQuestion({
+                          ...newQuestion,
+                          videoUrls: [...newQuestion.videoUrls, url],
+                        });
+                      }}
+                      maxSizeMB={100}
+                    />
+                    {newQuestion.videoUrls.length > 0 && (
+                      <div className="mt-3">
+                        <p className="text-sm text-green-600 font-medium mb-2">
+                          ✅ تم رفع {newQuestion.videoUrls.length} فيديو
+                        </p>
+                        <div className="space-y-2">
+                          {newQuestion.videoUrls.map((url, idx) => (
+                            <div key={idx} className="flex items-center gap-2 bg-green-50 p-2 rounded-lg">
+                              <video src={url} className="w-20 h-14 object-cover rounded" />
+                              <span className="text-xs text-gray-600 flex-1">فيديو {idx + 1}</span>
+                              <button
+                                onClick={() => {
+                                  setNewQuestion({
+                                    ...newQuestion,
+                                    videoUrls: newQuestion.videoUrls.filter((_, i) => i !== idx),
+                                  });
+                                }}
+                                className="text-red-500 hover:text-red-700 font-bold"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      🎵 رفع ملف صوتي
+                    </label>
+                    <FileUploader
+                      type="audio"
+                      onUploadComplete={(url, publicId) => {
+                        setNewQuestion({
+                          ...newQuestion,
+                          audioUrl: url,
+                        });
+                      }}
+                      maxSizeMB={10}
+                    />
+                    {newQuestion.audioUrl && (
+                      <div className="mt-3">
+                        <p className="text-sm text-green-600 font-medium mb-2">✅ تم رفع الملف الصوتي</p>
+                        <div className="bg-green-50 p-3 rounded-lg">
+                          <audio src={newQuestion.audioUrl} controls className="w-full" />
+                          <button
+                            onClick={() => {
+                              setNewQuestion({
+                                ...newQuestion,
+                                audioUrl: "",
+                              });
+                            }}
+                            className="mt-2 text-red-500 hover:text-red-700 text-sm font-medium"
+                          >
+                            حذف الملف الصوتي
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
+              ) : (
+                // Theorie & Examen: صوت فقط
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     🎵 رفع ملف صوتي
@@ -1081,7 +1121,7 @@ export default function AdminQuestionsPage() {
                     </div>
                   )}
                 </div>
-              </div>
+              )}
               <button
                 className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-4 rounded-lg font-bold text-lg hover:from-green-600 hover:to-green-700 transition shadow-lg"
                 onClick={handleAddQuestion}
