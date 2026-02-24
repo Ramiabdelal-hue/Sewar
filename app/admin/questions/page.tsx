@@ -488,18 +488,6 @@ export default function AdminQuestionsPage() {
         videoUrls: [],
         audioUrl: "",
       });
-        explanationNL: "",
-        explanationFR: "",
-        explanationAR: "",
-        answer1: "",
-        answer2: "",
-        answer3: "",
-        correctAnswer: 0,
-        videos: [], 
-        audio: null 
-      });
-      const fileInputs = document.querySelectorAll('input[type="file"]');
-      fileInputs.forEach((input: any) => input.value = '');
     } catch (err) {
       console.error("خطأ عند حفظ السؤال:", err);
       alert("فشل الاتصال بالسيرفر");
