@@ -1271,18 +1271,30 @@ export default function AdminQuestionsPage() {
 
                       {q.videoUrls && q.videoUrls.length > 0 && (
                         <div className="mb-4">
-                          <p className="text-sm font-medium text-gray-600 mb-3">الفيديوهات المرفقة:</p>
+                          <p className="text-sm font-medium text-gray-600 mb-3">
+                            {questionType === "Praktijk" ? "الفيديوهات المرفقة:" : "الصور المرفقة:"}
+                          </p>
                           <div className="flex gap-3 flex-wrap">
                             {q.videoUrls.map((url, idx) => (
                               <div
                                 key={idx}
                                 className="relative group"
                               >
-                                <video
-                                  src={url}
-                                  controls
-                                  className="w-80 h-60 object-cover rounded-lg border-2 border-gray-200"
-                                />
+                                {questionType === "Praktijk" ? (
+                                  // عرض فيديو
+                                  <video
+                                    src={url}
+                                    controls
+                                    className="w-80 h-60 object-cover rounded-lg border-2 border-gray-200"
+                                  />
+                                ) : (
+                                  // عرض صورة
+                                  <img
+                                    src={url}
+                                    alt={`صورة ${idx + 1}`}
+                                    className="w-80 h-60 object-cover rounded-lg border-2 border-gray-200"
+                                  />
+                                )}
                                 <button
                                   onClick={() => handleDeleteImage(q.id, url)}
                                   className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition font-bold shadow-lg hover:bg-red-600"
@@ -1290,7 +1302,7 @@ export default function AdminQuestionsPage() {
                                   ×
                                 </button>
                                 <div className="absolute bottom-2 left-2 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded">
-                                  فيديو {idx + 1}
+                                  {questionType === "Praktijk" ? `فيديو ${idx + 1}` : `صورة ${idx + 1}`}
                                 </div>
                               </div>
                             ))}
