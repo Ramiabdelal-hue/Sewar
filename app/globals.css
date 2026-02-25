@@ -9,8 +9,38 @@
   --brand-orange: #F28C00;
 }
 
-/* إضافة أي custom CSS بعد Tailwind */
+/* منع التمرير الأفقي في كل الصفحات */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  position: relative;
+}
+
 body {
   background-color: var(--background);
   font-family: sans-serif;
+}
+
+/* منع أي عنصر من التسبب في scroll أفقي */
+* {
+  max-width: 100%;
+}
+
+/* إصلاح الصور والفيديوهات */
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* إصلاح الجداول على الموبايل */
+table {
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+/* إصلاح pre و code */
+pre, code {
+  overflow-x: auto;
+  max-width: 100%;
 }
