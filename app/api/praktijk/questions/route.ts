@@ -58,25 +58,29 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     console.log("📥 Received POST request for Praktijk question");
-    const formData = await request.formData();
+    const body = await request.json();
     
-    const lessonId = formData.get("lessonId") as string;
-    const text = formData.get("text") as string;
-    const textNL = formData.get("textNL") as string;
-    const textFR = formData.get("textFR") as string;
-    const textAR = formData.get("textAR") as string;
-    const videos = formData.getAll("videos") as File[];
-    const audio = formData.get("audio") as File | null;
-    const explanationNL = formData.get("explanationNL") as string;
-    const explanationFR = formData.get("explanationFR") as string;
-    const explanationAR = formData.get("explanationAR") as string;
+    const {
+      lessonId,
+      text,
+      textNL,
+      textFR,
+      textAR,
+      videoUrls = [],
+      audioUrl = "",
+      explanationNL,
+      explanationFR,
+      explanationAR
+    } = body;
 
-    console.log("📋 Form data received:", {
+    console.log("📋 Data received:", {
       lessonId,
       hasText: !!text,
       hasTextNL: !!textNL,
       hasTextFR: !!textFR,
       hasTextAR: !!textAR,
+      videoCount: videoUrls.length,
+      hasAudio: !!audioUrl,
       hasExplanationNL: !!explanationNL,
       hasExplanationFR: !!explanationFR,
       hasExplanationAR: !!explanationAR
@@ -98,7 +102,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    const lessonIdNum = parseInt(lessonId);
+    const lessonIdNum = typeof lessonId === 'string' ? parseInt(lessonId) : lessonId;
     
     // التحقق من وجود الدرس
     const lesson = await prisma.praktijkLesson.findUnique({
@@ -114,38 +118,6 @@ export async function POST(request: NextRequest) {
 
     console.log(`💾 Creating Praktijk question for lesson ${lessonIdNum}`);
 
-    // حفظ الفيديوهات
-    const videoUrls: string[] = [];
-    const uploadDir = join(process.cwd(), "public", "uploads");
-    
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true });
-    }
-
-    for (const video of videos) {
-      if (video && video.size > 0) {
-        const bytes = await video.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-        const filename = `${Date.now()}-${video.name.replace(/\s/g, '_')}`;
-        const filepath = join(uploadDir, filename);
-        
-        await writeFile(filepath, buffer);
-        videoUrls.push(`/uploads/${filename}`);
-      }
-    }
-
-    // حفظ الملف الصوتي
-    let audioUrl: string | null = null;
-    if (audio && audio.size > 0) {
-      const bytes = await audio.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      const filename = `${Date.now()}-${audio.name.replace(/\s/g, '_')}`;
-      const filepath = join(uploadDir, filename);
-      
-      await writeFile(filepath, buffer);
-      audioUrl = `/uploads/${filename}`;
-    }
-
     // إنشاء السؤال
     const question = await prisma.praktijkQuestion.create({
       data: {
@@ -154,7 +126,7 @@ export async function POST(request: NextRequest) {
         textFR: textFR || null,
         textAR: textAR || null,
         videoUrls: videoUrls,
-        audioUrl: audioUrl,
+        audioUrl: audioUrl || null,
         explanationNL: explanationNL || null,
         explanationFR: explanationFR || null,
         explanationAR: explanationAR || null,

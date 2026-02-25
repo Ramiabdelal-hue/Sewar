@@ -80,16 +80,18 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     console.log("📥 Received POST request for exam question");
-    const formData = await request.formData();
+    const body = await request.json();
     
-    const lessonId = formData.get("lessonId") as string;
-    const textNL = formData.get("textNL") as string;
-    const videos = formData.getAll("videos") as File[];
-    const audio = formData.get("audio") as File | null;
-    const answer1 = formData.get("answer1") as string;
-    const answer2 = formData.get("answer2") as string;
-    const answer3 = formData.get("answer3") as string;
-    const correctAnswer = formData.get("correctAnswer") ? parseInt(formData.get("correctAnswer") as string) : null;
+    const {
+      lessonId,
+      textNL,
+      videoUrls = [],
+      audioUrl = "",
+      answer1,
+      answer2,
+      answer3,
+      correctAnswer
+    } = body;
 
     if (!lessonId || !textNL) {
       return NextResponse.json({
@@ -105,7 +107,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    const lessonIdNum = parseInt(lessonId);
+    const lessonIdNum = typeof lessonId === 'string' ? parseInt(lessonId) : lessonId;
     const category = await getCategoryFromLessonId(lessonIdNum);
     
     if (!category) {
@@ -117,45 +119,13 @@ export async function POST(request: NextRequest) {
 
     console.log(`💾 Creating exam question for category ${category}`);
 
-    // حفظ الفيديوهات
-    const videoUrls: string[] = [];
-    const uploadDir = join(process.cwd(), "public", "uploads");
-    
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true });
-    }
-
-    for (const video of videos) {
-      if (video && video.size > 0) {
-        const bytes = await video.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-        const filename = `${Date.now()}-${video.name.replace(/\s/g, '_')}`;
-        const filepath = join(uploadDir, filename);
-        
-        await writeFile(filepath, buffer);
-        videoUrls.push(`/uploads/${filename}`);
-      }
-    }
-
-    // حفظ الملف الصوتي
-    let audioUrl: string | null = null;
-    if (audio && audio.size > 0) {
-      const bytes = await audio.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      const filename = `${Date.now()}-${audio.name.replace(/\s/g, '_')}`;
-      const filepath = join(uploadDir, filename);
-      
-      await writeFile(filepath, buffer);
-      audioUrl = `/uploads/${filename}`;
-    }
-
     // إنشاء السؤال
     let question;
     const questionData = {
       text: textNL,
       textNL: textNL,
       videoUrls: videoUrls,
-      audioUrl: audioUrl,
+      audioUrl: audioUrl || null,
       answer1: answer1,
       answer2: answer2,
       answer3: answer3,
