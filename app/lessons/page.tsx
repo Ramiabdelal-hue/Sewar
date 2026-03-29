@@ -244,90 +244,101 @@ function LessonsContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50" dir={lang === "ar" ? "rtl" : "ltr"}>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-orange-50" dir={lang === "ar" ? "rtl" : "ltr"}>
       {/* إضافة Navbar */}
       <Navbar />
       
-      <div className="p-6 md:p-10">
+      <div className="px-3 py-4 sm:px-6 md:p-10">
         <div className="max-w-6xl mx-auto">
-          {/* Header with Back Button */}
-          <div className="flex justify-between items-center mb-8">
+          {/* Header with Back Button - محسّن للموبايل */}
+          <div className="flex justify-between items-center mb-4 sm:mb-6">
             <button
               onClick={() => router.push("/")}
-              className="flex items-center gap-2 bg-white px-6 py-3 rounded-xl shadow-md hover:shadow-lg transition font-bold text-gray-700 hover:text-brandOrange"
+              className="flex items-center gap-1.5 sm:gap-2 bg-white px-3 py-2 sm:px-6 sm:py-3 rounded-xl shadow-md hover:shadow-lg transition font-bold text-gray-700 hover:text-brandOrange text-sm sm:text-base active:scale-95"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-              {lang === "ar" ? "العودة للرئيسية" : lang === "nl" ? "Terug naar Home" : "Retour à l'accueil"}
+              <span className="hidden sm:inline">{lang === "ar" ? "العودة للرئيسية" : lang === "nl" ? "Terug naar Home" : "Retour à l'accueil"}</span>
+              <span className="sm:hidden">{lang === "ar" ? "رجوع" : lang === "nl" ? "Terug" : "Retour"}</span>
             </button>
           </div>
 
-          <header className="mb-12 text-center">
-            <h1 className="text-4xl font-black text-gray-900 mb-4 italic uppercase">
-              {lang === "ar" ? "دورة" : lang === "nl" ? "Cursus" : "Cours"} <span className="text-brandOrange">{title}</span>
+          {/* Header - محسّن للموبايل */}
+          <header className="mb-6 sm:mb-10 text-center">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-gray-900 mb-3 sm:mb-4 italic uppercase leading-tight">
+              {lang === "ar" ? "دورة" : lang === "nl" ? "Cursus" : "Cours"} <span className="text-brandOrange block sm:inline mt-1 sm:mt-0">{title}</span>
             </h1>
-            <div className="flex flex-wrap justify-center gap-4 mb-6">
-              <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-100 text-gray-700 text-sm font-bold">
-                <FaEnvelope className="text-brandOrange" />
-                <span>{lang === "ar" ? "المشترك:" : lang === "nl" ? "Abonnee:" : "Abonné:"} {userEmail}</span>
+            
+            {/* معلومات المستخدم - تصميم عمودي للموبايل */}
+            <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center gap-2 sm:gap-4 mb-4 sm:mb-6">
+              <div className="flex items-center justify-center gap-2 bg-white px-3 py-2 sm:px-4 rounded-xl shadow-sm border border-gray-100 text-gray-700 text-xs sm:text-sm font-bold">
+                <FaEnvelope className="text-brandOrange flex-shrink-0" />
+                <span className="truncate max-w-[200px] sm:max-w-none">{lang === "ar" ? "المشترك:" : lang === "nl" ? "Abonnee:" : "Abonné:"} {userEmail}</span>
               </div>
-              <div className="flex items-center gap-2 bg-orange-50 px-4 py-2 rounded-xl shadow-sm border border-orange-100 text-brandOrange text-sm font-bold">
-                <FaClock />
+              <div className="flex items-center justify-center gap-2 bg-orange-50 px-3 py-2 sm:px-4 rounded-xl shadow-sm border border-orange-100 text-brandOrange text-xs sm:text-sm font-bold">
+                <FaClock className="flex-shrink-0" />
                 <span>{lang === "ar" ? "الوقت المتبقي:" : lang === "nl" ? "Resterende tijd:" : "Temps restant:"} {timeLeft}</span>
               </div>
             </div>
-            <div className="inline-block bg-orange-100 text-brandOrange px-4 py-2 rounded-2xl font-bold">
+            
+            {/* عدد الدروس */}
+            <div className="inline-block bg-orange-100 text-brandOrange px-3 py-2 sm:px-4 rounded-2xl font-bold text-xs sm:text-sm">
               {lang === "ar" 
-                ? `عرض جميع الدروس المتاحة لهذه الفئة (${currentLessons.length} درس)`
+                ? `${currentLessons.length} درس متاح`
                 : lang === "nl"
-                ? `Alle beschikbare lessen voor deze categorie (${currentLessons.length} lessen)`
-                : `Toutes les leçons disponibles pour cette catégorie (${currentLessons.length} leçons)`
+                ? `${currentLessons.length} lessen beschikbaar`
+                : `${currentLessons.length} leçons disponibles`
               }
             </div>
           </header>
 
-          <div className="mb-6">
+          {/* شريط البحث - محسّن للموبايل */}
+          <div className="mb-4 sm:mb-6">
             <input 
               type="text" 
-              placeholder={lang === "ar" ? "ابحث عن درس..." : lang === "nl" ? "Zoek een les..." : "Rechercher une leçon..."} 
-              className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-brandOrange focus:outline-none transition" 
+              placeholder={lang === "ar" ? "🔍 ابحث عن درس..." : lang === "nl" ? "🔍 Zoek een les..." : "🔍 Rechercher une leçon..."} 
+              className="w-full p-3 sm:p-4 border-2 border-gray-200 rounded-2xl focus:border-brandOrange focus:outline-none transition text-sm sm:text-base" 
               value={searchTerm} 
               onChange={(e) => setSearchTerm(e.target.value)} 
             />
           </div>
           
+          {/* قائمة الدروس */}
           {currentLessons.length === 0 ? (
-            <div className="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-8 text-center">
-              <div className="w-20 h-20 bg-yellow-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <svg className="w-10 h-10 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-6 sm:p-8 text-center">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-yellow-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <svg className="w-8 h-8 sm:w-10 sm:h-10 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2">
                 {lang === "ar" ? "لا توجد دروس متاحة" : lang === "nl" ? "Geen lessen beschikbaar" : "Aucune leçon disponible"}
               </h3>
-              <p className="text-gray-600">
+              <p className="text-sm sm:text-base text-gray-600">
                 {lang === "ar" ? "لم يتم إضافة دروس لهذه الفئة بعد" : lang === "nl" ? "Er zijn nog geen lessen toegevoegd voor deze categorie" : "Aucune leçon n'a encore été ajoutée pour cette catégorie"}
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {currentLessons.filter(lesson => lesson.title.toLowerCase().includes(searchTerm.toLowerCase())).map((lesson, i) => (
                 <div
                   key={lesson.id}
                   onClick={() => router.push(`/lessons/view?lessonId=${lesson.id}&category=${cat || "B"}&email=${userEmail}`)}
-                  className="bg-white rounded-[30px] overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all group cursor-pointer"
+                  className="bg-white rounded-2xl sm:rounded-[30px] overflow-hidden shadow-md border border-gray-100 hover:shadow-xl transition-all group cursor-pointer active:scale-95"
                 >
-                  <div className="aspect-video bg-gray-900 flex items-center justify-center relative">
-                    <FaPlayCircle className="text-brandOrange text-5xl opacity-80 group-hover:scale-110 transition-all" />
-                    <div className="absolute top-4 right-4 bg-brandOrange text-white px-3 py-1 rounded-full text-xs font-bold">
+                  {/* صورة الدرس */}
+                  <div className="aspect-video bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center relative">
+                    <FaPlayCircle className="text-brandOrange text-4xl sm:text-5xl opacity-80 group-hover:scale-110 transition-all" />
+                    <div className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-brandOrange text-white px-2.5 py-1 sm:px-3 rounded-full text-xs font-bold shadow-lg">
                       {lang === "ar" ? `الدرس ${i + 1}` : lang === "nl" ? `Les ${i + 1}` : `Leçon ${i + 1}`}
                     </div>
                   </div>
-                  <div className="p-6 text-right">
-                    <h3 className="font-bold text-gray-800 text-lg">{lesson.title}</h3>
-                    <p className="text-gray-400 text-xs mt-2 italic">
+                  
+                  {/* محتوى الدرس */}
+                  <div className="p-4 sm:p-6 text-right">
+                    <h3 className="font-bold text-gray-800 text-base sm:text-lg leading-snug mb-2">{lesson.title}</h3>
+                    <p className="text-gray-400 text-xs italic leading-relaxed">
                       {lang === "ar" 
                         ? "رخصة السياقة البلجيكية - المنهج الرسمي"
                         : lang === "nl"

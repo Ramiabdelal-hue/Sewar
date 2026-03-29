@@ -47,16 +47,27 @@ export async function POST(req: Request) {
         const isActive = expiryDate > now;
 
         if (isActive) {
-          console.log("❌ User already has this specific subscription active");
-          return NextResponse.json({
-            success: false,
-            message: "لديك بالفعل اشتراك نشط في هذه الفئة! يمكنك الاشتراك في فئة أخرى.",
-            alreadySubscribed: true,
-            email: existingUser.email,
-            cat: body.category,
-            subscriptionType: body.subscriptionType,
-            exp: existingSubscription.expiryDate.getTime(),
-          });
+          // التحقق: هل يحاول الاشتراك في نفس الفئة والخدمة؟
+          const isSameSubscription = 
+            existingSubscription.subscriptionType === (body.subscriptionType || "theorie") &&
+            existingSubscription.category === (body.category || "B");
+
+          if (isSameSubscription) {
+            // ممنوع الاشتراك في نفس الفئة والخدمة مرة أخرى
+            console.log("❌ User trying to subscribe to same category and service");
+            return NextResponse.json({
+              success: false,
+              message: "لديك بالفعل اشتراك نشط في هذه الفئة والخدمة! يمكنك الاشتراك في فئة أو خدمة أخرى.",
+              alreadySubscribed: true,
+              email: existingUser.email,
+              cat: body.category,
+              subscriptionType: body.subscriptionType,
+              exp: existingSubscription.expiryDate.getTime(),
+            });
+          }
+          
+          // إذا كان يحاول الاشتراك في خدمة أخرى أو فئة أخرى، فهذا مسموح
+          console.log("✅ User subscribing to different category or service - allowed");
         }
       }
     }

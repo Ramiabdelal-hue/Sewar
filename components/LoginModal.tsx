@@ -87,6 +87,12 @@ export default function LoginModal({ lang, onClose }: any) {
       console.log("📥 Login API response:", data);
 
       if (response.ok && data.success) {
+        // توجيه الأدمن مباشرة
+        if (data.role === "admin") {
+          window.location.assign("/admin/questions");
+          return;
+        }
+
         // التوجيه حسب نوع الاشتراك
         const { subscriptionType, cat, email, exp, subscriptions: userSubscriptions } = data;
         
