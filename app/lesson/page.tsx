@@ -6,6 +6,7 @@ import { useLang } from "@/context/LangContext";
 import nl from "@/locales/nl.json";
 import fr from "@/locales/fr.json";
 import ar from "@/locales/ar.json";
+import en from "@/locales/en.json";
 import Navbar from "@/components/Navbar";
 
 interface Lesson {

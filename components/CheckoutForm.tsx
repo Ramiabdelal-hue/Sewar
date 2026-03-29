@@ -6,11 +6,12 @@ import { FaQrcode, FaPaypal, FaCreditCard, FaLock } from "react-icons/fa";
 import nl from "@/locales/nl.json";
 import fr from "@/locales/fr.json";
 import ar from "@/locales/ar.json";
+import en from "@/locales/en.json";
 import QRCode from "qrcode";
 
 export default function CheckoutForm({ selectedData, onBack, prefillData }: any) {
   const { lang } = useLang();
-  const translations: any = { nl, fr, ar };
+  const translations: any = { nl, fr, ar, en };
   const t = translations[lang];
 
   const [loading, setLoading] = useState(false);
