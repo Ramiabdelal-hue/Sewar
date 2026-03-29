@@ -6,6 +6,7 @@ import { useLang } from "@/context/LangContext";
 import nl from "@/locales/nl.json";
 import fr from "@/locales/fr.json";
 import ar from "@/locales/ar.json";
+import en from "@/locales/en.json";
 import Navbar from "@/components/Navbar";
 
 interface Question {
@@ -179,7 +180,7 @@ function LessonViewContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { lang } = useLang();
-  const translations: any = { nl, fr, ar };
+  const translations: any = { nl, fr, ar, en };
   const t = translations[lang];
 
   const category = searchParams.get("category");

@@ -6,6 +6,7 @@ import { useLang } from "@/context/LangContext";
 import nl from "@/locales/nl.json";
 import fr from "@/locales/fr.json";
 import ar from "@/locales/ar.json";
+import en from "@/locales/en.json";
 import { useEffect, useState } from "react";
 import LoginModal from "./LoginModal";
 
@@ -16,7 +17,7 @@ interface NavbarProps {
 
 export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
   const { lang, setLang } = useLang();
-  const translations: any = { nl, fr, ar };
+  const translations: any = { nl, fr, ar, en };
   const t = translations[lang];
   const [timeRemaining, setTimeRemaining] = useState<string | null>(null);
   const [isExpired, setIsExpired] = useState(false);
@@ -156,6 +157,16 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
             >
               AR
             </button>
+            <button 
+              onClick={() => setLang("en")} 
+              className={`px-2.5 md:px-4 py-1.5 md:py-2 rounded-full font-bold transition-all text-xs md:text-sm ${
+                lang === "en" 
+                  ? "bg-gradient-to-r from-purple-500 to-violet-500 text-white shadow-md scale-105" 
+                  : "text-gray-600 hover:bg-gray-100 hover:text-purple-500"
+              }`}
+            >
+              EN
+            </button>
           </div>
 
           {/* القائمة الرئيسية - تظهر فقط قبل تسجيل الدخول على Desktop */}
@@ -221,7 +232,7 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
                   <FaSignInAlt className="text-xl relative z-10 group-hover:rotate-12 transition-transform" />
-                  <span className="relative z-10">{lang === "ar" ? "دخول" : lang === "nl" ? "Inloggen" : "Login"}</span>
+                  <span className="relative z-10">{lang === "ar" ? "دخول" : lang === "nl" ? "Inloggen" : lang === "fr" ? "Login" : "Login"}</span>
                 </button>
               </li>
             </ul>
@@ -241,10 +252,10 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
               >
                 <FaHome className="text-sm md:text-lg group-hover:rotate-12 transition-transform" />
                 <span className="hidden sm:inline">
-                  {lang === "ar" ? "القائمة الرئيسية" : lang === "nl" ? "Hoofdmenu" : "Menu Principal"}
+                  {lang === "ar" ? "القائمة الرئيسية" : lang === "nl" ? "Hoofdmenu" : lang === "fr" ? "Menu Principal" : "Main Menu"}
                 </span>
                 <span className="sm:hidden">
-                  {lang === "ar" ? "القائمة" : lang === "nl" ? "Menu" : "Menu"}
+                  {lang === "ar" ? "القائمة" : lang === "nl" ? "Menu" : lang === "fr" ? "Menu" : "Menu"}
                 </span>
               </button>
 
@@ -279,10 +290,10 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                   <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 <span className="font-bold hidden sm:inline">
-                  {lang === "ar" ? "النتائج" : lang === "nl" ? "Resultaten" : "Résultats"}
+                  {lang === "ar" ? "النتائج" : lang === "nl" ? "Resultaten" : lang === "fr" ? "Résultats" : "Results"}
                 </span>
                 <span className="font-bold sm:hidden">
-                  {lang === "ar" ? "نتائج" : lang === "nl" ? "Result" : "Résult"}
+                  {lang === "ar" ? "نتائج" : lang === "nl" ? "Result" : lang === "fr" ? "Résult" : "Results"}
                 </span>
               </button>
             </div>
@@ -378,7 +389,7 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                 className="flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95"
               >
                 <FaSignInAlt className="text-xl" />
-                <span>{lang === "ar" ? "دخول" : lang === "nl" ? "Inloggen" : "Login"}</span>
+                <span>{lang === "ar" ? "دخول" : lang === "nl" ? "Inloggen" : lang === "fr" ? "Login" : "Login"}</span>
               </button>
             </div>
           </div>

@@ -48,25 +48,33 @@ export default function LoginModal({ lang, onClose }: any) {
         ? `امتحانات - فئة ${category}` 
         : lang === "nl" 
         ? `Examens - Categorie ${category}` 
-        : `Examens - Catégorie ${category}`;
+        : lang === "fr"
+        ? `Examens - Catégorie ${category}`
+        : `Exams - Category ${category}`;
     } else if (type === "praktijk-lessons") {
       return lang === "ar" 
         ? "دروس عملية - فيديوهات" 
         : lang === "nl" 
         ? "Praktijk - Lessen" 
-        : "Pratique - Leçons";
+        : lang === "fr"
+        ? "Pratique - Leçons"
+        : "Practical - Lessons";
     } else if (type === "praktijk-exam") {
       return lang === "ar" 
         ? "دروس عملية - إدراك المخاطر" 
         : lang === "nl" 
         ? "Praktijk - Gevaarherkenning" 
-        : "Pratique - Perception des dangers";
+        : lang === "fr"
+        ? "Pratique - Perception des dangers"
+        : "Practical - Hazard Perception";
     } else {
       return lang === "ar" 
         ? `دروس نظرية - فئة ${category}` 
         : lang === "nl" 
         ? `Theorie - Categorie ${category}` 
-        : `Théorie - Catégorie ${category}`;
+        : lang === "fr"
+        ? `Théorie - Catégorie ${category}`
+        : `Theory - Category ${category}`;
     }
   };
 
@@ -153,10 +161,10 @@ export default function LoginModal({ lang, onClose }: any) {
           // نموذج تسجيل الدخول
           <div className="p-8 pt-12">
             <h2 className="text-3xl font-black mb-2 text-center text-gray-800">
-              {lang === "ar" ? "دخول المشتركين" : "Inloggen"}
+              {lang === "ar" ? "دخول المشتركين" : lang === "nl" ? "Inloggen" : lang === "fr" ? "Connexion" : "Login"}
             </h2>
             <p className="text-gray-500 text-center mb-8 italic">
-              {lang === "ar" ? "أدخل بياناتك لمتابعة دروسك" : "Vul uw gegevens in"}
+              {lang === "ar" ? "أدخل بياناتك لمتابعة دروسك" : lang === "nl" ? "Vul uw gegevens in" : lang === "fr" ? "Entrez vos informations" : "Enter your details to continue"}
             </p>
 
             <form onSubmit={handleLogin} className="space-y-4">
@@ -165,7 +173,7 @@ export default function LoginModal({ lang, onClose }: any) {
                 <input 
                   required
                   type="email"
-                  placeholder={lang === "ar" ? "البريد الإلكتروني" : "E-mail"}
+                  placeholder={lang === "ar" ? "البريد الإلكتروني" : lang === "nl" ? "E-mail" : lang === "fr" ? "E-mail" : "Email"}
                   className="w-full p-4 pl-12 rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:ring-2 focus:ring-brandOrange transition"
                   onChange={(e) => setCredentials({...credentials, email: e.target.value})}
                 />
@@ -176,7 +184,7 @@ export default function LoginModal({ lang, onClose }: any) {
                 <input 
                   required
                   type="password"
-                  placeholder={lang === "ar" ? "كلمة المرور" : "Wachtwoord"}
+                  placeholder={lang === "ar" ? "كلمة المرور" : lang === "nl" ? "Wachtwoord" : lang === "fr" ? "Mot de passe" : "Password"}
                   className="w-full p-4 pl-12 rounded-2xl bg-gray-50 border border-gray-100 outline-none focus:ring-2 focus:ring-brandOrange transition"
                   onChange={(e) => setCredentials({...credentials, password: e.target.value})}
                 />
@@ -186,7 +194,7 @@ export default function LoginModal({ lang, onClose }: any) {
                 disabled={loading}
                 className="w-full bg-brandOrange text-white py-4 rounded-2xl font-black text-xl shadow-lg hover:scale-[1.02] transition active:scale-95 disabled:bg-gray-300"
               >
-                {loading ? "..." : (lang === "ar" ? "دخول" : "Inloggen")}
+                {loading ? "..." : (lang === "ar" ? "دخول" : lang === "nl" ? "Inloggen" : lang === "fr" ? "Connexion" : "Login")}
               </button>
             </form>
           </div>
@@ -194,10 +202,10 @@ export default function LoginModal({ lang, onClose }: any) {
           // قائمة اختيار الاشتراك
           <div className="p-8 pt-12">
             <h2 className="text-2xl font-black mb-2 text-center text-gray-800">
-              {lang === "ar" ? "اختر الاشتراك" : lang === "nl" ? "Kies je abonnement" : "Choisissez votre abonnement"}
+              {lang === "ar" ? "اختر الاشتراك" : lang === "nl" ? "Kies je abonnement" : lang === "fr" ? "Choisissez votre abonnement" : "Choose your subscription"}
             </h2>
             <p className="text-gray-500 text-center mb-6 text-sm">
-              {lang === "ar" ? "لديك عدة اشتراكات نشطة" : lang === "nl" ? "Je hebt meerdere actieve abonnementen" : "Vous avez plusieurs abonnements actifs"}
+              {lang === "ar" ? "لديك عدة اشتراكات نشطة" : lang === "nl" ? "Je hebt meerdere actieve abonnementen" : lang === "fr" ? "Vous avez plusieurs abonnements actifs" : "You have multiple active subscriptions"}
             </p>
 
             <div className="space-y-3">
@@ -217,7 +225,9 @@ export default function LoginModal({ lang, onClose }: any) {
                           ? `ينتهي في: ${new Date(sub.expiryDate).toLocaleDateString('ar-EG')}` 
                           : lang === "nl"
                           ? `Verloopt op: ${new Date(sub.expiryDate).toLocaleDateString('nl-NL')}`
-                          : `Expire le: ${new Date(sub.expiryDate).toLocaleDateString('fr-FR')}`
+                          : lang === "fr"
+                          ? `Expire le: ${new Date(sub.expiryDate).toLocaleDateString('fr-FR')}`
+                          : `Expires on: ${new Date(sub.expiryDate).toLocaleDateString('en-GB')}`
                         }
                       </p>
                     </div>
@@ -236,7 +246,7 @@ export default function LoginModal({ lang, onClose }: any) {
               }}
               className="w-full mt-4 text-gray-500 hover:text-gray-700 font-medium py-2"
             >
-              {lang === "ar" ? "العودة" : lang === "nl" ? "Terug" : "Retour"}
+              {lang === "ar" ? "العودة" : lang === "nl" ? "Terug" : lang === "fr" ? "Retour" : "Back"}
             </button>
           </div>
         )}

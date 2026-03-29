@@ -9,12 +9,13 @@ import { useLang } from "@/context/LangContext";
 import nl from "@/locales/nl.json";
 import fr from "@/locales/fr.json";
 import ar from "@/locales/ar.json";
+import en from "@/locales/en.json";
 
 function LessonsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { lang, setLang } = useLang();
-  const translations: any = { nl, fr, ar };
+  const translations: any = { nl, fr, ar, en };
   const t = translations[lang];
   
   const cat = searchParams.get("cat");

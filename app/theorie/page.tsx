@@ -8,6 +8,7 @@ import { useLang } from "@/context/LangContext";
 import nl from "@/locales/nl.json";
 import fr from "@/locales/fr.json";
 import ar from "@/locales/ar.json";
+import en from "@/locales/en.json";
 import CheckoutForm from "@/components/CheckoutForm";
 
 interface Lesson {
@@ -20,7 +21,7 @@ interface Lesson {
 export default function TheoriePage() {
   const router = useRouter();
   const { lang } = useLang();
-  const translations: any = { nl, fr, ar };
+  const translations: any = { nl, fr, ar, en };
   const t = translations[lang];
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
