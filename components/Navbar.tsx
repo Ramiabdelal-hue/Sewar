@@ -165,7 +165,7 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                   : "text-gray-600 hover:bg-gray-100 hover:text-purple-500"
               }`}
             >
-              EN
+              EN 🇬🇧
             </button>
           </div>
 
