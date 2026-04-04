@@ -167,7 +167,7 @@ function LessonsContent() {
             <tbody>
               {filteredLessons.map((lesson, i) => (
                 <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#ddeeff" }}>
-                  <td className="px-4 py-3 border border-gray-200 font-bold text-[#003399] text-sm">
+                  <td className="px-4 py-3 border border-gray-200 font-bold text-[#003399] text-base">
                     {i + 1}. {lesson.title}
                   </td>
                   <td className="px-4 py-3 border border-gray-200 text-center">
