@@ -33,7 +33,7 @@ img, video {
 }
 
 /* إصلاح الجداول على الموبايل */
-table {
+.table-scroll {
   display: block;
   overflow-x: auto;
   white-space: nowrap;
