@@ -69,9 +69,9 @@ function LessonsContent() {
   const currentCategory = (cat || "B").toUpperCase();
 
   const getCategoryTitle = () => {
-    if (currentCategory === "C") return lang === "ar" ? "فئة الشاحنات C" : lang === "nl" ? "THEORIE RIJBEWIJS C" : lang === "fr" ? "THÉORIE PERMIS C" : "THEORY LICENSE C";
-    if (currentCategory === "A") return lang === "ar" ? "فئة الدراجات A" : lang === "nl" ? "THEORIE RIJBEWIJS A" : lang === "fr" ? "THÉORIE PERMIS A" : "THEORY LICENSE A";
-    return lang === "ar" ? "فئة السيارات B" : lang === "nl" ? "THEORIE RIJBEWIJS B" : lang === "fr" ? "THÉORIE PERMIS B" : "THEORY LICENSE B";
+    if (currentCategory === "C") return lang === "ar" ? "نظرية رخصة القيادة C" : lang === "nl" ? "THEORIE RIJBEWIJS C OEFENVRAGEN EN PROEFEXAMEN" : lang === "fr" ? "THÉORIE PERMIS C QUESTIONS ET EXAMEN" : "THEORY LICENSE C PRACTICE QUESTIONS AND EXAM";
+    if (currentCategory === "A") return lang === "ar" ? "نظرية رخصة القيادة A" : lang === "nl" ? "THEORIE RIJBEWIJS A OEFENVRAGEN EN PROEFEXAMEN" : lang === "fr" ? "THÉORIE PERMIS A QUESTIONS ET EXAMEN" : "THEORY LICENSE A PRACTICE QUESTIONS AND EXAM";
+    return lang === "ar" ? "نظرية رخصة القيادة B - أسئلة تدريبية" : lang === "nl" ? "THEORIE RIJBEWIJS B OEFENVRAGEN EN PROEFEXAMEN" : lang === "fr" ? "THÉORIE PERMIS B QUESTIONS ET EXAMEN" : "THEORY LICENSE B PRACTICE QUESTIONS AND EXAM";
   };
 
   const filteredLessons = lessons.filter(l =>
@@ -123,11 +123,11 @@ function LessonsContent() {
     <div className="min-h-screen bg-white" dir={lang === "ar" ? "rtl" : "ltr"}>
       <Navbar />
 
-      <div className="max-w-5xl mx-auto px-2 sm:px-4 py-4">
+      <div className="max-w-5xl mx-auto px-4 py-6">
 
-        {/* عنوان الصفحة */}
-        <h1 className="text-lg sm:text-2xl font-black text-[#003399] uppercase border-b-2 border-[#003399] pb-2 mb-4">
-          {getCategoryTitle()} {lang === "ar" ? "- الدروس" : lang === "nl" ? "OEFENVRAGEN EN PROEFEXAMEN" : lang === "fr" ? "QUESTIONS ET EXAMEN" : "PRACTICE QUESTIONS AND EXAM"}
+        {/* عنوان الصفحة - أزرق داكن مع خط سفلي */}
+        <h1 className="text-xl sm:text-2xl font-black text-[#003399] uppercase border-b-4 border-[#003399] pb-3 mb-5">
+          {getCategoryTitle()}
         </h1>
 
         {/* شريط البحث */}
@@ -135,44 +135,45 @@ function LessonsContent() {
           <input
             type="text"
             placeholder={lang === "ar" ? "ابحث عن درس..." : lang === "nl" ? "Zoek een les..." : lang === "fr" ? "Rechercher..." : "Search lesson..."}
-            className="border-2 border-gray-300 px-3 py-2 text-sm w-full sm:w-80 focus:border-blue-500 focus:outline-none"
+            className="border border-gray-300 px-3 py-2 text-sm w-full sm:w-72 focus:border-blue-500 focus:outline-none rounded"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
-        {/* جدول الدروس */}
+        {/* جدول الدروس - عرض كامل */}
         {filteredLessons.length === 0 ? (
-          <div className="bg-yellow-50 border border-yellow-300 p-6 text-center">
+          <div className="border border-yellow-300 bg-yellow-50 p-6 text-center">
             <p className="font-bold text-gray-700">
               {lang === "ar" ? "لا توجد دروس متاحة" : lang === "nl" ? "Geen lessen beschikbaar" : lang === "fr" ? "Aucune leçon disponible" : "No lessons available"}
             </p>
           </div>
         ) : (
-          <table className="w-full border-collapse text-sm">
+          <table className="w-full border-collapse" style={{ tableLayout: "fixed" }}>
+            <colgroup>
+              <col style={{ width: "75%" }} />
+              <col style={{ width: "25%" }} />
+            </colgroup>
             <thead>
-              <tr className="bg-[#3399ff] text-white">
-                <th className="text-left px-3 py-2 font-bold uppercase text-xs sm:text-sm border border-[#2277cc]">
-                  {lang === "ar" ? "الدرس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
+              <tr style={{ backgroundColor: "#3399ff" }}>
+                <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc]">
+                  {lang === "ar" ? "الدرس" : lang === "nl" ? "LES" : lang === "fr" ? "LEÇON" : "LESSON"}
                 </th>
-                <th className="px-3 py-2 font-bold uppercase text-xs sm:text-sm border border-[#2277cc] w-28 sm:w-36 text-center">
-                  {lang === "ar" ? "فتح" : lang === "nl" ? "Openen" : lang === "fr" ? "Ouvrir" : "Open"}
+                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
+                  {lang === "ar" ? "فتح" : lang === "nl" ? "OPENEN" : lang === "fr" ? "OUVRIR" : "OPEN"}
                 </th>
               </tr>
             </thead>
             <tbody>
               {filteredLessons.map((lesson, i) => (
-                <tr
-                  key={lesson.id}
-                  className={i % 2 === 0 ? "bg-white" : "bg-[#e8f4ff]"}
-                >
-                  <td className="px-3 py-2 border border-gray-200 font-bold text-[#003399] text-xs sm:text-sm">
+                <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#ddeeff" }}>
+                  <td className="px-4 py-3 border border-gray-200 font-bold text-[#003399] text-sm">
                     {i + 1}. {lesson.title}
                   </td>
-                  <td className="px-3 py-2 border border-gray-200 text-center">
+                  <td className="px-4 py-3 border border-gray-200 text-center">
                     <button
                       onClick={() => router.push(`/lessons/view?lessonId=${lesson.id}&category=${cat || "B"}&email=${userEmail}`)}
-                      className="bg-white border-2 border-gray-400 px-4 py-1 text-xs sm:text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors"
+                      className="bg-white border-2 border-gray-400 px-6 py-1 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors"
                     >
                       {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
                     </button>
@@ -183,9 +184,8 @@ function LessonsContent() {
           </table>
         )}
 
-        {/* عدد الدروس */}
-        <p className="text-xs text-gray-500 mt-3">
-          {lang === "ar" ? `إجمالي الدروس: ${filteredLessons.length}` : lang === "nl" ? `Totaal lessen: ${filteredLessons.length}` : lang === "fr" ? `Total leçons: ${filteredLessons.length}` : `Total lessons: ${filteredLessons.length}`}
+        <p className="text-xs text-gray-400 mt-3">
+          {lang === "ar" ? `إجمالي: ${filteredLessons.length} درس` : lang === "nl" ? `Totaal: ${filteredLessons.length} lessen` : lang === "fr" ? `Total: ${filteredLessons.length} leçons` : `Total: ${filteredLessons.length} lessons`}
         </p>
       </div>
     </div>
