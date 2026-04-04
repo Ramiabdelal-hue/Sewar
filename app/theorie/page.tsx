@@ -40,6 +40,7 @@ export default function TheoriePage() {
       name: t.categoryA || "Category A",
       description: t.motorcycles || "Motorcycles",
       icon: <FaMotorcycle className="text-5xl text-brandOrange" />,
+      image: "https://www.gratisrijbewijsonline.be/images/moto.png",
       options: [
         { duration: t.twoWeeks || "2 Weeks", price: "€ 25", key: "2w" },
         { duration: t.oneMonth || "1 Month", price: "€ 50", key: "1m" },
@@ -50,6 +51,7 @@ export default function TheoriePage() {
       name: t.categoryB || "Category B",
       description: t.cars || "Cars",
       icon: <FaCarSide className="text-5xl text-brandOrange" />,
+      image: "https://www.gratisrijbewijsonline.be/images/auto.png",
       options: [
         { duration: t.twoWeeks || "2 Weeks", price: "€ 25", key: "2w" },
         { duration: t.oneMonth || "1 Month", price: "€ 50", key: "1m" },
@@ -60,6 +62,7 @@ export default function TheoriePage() {
       name: t.categoryC || "Category C",
       description: t.trucks || "Trucks",
       icon: <FaTruck className="text-5xl text-brandOrange" />,
+      image: "https://www.gratisrijbewijsonline.be/images/vrachtwagen.png",
       options: [
         { duration: t.twoWeeks || "2 Weeks", price: "€ 1", key: "2w" },
         { duration: t.oneMonth || "1 Month", price: "€ 50", key: "1m" },
@@ -173,14 +176,17 @@ export default function TheoriePage() {
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-100 to-red-100 rounded-full -translate-y-1/2 translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
-                <div className={`relative p-6 rounded-2xl transition-all duration-300 ${
+                <div className={`relative p-4 rounded-2xl transition-all duration-300 ${
                   globalSelection?.catId === cat.id 
                     ? "bg-gradient-to-br from-orange-500 to-red-500 shadow-lg" 
                     : "bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-orange-100 group-hover:to-red-100"
                 }`}>
-                  <div className={globalSelection?.catId === cat.id ? "text-white" : "text-orange-600"}>
-                    {cat.icon}
-                  </div>
+                  <img 
+                    src={cat.image} 
+                    alt={cat.name}
+                    className="w-32 h-24 object-contain"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                  />
                 </div>
 
                 <div className="text-center relative z-10">
