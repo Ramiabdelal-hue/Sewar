@@ -103,6 +103,7 @@ export default function ContactPage() {
                 <button onClick={() => setLang("nl")} className={`px-3 py-2 text-sm sm:text-base rounded-full font-semibold transition ${lang === "nl" ? "bg-gradient-to-r from-red-500 to-yellow-400 text-white" : "bg-gray-200 text-gray-600"}`}>NL</button>
                 <button onClick={() => setLang("fr")} className={`px-3 py-2 text-sm sm:text-base rounded-full font-semibold transition ${lang === "fr" ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white" : "bg-gray-200 text-gray-600"}`}>FR</button>
                 <button onClick={() => setLang("ar")} className={`px-3 py-2 text-sm sm:text-base rounded-full font-semibold transition ${lang === "ar" ? "bg-gradient-to-r from-green-400 to-cyan-400 text-white" : "bg-gray-200 text-gray-600"}`}>AR</button>
+                <button onClick={() => setLang("en")} className={`px-3 py-2 text-sm sm:text-base rounded-full font-semibold transition ${lang === "en" ? "bg-gradient-to-r from-purple-500 to-violet-500 text-white" : "bg-gray-200 text-gray-600"}`}>EN</button>
               </div>
               <button
                 onClick={() => router.push("/")}
