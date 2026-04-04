@@ -123,7 +123,7 @@ function LessonsContent() {
     <div className="min-h-screen bg-white" dir={lang === "ar" ? "rtl" : "ltr"}>
       <Navbar />
 
-      <div className="max-w-5xl mx-auto px-4 py-6">
+      <div className="w-full px-4 py-6">
 
         {/* عنوان الصفحة - أزرق داكن مع خط سفلي */}
         <h1 className="text-xl sm:text-2xl font-black text-[#003399] uppercase border-b-4 border-[#003399] pb-3 mb-5">
