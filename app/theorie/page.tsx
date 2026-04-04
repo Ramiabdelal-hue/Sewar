@@ -37,7 +37,7 @@ export default function TheoriePage() {
   const categories = [
     {
       id: "A",
-      name: t.categoryA || "Category A",
+      name: "Rijbewijs A",
       description: t.motorcycles || "Motorcycles",
       icon: <FaMotorcycle className="text-5xl text-brandOrange" />,
       image: "https://www.gratisrijbewijsonline.be/images/moto.png",
@@ -48,7 +48,7 @@ export default function TheoriePage() {
     },
     {
       id: "B",
-      name: t.categoryB || "Category B",
+      name: "Rijbewijs B",
       description: t.cars || "Cars",
       icon: <FaCarSide className="text-5xl text-brandOrange" />,
       image: "https://www.gratisrijbewijsonline.be/images/auto.png",
@@ -59,7 +59,7 @@ export default function TheoriePage() {
     },
     {
       id: "C",
-      name: t.categoryC || "Category C",
+      name: "Rijbewijs C",
       description: t.trucks || "Trucks",
       icon: <FaTruck className="text-5xl text-brandOrange" />,
       image: "https://www.gratisrijbewijsonline.be/images/vrachtwagen.png",
