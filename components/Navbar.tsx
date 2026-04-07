@@ -21,6 +21,20 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
   const translations: any = { nl, fr, ar, en };
   const t = translations[lang];
   const pathname = usePathname();
+
+  // دالة تغيير اللغة مع Google Translate
+  const changeLang = (code: string) => {
+    setLang(code as any);
+    // استدعاء Google Translate
+    try {
+      const select = document.querySelector('.goog-te-combo') as HTMLSelectElement;
+      if (select) {
+        const gtLang: Record<string, string> = { nl: 'nl', fr: 'fr', ar: 'ar', en: 'en' };
+        select.value = gtLang[code] || code;
+        select.dispatchEvent(new Event('change'));
+      }
+    } catch {}
+  };
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -107,7 +121,7 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
             ].map(({ code, label }) => (
               <button
                 key={code}
-                onClick={() => setLang(code as any)}
+                onClick={() => changeLang(code)}
                 className={`px-2 py-1 md:px-3 md:py-1 font-bold text-xs md:text-sm border-2 transition-all ${
                   lang === code
                     ? "bg-white text-[#0066cc] border-white"
