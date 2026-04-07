@@ -1,24 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 
+const langMap: Record<string, string> = {
+  nl: "nl-NL",
+  fr: "fr-FR",
+  ar: "ar-SA",
+  en: "en-US",
+};
+
 export async function POST(req: NextRequest) {
   try {
     const { text, targetLang } = await req.json();
-    
     if (!text || !targetLang) {
-      return NextResponse.json({ success: false, message: "text and targetLang required" }, { status: 400 });
+      return NextResponse.json({ success: false }, { status: 400 });
     }
 
-    const res = await fetch(
-      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=auto|${targetLang}`
-    );
+    const target = langMap[targetLang] || targetLang;
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=nl-NL|${target}`;
+
+    const res = await fetch(url);
     const data = await res.json();
 
-    if (data.responseStatus === 200) {
+    if (data.responseStatus === 200 && data.responseData?.translatedText) {
       return NextResponse.json({ success: true, translated: data.responseData.translatedText });
     }
 
     return NextResponse.json({ success: false, translated: text });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ success: false, translated: "" }, { status: 500 });
   }
 }

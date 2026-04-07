@@ -1,83 +1,54 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
-// Cache لتجنب إعادة الترجمة
 const cache: Record<string, string> = {};
 
-export function useAutoTranslate(text: string, targetLang: string, sourceLang = "nl") {
-  const [translated, setTranslated] = useState(text);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (!text) return;
-    
-    // إذا اللغة المستهدفة هي نفس المصدر، أرجع النص الأصلي
-    if (targetLang === sourceLang || targetLang === "nl") {
-      setTranslated(text);
-      return;
-    }
-
-    const cacheKey = `${text}__${targetLang}`;
-    if (cache[cacheKey]) {
-      setTranslated(cache[cacheKey]);
-      return;
-    }
-
-    setLoading(true);
-    fetch("/api/translate", {
+async function translateOne(text: string, targetLang: string): Promise<string> {
+  if (!text || targetLang === "nl") return text;
+  const key = `${text}__${targetLang}`;
+  if (cache[key]) return cache[key];
+  try {
+    const res = await fetch("/api/translate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text, targetLang }),
-    })
-      .then(r => r.json())
-      .then(data => {
-        if (data.success) {
-          cache[cacheKey] = data.translated;
-          setTranslated(data.translated);
-        }
-      })
-      .finally(() => setLoading(false));
-  }, [text, targetLang]);
-
-  return { translated, loading };
+    });
+    const data = await res.json();
+    if (data.success && data.translated) {
+      cache[key] = data.translated;
+      return data.translated;
+    }
+  } catch {}
+  return text;
 }
 
-// ترجمة مصفوفة من النصوص
-export function useAutoTranslateList(texts: string[], targetLang: string) {
-  const [translated, setTranslated] = useState<string[]>(texts);
-  const prevLang = useRef(targetLang);
+export function useAutoTranslate(text: string, targetLang: string) {
+  const [translated, setTranslated] = useState(text);
 
   useEffect(() => {
-    if (!texts.length) return;
+    if (!text) return;
+    if (targetLang === "nl") { setTranslated(text); return; }
+    translateOne(text, targetLang).then(setTranslated);
+  }, [text, targetLang]);
+
+  return translated;
+}
+
+export function useAutoTranslateList(texts: string[], targetLang: string) {
+  const [translated, setTranslated] = useState<string[]>([]);
+  const textsKey = texts.join("|||");
+
+  useEffect(() => {
+    if (!texts.length) { setTranslated([]); return; }
     if (targetLang === "nl") { setTranslated(texts); return; }
 
-    const translate = async () => {
-      const results = await Promise.all(
-        texts.map(async (text) => {
-          if (!text) return text;
-          const cacheKey = `${text}__${targetLang}`;
-          if (cache[cacheKey]) return cache[cacheKey];
-          
-          try {
-            const res = await fetch("/api/translate", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ text, targetLang }),
-            });
-            const data = await res.json();
-            if (data.success) {
-              cache[cacheKey] = data.translated;
-              return data.translated;
-            }
-          } catch {}
-          return text;
-        })
-      );
-      setTranslated(results);
-    };
+    // أولاً أعرض النصوص الأصلية فوراً
+    setTranslated(texts);
 
-    translate();
-  }, [texts.join("||"), targetLang]);
+    // ثم نترجم
+    Promise.all(texts.map(t => translateOne(t, targetLang)))
+      .then(results => setTranslated(results));
+  }, [textsKey, targetLang]);
 
   return translated;
 }
