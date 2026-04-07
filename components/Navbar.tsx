@@ -26,24 +26,42 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
   const [isExpired, setIsExpired] = useState(false);
 
   useEffect(() => {
-    const check = () => {
+    const check = async () => {
       const userEmail = localStorage.getItem("userEmail");
-      const userExpiry = localStorage.getItem("userExpiry");
-      setIsLoggedIn(!!userEmail);
+      if (!userEmail) {
+        setIsLoggedIn(false);
+        setDaysLeft(null);
+        return;
+      }
+      setIsLoggedIn(true);
 
-      if (userExpiry) {
-        const diff = parseInt(userExpiry) - Date.now();
-        if (diff <= 0) {
-          setIsExpired(true);
-          setDaysLeft(0);
-        } else {
-          setIsExpired(false);
-          setDaysLeft(Math.ceil(diff / (1000 * 60 * 60 * 24)));
+      try {
+        // جلب تاريخ الانتهاء من قاعدة البيانات مباشرة
+        const res = await fetch("/api/check-subscription", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: userEmail }),
+        });
+        const data = await res.json();
+
+        if (data.success && data.user?.expiryDate) {
+          const expiry = new Date(data.user.expiryDate).getTime();
+          const diff = expiry - Date.now();
+          if (diff <= 0) {
+            setIsExpired(true);
+            setDaysLeft(0);
+          } else {
+            setIsExpired(false);
+            setDaysLeft(Math.ceil(diff / (1000 * 60 * 60 * 24)));
+          }
         }
+      } catch (e) {
+        console.error(e);
       }
     };
+
     check();
-    const interval = setInterval(check, 60000);
+    const interval = setInterval(check, 60 * 60 * 1000); // كل ساعة
     window.addEventListener("userLoggedIn", check);
     window.addEventListener("storage", check);
     return () => {
