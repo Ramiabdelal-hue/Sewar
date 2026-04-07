@@ -30,6 +30,7 @@ function TheorieLessonContent() {
   const category = searchParams.get("category");
   const lesson = searchParams.get("lesson");
   const email = searchParams.get("email");
+  const lessonId = searchParams.get("lessonId");
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
@@ -78,14 +79,19 @@ function TheorieLessonContent() {
   }, [email, category]);
 
   useEffect(() => {
-    if (lesson && category && !isExpired && !checking) {
+    if (lessonId && !isExpired && !checking) {
       fetchQuestions();
     }
-  }, [lesson, category, isExpired, checking]);
+  }, [lessonId, isExpired, checking]);
 
   const fetchQuestions = async () => {
     try {
-      const url = `/api/questions?lesson=${encodeURIComponent(lesson!)}&category=${category}&questionType=Theori`;
+      if (!lessonId) {
+        console.error("❌ No lessonId provided");
+        setLoading(false);
+        return;
+      }
+      const url = `/api/questions?lessonId=${lessonId}`;
       const res = await fetch(url);
       const data = await res.json();
 
