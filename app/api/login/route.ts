@@ -39,20 +39,20 @@ export async function POST(req: Request) {
       expiryDate: sub.expiryDate.getTime()
     }));
 
-    // استخدام الفئة من أول اشتراك نشط (أو الفئة القديمة كـ fallback)
-    const primaryCategory = activeSubscriptions.length > 0 
-      ? activeSubscriptions[0].category 
-      : user.category;
+    // استخدام بيانات أول اشتراك نشط
+    const primarySub = activeSubscriptions.length > 0 ? activeSubscriptions[0] : null;
+    const primaryCategory = primarySub ? primarySub.category : user.category;
+    const primaryExp = primarySub ? primarySub.expiryDate : user.expiryDate.getTime();
 
     return NextResponse.json({
       success: true,
       role: "student",
-      cat: primaryCategory, // استخدام الفئة من الاشتراك النشط
+      cat: primaryCategory,
       email: user.email,
-      subscriptionType: user.subscriptionType || "theorie",
+      subscriptionType: primarySub ? primarySub.type : (user.subscriptionType || "theorie"),
       examCategory: user.examCategory,
-      exp: user.expiryDate.getTime(),
-      subscriptions: activeSubscriptions // جميع الاشتراكات النشطة
+      exp: primaryExp,
+      subscriptions: activeSubscriptions
     });
   }
 

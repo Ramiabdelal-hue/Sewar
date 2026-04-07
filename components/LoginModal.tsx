@@ -11,32 +11,20 @@ export default function LoginModal({ lang, onClose }: any) {
   const redirectToSubscription = (subscription: any, email: string) => {
     const { type, category, expiryDate } = subscription;
     
-    console.log("🔄 Redirecting to subscription:", { type, category, expiryDate, email });
-    
-    // التحقق من البيانات
-    if (!email || !category || !expiryDate) {
-      console.error("❌ Missing subscription data:", { email, category, expiryDate });
+    if (!email || !expiryDate) {
       alert(lang === "ar" ? "خطأ في بيانات الاشتراك" : "Subscription data error");
       return;
     }
     
     if (type === "examen") {
-      window.location.assign(
-        `/examen?email=${encodeURIComponent(email)}&cat=${category}&exp=${expiryDate}`
-      );
+      window.location.assign(`/examen?email=${encodeURIComponent(email)}&cat=${category}&exp=${expiryDate}`);
     } else if (type === "praktijk-lessons") {
-      window.location.assign(
-        `/praktical/lessons?email=${encodeURIComponent(email)}&exp=${expiryDate}`
-      );
+      window.location.assign(`/praktical/lessons?email=${encodeURIComponent(email)}&exp=${expiryDate}`);
     } else if (type === "praktijk-exam") {
-      window.location.assign(
-        `/praktical/exam?email=${encodeURIComponent(email)}&exp=${expiryDate}`
-      );
+      window.location.assign(`/praktical/exam?email=${encodeURIComponent(email)}&exp=${expiryDate}`);
     } else {
-      // theorie
-      window.location.assign(
-        `/lessons?cat=${category}&email=${encodeURIComponent(email)}&exp=${expiryDate}`
-      );
+      // theorie - توجيه لصفحة الدروس مع الفئة
+      window.location.assign(`/lessons?cat=${category}&email=${encodeURIComponent(email)}&exp=${expiryDate}`);
     }
   };
 
@@ -106,24 +94,12 @@ export default function LoginModal({ lang, onClose }: any) {
         
         console.log("✅ Login successful:", { subscriptionType, cat, email, exp, subscriptions: userSubscriptions });
         
-        // التحقق من البيانات
-        if (!email || !cat || !exp) {
-          console.error("❌ Missing data from login response:", { email, cat, exp });
-          alert(lang === "ar" ? "خطأ في البيانات المرجعة" : "Data error");
-          setLoading(false);
-          return;
-        }
-        
         // حفظ بيانات المستخدم في localStorage
         localStorage.setItem("userEmail", email);
         localStorage.setItem("userCategory", cat);
-        localStorage.setItem("userExpiry", exp);
+        localStorage.setItem("userExpiry", String(exp));
         
-        console.log("💾 Data saved to localStorage");
-        
-        // إطلاق حدث مخصص لتحديث Navbar
         window.dispatchEvent(new Event('userLoggedIn'));
-        console.log("📢 userLoggedIn event dispatched");
         
         // إذا كان لديه اشتراكات متعددة، عرض قائمة الاختيار
         if (userSubscriptions && userSubscriptions.length > 1) {
@@ -133,7 +109,7 @@ export default function LoginModal({ lang, onClose }: any) {
           return;
         }
         
-        // إذا كان لديه اشتراك واحد فقط، التوجيه مباشرة
+        // اشتراك واحد - توجيه مباشر
         const subscription = userSubscriptions && userSubscriptions.length > 0 
           ? userSubscriptions[0] 
           : { type: subscriptionType, category: cat, expiryDate: exp };
