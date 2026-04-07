@@ -22,16 +22,32 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [daysLeft, setDaysLeft] = useState<number | null>(null);
+  const [isExpired, setIsExpired] = useState(false);
 
   useEffect(() => {
     const check = () => {
       const userEmail = localStorage.getItem("userEmail");
+      const userExpiry = localStorage.getItem("userExpiry");
       setIsLoggedIn(!!userEmail);
+
+      if (userExpiry) {
+        const diff = parseInt(userExpiry) - Date.now();
+        if (diff <= 0) {
+          setIsExpired(true);
+          setDaysLeft(0);
+        } else {
+          setIsExpired(false);
+          setDaysLeft(Math.ceil(diff / (1000 * 60 * 60 * 24)));
+        }
+      }
     };
     check();
+    const interval = setInterval(check, 60000);
     window.addEventListener("userLoggedIn", check);
     window.addEventListener("storage", check);
     return () => {
+      clearInterval(interval);
       window.removeEventListener("userLoggedIn", check);
       window.removeEventListener("storage", check);
     };
@@ -113,17 +129,31 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                   {lang === "ar" ? "دخول" : lang === "nl" ? "Inloggen" : lang === "fr" ? "Connexion" : "Login"}
                 </button>
               ) : (
-                <button
-                  onClick={() => {
-                    localStorage.removeItem("userEmail");
-                    localStorage.removeItem("userCategory");
-                    localStorage.removeItem("userExpiry");
-                    window.location.href = "/";
-                  }}
-                  className="flex items-center gap-1.5 px-4 py-2.5 font-bold text-sm uppercase bg-red-500 hover:bg-red-600 transition-colors"
-                >
-                  {lang === "ar" ? "خروج" : lang === "nl" ? "Uitloggen" : lang === "fr" ? "Déconnexion" : "Logout"}
-                </button>
+                <div className="flex items-center gap-2">
+                  {daysLeft !== null && (
+                    <span className={`px-3 py-1.5 text-xs font-black border-2 ${
+                      isExpired ? "bg-red-600 border-red-600 text-white" :
+                      daysLeft <= 3 ? "bg-orange-500 border-orange-500 text-white" :
+                      "bg-white border-white text-[#0066cc]"
+                    }`}>
+                      {isExpired
+                        ? (lang === "ar" ? "منتهي" : lang === "nl" ? "Verlopen" : lang === "fr" ? "Expiré" : "Expired")
+                        : `${daysLeft} ${lang === "ar" ? "يوم" : lang === "nl" ? "dagen" : lang === "fr" ? "jours" : "days"}`
+                      }
+                    </span>
+                  )}
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem("userEmail");
+                      localStorage.removeItem("userCategory");
+                      localStorage.removeItem("userExpiry");
+                      window.location.href = "/";
+                    }}
+                    className="flex items-center gap-1.5 px-4 py-2.5 font-bold text-sm uppercase bg-red-500 hover:bg-red-600 transition-colors"
+                  >
+                    {lang === "ar" ? "خروج" : lang === "nl" ? "Uitloggen" : lang === "fr" ? "Déconnexion" : "Logout"}
+                  </button>
+                </div>
               )}
             </li>
           </ul>
@@ -146,17 +176,28 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                 {lang === "ar" ? "دخول" : lang === "nl" ? "Inloggen" : lang === "fr" ? "Connexion" : "Login"}
               </button>
             ) : (
-              <button
-                onClick={() => {
-                  localStorage.removeItem("userEmail");
-                  localStorage.removeItem("userCategory");
-                  localStorage.removeItem("userExpiry");
-                  window.location.href = "/";
-                }}
-                className="px-3 py-1.5 font-bold text-xs uppercase bg-red-500"
-              >
-                {lang === "ar" ? "خروج" : "Logout"}
-              </button>
+              <div className="flex items-center gap-1.5">
+                {daysLeft !== null && (
+                  <span className={`px-2 py-1 text-xs font-black border ${
+                    isExpired ? "bg-red-600 text-white border-red-600" :
+                    daysLeft <= 3 ? "bg-orange-500 text-white border-orange-500" :
+                    "bg-white text-[#0066cc] border-white"
+                  }`}>
+                    {isExpired ? "!" : `${daysLeft}d`}
+                  </span>
+                )}
+                <button
+                  onClick={() => {
+                    localStorage.removeItem("userEmail");
+                    localStorage.removeItem("userCategory");
+                    localStorage.removeItem("userExpiry");
+                    window.location.href = "/";
+                  }}
+                  className="px-3 py-1.5 font-bold text-xs uppercase bg-red-500"
+                >
+                  {lang === "ar" ? "خروج" : "Logout"}
+                </button>
+              </div>
             )}
           </div>
 
