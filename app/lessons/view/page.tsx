@@ -8,6 +8,7 @@ import fr from "@/locales/fr.json";
 import ar from "@/locales/ar.json";
 import en from "@/locales/en.json";
 import Navbar from "@/components/Navbar";
+import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
 
 interface Question {
   id: number;
@@ -321,7 +322,9 @@ function LessonViewContent() {
     }
   };
 
-  // حساب السؤال الحالي مع حماية
+  // ترجمة عنوان الدرس
+  const translatedLessonTitles = useAutoTranslateList(lessonTitle ? [lessonTitle] : [], lang);
+  const translatedLessonTitle = translatedLessonTitles[0] || lessonTitle;
   const currentQuestion = useMemo(() => {
     if (!filteredQuestions || filteredQuestions.length === 0) {
       return null;
@@ -446,7 +449,7 @@ function LessonViewContent() {
               </button>
             </div>
 
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">{lessonTitle || `${lang === "ar" ? "الدرس" : lang === "nl" ? "Les" : "Leçon"} ${lessonId}`}</h1>
+            <h1 className="text-2xl font-bold text-gray-800 mb-2">{translatedLessonTitle || `${lang === "ar" ? "الدرس" : lang === "nl" ? "Les" : "Leçon"} ${lessonId}`}</h1>
             <div className="flex items-center gap-4">
               <p className="text-gray-600">
                 {lang === "ar" ? `السؤال ${currentIndex + 1} من ${filteredQuestions.length}` : lang === "nl" ? `Vraag ${currentIndex + 1} van ${filteredQuestions.length}` : `Question ${currentIndex + 1} sur ${filteredQuestions.length}`}

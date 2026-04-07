@@ -10,6 +10,7 @@ import ar from "@/locales/ar.json";
 import en from "@/locales/en.json";
 import CheckoutForm from "@/components/CheckoutForm";
 import Navbar from "@/components/Navbar";
+import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
 
 function LessonsContent() {
   const searchParams = useSearchParams();
@@ -57,6 +58,9 @@ function LessonsContent() {
   const filtered = videoLessons.filter(l =>
     (t[l.key] || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // ترجمة أسماء الدروس تلقائياً
+  const translatedTitles = useAutoTranslateList(filtered.map(l => t[l.key] || ""), lang);
 
   if (checking) {
     return (
@@ -124,7 +128,7 @@ function LessonsContent() {
             {filtered.map((lesson, i) => (
               <tr key={i} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#ddeeff" }}>
                 <td className="px-4 py-3 border border-gray-200 font-bold text-[#003399] text-base">
-                  {i + 1}. {t[lesson.key]}
+                  {i + 1}. {translatedTitles[i] || t[lesson.key]}
                 </td>
                 <td className="px-4 py-3 border border-gray-200 text-center">
                   <button

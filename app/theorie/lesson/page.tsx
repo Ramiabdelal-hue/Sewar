@@ -8,6 +8,7 @@ import fr from "@/locales/fr.json";
 import ar from "@/locales/ar.json";
 import en from "@/locales/en.json";
 import Navbar from "@/components/Navbar";
+import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
 
 interface Question {
   id: number;
@@ -189,6 +190,15 @@ function TheorieLessonContent() {
 
   const currentQuestion = questions[currentIndex];
 
+  // ترجمة نص السؤال والإجابات تلقائياً
+  const textsToTranslate = currentQuestion ? [
+    currentQuestion.text || "",
+    currentQuestion.answer1 || "",
+    currentQuestion.answer2 || "",
+    currentQuestion.answer3 || "",
+  ] : ["", "", "", ""];
+  const translatedTexts = useAutoTranslateList(textsToTranslate, lang);
+
   return (
     <div className="min-h-screen bg-gray-50" dir={lang === "ar" ? "rtl" : "ltr"}>
       <Navbar />
@@ -217,7 +227,7 @@ function TheorieLessonContent() {
 
           {/* Question Card */}
           <div className="bg-white rounded-3xl shadow-xl p-8 mb-6">
-            <p className="text-xl text-gray-800 leading-relaxed mb-6 font-medium">{currentQuestion.text}</p>
+            <p className="text-xl text-gray-800 leading-relaxed mb-6 font-medium">{translatedTexts[0] || currentQuestion.text}</p>
 
             {/* Images */}
             {currentQuestion.imageUrls && currentQuestion.imageUrls.length > 0 && (
@@ -291,7 +301,7 @@ function TheorieLessonContent() {
                         </div>
                         <span className={`flex-1 font-semibold text-lg ${
                           isCorrect ? "text-green-800" : "text-gray-700"
-                        }`}>{answerText}</span>
+                        }`}>{translatedTexts[num] || answerText}</span>
                         {isCorrect && (
                           <span className="text-sm font-bold text-green-700 bg-green-200 px-3 py-1 rounded-full">
                             {lang === "ar" ? "الإجابة الصحيحة" : lang === "nl" ? "Juiste antwoord" : "Bonne réponse"}

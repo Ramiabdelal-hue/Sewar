@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
+import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
 import { FaLock } from "react-icons/fa";
 import { MotorcycleIcon, CarIcon, TruckIcon } from "@/components/VehicleIcons";
 import { useLang } from "@/context/LangContext";
@@ -227,6 +228,9 @@ export default function TheoriePage() {
   // عرض الدروس
   const filtered = lessons.filter(l => l.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
+  // ترجمة أسماء الدروس تلقائياً
+  const translatedTitles = useAutoTranslateList(filtered.map(l => l.title), lang);
+
   return (
     <div className="min-h-screen bg-white" dir={lang === "ar" ? "rtl" : "ltr"}>
       <Navbar />
@@ -275,7 +279,7 @@ export default function TheoriePage() {
               {filtered.map((lesson, i) => (
                 <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#ddeeff" }}>
                   <td className="px-4 py-3 border border-gray-200 font-bold text-[#003399] text-base">
-                    {i + 1}. {lesson.title}
+                    {i + 1}. {translatedTitles[i] || lesson.title}
                   </td>
                   <td className="px-4 py-3 border border-gray-200 text-center">
                     <button
