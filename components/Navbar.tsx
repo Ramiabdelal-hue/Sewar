@@ -7,6 +7,7 @@ import fr from "@/locales/fr.json";
 import ar from "@/locales/ar.json";
 import en from "@/locales/en.json";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import LoginModal from "./LoginModal";
 import { FaHome, FaBook, FaCar, FaCheckCircle, FaEnvelope, FaSignInAlt } from "react-icons/fa";
 
@@ -19,6 +20,7 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
   const { lang, setLang } = useLang();
   const translations: any = { nl, fr, ar, en };
   const t = translations[lang];
+  const pathname = usePathname();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -124,17 +126,24 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
         <div className="max-w-5xl mx-auto px-4">
           {/* Desktop */}
           <ul className="hidden md:flex items-center">
-            {navLinks.map((link, i) => (
-              <li key={i}>
-                <button
-                  onClick={() => link.onClick ? link.onClick() : window.location.href = link.href}
-                  className="flex items-center gap-1.5 px-4 py-2.5 font-bold text-sm uppercase tracking-wide border-r border-white/20 hover:bg-[#0066cc] transition-colors"
-                >
-                  {link.icon}
-                  {link.label}
-                </button>
-              </li>
-            ))}
+            {navLinks.map((link, i) => {
+              const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
+              return (
+                <li key={i}>
+                  <button
+                    onClick={() => link.onClick ? link.onClick() : window.location.href = link.href}
+                    className={`flex items-center gap-1.5 px-4 py-2.5 font-bold text-sm uppercase tracking-wide border-r border-white/20 transition-colors ${
+                      isActive
+                        ? "bg-white text-[#0066cc]"
+                        : "hover:bg-[#0066cc] text-white"
+                    }`}
+                  >
+                    {link.icon}
+                    {link.label}
+                  </button>
+                </li>
+              );
+            })}
 
             {/* زر الدخول */}
             <li className="mr-auto" style={{ marginLeft: "auto" }}>
@@ -222,19 +231,24 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
           {/* Mobile Menu Dropdown */}
           {isMobileMenuOpen && (
             <div className="md:hidden pb-2 flex flex-col">
-              {navLinks.map((link, i) => (
-                <button
-                  key={i}
-                  onClick={() => {
-                    link.onClick ? link.onClick() : window.location.href = link.href;
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="flex items-center gap-2 px-4 py-3 font-bold text-sm uppercase border-t border-white/20 hover:bg-[#0066cc] transition-colors text-left"
-                >
-                  {link.icon}
-                  {link.label}
-                </button>
-              ))}
+              {navLinks.map((link, i) => {
+                const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
+                return (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      link.onClick ? link.onClick() : window.location.href = link.href;
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`flex items-center gap-2 px-4 py-3 font-bold text-sm uppercase border-t border-white/20 transition-colors text-left ${
+                      isActive ? "bg-white text-[#0066cc]" : "hover:bg-[#0066cc]"
+                    }`}
+                  >
+                    {link.icon}
+                    {link.label}
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
