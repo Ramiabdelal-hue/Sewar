@@ -10,6 +10,7 @@ import nl from "@/locales/nl.json";
 import fr from "@/locales/fr.json";
 import ar from "@/locales/ar.json";
 import en from "@/locales/en.json";
+import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
 
 function LessonsContent() {
   const searchParams = useSearchParams();
@@ -76,6 +77,12 @@ function LessonsContent() {
 
   const filteredLessons = lessons.filter(l =>
     l.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // ترجمة أسماء الدروس تلقائياً
+  const translatedTitles = useAutoTranslateList(
+    filteredLessons.map(l => l.title),
+    lang
   );
 
   if (checking || loadingLessons) {
@@ -168,7 +175,7 @@ function LessonsContent() {
               {filteredLessons.map((lesson, i) => (
                 <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#ddeeff" }}>
                   <td className="px-4 py-3 border border-gray-200 font-bold text-[#003399] text-base">
-                    {i + 1}. {lesson.title}
+                    {i + 1}. {translatedTitles[i] || lesson.title}
                   </td>
                   <td className="px-4 py-3 border border-gray-200 text-center">
                     <button
