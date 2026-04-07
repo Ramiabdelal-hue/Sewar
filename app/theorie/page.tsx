@@ -29,6 +29,9 @@ export default function TheoriePage() {
   const [globalSelection, setGlobalSelection] = useState<{catId: string, duration: string, catName: string} | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Hook دائماً في نفس المكان - قبل أي return
+  const translatedTitles = useAutoTranslateList(lessons.map(l => l.title), lang);
+
   const categories = [
     { id: "A", name: "Rijbewijs A", description: t.motorcycles || "Motorfietsen", icon: <MotorcycleIcon className="w-16 h-10" /> },
     { id: "B", name: "Rijbewijs B", description: t.cars || "Auto's", icon: <CarIcon className="w-16 h-10" /> },
@@ -62,7 +65,6 @@ export default function TheoriePage() {
       });
       const data = await res.json();
       if (data.expired || !data.success) { setIsExpired(true); setLoading(false); return; }
-
       const lessonsRes = await fetch(`/api/lessons?category=${category}&questionType=Theori`);
       const lessonsData = await lessonsRes.json();
       if (lessonsData.success) setLessons(lessonsData.lessons);
@@ -83,30 +85,18 @@ export default function TheoriePage() {
           <h1 className="text-xl sm:text-2xl font-black text-[#003399] uppercase border-b-4 border-[#003399] pb-3 mb-5">
             {lang === "ar" ? "نظرية رخصة القيادة - اشتراك" : lang === "nl" ? "THEORIE RIJBEWIJS - INSCHRIJVING" : lang === "fr" ? "THÉORIE PERMIS - INSCRIPTION" : "THEORY LICENSE - SUBSCRIPTION"}
           </h1>
-
-          {/* جدول على الشاشات الكبيرة */}
           <div className="hidden sm:block">
             <table className="w-full border-collapse lessons-table" style={{ tableLayout: "fixed" }}>
               <colgroup>
-                <col style={{ width: "35%" }} />
-                <col style={{ width: "20%" }} />
-                <col style={{ width: "20%" }} />
-                <col style={{ width: "25%" }} />
+                <col style={{ width: "35%" }} /><col style={{ width: "20%" }} />
+                <col style={{ width: "20%" }} /><col style={{ width: "25%" }} />
               </colgroup>
               <thead>
                 <tr style={{ backgroundColor: "#3399ff" }}>
-                  <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc]">
-                    {lang === "ar" ? "الفئة" : lang === "nl" ? "CATEGORIE" : lang === "fr" ? "CATÉGORIE" : "CATEGORY"}
-                  </th>
-                  <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
-                    {t.twoWeeks || "2 Weken"}
-                  </th>
-                  <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
-                    {t.oneMonth || "1 Maand"}
-                  </th>
-                  <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
-                    {lang === "ar" ? "اشترك" : lang === "nl" ? "INSCHRIJVEN" : lang === "fr" ? "S'INSCRIRE" : "SUBSCRIBE"}
-                  </th>
+                  <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc]">{lang === "ar" ? "الفئة" : lang === "nl" ? "CATEGORIE" : lang === "fr" ? "CATÉGORIE" : "CATEGORY"}</th>
+                  <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">{t.twoWeeks || "2 Weken"}</th>
+                  <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">{t.oneMonth || "1 Maand"}</th>
+                  <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">{lang === "ar" ? "اشترك" : lang === "nl" ? "INSCHRIJVEN" : lang === "fr" ? "S'INSCRIRE" : "SUBSCRIBE"}</th>
                 </tr>
               </thead>
               <tbody>
@@ -123,28 +113,15 @@ export default function TheoriePage() {
                     </td>
                     {durations.map((dur) => (
                       <td key={dur.key} className="px-4 py-3 border border-gray-200 text-center">
-                        <button
-                          onClick={() => setGlobalSelection({ catId: cat.id, duration: dur.key, catName: cat.name })}
-                          className={`px-4 py-1.5 text-sm font-bold border-2 transition-colors w-full ${
-                            globalSelection?.catId === cat.id && globalSelection?.duration === dur.key
-                              ? "bg-[#3399ff] text-white border-[#3399ff]"
-                              : "bg-white border-gray-400 hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff]"
-                          }`}
-                        >
+                        <button onClick={() => setGlobalSelection({ catId: cat.id, duration: dur.key, catName: cat.name })}
+                          className={`px-4 py-1.5 text-sm font-bold border-2 transition-colors w-full ${globalSelection?.catId === cat.id && globalSelection?.duration === dur.key ? "bg-[#3399ff] text-white border-[#3399ff]" : "bg-white border-gray-400 hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff]"}`}>
                           {dur.price}
                         </button>
                       </td>
                     ))}
                     <td className="px-4 py-3 border border-gray-200 text-center">
-                      <button
-                        onClick={() => { if (globalSelection?.catId === cat.id) setShowCheckout(true); }}
-                        disabled={globalSelection?.catId !== cat.id}
-                        className={`px-6 py-1.5 text-sm font-bold border-2 transition-colors ${
-                          globalSelection?.catId === cat.id
-                            ? "bg-white border-gray-400 hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff]"
-                            : "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"
-                        }`}
-                      >
+                      <button onClick={() => { if (globalSelection?.catId === cat.id) setShowCheckout(true); }} disabled={globalSelection?.catId !== cat.id}
+                        className={`px-6 py-1.5 text-sm font-bold border-2 transition-colors ${globalSelection?.catId === cat.id ? "bg-white border-gray-400 hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff]" : "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"}`}>
                         {lang === "ar" ? "اشترك" : lang === "nl" ? "Inschrijven" : lang === "fr" ? "S'inscrire" : "Subscribe"}
                       </button>
                     </td>
@@ -153,8 +130,6 @@ export default function TheoriePage() {
               </tbody>
             </table>
           </div>
-
-          {/* بطاقات على الموبايل */}
           <div className="sm:hidden flex flex-col gap-4">
             {categories.map((cat, i) => (
               <div key={cat.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#ddeeff" }} className="border border-gray-200 p-4 rounded">
@@ -167,28 +142,14 @@ export default function TheoriePage() {
                 </div>
                 <div className="flex gap-2 mb-3">
                   {durations.map((dur) => (
-                    <button
-                      key={dur.key}
-                      onClick={() => setGlobalSelection({ catId: cat.id, duration: dur.key, catName: cat.name })}
-                      className={`flex-1 py-2 text-sm font-bold border-2 transition-colors ${
-                        globalSelection?.catId === cat.id && globalSelection?.duration === dur.key
-                          ? "bg-[#3399ff] text-white border-[#3399ff]"
-                          : "bg-white border-gray-400"
-                      }`}
-                    >
+                    <button key={dur.key} onClick={() => setGlobalSelection({ catId: cat.id, duration: dur.key, catName: cat.name })}
+                      className={`flex-1 py-2 text-sm font-bold border-2 transition-colors ${globalSelection?.catId === cat.id && globalSelection?.duration === dur.key ? "bg-[#3399ff] text-white border-[#3399ff]" : "bg-white border-gray-400"}`}>
                       {dur.label}<br /><span className="font-black">{dur.price}</span>
                     </button>
                   ))}
                 </div>
-                <button
-                  onClick={() => { if (globalSelection?.catId === cat.id) setShowCheckout(true); }}
-                  disabled={globalSelection?.catId !== cat.id}
-                  className={`w-full py-2.5 text-sm font-bold border-2 transition-colors ${
-                    globalSelection?.catId === cat.id
-                      ? "bg-[#3399ff] text-white border-[#3399ff]"
-                      : "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"
-                  }`}
-                >
+                <button onClick={() => { if (globalSelection?.catId === cat.id) setShowCheckout(true); }} disabled={globalSelection?.catId !== cat.id}
+                  className={`w-full py-2.5 text-sm font-bold border-2 transition-colors ${globalSelection?.catId === cat.id ? "bg-[#3399ff] text-white border-[#3399ff]" : "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"}`}>
                   {lang === "ar" ? "اشترك الآن" : lang === "nl" ? "Inschrijven" : lang === "fr" ? "S'inscrire" : "Subscribe"}
                 </button>
               </div>
@@ -199,7 +160,6 @@ export default function TheoriePage() {
     );
   }
 
-  // اشتراك منتهي
   if (isExpired) {
     return (
       <div className="min-h-screen bg-white" dir={lang === "ar" ? "rtl" : "ltr"}>
@@ -210,10 +170,8 @@ export default function TheoriePage() {
             <h2 className="text-2xl font-black text-gray-800 mb-4">
               {lang === "ar" ? "انتهت صلاحية الاشتراك" : lang === "nl" ? "Abonnement verlopen" : "Abonnement expiré"}
             </h2>
-            <button
-              onClick={() => { localStorage.removeItem("userEmail"); localStorage.removeItem("userCategory"); localStorage.removeItem("userExpiry"); setIsLoggedIn(false); setIsExpired(false); }}
-              className="bg-[#3399ff] text-white px-8 py-3 font-bold hover:bg-[#2277cc] transition w-full mb-2"
-            >
+            <button onClick={() => { localStorage.removeItem("userEmail"); localStorage.removeItem("userCategory"); localStorage.removeItem("userExpiry"); setIsLoggedIn(false); setIsExpired(false); }}
+              className="bg-[#3399ff] text-white px-8 py-3 font-bold hover:bg-[#2277cc] transition w-full mb-2">
               {lang === "ar" ? "تجديد الاشتراك" : lang === "nl" ? "Vernieuwen" : "Renouveler"}
             </button>
             <button onClick={() => router.push("/")} className="bg-gray-500 text-white px-8 py-3 font-bold hover:bg-gray-600 transition w-full">
@@ -225,11 +183,7 @@ export default function TheoriePage() {
     );
   }
 
-  // عرض الدروس
   const filtered = lessons.filter(l => l.title.toLowerCase().includes(searchTerm.toLowerCase()));
-
-  // ترجمة أسماء الدروس تلقائياً
-  const translatedTitles = useAutoTranslateList(filtered.map(l => l.title), lang);
 
   return (
     <div className="min-h-screen bg-white" dir={lang === "ar" ? "rtl" : "ltr"}>
@@ -238,54 +192,38 @@ export default function TheoriePage() {
         <h1 className="text-xl sm:text-2xl font-black text-[#003399] uppercase border-b-4 border-[#003399] pb-3 mb-5">
           {lang === "ar" ? `نظرية رخصة القيادة - فئة ${userCategory}` : lang === "nl" ? `THEORIE RIJBEWIJS ${userCategory} OEFENVRAGEN` : lang === "fr" ? `THÉORIE PERMIS ${userCategory}` : `THEORY LICENSE ${userCategory}`}
         </h1>
-
         <div className="mb-4">
-          <input
-            type="text"
+          <input type="text"
             placeholder={lang === "ar" ? "ابحث عن درس..." : lang === "nl" ? "Zoek een les..." : lang === "fr" ? "Rechercher..." : "Search..."}
             className="border border-gray-300 px-3 py-2 text-sm w-full sm:w-72 focus:border-blue-500 focus:outline-none rounded"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+            value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         </div>
-
         {loading ? (
           <div className="flex justify-center py-10">
             <div className="w-10 h-10 border-4 border-[#3399ff] border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : filtered.length === 0 ? (
           <div className="border border-yellow-300 bg-yellow-50 p-6 text-center">
-            <p className="font-bold text-gray-700">
-              {lang === "ar" ? "لا توجد دروس متاحة" : lang === "nl" ? "Geen lessen beschikbaar" : "No lessons available"}
-            </p>
+            <p className="font-bold text-gray-700">{lang === "ar" ? "لا توجد دروس متاحة" : lang === "nl" ? "Geen lessen beschikbaar" : "No lessons available"}</p>
           </div>
         ) : (
           <table className="w-full border-collapse lessons-table" style={{ tableLayout: "fixed" }}>
-            <colgroup>
-              <col style={{ width: "75%" }} />
-              <col style={{ width: "25%" }} />
-            </colgroup>
+            <colgroup><col style={{ width: "75%" }} /><col style={{ width: "25%" }} /></colgroup>
             <thead>
               <tr style={{ backgroundColor: "#3399ff" }}>
-                <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc]">
-                  {lang === "ar" ? "الدرس" : lang === "nl" ? "LES" : lang === "fr" ? "LEÇON" : "LESSON"}
-                </th>
-                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
-                  {lang === "ar" ? "فتح" : lang === "nl" ? "OPENEN" : lang === "fr" ? "OUVRIR" : "OPEN"}
-                </th>
+                <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc]">{lang === "ar" ? "الدرس" : lang === "nl" ? "LES" : lang === "fr" ? "LEÇON" : "LESSON"}</th>
+                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">{lang === "ar" ? "فتح" : lang === "nl" ? "OPENEN" : lang === "fr" ? "OUVRIR" : "OPEN"}</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((lesson, i) => (
                 <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#ddeeff" }}>
                   <td className="px-4 py-3 border border-gray-200 font-bold text-[#003399] text-base">
-                    {i + 1}. {translatedTitles[i] || lesson.title}
+                    {i + 1}. {translatedTitles[lessons.indexOf(lesson)] || lesson.title}
                   </td>
                   <td className="px-4 py-3 border border-gray-200 text-center">
-                    <button
-                      onClick={() => router.push(`/theorie/lesson?lessonId=${lesson.id}&category=${userCategory}&email=${userEmail}&lesson=${encodeURIComponent(lesson.title)}`)}
-                      className="bg-white border-2 border-gray-400 px-6 py-1.5 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors"
-                    >
+                    <button onClick={() => router.push(`/theorie/lesson?lessonId=${lesson.id}&category=${userCategory}&email=${userEmail}&lesson=${encodeURIComponent(lesson.title)}`)}
+                      className="bg-white border-2 border-gray-400 px-6 py-1.5 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors">
                       {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
                     </button>
                   </td>
