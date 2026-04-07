@@ -39,6 +39,40 @@ img, video {
   white-space: nowrap;
 }
 
+/* جداول الدروس على الموبايل */
+@media (max-width: 640px) {
+  .lessons-table {
+    display: block;
+  }
+  .lessons-table thead {
+    display: none;
+  }
+  .lessons-table tbody {
+    display: block;
+  }
+  .lessons-table tr {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #cce0ff;
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  .lessons-table td {
+    display: block;
+    border: none !important;
+    padding: 0 !important;
+  }
+  .lessons-table td:first-child {
+    flex: 1;
+    font-size: 14px;
+  }
+  .lessons-table td:last-child {
+    flex-shrink: 0;
+  }
+}
+
 /* إصلاح pre و code */
 pre, code {
   overflow-x: auto;

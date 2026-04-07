@@ -122,67 +122,106 @@ export default function ExamenPage() {
           {lang === "ar" ? "امتحانات رخصة القيادة" : lang === "nl" ? "THEORIE EXAMEN RIJBEWIJS" : lang === "fr" ? "EXAMEN THÉORIQUE PERMIS" : "THEORY DRIVING LICENSE EXAM"}
         </h1>
 
-        <table className="w-full border-collapse" style={{ tableLayout: "fixed" }}>
-          <colgroup>
-            <col style={{ width: "35%" }} />
-            <col style={{ width: "20%" }} />
-            <col style={{ width: "20%" }} />
-            <col style={{ width: "25%" }} />
-          </colgroup>
-          <thead>
-            <tr style={{ backgroundColor: "#3399ff" }}>
-              <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc]">
-                {lang === "ar" ? "الفئة" : lang === "nl" ? "CATEGORIE" : lang === "fr" ? "CATÉGORIE" : "CATEGORY"}
-              </th>
-              <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
-                {t.twoWeeks || "2 Weken"}
-              </th>
-              <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
-                {t.oneMonth || "1 Maand"}
-              </th>
-              <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
-                {lang === "ar" ? "اشترك" : lang === "nl" ? "INSCHRIJVEN" : lang === "fr" ? "S'INSCRIRE" : "SUBSCRIBE"}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {categories.map((cat, i) => (
-              <tr key={cat.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#ddeeff" }}>
-                <td className="px-4 py-3 border border-gray-200">
-                  <div className="font-black text-[#003399] text-base">{cat.name}</div>
-                  <div className="text-gray-500 text-sm">{cat.description}</div>
-                </td>
-                {durations.map((dur) => (
-                  <td key={dur.key} className="px-4 py-3 border border-gray-200 text-center">
+        {/* جدول على الشاشات الكبيرة */}
+        <div className="hidden sm:block">
+          <table className="w-full border-collapse lessons-table" style={{ tableLayout: "fixed" }}>
+            <colgroup>
+              <col style={{ width: "35%" }} />
+              <col style={{ width: "20%" }} />
+              <col style={{ width: "20%" }} />
+              <col style={{ width: "25%" }} />
+            </colgroup>
+            <thead>
+              <tr style={{ backgroundColor: "#3399ff" }}>
+                <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc]">
+                  {lang === "ar" ? "الفئة" : lang === "nl" ? "CATEGORIE" : lang === "fr" ? "CATÉGORIE" : "CATEGORY"}
+                </th>
+                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
+                  {t.twoWeeks || "2 Weken"}
+                </th>
+                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
+                  {t.oneMonth || "1 Maand"}
+                </th>
+                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
+                  {lang === "ar" ? "اشترك" : lang === "nl" ? "INSCHRIJVEN" : lang === "fr" ? "S'INSCRIRE" : "SUBSCRIBE"}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {categories.map((cat, i) => (
+                <tr key={cat.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#ddeeff" }}>
+                  <td className="px-4 py-3 border border-gray-200">
+                    <div className="font-black text-[#003399] text-base">{cat.name}</div>
+                    <div className="text-gray-500 text-sm">{cat.description}</div>
+                  </td>
+                  {durations.map((dur) => (
+                    <td key={dur.key} className="px-4 py-3 border border-gray-200 text-center">
+                      <button
+                        onClick={() => handleSelect(cat.id, dur.key, cat.name)}
+                        className={`px-4 py-1.5 text-sm font-bold border-2 transition-colors w-full ${
+                          globalSelection?.catId === cat.id && globalSelection?.duration === dur.key
+                            ? "bg-[#3399ff] text-white border-[#3399ff]"
+                            : "bg-white border-gray-400 hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff]"
+                        }`}
+                      >
+                        {dur.price}
+                      </button>
+                    </td>
+                  ))}
+                  <td className="px-4 py-3 border border-gray-200 text-center">
                     <button
-                      onClick={() => handleSelect(cat.id, dur.key, cat.name)}
-                      className={`px-4 py-1.5 text-sm font-bold border-2 transition-colors w-full ${
-                        globalSelection?.catId === cat.id && globalSelection?.duration === dur.key
-                          ? "bg-[#3399ff] text-white border-[#3399ff]"
-                          : "bg-white border-gray-400 hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff]"
+                      onClick={() => { if (globalSelection?.catId === cat.id) setIsCheckout(true); }}
+                      disabled={globalSelection?.catId !== cat.id}
+                      className={`px-6 py-1.5 text-sm font-bold border-2 transition-colors ${
+                        globalSelection?.catId === cat.id
+                          ? "bg-white border-gray-400 hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff]"
+                          : "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"
                       }`}
                     >
-                      {dur.price}
+                      {lang === "ar" ? "اشترك" : lang === "nl" ? "Inschrijven" : lang === "fr" ? "S'inscrire" : "Subscribe"}
                     </button>
                   </td>
-                ))}
-                <td className="px-4 py-3 border border-gray-200 text-center">
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* بطاقات على الموبايل */}
+        <div className="sm:hidden flex flex-col gap-4">
+          {categories.map((cat, i) => (
+            <div key={cat.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#ddeeff" }} className="border border-gray-200 p-4 rounded">
+              <div className="font-black text-[#003399] text-base mb-1">{cat.name}</div>
+              <div className="text-gray-500 text-sm mb-3">{cat.description}</div>
+              <div className="flex gap-2 mb-3">
+                {durations.map((dur) => (
                   <button
-                    onClick={() => { if (globalSelection?.catId === cat.id) setIsCheckout(true); }}
-                    disabled={globalSelection?.catId !== cat.id}
-                    className={`px-6 py-1.5 text-sm font-bold border-2 transition-colors ${
-                      globalSelection?.catId === cat.id
-                        ? "bg-white border-gray-400 hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff]"
-                        : "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"
+                    key={dur.key}
+                    onClick={() => handleSelect(cat.id, dur.key, cat.name)}
+                    className={`flex-1 py-2 text-sm font-bold border-2 transition-colors ${
+                      globalSelection?.catId === cat.id && globalSelection?.duration === dur.key
+                        ? "bg-[#3399ff] text-white border-[#3399ff]"
+                        : "bg-white border-gray-400"
                     }`}
                   >
-                    {lang === "ar" ? "اشترك" : lang === "nl" ? "Inschrijven" : lang === "fr" ? "S'inscrire" : "Subscribe"}
+                    {dur.label}<br/><span className="font-black">{dur.price}</span>
                   </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                ))}
+              </div>
+              <button
+                onClick={() => { if (globalSelection?.catId === cat.id) setIsCheckout(true); }}
+                disabled={globalSelection?.catId !== cat.id}
+                className={`w-full py-2.5 text-sm font-bold border-2 transition-colors ${
+                  globalSelection?.catId === cat.id
+                    ? "bg-[#3399ff] text-white border-[#3399ff]"
+                    : "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"
+                }`}
+              >
+                {lang === "ar" ? "اشترك الآن" : lang === "nl" ? "Inschrijven" : lang === "fr" ? "S'inscrire" : "Subscribe"}
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

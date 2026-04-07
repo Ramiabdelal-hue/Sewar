@@ -57,47 +57,69 @@ export default function VideoLessonsPage() {
           {t.prakticalTitle || "PRAKTIJK OEFENINGEN"}
         </h1>
 
-        <table className="w-full border-collapse" style={{ tableLayout: "fixed" }}>
-          <colgroup>
-            <col style={{ width: "50%" }} />
-            <col style={{ width: "25%" }} />
-            <col style={{ width: "25%" }} />
-          </colgroup>
-          <thead>
-            <tr style={{ backgroundColor: "#3399ff" }}>
-              <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc]">
-                {lang === "ar" ? "النوع" : lang === "nl" ? "TYPE" : lang === "fr" ? "TYPE" : "TYPE"}
-              </th>
-              <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
-                {lang === "ar" ? "السعر" : lang === "nl" ? "PRIJS" : lang === "fr" ? "PRIX" : "PRICE"}
-              </th>
-              <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
-                {lang === "ar" ? "اختيار" : lang === "nl" ? "KIES" : lang === "fr" ? "CHOISIR" : "SELECT"}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {options.map((item, i) => (
-              <tr key={item.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#ddeeff" }}>
-                <td className="px-4 py-3 border border-gray-200">
-                  <div className="font-black text-[#003399] text-base">{item.title}</div>
-                  <div className="text-gray-500 text-sm mt-1">{item.description}</div>
-                </td>
-                <td className="px-4 py-3 border border-gray-200 text-center font-black text-[#003399] text-lg">
-                  {item.price}
-                </td>
-                <td className="px-4 py-3 border border-gray-200 text-center">
-                  <button
-                    onClick={() => { setSelectedBox(item.id); setIsCheckout(true); }}
-                    className="bg-white border-2 border-gray-400 px-6 py-1.5 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors"
-                  >
-                    {lang === "ar" ? "اشترك" : lang === "nl" ? "Inschrijven" : lang === "fr" ? "S'inscrire" : "Subscribe"}
-                  </button>
-                </td>
+        {/* جدول على الشاشات الكبيرة، بطاقات على الموبايل */}
+        <div className="hidden sm:block">
+          <table className="w-full border-collapse lessons-table" style={{ tableLayout: "fixed" }}>
+            <colgroup>
+              <col style={{ width: "50%" }} />
+              <col style={{ width: "25%" }} />
+              <col style={{ width: "25%" }} />
+            </colgroup>
+            <thead>
+              <tr style={{ backgroundColor: "#3399ff" }}>
+                <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc]">
+                  {lang === "ar" ? "النوع" : lang === "nl" ? "TYPE" : lang === "fr" ? "TYPE" : "TYPE"}
+                </th>
+                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
+                  {lang === "ar" ? "السعر" : lang === "nl" ? "PRIJS" : lang === "fr" ? "PRIX" : "PRICE"}
+                </th>
+                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
+                  {lang === "ar" ? "اختيار" : lang === "nl" ? "KIES" : lang === "fr" ? "CHOISIR" : "SELECT"}
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {options.map((item, i) => (
+                <tr key={item.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#ddeeff" }}>
+                  <td className="px-4 py-3 border border-gray-200">
+                    <div className="font-black text-[#003399] text-base">{item.title}</div>
+                    <div className="text-gray-500 text-sm mt-1">{item.description}</div>
+                  </td>
+                  <td className="px-4 py-3 border border-gray-200 text-center font-black text-[#003399] text-lg">
+                    {item.price}
+                  </td>
+                  <td className="px-4 py-3 border border-gray-200 text-center">
+                    <button
+                      onClick={() => { setSelectedBox(item.id); setIsCheckout(true); }}
+                      className="bg-white border-2 border-gray-400 px-6 py-1.5 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors"
+                    >
+                      {lang === "ar" ? "اشترك" : lang === "nl" ? "Inschrijven" : lang === "fr" ? "S'inscrire" : "Subscribe"}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* بطاقات على الموبايل */}
+        <div className="sm:hidden flex flex-col gap-3">
+          {options.map((item, i) => (
+            <div key={item.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#ddeeff" }} className="border border-gray-200 p-4 rounded">
+              <div className="font-black text-[#003399] text-base mb-1">{item.title}</div>
+              <div className="text-gray-500 text-sm mb-3">{item.description}</div>
+              <div className="flex items-center justify-between">
+                <span className="font-black text-[#003399] text-xl">{item.price}</span>
+                <button
+                  onClick={() => { setSelectedBox(item.id); setIsCheckout(true); }}
+                  className="bg-[#3399ff] text-white border-2 border-[#3399ff] px-5 py-2 text-sm font-bold"
+                >
+                  {lang === "ar" ? "اشترك" : lang === "nl" ? "Inschrijven" : lang === "fr" ? "S'inscrire" : "Subscribe"}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

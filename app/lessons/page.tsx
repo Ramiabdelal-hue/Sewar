@@ -149,7 +149,7 @@ function LessonsContent() {
             </p>
           </div>
         ) : (
-          <table className="w-full border-collapse" style={{ tableLayout: "fixed" }}>
+          <table className="w-full border-collapse lessons-table" style={{ tableLayout: "fixed" }}>
             <colgroup>
               <col style={{ width: "75%" }} />
               <col style={{ width: "25%" }} />
