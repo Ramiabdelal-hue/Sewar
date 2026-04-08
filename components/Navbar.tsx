@@ -102,7 +102,7 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
         <div className="max-w-5xl mx-auto px-3 py-2 flex items-center justify-between">
           {/* اللوغو + اسم الموقع */}
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.href = "/"}>
-            <Image src="/logo.png" alt="Logo" width={70} height={70} className="rounded" />
+            <Image src="/logo.png" alt="Logo" width={70} height={70} className="rounded object-contain" style={{ maxHeight: '45px', width: 'auto' }} />
             <span className="text-base md:text-2xl font-black tracking-wide uppercase hidden sm:inline">
               S &amp; A Rijacademie
             </span>
