@@ -31,11 +31,11 @@ export default function Hero({ onSelect }: HeroProps) {
           style={{ background: "radial-gradient(circle, #d4af37, transparent)" }}
         ></div>
 
-        <div className="relative rounded-2xl overflow-hidden flex flex-col border"
+        <div className="relative rounded-2xl flex flex-col border"
           style={{ borderColor: "#d4af37", boxShadow: "0 0 60px rgba(212,175,55,0.3), 0 25px 50px rgba(0,0,0,0.8)" }}
         >
           {/* صورة الخلفية */}
-          <div className="relative h-56 md:h-72 group overflow-hidden">
+          <div className="relative h-56 md:h-72 group overflow-hidden rounded-t-2xl">
             <Image
               src="/hero.jpg"
               alt="Driving lesson"
