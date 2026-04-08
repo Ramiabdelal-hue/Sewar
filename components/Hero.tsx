@@ -91,7 +91,7 @@ export default function Hero({ onSelect }: HeroProps) {
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-black mb-4 leading-tight"
               style={{ color: "#d4af37", textShadow: "0 0 30px rgba(212,175,55,0.4)" }}
             >
-              {t.heroTitle}
+              <Image src="/logo.png" alt="S & A Rijacademie" width={220} height={220} className="object-contain mx-auto md:mx-0" style={{ filter: 'drop-shadow(0 0 20px rgba(212,175,55,0.5))' }} />
             </h1>
 
             <p className="mb-8 text-sm md:text-base leading-relaxed" style={{ color: "#a0a0a0" }}>
