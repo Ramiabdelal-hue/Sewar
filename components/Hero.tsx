@@ -89,7 +89,7 @@ export default function Hero({ onSelect }: HeroProps) {
             </div>
 
             <div className="mb-4">
-              <Image src="/logo.png" alt="S & A Rijacademie" width={200} height={100} className="object-contain" style={{ filter: 'drop-shadow(0 0 20px rgba(212,175,55,0.8)) brightness(1.2)', maxHeight: '100px', width: 'auto' }} />
+              <Image src="/logo.jpg" alt="S & A Rijacademie" width={200} height={100} className="object-contain" style={{ filter: 'drop-shadow(0 0 20px rgba(212,175,55,0.8)) brightness(1.2)', maxHeight: '100px', width: 'auto' }} />
             </div>
 
             <p className="mb-8 text-sm md:text-base leading-relaxed" style={{ color: "#a0a0a0" }}>
