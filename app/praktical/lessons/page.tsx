@@ -144,7 +144,7 @@ function LessonsContent() {
                   </td>
                   <td className="px-4 py-3 border border-gray-200 text-center">
                     <button
-                      onClick={() => router.push(`/lesson?lessonId=${lesson.id}&title=${encodeURIComponent(lesson.title)}&type=praktical&email=${userEmail}`)}
+                      onClick={() => router.push(`/praktical/lesson?lessonId=${lesson.id}&title=${encodeURIComponent(lesson.title)}&email=${userEmail}`)}
                       className="bg-white border-2 border-gray-400 px-6 py-1.5 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors"
                     >
                       {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
