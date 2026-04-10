@@ -27,6 +27,11 @@ function LessonsContent() {
   const [prefillData, setPrefillData] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [checking, setChecking] = useState(true);
+  const [lessons, setLessons] = useState<any[]>([]);
+  const [loadingLessons, setLoadingLessons] = useState(true);
+
+  // Hook دائماً في الأعلى
+  const translatedTitles = useAutoTranslateList(lessons.map(l => l.title), lang);
 
   useEffect(() => {
     if (userEmail) localStorage.setItem("userEmail", userEmail);
@@ -48,21 +53,24 @@ function LessonsContent() {
     checkSubscription();
   }, [userEmail, exp]);
 
-  const videoLessons = [
-    { key: "videoLesson1" }, { key: "videoLesson2" }, { key: "videoLesson3" },
-    { key: "videoLesson4" }, { key: "videoLesson5" }, { key: "videoLesson6" },
-    { key: "videoLesson7" }, { key: "videoLesson8" }, { key: "videoLesson9" },
-    { key: "videoLesson10" }, { key: "videoLesson11" }, { key: "videoLesson12" }
-  ];
+  // جلب الدروس من قاعدة البيانات
+  useEffect(() => {
+    const fetchLessons = async () => {
+      try {
+        const res = await fetch("/api/praktijk/lessons?type=training");
+        const data = await res.json();
+        if (data.success) setLessons(data.lessons);
+      } catch (e) { console.error(e); }
+      finally { setLoadingLessons(false); }
+    };
+    fetchLessons();
+  }, []);
 
-  const filtered = videoLessons.filter(l =>
-    (t[l.key] || "").toLowerCase().includes(searchTerm.toLowerCase())
+  const filtered = lessons.filter(l =>
+    l.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // ترجمة أسماء الدروس تلقائياً
-  const translatedTitles = useAutoTranslateList(filtered.map(l => t[l.key] || ""), lang);
-
-  if (checking) {
+  if (checking || loadingLessons) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
@@ -93,56 +101,60 @@ function LessonsContent() {
   return (
     <div className="min-h-screen bg-white" dir={lang === "ar" ? "rtl" : "ltr"}>
       <Navbar />
-
       <div className="w-full px-4 py-6">
         <h1 className="text-xl sm:text-2xl font-black text-[#003399] uppercase border-b-4 border-[#003399] pb-3 mb-5">
           {lang === "ar" ? "فيديوهات تدريبية عملية" : lang === "nl" ? "PRAKTIJK OEFENVIDEO'S" : lang === "fr" ? "VIDÉOS PRATIQUES" : "PRACTICAL TRAINING VIDEOS"}
         </h1>
 
         <div className="mb-4">
-          <input
-            type="text"
+          <input type="text"
             placeholder={lang === "ar" ? "ابحث عن درس..." : lang === "nl" ? "Zoek een les..." : lang === "fr" ? "Rechercher..." : "Search..."}
             className="border border-gray-300 px-3 py-2 text-sm w-full sm:w-72 focus:border-blue-500 focus:outline-none rounded"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
-        <table className="w-full border-collapse lessons-table" style={{ tableLayout: "fixed" }}>
-          <colgroup>
-            <col style={{ width: "75%" }} />
-            <col style={{ width: "25%" }} />
-          </colgroup>
-          <thead>
-            <tr style={{ backgroundColor: "#3399ff" }}>
-              <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc]">
-                {lang === "ar" ? "الدرس" : lang === "nl" ? "LES" : lang === "fr" ? "LEÇON" : "LESSON"}
-              </th>
-              <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
-                {lang === "ar" ? "فتح" : lang === "nl" ? "OPENEN" : lang === "fr" ? "OUVRIR" : "OPEN"}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((lesson, i) => (
-              <tr key={i} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#ddeeff" }}>
-                <td className="px-4 py-3 border border-gray-200 font-bold text-[#003399] text-base">
-                  {i + 1}. {translatedTitles[i] || t[lesson.key]}
-                </td>
-                <td className="px-4 py-3 border border-gray-200 text-center">
-                  <button
-                    onClick={() => router.push(`/lesson?title=${encodeURIComponent(t[lesson.key])}&type=praktical`)}
-                    className="bg-white border-2 border-gray-400 px-6 py-1.5 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors"
-                  >
-                    {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
-                  </button>
-                </td>
+        {filtered.length === 0 ? (
+          <div className="border border-yellow-300 bg-yellow-50 p-6 text-center">
+            <p className="font-bold text-gray-700">
+              {lang === "ar" ? "لا توجد دروس متاحة" : lang === "nl" ? "Geen lessen beschikbaar" : "No lessons available"}
+            </p>
+          </div>
+        ) : (
+          <table className="w-full border-collapse lessons-table" style={{ tableLayout: "fixed" }}>
+            <colgroup>
+              <col style={{ width: "75%" }} />
+              <col style={{ width: "25%" }} />
+            </colgroup>
+            <thead>
+              <tr style={{ backgroundColor: "#3399ff" }}>
+                <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc]">
+                  {lang === "ar" ? "الدرس" : lang === "nl" ? "LES" : lang === "fr" ? "LEÇON" : "LESSON"}
+                </th>
+                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
+                  {lang === "ar" ? "فتح" : lang === "nl" ? "OPENEN" : lang === "fr" ? "OUVRIR" : "OPEN"}
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-
+            </thead>
+            <tbody>
+              {filtered.map((lesson, i) => (
+                <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#ddeeff" }}>
+                  <td className="px-4 py-3 border border-gray-200 font-bold text-[#003399] text-base">
+                    {i + 1}. {translatedTitles[lessons.indexOf(lesson)] || lesson.title}
+                  </td>
+                  <td className="px-4 py-3 border border-gray-200 text-center">
+                    <button
+                      onClick={() => router.push(`/lesson?lessonId=${lesson.id}&title=${encodeURIComponent(lesson.title)}&type=praktical&email=${userEmail}`)}
+                      className="bg-white border-2 border-gray-400 px-6 py-1.5 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors"
+                    >
+                      {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
         <p className="text-xs text-gray-400 mt-3">
           {lang === "ar" ? `إجمالي: ${filtered.length} درس` : `Total: ${filtered.length} lessons`}
         </p>
