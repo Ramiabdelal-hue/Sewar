@@ -26,9 +26,11 @@ function PrakticalLessonContent() {
       try {
         const res = await fetch(`/api/praktijk/questions?lessonId=${lessonId}`);
         const data = await res.json();
+        console.log("📦 Lesson data:", data);
         if (data.success) {
           setLesson(data.lesson);
           setQuestions(data.questions || []);
+          console.log(`✅ Loaded ${data.questions?.length} questions`);
         }
       } catch (e) { console.error(e); }
       finally { setLoading(false); }
@@ -82,10 +84,10 @@ function PrakticalLessonContent() {
               {currentQ && (
                 <div className="p-6">
                   {/* فيديوهات السؤال */}
-                  {currentQ.videoUrls?.length > 0 && (
+                  {currentQ.videoUrls && Array.isArray(currentQ.videoUrls) && currentQ.videoUrls.length > 0 && (
                     <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {currentQ.videoUrls.map((url: string, i: number) => (
-                        <video key={i} controls className="w-full rounded-lg border border-gray-200">
+                        url && <video key={i} controls className="w-full rounded-lg border border-gray-200">
                           <source src={url} />
                         </video>
                       ))}
