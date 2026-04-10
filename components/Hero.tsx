@@ -58,31 +58,33 @@ export default function Hero({ onSelect }: HeroProps) {
               </span>
             </div>
 
-            {/* اللوغو فوق الصورة في المنتصف */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-30">
-              <div className="rounded-full p-2 border-4"
-                style={{ background: "#0f0f0f", borderColor: "#d4af37", boxShadow: "0 0 30px rgba(212,175,55,0.6)" }}
-              >
-                <Image
-                  src="/logo.jpg"
-                  alt="S & A Rijacademie"
-                  width={120}
-                  height={120}
-                  className="rounded-full object-cover"
-                  style={{ width: '120px', height: '120px' }}
-                />
-              </div>
-            </div>
+            {/* اللوغو فوق الصورة في المنتصف - أزلناه من هنا */}
           </div>
 
           {/* قسم المحتوى */}
-          <div className="flex flex-col items-center text-center pt-20 pb-8 px-6 md:px-12 relative"
+          <div className="flex flex-col items-center text-center pt-8 pb-8 px-6 md:px-12 relative"
             style={{ background: "linear-gradient(135deg, #0f0f0f 0%, #1c1c1c 100%)" }}
           >
             {/* خطوط ذهبية */}
             <div className="absolute top-0 left-0 w-full h-0.5"
               style={{ background: "linear-gradient(to right, transparent, #d4af37, transparent)" }}
             ></div>
+
+            {/* اللوغو دائري كامل في المنتصف */}
+            <div className="mb-6">
+              <div className="rounded-full p-1 border-4 inline-block"
+                style={{ background: "white", borderColor: "#d4af37", boxShadow: "0 0 30px rgba(212,175,55,0.6)" }}
+              >
+                <Image
+                  src="/logo.jpg"
+                  alt="S & A Rijacademie"
+                  width={130}
+                  height={130}
+                  className="rounded-full object-cover"
+                  style={{ width: '130px', height: '130px' }}
+                />
+              </div>
+            </div>
 
             <p className="text-sm md:text-base leading-relaxed mb-6 max-w-xl" style={{ color: "#a0a0a0" }}>
               {t.heroText}
