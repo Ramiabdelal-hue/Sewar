@@ -56,19 +56,15 @@ function QuestionWithLanguages({ question, lang }: { question: Question; lang: s
   }, [originalText, lang]);
 
   return (
-    <div className="mb-6 bg-purple-50 border-2 border-purple-200 rounded-2xl p-6">
-      <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
-        <svg className="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+    <div className="mb-4">
+      <h3 className="text-xs font-black text-[#003399] uppercase tracking-wider mb-2 flex items-center gap-1">
+        <span className="w-1 h-4 bg-[#003399] rounded-full inline-block"></span>
         {lang === "ar" ? "السؤال" : lang === "nl" ? "Vraag" : lang === "fr" ? "Question" : "Question"}
-        {translating && <span className="text-xs text-purple-400 animate-pulse">...ترجمة</span>}
+        {translating && <span className="text-xs text-blue-400 animate-pulse ml-2">...</span>}
       </h3>
-      <div className="bg-white p-6 rounded-xl border border-gray-200">
-        <p className={`text-xl text-gray-800 leading-relaxed ${lang === "ar" ? "text-right" : "text-left"}`}>
-          {translatedText}
-        </p>
-      </div>
+      <p className={`text-lg font-bold text-gray-900 leading-relaxed ${lang === "ar" ? "text-right" : "text-left"}`}>
+        {translatedText}
+      </p>
     </div>
   );
 }
@@ -104,16 +100,14 @@ function ExplanationWithLanguages({ question, lang }: { question: Question; lang
   if (!originalText) return null;
 
   return (
-    <div className="mb-6 bg-blue-50 border-2 border-blue-200 rounded-2xl p-6">
-      <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
-        <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-        </svg>
+    <div className="mt-4 pt-4 border-t border-gray-100">
+      <h3 className="text-xs font-black text-green-700 uppercase tracking-wider mb-2 flex items-center gap-1">
+        <span className="w-1 h-4 bg-green-500 rounded-full inline-block"></span>
         {lang === "ar" ? "الشرح" : lang === "nl" ? "Uitleg" : lang === "fr" ? "Explication" : "Explanation"}
-        {translating && <span className="text-xs text-blue-400 animate-pulse">...ترجمة</span>}
+        {translating && <span className="text-xs text-green-400 animate-pulse ml-2">...</span>}
       </h3>
-      <div className="bg-white p-6 rounded-xl border border-gray-200">
-        <p className={`text-lg text-gray-700 leading-relaxed ${lang === "ar" ? "text-right" : "text-left"}`}>
+      <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+        <p className={`text-sm text-green-900 leading-relaxed ${lang === "ar" ? "text-right" : "text-left"}`}>
           {translatedText}
         </p>
       </div>
@@ -453,83 +447,89 @@ function LessonViewContent() {
           </div>
 
           {/* Question Card */}
-          <div className="bg-white rounded-3xl shadow-xl p-8 mb-6">
-            {/* Question Number Badge */}
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-600 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                {currentIndex + 1}
+          <div className="mb-6 rounded-3xl overflow-hidden shadow-2xl border border-gray-100">
+            
+            {/* شريط رقم السؤال */}
+            <div className="flex items-center justify-between px-6 py-4"
+              style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-white font-black text-lg">
+                  {currentIndex + 1}
+                </div>
+                <span className="text-white font-bold text-sm opacity-80">
+                  {lang === "ar" ? "السؤال" : lang === "nl" ? "Vraag" : lang === "fr" ? "Question" : "Question"}
+                </span>
               </div>
-              <div>
-                <p className="text-sm text-gray-500 font-medium">
-                  {lang === "ar" ? "السؤال" : lang === "nl" ? "Vraag" : "Question"}
-                </p>
-                <p className="text-lg font-bold text-gray-800">
-                  {currentIndex + 1} / {filteredQuestions.length}
-                </p>
-              </div>
+              <span className="text-white/70 text-sm font-bold">
+                {currentIndex + 1} / {filteredQuestions.length}
+              </span>
             </div>
 
-            {/* Images/Videos - في الأول */}
+            {/* الصور */}
             {currentQuestion.videoUrls && currentQuestion.videoUrls.length > 0 && (
-              <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className={`grid gap-2 p-3 bg-gray-900 ${currentQuestion.videoUrls.length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
                 {currentQuestion.videoUrls.map((url, idx) => (
-                  <img
-                    key={idx}
-                    src={url}
-                    alt={`Question image ${idx + 1}`}
-                    className="w-full h-64 object-cover rounded-2xl border-4 border-gray-100 shadow-lg hover:shadow-xl transition-shadow"
-                  />
+                  <div key={idx} className="relative overflow-hidden rounded-xl" style={{ aspectRatio: currentQuestion.videoUrls!.length === 1 ? "16/9" : "4/3" }}>
+                    <img
+                      src={url}
+                      alt={`Image ${idx + 1}`}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 cursor-zoom-in"
+                      onClick={() => window.open(url, '_blank')}
+                    />
+                    <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
+                      {idx + 1}/{currentQuestion.videoUrls!.length}
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
 
             {/* Audio */}
             {currentQuestion.audioUrl && (
-              <div className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 p-4 rounded-2xl border-2 border-purple-200">
-                <p className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
-                  <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                  </svg>
-                  {lang === "ar" ? "الملف الصوتي" : lang === "nl" ? "Audio" : "Audio"}
-                </p>
-                <audio controls className="w-full">
+              <div className="px-6 py-4 bg-gradient-to-r from-purple-50 to-indigo-50 border-b border-purple-100">
+                <audio controls className="w-full h-10">
                   <source src={currentQuestion.audioUrl} type="audio/mpeg" />
                 </audio>
               </div>
             )}
 
-            {/* Question Text with Language Buttons */}
-            <QuestionWithLanguages question={currentQuestion} lang={lang} />
+            {/* نص السؤال */}
+            <div className="px-6 py-5 bg-white">
+              <QuestionWithLanguages question={currentQuestion} lang={lang} />
+            </div>
 
-            {/* Explanations with Language Buttons */}
+            {/* الشرح */}
             {(currentQuestion.explanationNL || currentQuestion.explanationFR || currentQuestion.explanationAR) && (
-              <ExplanationWithLanguages question={currentQuestion} lang={lang} />
+              <div className="px-6 pb-5 bg-white">
+                <ExplanationWithLanguages question={currentQuestion} lang={lang} />
+              </div>
             )}
           </div>
 
-          {/* Navigation */}
-          <div className="flex gap-4">
+          {/* أزرار التنقل */}
+          <div className="flex gap-3">
             <button
               onClick={handlePrevious}
               disabled={currentIndex === 0}
-              className={`flex-1 py-4 rounded-2xl font-bold text-lg transition-all ${
+              className={`flex-1 py-4 rounded-2xl font-black text-base transition-all flex items-center justify-center gap-2 ${
                 currentIndex === 0
-                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "bg-white text-gray-700 hover:bg-gray-50 shadow-lg border-2 border-gray-200"
+                  ? "bg-gray-100 text-gray-300 cursor-not-allowed"
+                  : "bg-white text-[#003399] hover:bg-[#ddeeff] shadow-lg border-2 border-[#3399ff] active:scale-95"
               }`}
             >
-              {lang === "ar" ? "السابق" : lang === "nl" ? "Vorige" : "Précédent"}
+              ← {lang === "ar" ? "السابق" : lang === "nl" ? "Vorige" : lang === "fr" ? "Précédent" : "Previous"}
             </button>
             <button
               onClick={handleNext}
               disabled={currentIndex === filteredQuestions.length - 1}
-              className={`flex-1 py-4 rounded-2xl font-bold text-lg transition-all ${
+              className={`flex-1 py-4 rounded-2xl font-black text-base transition-all flex items-center justify-center gap-2 ${
                 currentIndex === filteredQuestions.length - 1
-                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "bg-gradient-to-r from-orange-500 to-amber-600 text-white hover:from-orange-600 hover:to-amber-700 shadow-lg"
+                  ? "bg-gray-100 text-gray-300 cursor-not-allowed"
+                  : "text-white shadow-lg active:scale-95"
               }`}
+              style={currentIndex < filteredQuestions.length - 1 ? { background: "linear-gradient(135deg, #003399, #0055cc)" } : {}}
             >
-              {lang === "ar" ? "التالي" : lang === "nl" ? "Volgende" : "Suivant"}
+              {lang === "ar" ? "التالي" : lang === "nl" ? "Volgende" : lang === "fr" ? "Suivant" : "Next"} →
             </button>
           </div>
         </div>
