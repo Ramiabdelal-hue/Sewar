@@ -49,7 +49,10 @@ export async function POST(request: NextRequest) {
         subscriptionType: user.subscriptionType || "theorie",
         examCategory: user.examCategory,
         expiryDate: user.expiryDate
-      }
+      },
+      subscriptions: await prisma.subscription.findMany({
+        where: { userId: user.id, isActive: true, expiryDate: { gt: now } }
+      })
     });
 
   } catch (error) {

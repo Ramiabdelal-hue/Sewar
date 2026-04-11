@@ -21,6 +21,29 @@ export default function VideoLessonsPage() {
   useEffect(() => {
     const stored = localStorage.getItem("renewPrefillData");
     if (stored) setPrefillData(JSON.parse(stored));
+
+    // إذا كان مشتركاً في praktijk-lessons، وجهه مباشرة
+    const email = localStorage.getItem("userEmail");
+    if (email) {
+      fetch("/api/check-subscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success && data.subscriptions) {
+            const praktijkLessons = data.subscriptions.find((s: any) => s.subscriptionType === "praktijk-lessons");
+            const praktijkExam = data.subscriptions.find((s: any) => s.subscriptionType === "praktijk-exam");
+            if (praktijkLessons) {
+              window.location.assign(`/praktical/lessons?email=${encodeURIComponent(email)}&exp=${new Date(praktijkLessons.expiryDate).getTime()}`);
+            } else if (praktijkExam) {
+              window.location.assign(`/praktical/exam?email=${encodeURIComponent(email)}&exp=${new Date(praktijkExam.expiryDate).getTime()}`);
+            }
+          }
+        })
+        .catch(() => {});
+    }
   }, []);
 
   const options = [
