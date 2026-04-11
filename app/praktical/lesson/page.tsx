@@ -20,19 +20,23 @@ function PrakticalLessonContent() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
+    console.log("🔍 lessonId from URL:", lessonId);
     if (!lessonId) { router.push("/"); return; }
 
     const fetchLesson = async () => {
       try {
-        const res = await fetch(`/api/praktijk/questions?lessonId=${lessonId}`);
+        const url = `/api/praktijk/questions?lessonId=${lessonId}`;
+        console.log("📡 Fetching:", url);
+        const res = await fetch(url);
         const data = await res.json();
-        console.log("📦 Lesson data:", data);
+        console.log("📦 Response:", JSON.stringify(data).substring(0, 200));
         if (data.success) {
           setLesson(data.lesson);
-          setQuestions(data.questions || []);
-          console.log(`✅ Loaded ${data.questions?.length} questions`);
+          const qs = data.questions || data.lesson?.questions || [];
+          setQuestions(qs);
+          console.log(`✅ Questions loaded: ${qs.length}`);
         }
-      } catch (e) { console.error(e); }
+      } catch (e) { console.error("❌ Error:", e); }
       finally { setLoading(false); }
     };
     fetchLesson();
@@ -130,6 +134,7 @@ function PrakticalLessonContent() {
             <p className="font-bold text-gray-700">
               {lang === "ar" ? "لا يوجد محتوى لهذا الدرس بعد" : lang === "nl" ? "Nog geen inhoud voor deze les" : "No content yet for this lesson"}
             </p>
+            <p className="text-xs text-gray-400 mt-2">lessonId: {lessonId}</p>
           </div>
         )}
       </div>
