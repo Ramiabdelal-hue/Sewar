@@ -65,6 +65,29 @@ export default function TheoriePage() {
       });
       const data = await res.json();
       if (data.expired || !data.success) { setIsExpired(true); setLoading(false); return; }
+
+      // التحقق إن الاشتراك من نوع theorie فقط
+      const subs = data.subscriptions || [];
+      const hasTheorie = subs.some((s: any) => s.subscriptionType === "theorie") || 
+                         data.user?.subscriptionType === "theorie";
+      
+      if (!hasTheorie && subs.length > 0) {
+        // ليس لديه اشتراك theorie - أعد توجيهه
+        const praktijkLessons = subs.find((s: any) => s.subscriptionType === "praktijk-lessons");
+        const praktijkExam = subs.find((s: any) => s.subscriptionType === "praktijk-exam");
+        const examen = subs.find((s: any) => s.subscriptionType === "examen");
+        
+        if (praktijkLessons) {
+          window.location.assign(`/praktical/lessons?email=${encodeURIComponent(email)}&exp=${new Date(praktijkLessons.expiryDate).getTime()}`);
+        } else if (praktijkExam) {
+          window.location.assign(`/praktical/exam?email=${encodeURIComponent(email)}&exp=${new Date(praktijkExam.expiryDate).getTime()}`);
+        } else if (examen) {
+          window.location.assign(`/examen?email=${encodeURIComponent(email)}&cat=${examen.category}&exp=${new Date(examen.expiryDate).getTime()}`);
+        }
+        setLoading(false);
+        return;
+      }
+
       const lessonsRes = await fetch(`/api/lessons?category=${category}&questionType=Theori`);
       const lessonsData = await lessonsRes.json();
       if (lessonsData.success) setLessons(lessonsData.lessons);
