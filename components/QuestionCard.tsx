@@ -87,11 +87,34 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
       {question.videoUrls && question.videoUrls.filter(Boolean).length > 0 && (
         <div className={`grid gap-1 bg-gray-900 p-2 ${question.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
           {question.videoUrls.filter(Boolean).map((url, i) => (
-            <div key={i} className="relative overflow-hidden rounded-xl"
+            <div key={i} className="relative overflow-hidden rounded-xl select-none"
               style={{ aspectRatio: question.videoUrls!.filter(Boolean).length === 1 ? "16/9" : "4/3" }}>
               <img src={url} alt={`img ${i + 1}`}
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 cursor-zoom-in"
-                onClick={() => window.open(url, '_blank')} />
+                className="w-full h-full object-cover"
+                draggable={false}
+                onContextMenu={(e) => e.preventDefault()}
+              />
+              {/* Watermark شبكي */}
+              <div className="absolute inset-0 pointer-events-none"
+                style={{
+                  backgroundImage: `repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 60px,
+                    rgba(255,255,255,0.08) 60px,
+                    rgba(255,255,255,0.08) 61px
+                  )`,
+                }}>
+              </div>
+              {/* Logo watermark في الزاوية */}
+              <div className="absolute bottom-2 right-2 pointer-events-none select-none opacity-60">
+                <img src="/logo.jpg" alt="Sewar" 
+                  style={{ width: '50px', height: '50px', objectFit: 'contain', filter: 'drop-shadow(0 0 3px rgba(0,0,0,0.8))' }}
+                  draggable={false}
+                  onContextMenu={(e) => e.preventDefault()}
+                />
+              </div>
+              {/* رقم الصورة */}
               {question.videoUrls!.filter(Boolean).length > 1 && (
                 <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
                   {i + 1}/{question.videoUrls!.filter(Boolean).length}
