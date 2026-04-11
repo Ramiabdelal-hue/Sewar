@@ -75,20 +75,17 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
       expiry: data.exp
     });
     
-    // التحقق من نوع الاختيار (praktical أو theorie أو examen)
-    if (selectedCatId === "lessons" || selectedCatId === "exam") {
-      window.location.assign(
-        `/praktical/${selectedCatId}?email=${encodeURIComponent(data.email)}&exp=${data.exp}`
-      );
-    } else if (selectedCatId === "cat-a" || selectedCatId === "cat-b" || selectedCatId === "cat-c" || selectedCatId === "A" || selectedCatId === "B" || selectedCatId === "C") {
-      // للامتحانات أو الفئات المباشرة، استخدم الفئة الصحيحة
-      window.location.assign(
-        `/lessons?cat=${userCategory}&email=${encodeURIComponent(data.email)}&exp=${data.exp}`
-      );
+    // التحقق من نوع الاختيار
+    if (selectedCatId === "lessons") {
+      window.location.assign(`/praktical/lessons?email=${encodeURIComponent(data.email)}&exp=${data.exp}`);
+    } else if (selectedCatId === "exam") {
+      window.location.assign(`/praktical/exam?email=${encodeURIComponent(data.email)}&exp=${data.exp}`);
+    } else if (selectedCatId === "cat-a" || selectedCatId === "cat-b" || selectedCatId === "cat-c") {
+      // examen categories
+      window.location.assign(`/examen?email=${encodeURIComponent(data.email)}&cat=${userCategory}&exp=${data.exp}`);
     } else {
-      window.location.assign(
-        `/lessons?cat=${userCategory}&email=${encodeURIComponent(data.email)}&exp=${data.exp}`
-      );
+      // theorie A/B/C
+      window.location.assign(`/lessons?cat=${userCategory}&email=${encodeURIComponent(data.email)}&exp=${data.exp}`);
     }
   };
 
@@ -121,7 +118,11 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
       } else if (selectedCatId === "exam") {
         subscriptionType = "praktijk-exam";
       } else if (selectedCatId === "cat-a" || selectedCatId === "cat-b" || selectedCatId === "cat-c") {
+        // من صفحة examen
         subscriptionType = "examen";
+      } else if (selectedCatId === "A" || selectedCatId === "B" || selectedCatId === "C") {
+        // من صفحة theorie
+        subscriptionType = "theorie";
       }
 
       const expiryDate = new Date();
