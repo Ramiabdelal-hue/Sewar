@@ -8,6 +8,7 @@ import fr from "@/locales/fr.json";
 import ar from "@/locales/ar.json";
 import en from "@/locales/en.json";
 import Navbar from "@/components/Navbar";
+import QuestionCard from "@/components/QuestionCard";
 import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
 
 interface Question {
@@ -226,120 +227,14 @@ function TheorieLessonContent() {
           </div>
 
           {/* Question Card */}
-          <div className="bg-white rounded-3xl shadow-xl p-8 mb-6">
-            <p className="text-xl text-gray-800 leading-relaxed mb-6 font-medium">{translatedTexts[0] || currentQuestion.text}</p>
-
-            {/* Images */}
-            {currentQuestion.imageUrls && currentQuestion.imageUrls.length > 0 && (
-              <div className="mb-6 grid grid-cols-2 md:grid-cols-3 gap-4">
-                {currentQuestion.imageUrls.map((url, idx) => (
-                  <img
-                    key={idx}
-                    src={url}
-                    alt={`Question image ${idx + 1}`}
-                    className="w-full h-48 object-cover rounded-2xl border-4 border-gray-100 shadow-md"
-                  />
-                ))}
-              </div>
-            )}
-
-            {/* Audio */}
-            {currentQuestion.audioUrl && (
-              <div className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 p-4 rounded-2xl border-2 border-purple-200">
-                <audio controls className="w-full">
-                  <source src={currentQuestion.audioUrl} type="audio/mpeg" />
-                </audio>
-              </div>
-            )}
-
-            {/* Show Answer Button */}
-            {!showAnswer && (
-              <button
-                onClick={() => setShowAnswer(true)}
-                className="w-full bg-gradient-to-r from-orange-500 to-amber-600 text-white py-4 rounded-2xl font-bold text-lg hover:from-orange-600 hover:to-amber-700 transition-all shadow-lg"
-              >
-                {lang === "ar" ? "عرض الإجابة" : lang === "nl" ? "Toon antwoord" : "Afficher la réponse"}
-              </button>
-            )}
-
-            {/* Answers */}
-            {showAnswer && (
-              <div className="space-y-4 mt-6">
-                {[1, 2, 3].map((num) => {
-                  const answerKey = `answer${num}` as keyof Question;
-                  const answerText = currentQuestion[answerKey] as string;
-                  
-                  if (!answerText) return null;
-
-                  const isCorrect = currentQuestion.correctAnswer === num;
-
-                  return (
-                    <div
-                      key={num}
-                      className={`p-5 rounded-2xl border-3 ${
-                        isCorrect
-                          ? "bg-gradient-to-r from-green-50 to-emerald-50 border-green-400 shadow-lg shadow-green-200"
-                          : "bg-gray-50 border-gray-200"
-                      }`}
-                      style={{ borderWidth: '3px' }}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div
-                          className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg ${
-                            isCorrect
-                              ? "bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg"
-                              : "bg-gray-200 text-gray-600"
-                          }`}
-                        >
-                          {isCorrect ? (
-                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                          ) : (
-                            num
-                          )}
-                        </div>
-                        <span className={`flex-1 font-semibold text-lg ${
-                          isCorrect ? "text-green-800" : "text-gray-700"
-                        }`}>{translatedTexts[num] || answerText}</span>
-                        {isCorrect && (
-                          <span className="text-sm font-bold text-green-700 bg-green-200 px-3 py-1 rounded-full">
-                            {lang === "ar" ? "الإجابة الصحيحة" : lang === "nl" ? "Juiste antwoord" : "Bonne réponse"}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Navigation */}
-          <div className="flex gap-4">
-            <button
-              onClick={handlePrevious}
-              disabled={currentIndex === 0}
-              className={`flex-1 py-4 rounded-2xl font-bold text-lg transition-all ${
-                currentIndex === 0
-                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "bg-white text-gray-700 hover:bg-gray-50 shadow-lg border-2 border-gray-200"
-              }`}
-            >
-              {lang === "ar" ? "السابق" : lang === "nl" ? "Vorige" : "Précédent"}
-            </button>
-            <button
-              onClick={handleNext}
-              disabled={currentIndex === questions.length - 1}
-              className={`flex-1 py-4 rounded-2xl font-bold text-lg transition-all ${
-                currentIndex === questions.length - 1
-                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "bg-gradient-to-r from-orange-500 to-amber-600 text-white hover:from-orange-600 hover:to-amber-700 shadow-lg"
-              }`}
-            >
-              {lang === "ar" ? "التالي" : lang === "nl" ? "Volgende" : "Suivant"}
-            </button>
-          </div>
+          <QuestionCard
+            question={currentQuestion}
+            index={currentIndex}
+            total={questions.length}
+            lang={lang}
+            onNext={handleNext}
+            onPrev={handlePrevious}
+          />
         </div>
       </div>
     </div>

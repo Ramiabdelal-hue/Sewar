@@ -8,6 +8,7 @@ import fr from "@/locales/fr.json";
 import ar from "@/locales/ar.json";
 import en from "@/locales/en.json";
 import Navbar from "@/components/Navbar";
+import QuestionCard from "@/components/QuestionCard";
 import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
 
 interface Question {
@@ -447,91 +448,16 @@ function LessonViewContent() {
           </div>
 
           {/* Question Card */}
-          <div className="mb-6 rounded-3xl overflow-hidden shadow-2xl border border-gray-100">
-            
-            {/* شريط رقم السؤال */}
-            <div className="flex items-center justify-between px-6 py-4"
-              style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-white font-black text-lg">
-                  {currentIndex + 1}
-                </div>
-                <span className="text-white font-bold text-sm opacity-80">
-                  {lang === "ar" ? "السؤال" : lang === "nl" ? "Vraag" : lang === "fr" ? "Question" : "Question"}
-                </span>
-              </div>
-              <span className="text-white/70 text-sm font-bold">
-                {currentIndex + 1} / {filteredQuestions.length}
-              </span>
-            </div>
-
-            {/* الصور */}
-            {currentQuestion.videoUrls && currentQuestion.videoUrls.length > 0 && (
-              <div className={`grid gap-2 p-3 bg-gray-900 ${currentQuestion.videoUrls.length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
-                {currentQuestion.videoUrls.map((url, idx) => (
-                  <div key={idx} className="relative overflow-hidden rounded-xl" style={{ aspectRatio: currentQuestion.videoUrls!.length === 1 ? "16/9" : "4/3" }}>
-                    <img
-                      src={url}
-                      alt={`Image ${idx + 1}`}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 cursor-zoom-in"
-                      onClick={() => window.open(url, '_blank')}
-                    />
-                    <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
-                      {idx + 1}/{currentQuestion.videoUrls!.length}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Audio */}
-            {currentQuestion.audioUrl && (
-              <div className="px-6 py-4 bg-gradient-to-r from-purple-50 to-indigo-50 border-b border-purple-100">
-                <audio controls className="w-full h-10">
-                  <source src={currentQuestion.audioUrl} type="audio/mpeg" />
-                </audio>
-              </div>
-            )}
-
-            {/* نص السؤال */}
-            <div className="px-6 py-5 bg-white">
-              <QuestionWithLanguages question={currentQuestion} lang={lang} />
-            </div>
-
-            {/* الشرح */}
-            {(currentQuestion.explanationNL || currentQuestion.explanationFR || currentQuestion.explanationAR) && (
-              <div className="px-6 pb-5 bg-white">
-                <ExplanationWithLanguages question={currentQuestion} lang={lang} />
-              </div>
-            )}
-          </div>
-
-          {/* أزرار التنقل */}
-          <div className="flex gap-3">
-            <button
-              onClick={handlePrevious}
-              disabled={currentIndex === 0}
-              className={`flex-1 py-4 rounded-2xl font-black text-base transition-all flex items-center justify-center gap-2 ${
-                currentIndex === 0
-                  ? "bg-gray-100 text-gray-300 cursor-not-allowed"
-                  : "bg-white text-[#003399] hover:bg-[#ddeeff] shadow-lg border-2 border-[#3399ff] active:scale-95"
-              }`}
-            >
-              ← {lang === "ar" ? "السابق" : lang === "nl" ? "Vorige" : lang === "fr" ? "Précédent" : "Previous"}
-            </button>
-            <button
-              onClick={handleNext}
-              disabled={currentIndex === filteredQuestions.length - 1}
-              className={`flex-1 py-4 rounded-2xl font-black text-base transition-all flex items-center justify-center gap-2 ${
-                currentIndex === filteredQuestions.length - 1
-                  ? "bg-gray-100 text-gray-300 cursor-not-allowed"
-                  : "text-white shadow-lg active:scale-95"
-              }`}
-              style={currentIndex < filteredQuestions.length - 1 ? { background: "linear-gradient(135deg, #003399, #0055cc)" } : {}}
-            >
-              {lang === "ar" ? "التالي" : lang === "nl" ? "Volgende" : lang === "fr" ? "Suivant" : "Next"} →
-            </button>
-          </div>
+          {currentQuestion && (
+            <QuestionCard
+              question={currentQuestion}
+              index={currentIndex}
+              total={filteredQuestions.length}
+              lang={lang}
+              onNext={handleNext}
+              onPrev={handlePrevious}
+            />
+          )}
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useLang } from "@/context/LangContext";
 import Navbar from "@/components/Navbar";
+import QuestionCard from "@/components/QuestionCard";
 
 function PrakticalLessonContent() {
   const searchParams = useSearchParams();
@@ -78,55 +79,14 @@ function PrakticalLessonContent() {
 
         {/* الأسئلة */}
         {questions.length > 0 && (
-          <div>
-            <h2 className="text-lg font-black text-[#003399] mb-4 uppercase border-b-2 border-[#ddeeff] pb-2">
-              {lang === "ar" ? "الأسئلة" : lang === "nl" ? "Vragen" : lang === "fr" ? "Questions" : "Questions"} ({questions.length})
-            </h2>
-
-            <div className="border border-gray-200 rounded-xl overflow-hidden">
-              {/* السؤال الحالي */}
-              {currentQ && (
-                <div className="p-6">
-                  {/* فيديوهات السؤال */}
-                  {currentQ.videoUrls && Array.isArray(currentQ.videoUrls) && currentQ.videoUrls.length > 0 && (
-                    <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {currentQ.videoUrls.map((url: string, i: number) => (
-                        url && <video key={i} controls className="w-full rounded-lg border border-gray-200">
-                          <source src={url} />
-                        </video>
-                      ))}
-                    </div>
-                  )}
-
-                  <p className="text-base font-bold text-gray-800 mb-4">
-                    {currentIndex + 1}. {currentQ.textNL || currentQ.text}
-                  </p>
-
-                  <p className="text-xs text-gray-400 mt-4">
-                    {currentIndex + 1} / {questions.length}
-                  </p>
-                </div>
-              )}
-
-              {/* أزرار التنقل */}
-              <div className="flex border-t border-gray-200">
-                <button
-                  onClick={() => setCurrentIndex(i => Math.max(0, i - 1))}
-                  disabled={currentIndex === 0}
-                  className={`flex-1 py-3 font-bold text-sm border-r border-gray-200 transition-colors ${currentIndex === 0 ? "text-gray-300" : "text-[#003399] hover:bg-[#ddeeff]"}`}
-                >
-                  ← {lang === "ar" ? "السابق" : lang === "nl" ? "Vorige" : "Previous"}
-                </button>
-                <button
-                  onClick={() => setCurrentIndex(i => Math.min(questions.length - 1, i + 1))}
-                  disabled={currentIndex === questions.length - 1}
-                  className={`flex-1 py-3 font-bold text-sm transition-colors ${currentIndex === questions.length - 1 ? "text-gray-300" : "text-[#003399] hover:bg-[#ddeeff]"}`}
-                >
-                  {lang === "ar" ? "التالي" : lang === "nl" ? "Volgende" : "Next"} →
-                </button>
-              </div>
-            </div>
-          </div>
+          <QuestionCard
+            question={questions[currentIndex]}
+            index={currentIndex}
+            total={questions.length}
+            lang={lang}
+            onNext={() => setCurrentIndex(i => Math.min(questions.length - 1, i + 1))}
+            onPrev={() => setCurrentIndex(i => Math.max(0, i - 1))}
+          />
         )}
 
         {!lesson?.videoUrl && questions.length === 0 && (
