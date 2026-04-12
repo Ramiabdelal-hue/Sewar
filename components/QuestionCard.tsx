@@ -79,25 +79,31 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
       return;
     }
 
-    const utterance = new SpeechSynthesisUtterance(originalText); // النص الهولندي الأصلي دائماً
-    utterance.rate = rate;
-    utterance.lang = "nl-NL"; // دائماً هولندي
+    const doSpeak = () => {
+      const utterance = new SpeechSynthesisUtterance(originalText);
+      utterance.rate = rate;
+      utterance.lang = "nl-NL";
 
-    // اختيار صوت أنثوي هولندي
-    const voices = window.speechSynthesis.getVoices();
-    const femaleVoice = voices.find(v =>
-      v.lang.startsWith("nl") &&
-      (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('woman') ||
-       v.name.includes('Xander') === false)
-    ) || voices.find(v => v.lang.startsWith("nl"));
+      const voices = window.speechSynthesis.getVoices();
+      // ابحث عن صوت هولندي أنثوي أولاً
+      const nlVoice = voices.find(v => v.lang === "nl-NL" && !v.name.includes("Xander")) ||
+                      voices.find(v => v.lang === "nl-BE") ||
+                      voices.find(v => v.lang.startsWith("nl"));
 
-    if (femaleVoice) utterance.voice = femaleVoice;
+      if (nlVoice) utterance.voice = nlVoice;
 
-    utterance.onend = () => setSpeaking(false);
-    utterance.onerror = () => setSpeaking(false);
+      utterance.onend = () => setSpeaking(false);
+      utterance.onerror = () => setSpeaking(false);
+      setSpeaking(true);
+      window.speechSynthesis.speak(utterance);
+    };
 
-    setSpeaking(true);
-    window.speechSynthesis.speak(utterance);
+    // الأصوات قد لا تكون محملة بعد
+    if (window.speechSynthesis.getVoices().length === 0) {
+      window.speechSynthesis.onvoiceschanged = () => { doSpeak(); };
+    } else {
+      doSpeak();
+    }
   };
 
   const isRtl = lang === "ar";
