@@ -79,18 +79,17 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
       return;
     }
 
-    const utterance = new SpeechSynthesisUtterance(qText);
+    const utterance = new SpeechSynthesisUtterance(originalText); // النص الهولندي الأصلي دائماً
     utterance.rate = rate;
-    utterance.lang = lang === "ar" ? "ar-SA" : lang === "fr" ? "fr-FR" : lang === "en" ? "en-US" : "nl-NL";
+    utterance.lang = "nl-NL"; // دائماً هولندي
 
-    // اختيار صوت أنثوي
+    // اختيار صوت أنثوي هولندي
     const voices = window.speechSynthesis.getVoices();
     const femaleVoice = voices.find(v =>
-      v.lang.startsWith(utterance.lang.split('-')[0]) &&
+      v.lang.startsWith("nl") &&
       (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('woman') ||
-       v.name.includes('Samantha') || v.name.includes('Karen') || v.name.includes('Fiona') ||
-       v.name.includes('Amelie') || v.name.includes('Ioana') || v.name.includes('Lekha'))
-    ) || voices.find(v => v.lang.startsWith(utterance.lang.split('-')[0]));
+       v.name.includes('Xander') === false)
+    ) || voices.find(v => v.lang.startsWith("nl"));
 
     if (femaleVoice) utterance.voice = femaleVoice;
 
