@@ -149,10 +149,16 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
                   )`,
                 }}>
               </div>
-              {/* Logo watermark في الزاوية */}
-              <div className="absolute bottom-2 right-2 pointer-events-none select-none opacity-60">
-                <img src="/logo.jpg" alt="Sewar" 
-                  style={{ width: '50px', height: '50px', objectFit: 'contain', filter: 'drop-shadow(0 0 3px rgba(0,0,0,0.8))' }}
+              {/* Logo watermark في المنتصف */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
+                <img src="/logo.jpg" alt="Sewar"
+                  style={{
+                    width: '120px',
+                    height: '120px',
+                    objectFit: 'contain',
+                    opacity: 0.35,
+                    filter: 'drop-shadow(0 0 8px rgba(0,0,0,0.8))',
+                  }}
                   draggable={false}
                   onContextMenu={(e) => e.preventDefault()}
                 />
