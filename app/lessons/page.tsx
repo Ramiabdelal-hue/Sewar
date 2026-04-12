@@ -49,7 +49,7 @@ function LessonsContent() {
         const data = await res.json();
         if (data.expired || !data.success) { setIsExpired(true); setPrefillData({ email: userEmail }); return; }
         
-        // ÇáÊÍŞŞ Åä ÇáÇÔÊÑÇß ãä äæÚ theorie
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ theorie
         const subs = data.subscriptions || [];
         const hasTheorie = subs.some((s: any) => s.subscriptionType === "theorie") ||
                            data.user?.subscriptionType === "theorie";
@@ -87,16 +87,16 @@ function LessonsContent() {
   const currentCategory = (cat || "B").toUpperCase();
 
   const getCategoryTitle = () => {
-    if (currentCategory === "C") return lang === "ar" ? "äÙÑíÉ ÑÎÕÉ ÇáŞíÇÏÉ C" : lang === "nl" ? "THEORIE RIJBEWIJS C OEFENVRAGEN EN PROEFEXAMEN" : lang === "fr" ? "THEORIE PERMIS C QUESTIONS ET EXAMEN" : "THEORY LICENSE C PRACTICE QUESTIONS AND EXAM";
-    if (currentCategory === "A") return lang === "ar" ? "äÙÑíÉ ÑÎÕÉ ÇáŞíÇÏÉ A" : lang === "nl" ? "THEORIE RIJBEWIJS A OEFENVRAGEN EN PROEFEXAMEN" : lang === "fr" ? "THEORIE PERMIS A QUESTIONS ET EXAMEN" : "THEORY LICENSE A PRACTICE QUESTIONS AND EXAM";
-    return lang === "ar" ? "äÙÑíÉ ÑÎÕÉ ÇáŞíÇÏÉ B - ÃÓÆáÉ ÊÏÑíÈíÉ" : lang === "nl" ? "THEORIE RIJBEWIJS B OEFENVRAGEN EN PROEFEXAMEN" : lang === "fr" ? "THEORIE PERMIS B QUESTIONS ET EXAMEN" : "THEORY LICENSE B PRACTICE QUESTIONS AND EXAM";
+    if (currentCategory === "C") return lang === "ar" ? "ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ C" : lang === "nl" ? "THEORIE RIJBEWIJS C OEFENVRAGEN EN PROEFEXAMEN" : lang === "fr" ? "THEORIE PERMIS C QUESTIONS ET EXAMEN" : "THEORY LICENSE C PRACTICE QUESTIONS AND EXAM";
+    if (currentCategory === "A") return lang === "ar" ? "ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ A" : lang === "nl" ? "THEORIE RIJBEWIJS A OEFENVRAGEN EN PROEFEXAMEN" : lang === "fr" ? "THEORIE PERMIS A QUESTIONS ET EXAMEN" : "THEORY LICENSE A PRACTICE QUESTIONS AND EXAM";
+    return lang === "ar" ? "ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ B - ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" : lang === "nl" ? "THEORIE RIJBEWIJS B OEFENVRAGEN EN PROEFEXAMEN" : lang === "fr" ? "THEORIE PERMIS B QUESTIONS ET EXAMEN" : "THEORY LICENSE B PRACTICE QUESTIONS AND EXAM";
   };
 
   const filteredLessons = lessons.filter(l =>
     l.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // ÊÑÌãÉ ÃÓãÇÁ ÇáÏÑæÓ ÊáŞÇÆíÇğ
+  // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
   const translatedTitles = useAutoTranslateList(
     filteredLessons.map(l => l.title),
     lang
@@ -108,7 +108,7 @@ function LessonsContent() {
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
           <p className="font-bold text-gray-600">
-            {lang === "ar" ? "ÌÇÑí ÇáÊÍãíá..." : lang === "nl" ? "Laden..." : lang === "fr" ? "Chargement..." : "Loading..."}
+            {lang === "ar" ? "ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½..." : lang === "nl" ? "Laden..." : lang === "fr" ? "Chargement..." : "Loading..."}
           </p>
         </div>
       </div>
@@ -125,18 +125,18 @@ function LessonsContent() {
         <div className="bg-white p-10 rounded-2xl shadow-xl max-w-md border-t-8 border-red-500">
           <FaLock className="text-red-500 text-5xl mx-auto mb-4" />
           <h2 className="text-2xl font-black text-gray-900 mb-3">
-            {lang === "ar" ? "ÇáÇÔÊÑÇß ÛíÑ ãÊÇÍ" : lang === "nl" ? "Abonnement niet beschikbaar" : lang === "fr" ? "Abonnement non disponible" : "Subscription not available"}
+            {lang === "ar" ? "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½" : lang === "nl" ? "Abonnement niet beschikbaar" : lang === "fr" ? "Abonnement non disponible" : "Subscription not available"}
           </h2>
           <p className="text-gray-500 mb-6">
             {!userEmail
-              ? (lang === "ar" ? "íÑÌì ÊÓÌíá ÇáÏÎæá ãÑÉ ÃÎÑì" : "Please login again")
-              : (lang === "ar" ? "ÇäÊåÊ ÕáÇÍíÉ ÇÔÊÑÇßß" : lang === "nl" ? "Uw abonnement is verlopen" : lang === "fr" ? "Votre abonnement a expiré" : "Your subscription has expired")}
+              ? (lang === "ar" ? "ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½" : "Please login again")
+              : (lang === "ar" ? "ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" : lang === "nl" ? "Uw abonnement is verlopen" : lang === "fr" ? "Votre abonnement a expirï¿½" : "Your subscription has expired")}
           </p>
           <button
             onClick={() => !userEmail ? router.push("/") : setRenewing(true)}
             className="bg-blue-600 text-white px-8 py-3 font-bold hover:bg-blue-700 transition"
           >
-            {!userEmail ? (lang === "ar" ? "ÊÓÌíá ÇáÏÎæá" : "Login") : (lang === "ar" ? "ÊÌÏíÏ ÇáÇÔÊÑÇß" : lang === "nl" ? "Vernieuwen" : lang === "fr" ? "Renouveler" : "Renew")}
+            {!userEmail ? (lang === "ar" ? "ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" : "Login") : (lang === "ar" ? "ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" : lang === "nl" ? "Vernieuwen" : lang === "fr" ? "Renouveler" : "Renew")}
           </button>
         </div>
       </div>
@@ -149,42 +149,46 @@ function LessonsContent() {
 
       <div className="w-full px-4 py-6">
 
-        {/* ÚäæÇä ÇáÕİÍÉ - ÃÒÑŞ ÏÇßä ãÚ ÎØ Óİáí */}
+        {/* ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ - ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ */}
         <h1 className="text-xl sm:text-2xl font-black text-[#003399] uppercase border-b-4 border-[#003399] pb-3 mb-5">
           {getCategoryTitle()}
         </h1>
 
-        {/* ÔÑíØ ÇáÈÍË */}
+        {/* ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ */}
         <div className="mb-4">
           <input
             type="text"
-            placeholder={lang === "ar" ? "ÇÈÍË Úä ÏÑÓ..." : lang === "nl" ? "Zoek een les..." : lang === "fr" ? "Rechercher..." : "Search lesson..."}
+            placeholder={lang === "ar" ? "ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½..." : lang === "nl" ? "Zoek een les..." : lang === "fr" ? "Rechercher..." : "Search lesson..."}
             className="border border-gray-300 px-3 py-2 text-sm w-full sm:w-72 focus:border-blue-500 focus:outline-none rounded"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
-        {/* ÌÏæá ÇáÏÑæÓ - ÚÑÖ ßÇãá */}
+        {/* ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ - ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ */}
         {filteredLessons.length === 0 ? (
           <div className="border border-yellow-300 bg-yellow-50 p-6 text-center">
             <p className="font-bold text-gray-700">
-              {lang === "ar" ? "áÇ ÊæÌÏ ÏÑæÓ ãÊÇÍÉ" : lang === "nl" ? "Geen lessen beschikbaar" : lang === "fr" ? "Aucune leçon disponible" : "No lessons available"}
+              {lang === "ar" ? "ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½" : lang === "nl" ? "Geen lessen beschikbaar" : lang === "fr" ? "Aucune leï¿½on disponible" : "No lessons available"}
             </p>
           </div>
         ) : (
           <table className="w-full border-collapse lessons-table" style={{ tableLayout: "fixed" }}>
             <colgroup>
-              <col style={{ width: "75%" }} />
-              <col style={{ width: "25%" }} />
+              <col style={{ width: "60%" }} />
+              <col style={{ width: "20%" }} />
+              <col style={{ width: "20%" }} />
             </colgroup>
             <thead>
               <tr style={{ backgroundColor: "#3399ff" }}>
                 <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc]">
-                  {lang === "ar" ? "ÇáÏÑÓ" : lang === "nl" ? "LES" : lang === "fr" ? "LECON" : "LESSON"}
+                  {lang === "ar" ? "Ø§Ù„Ø¯Ø±Ø³" : lang === "nl" ? "LES" : lang === "fr" ? "LECON" : "LESSON"}
                 </th>
                 <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
-                  {lang === "ar" ? "İÊÍ" : lang === "nl" ? "OPENEN" : lang === "fr" ? "OUVRIR" : "OPEN"}
+                  {lang === "ar" ? "ÙØªØ­" : lang === "nl" ? "OPENEN" : lang === "fr" ? "OUVRIR" : "OPEN"}
+                </th>
+                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
+                  EXAMEN
                 </th>
               </tr>
             </thead>
@@ -197,9 +201,17 @@ function LessonsContent() {
                   <td className="px-4 py-3 border border-gray-200 text-center">
                     <button
                       onClick={() => router.push(`/lessons/view?lessonId=${lesson.id}&category=${cat || "B"}&email=${userEmail}`)}
-                      className="bg-white border-2 border-gray-400 px-6 py-1 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors"
+                      className="bg-white border-2 border-gray-400 px-4 py-1 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors"
                     >
-                      {lang === "ar" ? "ÏÑÓ" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
+                      {lang === "ar" ? "Ø¯Ø±Ø³" : lang === "nl" ? "Les" : lang === "fr" ? "LeÃ§on" : "Lesson"}
+                    </button>
+                  </td>
+                  <td className="px-4 py-3 border border-gray-200 text-center">
+                    <button
+                      onClick={() => router.push(`/examen/test?category=${cat || "B"}&lesson=${encodeURIComponent(lesson.title)}&email=${userEmail}`)}
+                      className="bg-white border-2 border-orange-400 px-4 py-1 text-sm font-bold text-orange-600 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-colors"
+                    >
+                      Examen
                     </button>
                   </td>
                 </tr>
@@ -209,7 +221,7 @@ function LessonsContent() {
         )}
 
         <p className="text-xs text-gray-400 mt-3">
-          {lang === "ar" ? `ÅÌãÇáí: ${filteredLessons.length} ÏÑÓ` : lang === "nl" ? `Totaal: ${filteredLessons.length} lessen` : lang === "fr" ? `Total: ${filteredLessons.length} leçons` : `Total: ${filteredLessons.length} lessons`}
+          {lang === "ar" ? `ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ${filteredLessons.length} ï¿½ï¿½ï¿½` : lang === "nl" ? `Totaal: ${filteredLessons.length} lessen` : lang === "fr" ? `Total: ${filteredLessons.length} leï¿½ons` : `Total: ${filteredLessons.length} lessons`}
         </p>
       </div>
     </div>
