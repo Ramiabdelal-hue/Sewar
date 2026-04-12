@@ -29,6 +29,31 @@ export default function ExamenPage() {
   useEffect(() => {
     const stored = localStorage.getItem("renewPrefillData");
     if (stored) setPrefillData(JSON.parse(stored));
+
+    // التحقق من اشتراك examen موجود
+    const email = localStorage.getItem("userEmail");
+    if (email) {
+      fetch("/api/check-subscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success && data.subscriptions) {
+            const examenSub = data.subscriptions.find((s: any) => s.subscriptionType === "examen");
+            if (examenSub) {
+              const cat = examenSub.category || "B";
+              const exp = new Date(examenSub.expiryDate).getTime();
+              setUserEmail(email);
+              setSelectedCategory(cat);
+              fetchLessons(cat);
+              setShowLessons(true);
+            }
+          }
+        })
+        .catch(() => {});
+    }
   }, []);
 
   const categories = [
