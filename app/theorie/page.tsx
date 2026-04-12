@@ -254,8 +254,10 @@ export default function TheoriePage() {
               ))}
             </tbody>
           </table>
+        )}
 
-          {/* زر Examen واحد للفئة */}
+        {/* زر Examen واحد للفئة */}
+        {!loading && filtered.length > 0 && (
           <div className="mt-4">
             <button
               onClick={() => router.push(`/examen?email=${userEmail}&cat=${userCategory}`)}

@@ -206,8 +206,10 @@ function LessonsContent() {
               ))}
             </tbody>
           </table>
+        )}
 
-          {/* زر Examen واحد لكل الفئة */}
+        {/* زر Examen واحد لكل الفئة */}
+        {filteredLessons.length > 0 && (
           <div className="mt-4">
             <button
               onClick={() => router.push(`/examen?email=${userEmail}&cat=${cat || "B"}`)}
