@@ -138,7 +138,7 @@ function LessonsContent() {
             </thead>
             <tbody>
               {filtered.map((lesson, i) => (
-                <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#ddeeff" }}>
+                <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#f5f5f5" }}>
                   <td className="px-4 py-3 border border-gray-200 font-bold text-[#003399] text-base">
                     {i + 1}. {translatedTitles[lessons.indexOf(lesson)] || lesson.title}
                   </td>

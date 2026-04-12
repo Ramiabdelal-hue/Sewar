@@ -138,7 +138,7 @@ export default function ExamenPage() {
               </thead>
               <tbody>
                 {availableLessons.map((lesson, i) => (
-                  <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#ddeeff" }}>
+                  <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#f5f5f5" }}>
                     <td className="px-4 py-3 border border-gray-200 font-bold text-[#003399] text-base">
                       {i + 1}. {lesson.title}
                     </td>
@@ -196,7 +196,7 @@ export default function ExamenPage() {
             </thead>
             <tbody>
               {categories.map((cat, i) => (
-                <tr key={cat.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#ddeeff" }}>
+                <tr key={cat.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#f5f5f5" }}>
                   <td className="px-4 py-3 border border-gray-200">
                     <div className="flex items-center gap-3">
                       <div className="flex-shrink-0">{cat.icon}</div>
@@ -242,7 +242,7 @@ export default function ExamenPage() {
         {/* بطاقات على الموبايل */}
         <div className="sm:hidden flex flex-col gap-4">
           {categories.map((cat, i) => (
-            <div key={cat.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#ddeeff" }} className="border border-gray-200 p-4 rounded">
+            <div key={cat.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#f5f5f5" }} className="border border-gray-200 p-4 rounded">
               <div className="flex items-center gap-3 mb-2">
                 {cat.icon}
                 <div>
