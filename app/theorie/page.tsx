@@ -254,6 +254,16 @@ export default function TheoriePage() {
               ))}
             </tbody>
           </table>
+
+          {/* زر Examen واحد للفئة */}
+          <div className="mt-4">
+            <button
+              onClick={() => router.push(`/examen?email=${userEmail}&cat=${userCategory}`)}
+              className="px-8 py-3 font-black text-sm uppercase border-2 border-orange-500 text-orange-600 hover:bg-orange-500 hover:text-white transition-colors"
+            >
+              🎯 {lang === "ar" ? "ابدأ امتحان الفئة" : lang === "nl" ? `Examen Categorie ${userCategory}` : lang === "fr" ? `Examen Catégorie ${userCategory}` : `Exam Category ${userCategory}`}
+            </button>
+          </div>
         )}
       </div>
     </div>
