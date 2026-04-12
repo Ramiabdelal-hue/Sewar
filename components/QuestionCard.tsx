@@ -153,11 +153,11 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
                 <img src="/logo.jpg" alt="Sewar"
                   style={{
-                    width: '120px',
-                    height: '120px',
+                    width: '70%',
+                    height: '70%',
                     objectFit: 'contain',
                     opacity: 0.35,
-                    filter: 'drop-shadow(0 0 8px rgba(0,0,0,0.8))',
+                    mixBlendMode: 'luminosity',
                   }}
                   draggable={false}
                   onContextMenu={(e) => e.preventDefault()}
