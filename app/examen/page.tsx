@@ -30,7 +30,21 @@ export default function ExamenPage() {
     const stored = localStorage.getItem("renewPrefillData");
     if (stored) setPrefillData(JSON.parse(stored));
 
-    // التحقق من اشتراك examen موجود
+    // قراءة URL params (بعد الاشتراك مباشرة)
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const emailParam = params.get("email");
+      const catParam = params.get("cat");
+      if (emailParam && catParam) {
+        setUserEmail(emailParam);
+        setSelectedCategory(catParam);
+        fetchLessons(catParam);
+        setShowLessons(true);
+        return;
+      }
+    }
+
+    // التحقق من اشتراك examen موجود في localStorage
     const email = localStorage.getItem("userEmail");
     if (email) {
       fetch("/api/check-subscription", {
@@ -44,7 +58,6 @@ export default function ExamenPage() {
             const examenSub = data.subscriptions.find((s: any) => s.subscriptionType === "examen");
             if (examenSub) {
               const cat = examenSub.category || "B";
-              const exp = new Date(examenSub.expiryDate).getTime();
               setUserEmail(email);
               setSelectedCategory(cat);
               fetchLessons(cat);
@@ -69,9 +82,17 @@ export default function ExamenPage() {
 
   const fetchLessons = async (catLetter: string) => {
     try {
-      const res = await fetch(`/api/lessons?category=exam${catLetter}&questionType=Examen`);
+      // جرب أولاً بـ examCategory
+      const res = await fetch(`/api/lessons?category=${catLetter}&questionType=Examen`);
       const data = await res.json();
-      if (data.success) setAvailableLessons(data.lessons);
+      if (data.success && data.lessons.length > 0) {
+        setAvailableLessons(data.lessons);
+      } else {
+        // جرب بدون questionType
+        const res2 = await fetch(`/api/lessons?category=${catLetter}`);
+        const data2 = await res2.json();
+        if (data2.success) setAvailableLessons(data2.lessons);
+      }
     } catch (e) { console.error(e); }
   };
 
