@@ -260,7 +260,7 @@ export default function TheoriePage() {
         {!loading && filtered.length > 0 && (
           <div className="mt-4">
             <button
-              onClick={() => router.push(`/examen?email=${userEmail}&cat=${userCategory}`)}
+              onClick={() => router.push(`/examen/category?cat=${userCategory}&email=${userEmail}`)}
               className="px-8 py-3 font-black text-sm uppercase border-2 border-orange-500 text-orange-600 hover:bg-orange-500 hover:text-white transition-colors"
             >
               🎯 {lang === "ar" ? "ابدأ امتحان الفئة" : lang === "nl" ? `Examen Categorie ${userCategory}` : lang === "fr" ? `Examen Catégorie ${userCategory}` : `Exam Category ${userCategory}`}
