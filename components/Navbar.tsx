@@ -102,10 +102,10 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
           {/* اللوغو + اسم الموقع */}
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.href = "/"}>
             <span className="text-base md:text-2xl font-black tracking-wide uppercase hidden sm:inline">
-              S &amp; A Rijacademie
+              Sewar VerkeersSchool
             </span>
             <span className="text-base font-black tracking-wide uppercase sm:hidden">
-              S &amp; A
+              Sewar
             </span>
           </div>
 
