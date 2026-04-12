@@ -110,7 +110,7 @@ export default function Hero({ onSelect }: HeroProps) {
               style={{ borderColor: "rgba(212,175,55,0.2)" }}
             >
               {[
-                { value: "10000+", label: lang === "ar" ? "طالب" : lang === "nl" ? "Studenten" : lang === "fr" ? "Étudiants" : "Students" },
+                { value: "10.000+", label: lang === "ar" ? "طالب" : lang === "nl" ? "Studenten" : lang === "fr" ? "Étudiants" : "Students" },
                 { value: "100%", label: lang === "ar" ? "نجاح" : lang === "nl" ? "Geslaagd" : lang === "fr" ? "Réussite" : "Pass rate" },
                 { value: "A·B·C", label: lang === "ar" ? "فئات" : lang === "nl" ? "Categorieën" : lang === "fr" ? "Catégories" : "Categories" },
               ].map((stat, i) => (
