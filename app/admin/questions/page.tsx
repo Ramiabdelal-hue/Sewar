@@ -1728,51 +1728,27 @@ export default function AdminQuestionsPage() {
                         </div>
                       )}
 
-                      {/* 2. نص السؤال */}
-                      <div className="mb-4 space-y-2">
+                      {/* 2. نص السؤال - هولندي فقط */}
+                      <div className="mb-4">
                         <p className="text-xs font-black text-gray-400 uppercase tracking-wider mb-2">نص السؤال</p>
-                        {q.textNL && (
-                          <div className="px-4 py-3 rounded-xl" style={{ background: "#f0f4ff", border: "1px solid #c7d2fe" }}>
-                            <span className="text-[10px] font-black text-indigo-400 uppercase tracking-wider">🇳🇱 NL</span>
-                            <p className="text-sm font-medium text-gray-800 mt-1 leading-relaxed">{q.textNL}</p>
-                          </div>
-                        )}
-                        {q.textFR && (
-                          <div className="px-4 py-3 rounded-xl" style={{ background: "#fff7ed", border: "1px solid #fed7aa" }}>
-                            <span className="text-[10px] font-black text-orange-400 uppercase tracking-wider">🇫🇷 FR</span>
-                            <p className="text-sm font-medium text-gray-800 mt-1 leading-relaxed">{q.textFR}</p>
-                          </div>
-                        )}
-                        {q.textAR && (
-                          <div className="px-4 py-3 rounded-xl" style={{ background: "#f0fdf4", border: "1px solid #bbf7d0" }}>
-                            <span className="text-[10px] font-black text-green-500 uppercase tracking-wider">🇸🇦 AR</span>
-                            <p className="text-sm font-medium text-gray-800 mt-1 leading-relaxed text-right">{q.textAR}</p>
-                          </div>
-                        )}
+                        <div className="px-4 py-3 rounded-xl" style={{ background: "#f0f4ff", border: "1px solid #c7d2fe" }}>
+                          <span className="text-[10px] font-black text-indigo-400 uppercase tracking-wider">🇳🇱 Nederlands</span>
+                          <p className="text-sm font-medium text-gray-800 mt-1 leading-relaxed">
+                            {q.textNL || q.text || "—"}
+                          </p>
+                        </div>
                       </div>
 
-                      {/* 3. الشروحات */}
+                      {/* 3. الشرح - هولندي فقط */}
                       {(q.explanationNL || q.explanationFR || q.explanationAR) && (
-                        <div className="mb-4 space-y-2">
-                          <p className="text-xs font-black text-gray-400 uppercase tracking-wider mb-2">الشروحات</p>
-                          {q.explanationNL && (
-                            <div className="px-4 py-3 rounded-xl" style={{ background: "#eff6ff", border: "1px solid #bfdbfe" }}>
-                              <span className="text-[10px] font-black text-blue-400 uppercase tracking-wider">🇳🇱 NL</span>
-                              <p className="text-sm text-gray-700 mt-1 leading-relaxed">{q.explanationNL}</p>
-                            </div>
-                          )}
-                          {q.explanationFR && (
-                            <div className="px-4 py-3 rounded-xl" style={{ background: "#eff6ff", border: "1px solid #bfdbfe" }}>
-                              <span className="text-[10px] font-black text-blue-400 uppercase tracking-wider">🇫🇷 FR</span>
-                              <p className="text-sm text-gray-700 mt-1 leading-relaxed">{q.explanationFR}</p>
-                            </div>
-                          )}
-                          {q.explanationAR && (
-                            <div className="px-4 py-3 rounded-xl" style={{ background: "#eff6ff", border: "1px solid #bfdbfe" }}>
-                              <span className="text-[10px] font-black text-blue-400 uppercase tracking-wider">🇸🇦 AR</span>
-                              <p className="text-sm text-gray-700 mt-1 leading-relaxed text-right">{q.explanationAR}</p>
-                            </div>
-                          )}
+                        <div className="mb-4">
+                          <p className="text-xs font-black text-gray-400 uppercase tracking-wider mb-2">الشرح</p>
+                          <div className="px-4 py-3 rounded-xl" style={{ background: "#eff6ff", border: "1px solid #bfdbfe" }}>
+                            <span className="text-[10px] font-black text-blue-400 uppercase tracking-wider">🇳🇱 Nederlands</span>
+                            <p className="text-sm text-gray-700 mt-1 leading-relaxed">
+                              {q.explanationNL || "—"}
+                            </p>
+                          </div>
                         </div>
                       )}
 
