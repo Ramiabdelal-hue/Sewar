@@ -798,39 +798,68 @@ export default function AdminQuestionsPage() {
 
   if (!isLogged) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100">
-        <div className="bg-white p-10 rounded-2xl shadow-2xl w-full max-w-md">
+      <div className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0a0a2e 0%, #001a6e 50%, #0a0a2e 100%)" }}>
+        {/* خلفية زخرفية */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full opacity-20 blur-3xl" style={{ background: "#ffcc00" }}></div>
+          <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-20 blur-3xl" style={{ background: "#003399" }}></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-5 blur-3xl" style={{ background: "#ffffff" }}></div>
+        </div>
+
+        <div className="relative z-10 w-full max-w-sm mx-auto px-6">
+          {/* لوغو */}
           <div className="text-center mb-8">
-            <div className="w-20 h-20 bg-orange-500 rounded-full mx-auto mb-4 flex items-center justify-center">
-              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            <div className="w-20 h-20 mx-auto mb-5 rounded-2xl flex items-center justify-center shadow-2xl" style={{ background: "linear-gradient(135deg, #ffcc00, #ff9900)", boxShadow: "0 20px 60px rgba(255,204,0,0.4)" }}>
+              <svg className="w-10 h-10" style={{ color: "#003399" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
-            <h1 className="text-3xl font-bold text-gray-800">{t.adminLogin}</h1>
-            <p className="text-gray-500 mt-2">{t.manageQuestions}</p>
+            <h1 className="text-2xl font-black text-white mb-1">{t.adminLogin}</h1>
+            <p className="text-white/40 text-sm">{t.manageQuestions}</p>
           </div>
-          <input
-            type="text"
-            placeholder={t.username}
-            className="w-full p-4 border-2 border-gray-200 rounded-lg mb-4 focus:border-orange-500 focus:outline-none transition"
-            value={user}
-            onChange={(e) => setUser(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-          />
-          <input
-            type="password"
-            placeholder={t.password}
-            className="w-full p-4 border-2 border-gray-200 rounded-lg mb-6 focus:border-orange-500 focus:outline-none transition"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-          />
-          <button
-            className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 rounded-lg font-bold text-lg hover:from-orange-600 hover:to-orange-700 transition shadow-lg"
-            onClick={handleLogin}
-          >
-            {t.login}
-          </button>
+
+          {/* بطاقة اللوجين */}
+          <div className="rounded-2xl p-6 space-y-4" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(20px)" }}>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                <svg className="w-4 h-4 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <input
+                type="text"
+                placeholder={t.username}
+                className="w-full pl-10 pr-4 py-3 rounded-xl text-sm font-medium text-white placeholder-white/30 focus:outline-none transition-all"
+                style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)" }}
+                value={user}
+                onChange={(e) => setUser(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+              />
+            </div>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                <svg className="w-4 h-4 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                </svg>
+              </div>
+              <input
+                type="password"
+                placeholder={t.password}
+                className="w-full pl-10 pr-4 py-3 rounded-xl text-sm font-medium text-white placeholder-white/30 focus:outline-none transition-all"
+                style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)" }}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+              />
+            </div>
+            <button
+              className="w-full py-3 rounded-xl font-black text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-lg"
+              style={{ background: "linear-gradient(135deg, #ffcc00, #ff9900)", color: "#003399", boxShadow: "0 8px 30px rgba(255,204,0,0.35)" }}
+              onClick={handleLogin}
+            >
+              {t.login} →
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -844,53 +873,44 @@ export default function AdminQuestionsPage() {
   // شاشة اختيار subtype لـ Theori
   if (questionType === "Theori" && !questionSubType) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(135deg, #0a0a2e 0%, #003399 50%, #0a0a2e 100%)" }}>
-        <div className="w-full max-w-xl px-6">
+      <div className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0a0a2e 0%, #001a6e 50%, #0a0a2e 100%)" }}>
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full opacity-15 blur-3xl" style={{ background: "#22c55e" }}></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full opacity-15 blur-3xl" style={{ background: "#f97316" }}></div>
+        </div>
+        <div className="relative z-10 w-full max-w-lg px-6">
           <div className="text-center mb-10">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", boxShadow: "0 15px 40px rgba(34,197,94,0.4)" }}>
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
             </div>
-            <h1 className="text-2xl font-black text-white">Theorie - اختر النوع</h1>
-            <p className="text-white/60 mt-2 text-sm">أسئلة الدروس أم أسئلة الامتحانات؟</p>
+            <h1 className="text-2xl font-black text-white mb-1">Theorie</h1>
+            <p className="text-white/40 text-sm">اختر نوع الأسئلة</p>
           </div>
-
           <div className="grid grid-cols-2 gap-4">
-            <button
-              onClick={() => setQuestionSubType("lessons")}
-              className="group relative overflow-hidden rounded-2xl p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl active:scale-95"
-              style={{ background: "rgba(34,197,94,0.1)", border: "2px solid rgba(34,197,94,0.3)" }}
-            >
-              <div className="w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center"
-                style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", boxShadow: "0 8px 20px rgba(34,197,94,0.4)" }}>
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13" />
-                </svg>
-              </div>
-              <h3 className="text-base font-black text-white mb-1">أسئلة الدروس</h3>
-              <p className="text-xs text-white/50">تظهر في صفحة الدرس</p>
-            </button>
-
-            <button
-              onClick={() => { setQuestionSubType("exam"); setQuestionType("Examen"); }}
-              className="group relative overflow-hidden rounded-2xl p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl active:scale-95"
-              style={{ background: "rgba(249,115,22,0.1)", border: "2px solid rgba(249,115,22,0.3)" }}
-            >
-              <div className="w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center"
-                style={{ background: "linear-gradient(135deg, #f97316, #ea580c)", boxShadow: "0 8px 20px rgba(249,115,22,0.4)" }}>
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138z" />
-                </svg>
-              </div>
-              <h3 className="text-base font-black text-white mb-1">أسئلة الامتحانات</h3>
-              <p className="text-xs text-white/50">تظهر في زر Exam بجانب الدرس</p>
-            </button>
+            {[
+              { label: "أسئلة الدروس", sub: "تظهر في صفحة الدرس", color: "#22c55e", icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13", onClick: () => setQuestionSubType("lessons") },
+              { label: "أسئلة الامتحانات", sub: "تظهر في زر Exam", color: "#f97316", icon: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138z", onClick: () => { setQuestionSubType("exam"); setQuestionType("Examen"); } },
+            ].map(({ label, sub, color, icon, onClick }) => (
+              <button key={label} onClick={onClick}
+                className="group relative overflow-hidden rounded-2xl p-6 text-center transition-all duration-300 hover:scale-105 active:scale-95"
+                style={{ background: `${color}12`, border: `1.5px solid ${color}40` }}>
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" style={{ background: `radial-gradient(circle at center, ${color}20, transparent)` }}></div>
+                <div className="relative z-10">
+                  <div className="w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${color}, ${color}cc)`, boxShadow: `0 8px 20px ${color}40` }}>
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} /></svg>
+                  </div>
+                  <p className="text-sm font-black text-white mb-0.5">{label}</p>
+                  <p className="text-xs text-white/40">{sub}</p>
+                </div>
+              </button>
+            ))}
           </div>
-
-          <div className="mt-6 text-center">
-            <button onClick={() => setQuestionType("")} className="text-white/40 hover:text-white/70 text-sm transition-colors">
-              ← رجوع
+          <div className="mt-8 text-center">
+            <button onClick={() => setQuestionType("")} className="inline-flex items-center gap-2 text-white/40 hover:text-white/70 text-sm transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+              رجوع
             </button>
           </div>
         </div>
@@ -900,54 +920,59 @@ export default function AdminQuestionsPage() {
 
   // شاشة اختيار نوع الأسئلة
   if (!questionType) {
+    const menuItems = [
+      { type: "Theori", label: t.theori, sub: t.theoryQuestions, color: "#22c55e", icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" },
+      { type: "Praktijk", label: t.praktijk, sub: t.practicalQuestions, color: "#3b82f6", icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" },
+      { type: "Examen", label: t.examen, sub: t.examQuestions, color: "#f97316", icon: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" },
+      { type: "lessons-manager", label: "عناوين الدروس", sub: "إضافة وحذف عناوين", color: "#14b8a6", icon: "M4 6h16M4 10h16M4 14h16M4 18h16" },
+      { type: "subscribers", label: "المشتركون", sub: "عرض قائمة المشتركين", color: "#a855f7", icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" },
+    ];
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(135deg, #0a0a2e 0%, #003399 50%, #0a0a2e 100%)" }}>
-        <div className="w-full max-w-3xl px-6">
+      <div className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0a0a2e 0%, #001a6e 50%, #0a0a2e 100%)" }}>
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-60 -left-60 w-[500px] h-[500px] rounded-full opacity-10 blur-3xl" style={{ background: "#ffcc00" }}></div>
+          <div className="absolute -bottom-60 -right-60 w-[500px] h-[500px] rounded-full opacity-10 blur-3xl" style={{ background: "#003399" }}></div>
+        </div>
+        <div className="relative z-10 w-full max-w-2xl px-6 py-10">
           {/* Header */}
           <div className="text-center mb-10">
-            <div className="w-20 h-20 mx-auto mb-4 rounded-2xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #ffcc00, #ff9900)" }}>
-              <svg className="w-10 h-10 text-[#003399]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #ffcc00, #ff9900)", boxShadow: "0 15px 40px rgba(255,204,0,0.35)" }}>
+              <svg className="w-8 h-8" style={{ color: "#003399" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
             </div>
-            <h1 className="text-3xl font-black text-white tracking-wide">{t.chooseQuestionType}</h1>
-            <p className="text-white/60 mt-2 text-sm">{t.selectType}</p>
+            <h1 className="text-2xl font-black text-white mb-1">{t.chooseQuestionType}</h1>
+            <p className="text-white/40 text-sm">{t.selectType}</p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { type: "Theori", label: t.theori, sub: t.theoryQuestions, color: "#22c55e", bg: "rgba(34,197,94,0.1)", border: "rgba(34,197,94,0.3)", icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" },
-              { type: "Praktijk", label: t.praktijk, sub: t.practicalQuestions, color: "#3b82f6", bg: "rgba(59,130,246,0.1)", border: "rgba(59,130,246,0.3)", icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" },
-              { type: "Examen", label: t.examen, sub: t.examQuestions, color: "#f97316", bg: "rgba(249,115,22,0.1)", border: "rgba(249,115,22,0.3)", icon: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" },
-              { type: "lessons-manager", label: "عناوين الدروس", sub: "إضافة وحذف عناوين الدروس", color: "#14b8a6", bg: "rgba(20,184,166,0.1)", border: "rgba(20,184,166,0.3)", icon: "M4 6h16M4 10h16M4 14h16M4 18h16" },
-              { type: "subscribers", label: "المشتركون", sub: "عرض قائمة المشتركين", color: "#a855f7", bg: "rgba(168,85,247,0.1)", border: "rgba(168,85,247,0.3)", icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" },
-            ].map(({ type, label, sub, color, bg, border, icon }) => (
+          {/* Grid الأزرار */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {menuItems.map(({ type, label, sub, color, icon }) => (
               <button
                 key={type}
-                onClick={() => type === "subscribers" ? window.open("/admin/subscribers", "_blank") : type === "lessons-manager" ? setQuestionType("lessons-manager" as any) : setQuestionType(type as any)}
-                className="group relative overflow-hidden rounded-2xl p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl active:scale-95"
-                style={{ background: bg, border: `2px solid ${border}` }}
+                onClick={() => {
+                  if (type === "subscribers") window.open("/admin/subscribers", "_blank");
+                  else if (type === "lessons-manager") setQuestionType("lessons-manager" as any);
+                  else setQuestionType(type as any);
+                }}
+                className="group relative overflow-hidden rounded-2xl p-5 text-center transition-all duration-300 hover:scale-[1.03] active:scale-95"
+                style={{ background: `${color}10`, border: `1.5px solid ${color}35` }}
               >
-                {/* توهج خلفي */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"
-                  style={{ background: `radial-gradient(circle at center, ${color}20, transparent)` }}></div>
-
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" style={{ background: `radial-gradient(circle at center, ${color}18, transparent)` }}></div>
                 <div className="relative z-10">
-                  <div className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"
-                    style={{ background: `linear-gradient(135deg, ${color}, ${color}cc)`, boxShadow: `0 8px 20px ${color}40` }}>
-                    <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
-                    </svg>
+                  <div className="w-11 h-11 rounded-xl mx-auto mb-3 flex items-center justify-center transition-transform duration-300 group-hover:scale-110" style={{ background: `linear-gradient(135deg, ${color}, ${color}bb)`, boxShadow: `0 6px 18px ${color}35` }}>
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} /></svg>
                   </div>
-                  <h3 className="text-base font-black text-white mb-1">{label}</h3>
-                  <p className="text-xs text-white/50">{sub}</p>
+                  <p className="text-sm font-black text-white mb-0.5">{label}</p>
+                  <p className="text-xs text-white/35">{sub}</p>
                 </div>
               </button>
             ))}
           </div>
 
           <div className="mt-8 text-center">
-            <button onClick={() => setIsLogged(false)} className="text-white/40 hover:text-white/70 font-medium text-sm transition-colors">
+            <button onClick={() => setIsLogged(false)} className="inline-flex items-center gap-2 text-white/30 hover:text-white/60 text-xs transition-colors">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
               {t.backToLogin}
             </button>
           </div>
@@ -989,10 +1014,10 @@ export default function AdminQuestionsPage() {
             {/* اليمين: أزرار */}
             <div className="flex items-center gap-2 flex-wrap">
               {/* أزرار اللغة */}
-              <div className="flex gap-1 bg-white/10 rounded-lg p-1">
+              <div className="flex gap-0.5 rounded-lg p-1" style={{ background: "rgba(255,255,255,0.08)" }}>
                 {[["nl","NL"],["fr","FR"],["ar","AR"]].map(([code, label]) => (
                   <button key={code} onClick={() => setLang(code as any)}
-                    className={`px-3 py-1.5 rounded-md text-xs font-black transition-all ${lang === code ? "bg-white text-[#003399] shadow" : "text-white/70 hover:text-white hover:bg-white/10"}`}>
+                    className={`px-3 py-1.5 rounded-md text-xs font-black transition-all ${lang === code ? "bg-white text-[#003399] shadow-md" : "text-white/50 hover:text-white hover:bg-white/10"}`}>
                     {label}
                   </button>
                 ))}
@@ -1001,14 +1026,16 @@ export default function AdminQuestionsPage() {
               {/* زر تغيير النوع */}
               <button onClick={() => { setQuestionType(""); setQuestionSubType(""); }}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-black transition-all hover:scale-105 active:scale-95"
-                style={{ background: "rgba(255,255,255,0.15)", color: "white", border: "1px solid rgba(255,255,255,0.2)" }}>
-                ← {t.changeType}
+                style={{ background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.8)", border: "1px solid rgba(255,255,255,0.15)" }}>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                {t.changeType}
               </button>
 
               {/* زر الخروج */}
               <button onClick={() => setIsLogged(false)}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-black transition-all hover:scale-105 active:scale-95"
-                style={{ background: "rgba(239,68,68,0.8)", color: "white" }}>
+                style={{ background: "rgba(239,68,68,0.7)", color: "white", border: "1px solid rgba(239,68,68,0.4)" }}>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                 {t.logout}
               </button>
             </div>
@@ -1016,59 +1043,43 @@ export default function AdminQuestionsPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-            </svg>
-            {t.filterQuestions}
-          </h2>
-          <div className="grid md:grid-cols-2 gap-4">
+      <div className="max-w-7xl mx-auto px-6 py-6">
+        {/* قسم الفلتر */}
+        <div className="rounded-2xl p-5 mb-5" style={{ background: "white", border: "1px solid #e5e7eb", boxShadow: "0 1px 8px rgba(0,0,0,0.06)" }}>
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
+              <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
+            </div>
+            <h2 className="text-sm font-black text-gray-700">{t.filterQuestions}</h2>
+          </div>
+          <div className="grid md:grid-cols-2 gap-3">
             {questionType === "Praktijk" ? (
-              // خيارات خاصة بـ Praktijk
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">نوع المحتوى</label>
-                <select
-                  className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-orange-500 focus:outline-none transition"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                >
+                <label className="block text-xs font-bold text-gray-500 mb-1.5">نوع المحتوى</label>
+                <select className="w-full px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 focus:outline-none" style={{ background: "#f8fafc", border: "1.5px solid #e2e8f0" }} value={category} onChange={(e) => setCategory(e.target.value)}>
                   <option value="">اختر نوع المحتوى</option>
                   <option value="training">فيديوهات تدريبية</option>
                   <option value="hazard">إدراك المخاطر</option>
                 </select>
               </div>
             ) : (
-              // الفئات العادية لـ Theori و Examen
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">الفئة</label>
-                <select
-                  className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-orange-500 focus:outline-none transition"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                >
+                <label className="block text-xs font-bold text-gray-500 mb-1.5">الفئة</label>
+                <select className="w-full px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 focus:outline-none" style={{ background: "#f8fafc", border: "1.5px solid #e2e8f0" }} value={category} onChange={(e) => setCategory(e.target.value)}>
                   <option value="">اختر الفئة</option>
-                  <option value="A"> فئة الموتورات (A)</option>
-                  <option value="B"> فئة السيارات (B)</option>
-                  <option value="C"> فئة الشاحنات (C)</option>
+                  <option value="A">🏍️ فئة الموتورات (A)</option>
+                  <option value="B">🚗 فئة السيارات (B)</option>
+                  <option value="C">🚛 فئة الشاحنات (C)</option>
                 </select>
               </div>
             )}
-
             {lessons.length > 0 && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">الدرس</label>
-                <select
-                  className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-orange-500 focus:outline-none transition"
-                  value={lessonId}
-                  onChange={(e) => setLessonId(e.target.value)}
-                >
+                <label className="block text-xs font-bold text-gray-500 mb-1.5">الدرس</label>
+                <select className="w-full px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 focus:outline-none" style={{ background: "#f8fafc", border: "1.5px solid #e2e8f0" }} value={lessonId} onChange={(e) => setLessonId(e.target.value)}>
                   <option value="">اختر الدرس</option>
                   {lessons.map((lesson) => (
-                    <option key={lesson.id} value={lesson.id}>
-                      {lesson.name}
-                    </option>
+                    <option key={lesson.id} value={lesson.id}>{lesson.name}</option>
                   ))}
                 </select>
               </div>
@@ -1076,13 +1087,13 @@ export default function AdminQuestionsPage() {
           </div>
         </div>
         {lessonId && (
-          <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              إضافة سؤال جديد
-            </h2>
+          <div className="rounded-2xl p-5 mb-5" style={{ background: "white", border: "1px solid #e5e7eb", boxShadow: "0 1px 8px rgba(0,0,0,0.06)" }}>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
+                <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+              </div>
+              <h2 className="text-sm font-black text-gray-700">إضافة سؤال جديد</h2>
+            </div>
             <div className="space-y-4">
               {/* حقول السؤال - للامتحانات بالهولندية فقط */}
               {questionType === "Examen" ? (
@@ -1423,7 +1434,8 @@ export default function AdminQuestionsPage() {
                 </div>
               )}
               <button
-                className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-4 rounded-lg font-bold text-lg hover:from-green-600 hover:to-green-700 transition shadow-lg"
+                className="w-full py-3 rounded-xl font-black text-sm transition-all hover:scale-[1.01] active:scale-95"
+                style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white", boxShadow: "0 4px 14px rgba(34,197,94,0.35)" }}
                 onClick={handleAddQuestion}
               >
                 💾 حفظ السؤال
@@ -1433,36 +1445,41 @@ export default function AdminQuestionsPage() {
         )}
 
         {questions.length > 0 && (
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="mb-6">
+          <div className="rounded-2xl overflow-hidden" style={{ background: "white", border: "1px solid #e5e7eb", boxShadow: "0 1px 8px rgba(0,0,0,0.06)" }}>
+            {/* شريط البحث */}
+            <div className="p-5 border-b border-gray-100">
               <div className="relative">
+                <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                </div>
                 <input
                   type="text"
-                  placeholder=" ابحث عن سؤال..."
-                  className="w-full p-4 pr-12 border-2 border-gray-200 rounded-lg focus:border-orange-500 focus:outline-none transition text-lg"
+                  placeholder="ابحث عن سؤال..."
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm font-medium text-gray-700 placeholder-gray-400 focus:outline-none"
+                  style={{ background: "#f8fafc", border: "1.5px solid #e2e8f0" }}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <svg className="w-6 h-6 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
               </div>
             </div>
 
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">
-                الأسئلة المتاحة ({filteredQuestions.length})
-              </h2>
+            {/* عنوان القائمة */}
+            <div className="px-5 py-3 flex items-center justify-between" style={{ background: "#f8fafc", borderBottom: "1px solid #e5e7eb" }}>
+              <span className="text-xs font-black text-gray-500 uppercase tracking-wider">الأسئلة</span>
+              <span className="px-2.5 py-1 rounded-full text-xs font-black" style={{ background: "linear-gradient(135deg, #003399, #0055cc)", color: "white" }}>
+                {filteredQuestions.length}
+              </span>
             </div>
 
-            <div className="space-y-4">
+            <div className="divide-y divide-gray-50 p-4 space-y-3">
               {filteredQuestions.map((q, index) => (
                 <div
                   key={q.id}
-                  className="border-2 border-gray-200 rounded-xl p-6 hover:border-orange-300 transition bg-gradient-to-r from-white to-gray-50"
+                  className="rounded-2xl overflow-hidden transition-all"
+                  style={{ border: editingQuestion?.id === q.id ? "1.5px solid #3b82f6" : "1.5px solid #e5e7eb", background: editingQuestion?.id === q.id ? "#eff6ff" : "white" }}
                 >
                   {editingQuestion?.id === q.id ? (
-                    <div className="space-y-4">
+                    <div className="space-y-4 p-5">
                       {/* نصوص السؤال بثلاث لغات */}
                       <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-4">
                         <h3 className="text-sm font-bold text-gray-800 mb-3">✏️ تعديل نص السؤال</h3>
@@ -1600,16 +1617,18 @@ export default function AdminQuestionsPage() {
                       </div>
 
                       <div className="flex gap-3">
-                        <button onClick={() => handleEditQuestion(q.id)} className="flex-1 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition font-bold">
-                          💾 حفظ التعديلات
+                        <button onClick={() => handleEditQuestion(q.id)} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black transition-all hover:scale-[1.02] active:scale-95" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white", boxShadow: "0 4px 14px rgba(34,197,94,0.35)" }}>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                          حفظ التعديلات
                         </button>
-                        <button onClick={() => setEditingQuestion(null)} className="flex-1 px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition font-bold">
+                        <button onClick={() => setEditingQuestion(null)} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black transition-all hover:scale-[1.02] active:scale-95" style={{ background: "#f1f5f9", color: "#64748b", border: "1.5px solid #e2e8f0" }}>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                           إلغاء
                         </button>
                       </div>
                     </div>
                   ) : (
-                    <div>
+                    <div className="p-5">
                       {/* عرض السؤال بثلاث لغات */}
                       <div className="mb-4 bg-purple-50 border-2 border-purple-200 rounded-lg p-4">
                         <div className="flex items-center gap-2 mb-3">
@@ -1765,7 +1784,7 @@ export default function AdminQuestionsPage() {
                         </div>
                       )}
 
-                      <div className="flex gap-3 pt-4 border-t-2 border-gray-100">
+                      <div className="flex gap-2 pt-4 border-t border-gray-100">
                         <button
                           onClick={() => {
                             setEditingQuestion(q);
@@ -1785,20 +1804,18 @@ export default function AdminQuestionsPage() {
                               audioUrl: q.audioUrl || "",
                             });
                           }}
-                          className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-bold flex items-center justify-center gap-2"
+                          className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-black transition-all hover:scale-[1.02] active:scale-95"
+                          style={{ background: "linear-gradient(135deg, #3b82f6, #2563eb)", color: "white", boxShadow: "0 4px 12px rgba(59,130,246,0.3)" }}
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                           تعديل
                         </button>
                         <button
                           onClick={() => handleDeleteQuestion(q.id)}
-                          className="flex-1 px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-bold flex items-center justify-center gap-2"
+                          className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-black transition-all hover:scale-[1.02] active:scale-95"
+                          style={{ background: "linear-gradient(135deg, #ef4444, #dc2626)", color: "white", boxShadow: "0 4px 12px rgba(239,68,68,0.3)" }}
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                           حذف
                         </button>
                       </div>
