@@ -83,6 +83,8 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
       else alert(data.message || "خطأ في التعديل");
     } catch (e) { alert("خطأ في الاتصال"); }
   };
+
+  return (
     <div className="min-h-screen" style={{ background: "#f0f4f8" }}>
       {/* Header */}
       <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0a0a2e 0%, #003399 60%, #0055cc 100%)" }}>
