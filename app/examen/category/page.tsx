@@ -5,6 +5,46 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useLang } from "@/context/LangContext";
 import Navbar from "@/components/Navbar";
 
+// زر القراءة الصوتية
+function TTSButton({ text }: { text: string }) {
+  const [speaking, setSpeaking] = useState(false);
+  const [rate, setRate] = useState(1);
+
+  const speak = () => {
+    if (!window.speechSynthesis) return;
+    if (speaking) { window.speechSynthesis.cancel(); setSpeaking(false); return; }
+    const doSpeak = () => {
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = rate; u.lang = "nl-NL";
+      const voices = window.speechSynthesis.getVoices();
+      const v = voices.find(v => v.lang === "nl-NL" && !v.name.includes("Xander")) || voices.find(v => v.lang.startsWith("nl"));
+      if (v) u.voice = v;
+      u.onend = () => setSpeaking(false);
+      u.onerror = () => setSpeaking(false);
+      setSpeaking(true);
+      window.speechSynthesis.speak(u);
+    };
+    if (window.speechSynthesis.getVoices().length === 0) { window.speechSynthesis.onvoiceschanged = doSpeak; } else { doSpeak(); }
+  };
+
+  return (
+    <div className="flex items-center gap-2 mb-3 flex-wrap">
+      <button onClick={speak}
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border-2 transition-all ${speaking ? "bg-red-500 text-white border-red-500" : "bg-white text-[#003399] border-[#003399] hover:bg-[#003399] hover:text-white"}`}>
+        {speaking ? "⏹ Stop" : "🔊 Lees voor"}
+      </button>
+      <div className="flex gap-1">
+        {[0.5, 0.75, 1, 1.25, 1.5].map(r => (
+          <button key={r} onClick={() => { setRate(r); if (speaking) { window.speechSynthesis?.cancel(); setSpeaking(false); } }}
+            className={`px-2 py-0.5 text-xs font-black rounded border transition-all ${rate === r ? "bg-[#003399] text-white border-[#003399]" : "bg-white text-gray-500 border-gray-300"}`}>
+            {r}x
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function ExamenCategoryContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -257,6 +297,9 @@ function ExamenCategoryContent() {
 
             {/* نص السؤال */}
             <div className="px-5 py-4 bg-white">
+              {/* زر القراءة */}
+              <TTSButton text={q.textNL || q.text} />
+
               <p className={`text-lg font-bold text-gray-900 leading-relaxed mb-5 ${isRtl ? "text-right" : "text-left"}`}>
                 {q.textNL || q.text}
               </p>

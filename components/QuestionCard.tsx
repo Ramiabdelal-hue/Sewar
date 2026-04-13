@@ -53,8 +53,6 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
   const [qText, setQText] = useState(originalText);
   const [expText, setExpText] = useState(originalExplanation);
   const [translating, setTranslating] = useState(false);
-  const [speaking, setSpeaking] = useState(false);
-  const [rate, setRate] = useState(1);
 
   useEffect(() => {
     if (lang === "nl") { setQText(originalText); setExpText(originalExplanation); return; }
@@ -64,47 +62,6 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
       translateOne(originalExplanation, lang),
     ]).then(([q, e]) => { setQText(q); setExpText(e); }).finally(() => setTranslating(false));
   }, [originalText, originalExplanation, lang]);
-
-  // إيقاف القراءة عند تغيير السؤال
-  useEffect(() => {
-    window.speechSynthesis?.cancel();
-    setSpeaking(false);
-  }, [index]);
-
-  const speak = () => {
-    if (!window.speechSynthesis) return;
-    if (speaking) {
-      window.speechSynthesis.cancel();
-      setSpeaking(false);
-      return;
-    }
-
-    const doSpeak = () => {
-      const utterance = new SpeechSynthesisUtterance(originalText);
-      utterance.rate = rate;
-      utterance.lang = "nl-NL";
-
-      const voices = window.speechSynthesis.getVoices();
-      // ابحث عن صوت هولندي أنثوي أولاً
-      const nlVoice = voices.find(v => v.lang === "nl-NL" && !v.name.includes("Xander")) ||
-                      voices.find(v => v.lang === "nl-BE") ||
-                      voices.find(v => v.lang.startsWith("nl"));
-
-      if (nlVoice) utterance.voice = nlVoice;
-
-      utterance.onend = () => setSpeaking(false);
-      utterance.onerror = () => setSpeaking(false);
-      setSpeaking(true);
-      window.speechSynthesis.speak(utterance);
-    };
-
-    // الأصوات قد لا تكون محملة بعد
-    if (window.speechSynthesis.getVoices().length === 0) {
-      window.speechSynthesis.onvoiceschanged = () => { doSpeak(); };
-    } else {
-      doSpeak();
-    }
-  };
 
   const isRtl = lang === "ar";
 
@@ -185,44 +142,6 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
 
       {/* نص السؤال */}
       <div className="px-5 py-5 bg-white">
-        {/* أزرار القراءة والسرعة */}
-        <div className="flex items-center gap-2 mb-3 flex-wrap">
-          <button
-            onClick={speak}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border-2 transition-all ${
-              speaking
-                ? "bg-red-500 text-white border-red-500"
-                : "bg-white text-[#003399] border-[#003399] hover:bg-[#003399] hover:text-white"
-            }`}
-          >
-            {speaking ? (
-              <>⏹ {lang === "ar" ? "إيقاف" : lang === "nl" ? "Stop" : lang === "fr" ? "Arrêt" : "Stop"}</>
-            ) : (
-              <>🔊 {lang === "ar" ? "اقرأ" : lang === "nl" ? "Lees voor" : lang === "fr" ? "Lire" : "Read"}</>
-            )}
-          </button>
-
-          {/* أزرار السرعة */}
-          <div className="flex items-center gap-1">
-            <span className="text-xs text-gray-400 font-bold">
-              {lang === "ar" ? "السرعة:" : lang === "nl" ? "Snelheid:" : lang === "fr" ? "Vitesse:" : "Speed:"}
-            </span>
-            {[0.5, 0.75, 1, 1.25, 1.5].map(r => (
-              <button
-                key={r}
-                onClick={() => { setRate(r); if (speaking) { window.speechSynthesis?.cancel(); setSpeaking(false); } }}
-                className={`px-2 py-0.5 text-xs font-black rounded border transition-all ${
-                  rate === r
-                    ? "bg-[#003399] text-white border-[#003399]"
-                    : "bg-white text-gray-500 border-gray-300 hover:border-[#003399]"
-                }`}
-              >
-                {r}x
-              </button>
-            ))}
-          </div>
-        </div>
-
         <div className="flex items-start gap-2 mb-1">
           <span className="w-1 h-5 bg-[#003399] rounded-full flex-shrink-0 mt-1"></span>
           <p className={`text-lg font-bold text-gray-900 leading-relaxed ${isRtl ? "text-right" : "text-left"}`}>
