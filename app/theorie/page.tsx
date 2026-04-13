@@ -75,14 +75,14 @@ export default function TheoriePage() {
         // ليس لديه اشتراك theorie - أعد توجيهه
         const praktijkLessons = subs.find((s: any) => s.subscriptionType === "praktijk-lessons");
         const praktijkExam = subs.find((s: any) => s.subscriptionType === "praktijk-exam");
-        const examen = subs.find((s: any) => s.subscriptionType === "examen");
+        const EXAM = subs.find((s: any) => s.subscriptionType === "EXAM");
         
         if (praktijkLessons) {
           window.location.assign(`/praktical/lessons?email=${encodeURIComponent(email)}&exp=${new Date(praktijkLessons.expiryDate).getTime()}`);
         } else if (praktijkExam) {
           window.location.assign(`/praktical/exam?email=${encodeURIComponent(email)}&exp=${new Date(praktijkExam.expiryDate).getTime()}`);
-        } else if (examen) {
-          window.location.assign(`/examen?email=${encodeURIComponent(email)}&cat=${examen.category}&exp=${new Date(examen.expiryDate).getTime()}`);
+        } else if (EXAM) {
+          window.location.assign(`/EXAM?email=${encodeURIComponent(email)}&cat=${EXAM.category}&exp=${new Date(EXAM.expiryDate).getTime()}`);
         }
         setLoading(false);
         return;
@@ -240,7 +240,7 @@ export default function TheoriePage() {
               <tr style={{ backgroundColor: "#3399ff" }}>
                 <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc]">{lang === "ar" ? "الدرس" : lang === "nl" ? "LES" : lang === "fr" ? "LEÇON" : "LESSON"}</th>
                 <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">{lang === "ar" ? "فتح" : lang === "nl" ? "OPENEN" : lang === "fr" ? "OUVRIR" : "OPEN"}</th>
-                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">EXAMEN</th>
+                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">Exam</th>
               </tr>
             </thead>
             <tbody>
@@ -258,7 +258,7 @@ export default function TheoriePage() {
                   <td className="px-4 py-3 border border-gray-200 text-center">
                     <button onClick={() => router.push(`/examen/category?cat=${userCategory}&email=${userEmail}&lessonId=${lesson.id}`)}
                       className="bg-white border-2 border-orange-400 px-4 py-1.5 text-sm font-bold text-orange-600 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-colors">
-                      Examen
+                      EXAM
                     </button>
                   </td>
                 </tr>
@@ -267,7 +267,7 @@ export default function TheoriePage() {
           </table>
         )}
 
-        {/* زر Examen أُزيل من الأسفل */}
+        {/* زر EXAM أُزيل من الأسفل */}
       </div>
     </div>
   );

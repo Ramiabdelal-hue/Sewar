@@ -87,9 +87,9 @@ function LessonsContent() {
   const currentCategory = (cat || "B").toUpperCase();
 
   const getCategoryTitle = () => {
-    if (currentCategory === "C") return lang === "ar" ? "����� ���� ������� C" : lang === "nl" ? "THEORIE RIJBEWIJS C OEFENVRAGEN EN PROEFEXAMEN" : lang === "fr" ? "THEORIE PERMIS C QUESTIONS ET EXAMEN" : "THEORY LICENSE C PRACTICE QUESTIONS AND EXAM";
-    if (currentCategory === "A") return lang === "ar" ? "����� ���� ������� A" : lang === "nl" ? "THEORIE RIJBEWIJS A OEFENVRAGEN EN PROEFEXAMEN" : lang === "fr" ? "THEORIE PERMIS A QUESTIONS ET EXAMEN" : "THEORY LICENSE A PRACTICE QUESTIONS AND EXAM";
-    return lang === "ar" ? "����� ���� ������� B - ����� �������" : lang === "nl" ? "THEORIE RIJBEWIJS B OEFENVRAGEN EN PROEFEXAMEN" : lang === "fr" ? "THEORIE PERMIS B QUESTIONS ET EXAMEN" : "THEORY LICENSE B PRACTICE QUESTIONS AND EXAM";
+    if (currentCategory === "C") return lang === "ar" ? "����� ���� ������� C" : lang === "nl" ? "THEORIE RIJBEWIJS C OEFENVRAGEN EN PROEFEXAM" : lang === "fr" ? "THEORIE PERMIS C QUESTIONS ET EXAM" : "THEORY LICENSE C PRACTICE QUESTIONS AND EXAM";
+    if (currentCategory === "A") return lang === "ar" ? "����� ���� ������� A" : lang === "nl" ? "THEORIE RIJBEWIJS A OEFENVRAGEN EN PROEFEXAM" : lang === "fr" ? "THEORIE PERMIS A QUESTIONS ET EXAM" : "THEORY LICENSE A PRACTICE QUESTIONS AND EXAM";
+    return lang === "ar" ? "����� ���� ������� B - ����� �������" : lang === "nl" ? "THEORIE RIJBEWIJS B OEFENVRAGEN EN PROEFEXAM" : lang === "fr" ? "THEORIE PERMIS B QUESTIONS ET EXAM" : "THEORY LICENSE B PRACTICE QUESTIONS AND EXAM";
   };
 
   const filteredLessons = lessons.filter(l =>
@@ -188,7 +188,7 @@ function LessonsContent() {
                   {lang === "ar" ? "فتح" : lang === "nl" ? "OPENEN" : lang === "fr" ? "OUVRIR" : "OPEN"}
                 </th>
                 <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
-                  EXAMEN
+                  EXAM
                 </th>
               </tr>
             </thead>
@@ -211,7 +211,7 @@ function LessonsContent() {
                       onClick={() => router.push(`/examen/category?cat=${cat || "B"}&email=${userEmail}&lessonId=${lesson.id}`)}
                       className="bg-white border-2 border-orange-400 px-4 py-1 text-sm font-bold text-orange-600 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-colors"
                     >
-                      Examen
+                      EXAM
                     </button>
                   </td>
                 </tr>
