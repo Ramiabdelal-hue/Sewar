@@ -739,51 +739,58 @@ export default function AdminQuestionsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="bg-white shadow-md border-b-4 border-orange-500">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
-                <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center">
-                  <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
+    <div className="min-h-screen" style={{ background: "#f0f4f8" }}>
+      {/* Header خرافي */}
+      <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0a0a2e 0%, #003399 60%, #0055cc 100%)" }}>
+        {/* خطوط زخرفية */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-96 h-96 rounded-full blur-3xl" style={{ background: "#ffcc00", transform: "translate(-50%, -50%)" }}></div>
+          <div className="absolute bottom-0 right-0 w-64 h-64 rounded-full blur-3xl" style={{ background: "#ff9900", transform: "translate(30%, 30%)" }}></div>
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-6 py-5">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            {/* اليسار: اللوغو + العنوان */}
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, #ffcc00, #ff9900)" }}>
+                <svg className="w-7 h-7 text-[#003399]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-xl font-black text-white tracking-wide">إدارة وتنظيم الأسئلة</h1>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="px-2 py-0.5 rounded-full text-xs font-bold" style={{ background: "rgba(255,204,0,0.2)", color: "#ffcc00", border: "1px solid rgba(255,204,0,0.4)" }}>
+                    {questionType}
+                  </span>
+                  <span className="text-white/40 text-xs">{t.systemManagement}</span>
                 </div>
-                إدارة وتنظيم الأسئلة
-              </h1>
-              <p className="text-gray-500 mt-1 mr-15">
-                {t.systemManagement} {questionType}
-              </p>
+              </div>
             </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setLang("nl")}
-                className={`px-4 py-2 rounded-lg font-semibold transition ${lang === "nl" ? "bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md" : "bg-white text-gray-600 hover:bg-gray-100"}`}
-              >
-                NL
+
+            {/* اليمين: أزرار */}
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* أزرار اللغة */}
+              <div className="flex gap-1 bg-white/10 rounded-lg p-1">
+                {[["nl","NL"],["fr","FR"],["ar","AR"]].map(([code, label]) => (
+                  <button key={code} onClick={() => setLang(code as any)}
+                    className={`px-3 py-1.5 rounded-md text-xs font-black transition-all ${lang === code ? "bg-white text-[#003399] shadow" : "text-white/70 hover:text-white hover:bg-white/10"}`}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {/* زر تغيير النوع */}
+              <button onClick={() => { setQuestionType(""); setQuestionSubType(""); }}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-black transition-all hover:scale-105 active:scale-95"
+                style={{ background: "rgba(255,255,255,0.15)", color: "white", border: "1px solid rgba(255,255,255,0.2)" }}>
+                ← {t.changeType}
               </button>
-              <button
-                onClick={() => setLang("fr")}
-                className={`px-4 py-2 rounded-lg font-semibold transition ${lang === "fr" ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md" : "bg-white text-gray-600 hover:bg-gray-100"}`}
-              >
-                FR
-              </button>
-              <button
-                onClick={() => setLang("ar")}
-                className={`px-4 py-2 rounded-lg font-semibold transition ${lang === "ar" ? "bg-gradient-to-r from-green-400 to-cyan-400 text-white shadow-md" : "bg-white text-gray-600 hover:bg-gray-100"}`}
-              >
-                AR
-              </button>
-              <button
-                onClick={() => { setQuestionType(""); setQuestionSubType(""); }}
-              >
-                {t.changeType}
-              </button>
-              <button
-                onClick={() => setIsLogged(false)}
-                className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium"
-              >
+
+              {/* زر الخروج */}
+              <button onClick={() => setIsLogged(false)}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-black transition-all hover:scale-105 active:scale-95"
+                style={{ background: "rgba(239,68,68,0.8)", color: "white" }}>
                 {t.logout}
               </button>
             </div>
