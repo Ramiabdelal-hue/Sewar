@@ -626,78 +626,59 @@ export default function AdminQuestionsPage() {
   // شاشة اختيار نوع الأسئلة
   if (!questionType) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100">
-        <div className="bg-white p-10 rounded-2xl shadow-2xl w-full max-w-2xl">
-          <div className="text-center mb-8">
-            <div className="w-20 h-20 bg-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center">
-              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(135deg, #0a0a2e 0%, #003399 50%, #0a0a2e 100%)" }}>
+        <div className="w-full max-w-3xl px-6">
+          {/* Header */}
+          <div className="text-center mb-10">
+            <div className="w-20 h-20 mx-auto mb-4 rounded-2xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #ffcc00, #ff9900)" }}>
+              <svg className="w-10 h-10 text-[#003399]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
             </div>
-            <h1 className="text-3xl font-bold text-gray-800">{t.chooseQuestionType}</h1>
-            <p className="text-gray-500 mt-2">{t.selectType}</p>
+            <h1 className="text-3xl font-black text-white tracking-wide">{t.chooseQuestionType}</h1>
+            <p className="text-white/60 mt-2 text-sm">{t.selectType}</p>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-6">
-            <button
-              onClick={() => setQuestionType("Theori")}
-              className="group bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-200 rounded-xl p-5 hover:border-green-500 hover:shadow-xl transition-all"
-            >
-              <div className="w-16 h-16 bg-green-500 rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">{t.theori}</h3>
-              <p className="text-gray-600">{t.theoryQuestions}</p>
-            </button>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { type: "Theori", label: t.theori, sub: t.theoryQuestions, color: "#22c55e", bg: "rgba(34,197,94,0.1)", border: "rgba(34,197,94,0.3)", icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" },
+              { type: "Praktijk", label: t.praktijk, sub: t.practicalQuestions, color: "#3b82f6", bg: "rgba(59,130,246,0.1)", border: "rgba(59,130,246,0.3)", icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" },
+              { type: "Examen", label: t.examen, sub: t.examQuestions, color: "#f97316", bg: "rgba(249,115,22,0.1)", border: "rgba(249,115,22,0.3)", icon: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" },
+              { type: "subscribers", label: "المشتركون", sub: "عرض قائمة المشتركين", color: "#a855f7", bg: "rgba(168,85,247,0.1)", border: "rgba(168,85,247,0.3)", icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" },
+            ].map(({ type, label, sub, color, bg, border, icon }) => (
+              <button
+                key={type}
+                onClick={() => type === "subscribers" ? window.open("/admin/subscribers", "_blank") : setQuestionType(type as any)}
+                className="group relative overflow-hidden rounded-2xl p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl active:scale-95"
+                style={{ background: bg, border: `2px solid ${border}` }}
+              >
+                {/* توهج خلفي */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"
+                  style={{ background: `radial-gradient(circle at center, ${color}20, transparent)` }}></div>
 
-            <button
-              onClick={() => setQuestionType("Praktijk")}
-              className="group bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 rounded-xl p-5 hover:border-blue-500 hover:shadow-xl transition-all"
-            >
-              <div className="w-16 h-16 bg-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">{t.praktijk}</h3>
-              <p className="text-gray-600">{t.practicalQuestions}</p>
-            </button>
-
-            <button
-              onClick={() => setQuestionType("Examen")}
-              className="group bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-200 rounded-xl p-5 hover:border-orange-500 hover:shadow-xl transition-all"
-            >
-              <div className="w-16 h-16 bg-orange-500 rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">{t.examen}</h3>
-              <p className="text-gray-600">{t.examQuestions}</p>
-            </button>
-
-            <button
-              onClick={() => window.open("/admin/subscribers", "_blank")}
-              className="group bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-200 rounded-xl p-5 hover:border-purple-500 hover:shadow-xl transition-all"
-            >
-              <div className="w-16 h-16 bg-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">المشتركون</h3>
-              <p className="text-gray-600">عرض قائمة المشتركين</p>
-            </button>
+                <div className="relative z-10">
+                  <div className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"
+                    style={{ background: `linear-gradient(135deg, ${color}, ${color}cc)`, boxShadow: `0 8px 20px ${color}40` }}>
+                    <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
+                    </svg>
+                  </div>
+                  <h3 className="text-base font-black text-white mb-1">{label}</h3>
+                  <p className="text-xs text-white/50">{sub}</p>
+                </div>
+              </button>
+            ))}
           </div>
 
           <div className="mt-8 text-center">
-            <button
-              onClick={() => setIsLogged(false)}
-              className="text-gray-600 hover:text-gray-800 font-medium"
-            >
+            <button onClick={() => setIsLogged(false)} className="text-white/40 hover:text-white/70 font-medium text-sm transition-colors">
               {t.backToLogin}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
             </button>
           </div>
         </div>
