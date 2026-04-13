@@ -129,7 +129,7 @@ function ExamenCategoryContent() {
   };
 
   const score = Object.entries(answers).filter(([i, ans]) =>
-    ans !== null && questions[parseInt(i)]?.correctAnswer === ans
+    ans !== null && ans !== undefined && questions[parseInt(i)]?.correctAnswer === ans
   ).length;
 
   const q = questions[currentIndex];
@@ -173,48 +173,151 @@ function ExamenCategoryContent() {
   if (finished) {
     const pct = Math.round((score / questions.length) * 100);
     const passed = pct >= 60;
+    const wrongAnswers = questions.filter((q, i) => answers[i] !== q.correctAnswer);
+
     return (
-      <div className="min-h-screen bg-white" dir={isRtl ? "rtl" : "ltr"}>
+      <div className="min-h-screen bg-gray-50" dir={isRtl ? "rtl" : "ltr"}>
         <Navbar />
-        <div className="max-w-2xl mx-auto px-4 py-12 text-center">
-          <div className={`border-4 rounded-2xl p-10 ${passed ? "border-green-500" : "border-red-500"}`}>
-            <div className="text-7xl mb-4">{passed ? "🏆" : "😔"}</div>
-            <h1 className="text-3xl font-black mb-2" style={{ color: passed ? "#16a34a" : "#dc2626" }}>
+        <div className="max-w-3xl mx-auto px-4 py-8">
+
+          {/* بطاقة النتيجة */}
+          <div className={`rounded-2xl p-8 mb-6 text-center border-4 ${passed ? "border-green-400 bg-green-50" : "border-red-400 bg-red-50"}`}>
+            <div className="text-6xl mb-3">{passed ? "🏆" : "😔"}</div>
+            <h1 className="text-2xl font-black mb-1" style={{ color: passed ? "#16a34a" : "#dc2626" }}>
               {passed
-                ? (lang === "ar" ? "مبروك! نجحت" : lang === "nl" ? "Gefeliciteerd! Geslaagd!" : "Congratulations! Passed!")
-                : (lang === "ar" ? "لم تنجح هذه المرة" : lang === "nl" ? "Helaas niet geslaagd" : "Not passed this time")}
+                ? (lang === "ar" ? "مبروك! نجحت" : lang === "nl" ? "Gefeliciteerd! Geslaagd!" : "Congratulations!")
+                : (lang === "ar" ? "لم تنجح هذه المرة" : lang === "nl" ? "Helaas niet geslaagd" : "Not passed")}
             </h1>
-            <div className="text-6xl font-black my-6" style={{ color: passed ? "#16a34a" : "#dc2626" }}>
-              {score} / {questions.length}
+            <div className="flex items-center justify-center gap-6 mt-4">
+              <div className="bg-white rounded-xl px-6 py-3 shadow">
+                <p className="text-xs text-gray-400 font-bold uppercase">Correct</p>
+                <p className="text-3xl font-black text-green-600">{score}</p>
+              </div>
+              <div className="bg-white rounded-xl px-6 py-3 shadow">
+                <p className="text-xs text-gray-400 font-bold uppercase">Fout</p>
+                <p className="text-3xl font-black text-red-500">{questions.length - score}</p>
+              </div>
+              <div className="bg-white rounded-xl px-6 py-3 shadow">
+                <p className="text-xs text-gray-400 font-bold uppercase">Score</p>
+                <p className="text-3xl font-black" style={{ color: passed ? "#16a34a" : "#dc2626" }}>{pct}%</p>
+              </div>
             </div>
-            <div className="text-2xl font-bold text-gray-600 mb-8">{pct}%</div>
+          </div>
 
-            {/* تفاصيل الإجابات */}
-            <div className="text-left mt-6 space-y-2 max-h-64 overflow-y-auto">
-              {questions.map((q, i) => {
-                const userAns = answers[i];
-                const correct = q.correctAnswer === userAns;
-                return (
-                  <div key={i} className={`flex items-center gap-2 p-2 rounded text-sm ${correct ? "bg-green-50" : "bg-red-50"}`}>
-                    <span>{correct ? "✅" : "❌"}</span>
-                    <span className="flex-1 truncate text-gray-700">{q.textNL || q.text}</span>
-                    {!correct && userAns === null && <span className="text-orange-500 text-xs font-bold">⏱ {lang === "ar" ? "انتهى الوقت" : "Tijd op"}</span>}
-                  </div>
-                );
-              })}
-            </div>
+          {/* مراجعة الأسئلة الخاطئة */}
+          {wrongAnswers.length > 0 && (
+            <div className="mb-6">
+              <h2 className="text-lg font-black text-gray-800 mb-3 flex items-center gap-2">
+                <span className="w-7 h-7 rounded-lg bg-red-500 flex items-center justify-center text-white text-sm">✗</span>
+                {lang === "ar" ? `الأسئلة الخاطئة (${wrongAnswers.length})` : lang === "nl" ? `Foute antwoorden (${wrongAnswers.length})` : `Wrong answers (${wrongAnswers.length})`}
+              </h2>
+              <div className="space-y-4">
+                {questions.map((q, i) => {
+                  const userAns = answers[i];
+                  const isCorrect = userAns === q.correctAnswer;
+                  if (isCorrect) return null;
 
-            <div className="flex gap-3 mt-8 justify-center">
-              <button onClick={() => { setStarted(false); setFinished(false); setCurrentIndex(0); setAnswers({}); setLocked(false); setQuestions(q => [...q].sort(() => Math.random() - 0.5)); }}
-                className="px-6 py-3 font-black text-white rounded-xl"
-                style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-                🔄 {lang === "ar" ? "إعادة" : lang === "nl" ? "Opnieuw" : "Retry"}
-              </button>
-              <button onClick={() => router.back()}
-                className="px-6 py-3 font-black border-2 border-gray-400 text-gray-600 rounded-xl hover:bg-gray-50">
-                ← {lang === "ar" ? "رجوع" : lang === "nl" ? "Terug" : "Back"}
-              </button>
+                  const timedOut = userAns === null || userAns === undefined;
+
+                  return (
+                    <div key={i} className="bg-white rounded-2xl overflow-hidden shadow border border-red-100">
+                      {/* رأس */}
+                      <div className="px-4 py-2 flex items-center gap-2" style={{ background: "#fef2f2" }}>
+                        <span className="w-6 h-6 rounded-full bg-red-500 text-white text-xs font-black flex items-center justify-center">{i + 1}</span>
+                        {timedOut && (
+                          <span className="text-xs font-black text-orange-500 flex items-center gap-1">
+                            ⏱ {lang === "ar" ? "انتهى الوقت" : lang === "nl" ? "Tijd verlopen" : "Time out"}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* صورة */}
+                      {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
+                        <div className={`grid gap-0.5 bg-gray-900 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+                          {q.videoUrls.filter(Boolean).map((url: string, idx: number) => (
+                            <div key={idx} className="relative" style={{ aspectRatio: "16/9" }}>
+                              <img src={url} alt="" className="w-full h-full object-cover" />
+                              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <img src="/logo.jpg" alt="" style={{ width: '60%', height: '60%', objectFit: 'contain', opacity: 0.3, mixBlendMode: 'luminosity' }} />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="p-4">
+                        {/* نص السؤال */}
+                        <p className="font-bold text-gray-800 mb-4 text-sm leading-relaxed">{q.textNL || q.text}</p>
+
+                        {/* الإجابات */}
+                        <div className="space-y-2">
+                          {[1, 2, 3].map(num => {
+                            const ansText = q[`answer${num}`];
+                            if (!ansText) return null;
+                            const isCorrectAns = q.correctAnswer === num;
+                            const isUserAns = userAns === num;
+
+                            return (
+                              <div key={num} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium border-2 ${
+                                isCorrectAns ? "bg-green-50 border-green-400 text-green-800" :
+                                isUserAns ? "bg-red-50 border-red-400 text-red-800" :
+                                "bg-gray-50 border-gray-200 text-gray-500"
+                              }`}>
+                                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0 ${
+                                  isCorrectAns ? "bg-green-500 text-white" :
+                                  isUserAns ? "bg-red-500 text-white" :
+                                  "bg-gray-300 text-gray-600"
+                                }`}>
+                                  {isCorrectAns ? "✓" : isUserAns ? "✗" : num}
+                                </span>
+                                <span className="flex-1">{ansText}</span>
+                                {isCorrectAns && <span className="text-xs font-black text-green-600">{lang === "ar" ? "الصحيحة" : lang === "nl" ? "Correct" : "Correct"}</span>}
+                                {isUserAns && !isCorrectAns && <span className="text-xs font-black text-red-500">{lang === "ar" ? "إجابتك" : lang === "nl" ? "Jouw antwoord" : "Your answer"}</span>}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
+          )}
+
+          {/* الأسئلة الصحيحة */}
+          {score > 0 && (
+            <details className="mb-6">
+              <summary className="cursor-pointer text-sm font-black text-gray-500 flex items-center gap-2 mb-3 select-none">
+                <span className="w-7 h-7 rounded-lg bg-green-500 flex items-center justify-center text-white text-sm">✓</span>
+                {lang === "ar" ? `الأسئلة الصحيحة (${score})` : lang === "nl" ? `Goede antwoorden (${score})` : `Correct answers (${score})`}
+              </summary>
+              <div className="space-y-2 mt-2">
+                {questions.map((q, i) => {
+                  if (answers[i] !== q.correctAnswer) return null;
+                  return (
+                    <div key={i} className="bg-white rounded-xl px-4 py-3 border border-green-200 flex items-center gap-3">
+                      <span className="w-6 h-6 rounded-full bg-green-500 text-white text-xs font-black flex items-center justify-center flex-shrink-0">{i + 1}</span>
+                      <p className="text-sm text-gray-700 flex-1 truncate">{q.textNL || q.text}</p>
+                      <span className="text-green-500 font-black text-sm">✓</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </details>
+          )}
+
+          {/* أزرار */}
+          <div className="flex gap-3">
+            <button onClick={() => { setStarted(false); setFinished(false); setCurrentIndex(0); setAnswers({}); setLocked(false); setQuestions(q => [...q].sort(() => Math.random() - 0.5)); }}
+              className="flex-1 py-3 font-black text-white rounded-xl transition-all hover:opacity-90 active:scale-95"
+              style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
+              🔄 {lang === "ar" ? "إعادة" : lang === "nl" ? "Opnieuw" : "Retry"}
+            </button>
+            <button onClick={() => router.back()}
+              className="flex-1 py-3 font-black border-2 border-gray-300 text-gray-600 rounded-xl hover:bg-gray-50 active:scale-95">
+              ← {lang === "ar" ? "رجوع" : lang === "nl" ? "Terug" : "Back"}
+            </button>
           </div>
         </div>
       </div>
