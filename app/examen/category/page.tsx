@@ -12,6 +12,7 @@ function ExamenCategoryContent() {
 
   const cat = searchParams.get("cat") || "B";
   const email = searchParams.get("email") || "";
+  const lessonId = searchParams.get("lessonId"); // إذا موجود يجلب درس محدد فقط
 
   const [questions, setQuestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,20 +27,24 @@ function ExamenCategoryContent() {
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        const lessonsRes = await fetch(`/api/lessons?category=${cat.toUpperCase()}`);
-        const lessonsData = await lessonsRes.json();
-        if (!lessonsData.success) { setLoading(false); return; }
-
-        const allQ: any[] = [];
-        for (const lesson of lessonsData.lessons) {
-          const qRes = await fetch(`/api/exam-questions?lessonId=${lesson.id}`);
+        if (lessonId) {
+          // جلب أسئلة درس محدد فقط
+          const qRes = await fetch(`/api/exam-questions?lessonId=${lessonId}`);
           const qData = await qRes.json();
-          if (qData.success && qData.questions?.length > 0) {
-            allQ.push(...qData.questions);
+          if (qData.success) setQuestions(qData.questions.sort(() => Math.random() - 0.5));
+        } else {
+          // جلب كل أسئلة الفئة
+          const lessonsRes = await fetch(`/api/lessons?category=${cat.toUpperCase()}`);
+          const lessonsData = await lessonsRes.json();
+          if (!lessonsData.success) { setLoading(false); return; }
+          const allQ: any[] = [];
+          for (const lesson of lessonsData.lessons) {
+            const qRes = await fetch(`/api/exam-questions?lessonId=${lesson.id}`);
+            const qData = await qRes.json();
+            if (qData.success && qData.questions?.length > 0) allQ.push(...qData.questions);
           }
+          setQuestions(allQ.sort(() => Math.random() - 0.5));
         }
-        // خلط الأسئلة عشوائياً
-        setQuestions(allQ.sort(() => Math.random() - 0.5));
       } catch (e) { console.error(e); }
       finally { setLoading(false); }
     };
@@ -211,12 +216,28 @@ function ExamenCategoryContent() {
         {/* السؤال */}
         {q && (
           <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-100">
-            {/* رأس السؤال */}
+            {/* رأس السؤال مع المؤقت */}
             <div className="px-5 py-3 flex items-center justify-between"
               style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
               <span className="text-white font-black text-sm">
                 {lang === "ar" ? "السؤال" : lang === "nl" ? "Vraag" : "Question"} {currentIndex + 1}
               </span>
+
+              {/* المؤقت بجانب رقم السؤال */}
+              <div className={`flex items-center gap-2 px-3 py-1 rounded-full font-black text-sm border-2 transition-all ${
+                locked ? "bg-white/20 border-white/40 text-white" :
+                timeLeft <= 5 ? "bg-red-500 border-red-300 text-white animate-pulse" :
+                timeLeft <= 10 ? "bg-orange-500 border-orange-300 text-white" :
+                "bg-white/20 border-white/40 text-white"
+              }`}>
+                <span>⏱</span>
+                <span className="text-lg">
+                  {locked
+                    ? (isAnswered && userAnswer !== null ? (userAnswer === q?.correctAnswer ? "✅" : "❌") : "⏱")
+                    : timeLeft}
+                </span>
+                {!locked && <span className="text-xs opacity-80">s</span>}
+              </div>
             </div>
 
             {/* الصور */}
