@@ -237,6 +237,8 @@ export default function AdminQuestionsPage() {
     answer1: "", answer2: "", answer3: "", correctAnswer: 0,
     videoUrls: [] as string[], audioUrl: "",
   });
+  const editFormRef = React.useRef(editForm);
+  useEffect(() => { editFormRef.current = editForm; }, [editForm]);
 
   const [newQuestion, setNewQuestion] = useState({
     text: "",
@@ -689,35 +691,37 @@ export default function AdminQuestionsPage() {
     }
   };
   const handleEditQuestion = async (questionId: number) => {
-    if (!editForm.textNL && !editForm.textFR && !editForm.textAR) {
+    const form = editFormRef.current;
+    if (!form.textNL && !form.textFR && !form.textAR) {
       alert("أدخل نص السؤال بلغة واحدة على الأقل");
       return;
     }
 
     try {
-      // اختيار API المناسب حسب نوع السؤال
       let apiUrl = "/api/questions";
       if (questionType === "Examen") apiUrl = "/api/exam-questions";
       else if (questionType === "Praktijk") apiUrl = "/api/praktijk/questions";
+
+      console.log("📤 Sending videoUrls:", form.videoUrls);
 
       const res = await fetch(apiUrl, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: questionId,
-          text: editForm.textNL || editForm.textFR || editForm.textAR || "",
-          textNL: editForm.textNL,
-          textFR: editForm.textFR,
-          textAR: editForm.textAR,
-          explanationNL: editForm.explanationNL,
-          explanationFR: editForm.explanationFR,
-          explanationAR: editForm.explanationAR,
-          answer1: editForm.answer1,
-          answer2: editForm.answer2,
-          answer3: editForm.answer3,
-          correctAnswer: editForm.correctAnswer,
-          videoUrls: editForm.videoUrls,
-          audioUrl: editForm.audioUrl,
+          text: form.textNL || form.textFR || form.textAR || "",
+          textNL: form.textNL,
+          textFR: form.textFR,
+          textAR: form.textAR,
+          explanationNL: form.explanationNL,
+          explanationFR: form.explanationFR,
+          explanationAR: form.explanationAR,
+          answer1: form.answer1,
+          answer2: form.answer2,
+          answer3: form.answer3,
+          correctAnswer: form.correctAnswer,
+          videoUrls: form.videoUrls,
+          audioUrl: form.audioUrl,
         }),
       });
 
