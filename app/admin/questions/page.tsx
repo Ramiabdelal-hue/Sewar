@@ -641,7 +641,7 @@ export default function AdminQuestionsPage() {
           <div className="grid md:grid-cols-4 gap-6">
             <button
               onClick={() => setQuestionType("Theori")}
-              className="group bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-200 rounded-xl p-8 hover:border-green-500 hover:shadow-xl transition-all"
+              className="group bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-200 rounded-xl p-5 hover:border-green-500 hover:shadow-xl transition-all"
             >
               <div className="w-16 h-16 bg-green-500 rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -654,7 +654,7 @@ export default function AdminQuestionsPage() {
 
             <button
               onClick={() => setQuestionType("Praktijk")}
-              className="group bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 rounded-xl p-8 hover:border-blue-500 hover:shadow-xl transition-all"
+              className="group bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 rounded-xl p-5 hover:border-blue-500 hover:shadow-xl transition-all"
             >
               <div className="w-16 h-16 bg-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -667,7 +667,7 @@ export default function AdminQuestionsPage() {
 
             <button
               onClick={() => setQuestionType("Examen")}
-              className="group bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-200 rounded-xl p-8 hover:border-orange-500 hover:shadow-xl transition-all"
+              className="group bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-200 rounded-xl p-5 hover:border-orange-500 hover:shadow-xl transition-all"
             >
               <div className="w-16 h-16 bg-orange-500 rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -680,7 +680,7 @@ export default function AdminQuestionsPage() {
 
             <button
               onClick={() => window.open("/admin/subscribers", "_blank")}
-              className="group bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-200 rounded-xl p-8 hover:border-purple-500 hover:shadow-xl transition-all"
+              className="group bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-200 rounded-xl p-5 hover:border-purple-500 hover:shadow-xl transition-all"
             >
               <div className="w-16 h-16 bg-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
