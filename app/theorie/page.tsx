@@ -231,11 +231,16 @@ export default function TheoriePage() {
           </div>
         ) : (
           <table className="w-full border-collapse lessons-table" style={{ tableLayout: "fixed" }}>
-            <colgroup><col style={{ width: "75%" }} /><col style={{ width: "25%" }} /></colgroup>
+            <colgroup>
+              <col style={{ width: "60%" }} />
+              <col style={{ width: "20%" }} />
+              <col style={{ width: "20%" }} />
+            </colgroup>
             <thead>
               <tr style={{ backgroundColor: "#3399ff" }}>
                 <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc]">{lang === "ar" ? "الدرس" : lang === "nl" ? "LES" : lang === "fr" ? "LEÇON" : "LESSON"}</th>
                 <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">{lang === "ar" ? "فتح" : lang === "nl" ? "OPENEN" : lang === "fr" ? "OUVRIR" : "OPEN"}</th>
+                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">EXAMEN</th>
               </tr>
             </thead>
             <tbody>
@@ -246,8 +251,14 @@ export default function TheoriePage() {
                   </td>
                   <td className="px-4 py-3 border border-gray-200 text-center">
                     <button onClick={() => router.push(`/theorie/lesson?lessonId=${lesson.id}&category=${userCategory}&email=${userEmail}&lesson=${encodeURIComponent(lesson.title)}`)}
-                      className="bg-white border-2 border-gray-400 px-6 py-1.5 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors">
+                      className="bg-white border-2 border-gray-400 px-4 py-1.5 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors">
                       {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
+                    </button>
+                  </td>
+                  <td className="px-4 py-3 border border-gray-200 text-center">
+                    <button onClick={() => router.push(`/examen/category?cat=${userCategory}&email=${userEmail}&lessonId=${lesson.id}`)}
+                      className="bg-white border-2 border-orange-400 px-4 py-1.5 text-sm font-bold text-orange-600 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-colors">
+                      Examen
                     </button>
                   </td>
                 </tr>
@@ -256,17 +267,7 @@ export default function TheoriePage() {
           </table>
         )}
 
-        {/* زر Examen واحد للفئة */}
-        {!loading && filtered.length > 0 && (
-          <div className="mt-4">
-            <button
-              onClick={() => router.push(`/examen/category?cat=${userCategory}&email=${userEmail}`)}
-              className="px-8 py-3 font-black text-sm uppercase border-2 border-orange-500 text-orange-600 hover:bg-orange-500 hover:text-white transition-colors"
-            >
-              🎯 {lang === "ar" ? "ابدأ امتحان الفئة" : lang === "nl" ? `Examen Categorie ${userCategory}` : lang === "fr" ? `Examen Catégorie ${userCategory}` : `Exam Category ${userCategory}`}
-            </button>
-          </div>
-        )}
+        {/* زر Examen أُزيل من الأسفل */}
       </div>
     </div>
   );

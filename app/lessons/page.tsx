@@ -175,8 +175,9 @@ function LessonsContent() {
         ) : (
           <table className="w-full border-collapse lessons-table" style={{ tableLayout: "fixed" }}>
             <colgroup>
-              <col style={{ width: "75%" }} />
-              <col style={{ width: "25%" }} />
+              <col style={{ width: "60%" }} />
+              <col style={{ width: "20%" }} />
+              <col style={{ width: "20%" }} />
             </colgroup>
             <thead>
               <tr style={{ backgroundColor: "#3399ff" }}>
@@ -185,6 +186,9 @@ function LessonsContent() {
                 </th>
                 <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
                   {lang === "ar" ? "فتح" : lang === "nl" ? "OPENEN" : lang === "fr" ? "OUVRIR" : "OPEN"}
+                </th>
+                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
+                  EXAMEN
                 </th>
               </tr>
             </thead>
@@ -202,22 +206,18 @@ function LessonsContent() {
                       {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
                     </button>
                   </td>
+                  <td className="px-4 py-3 border border-gray-200 text-center">
+                    <button
+                      onClick={() => router.push(`/examen/category?cat=${cat || "B"}&email=${userEmail}&lessonId=${lesson.id}`)}
+                      className="bg-white border-2 border-orange-400 px-4 py-1 text-sm font-bold text-orange-600 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-colors"
+                    >
+                      Examen
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        )}
-
-        {/* زر Examen واحد لكل الفئة */}
-        {filteredLessons.length > 0 && (
-          <div className="mt-4">
-            <button
-              onClick={() => router.push(`/examen/category?cat=${cat || "B"}&email=${userEmail}`)}
-              className="px-8 py-3 font-black text-sm uppercase border-2 border-orange-500 text-orange-600 hover:bg-orange-500 hover:text-white transition-colors"
-            >
-              🎯 {lang === "ar" ? "ابدأ امتحان الفئة" : lang === "nl" ? `Examen Categorie ${(cat || "B").toUpperCase()}` : lang === "fr" ? `Examen Catégorie ${(cat || "B").toUpperCase()}` : `Exam Category ${(cat || "B").toUpperCase()}`}
-            </button>
-          </div>
         )}
 
         <p className="text-xs text-gray-400 mt-3">
