@@ -109,8 +109,9 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
             </span>
           </div>
 
-          {/* أزرار اللغة + Inloggen بنفس الحجم */}
+          {/* أزرار اللغة + Inloggen */}
           <div className="flex flex-col items-end gap-1">
+            {/* أزرار اللغة */}
             <div className="flex gap-1">
               {[
                 { code: "nl", label: "NL" },
@@ -130,37 +131,37 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                   {label}
                 </button>
               ))}
-
-              {/* زر Inloggen بنفس حجم أزرار اللغة */}
-              {!isLoggedIn ? (
-                <button
-                  onClick={() => onOpenLogin ? onOpenLogin() : setShowLoginModal(true)}
-                  className="px-2 py-1 md:px-3 md:py-1 font-black text-xs md:text-sm transition-all active:scale-95 hover:opacity-90 flex items-center gap-1"
-                  style={{ background: "linear-gradient(135deg, #ffcc00, #ff9900)", color: "#003399" }}
-                >
-                  <FaSignInAlt className="text-xs" />
-                  {lang === "ar" ? "دخول" : lang === "nl" ? "Inloggen" : lang === "fr" ? "Connexion" : "Login"}
-                </button>
-              ) : (
-                <>
-                  {daysLeft !== null && (
-                    <span className={`px-2 py-1 text-xs font-black ${
-                      isExpired ? "bg-red-600 text-white" :
-                      daysLeft <= 3 ? "bg-orange-500 text-white" :
-                      "bg-white/20 text-white"
-                    }`}>
-                      {isExpired ? "!" : `${daysLeft}d`}
-                    </span>
-                  )}
-                  <button
-                    onClick={() => { localStorage.removeItem("userEmail"); localStorage.removeItem("userCategory"); localStorage.removeItem("userExpiry"); window.location.href = "/"; }}
-                    className="px-2 py-1 md:px-3 md:py-1 font-black text-xs md:text-sm bg-red-500 hover:bg-red-600 transition-colors text-white"
-                  >
-                    {lang === "ar" ? "خروج" : "Logout"}
-                  </button>
-                </>
-              )}
             </div>
+
+            {/* زر Inloggen يغطي نفس عرض الأزرار الأربعة */}
+            {!isLoggedIn ? (
+              <button
+                onClick={() => onOpenLogin ? onOpenLogin() : setShowLoginModal(true)}
+                className="w-full flex items-center justify-center gap-1.5 py-1 font-black text-xs uppercase tracking-wide transition-all active:scale-95 hover:opacity-90"
+                style={{ background: "linear-gradient(135deg, #ffcc00, #ff9900)", color: "#003399" }}
+              >
+                <FaSignInAlt className="text-xs" />
+                {lang === "ar" ? "دخول" : lang === "nl" ? "Inloggen" : lang === "fr" ? "Connexion" : "Login"}
+              </button>
+            ) : (
+              <div className="flex items-center gap-1 w-full">
+                {daysLeft !== null && (
+                  <span className={`px-2 py-0.5 text-xs font-black flex-shrink-0 ${
+                    isExpired ? "bg-red-600 text-white" :
+                    daysLeft <= 3 ? "bg-orange-500 text-white" :
+                    "bg-white/20 text-white"
+                  }`}>
+                    {isExpired ? "!" : `${daysLeft}d`}
+                  </span>
+                )}
+                <button
+                  onClick={() => { localStorage.removeItem("userEmail"); localStorage.removeItem("userCategory"); localStorage.removeItem("userExpiry"); window.location.href = "/"; }}
+                  className="flex-1 py-0.5 text-xs font-black uppercase bg-red-500 hover:bg-red-600 transition-colors text-white text-center"
+                >
+                  {lang === "ar" ? "خروج" : "Logout"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
