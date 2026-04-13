@@ -1684,120 +1684,95 @@ export default function AdminQuestionsPage() {
                     </div>
                   ) : (
                     <div className="p-5">
-                      {/* عرض السؤال بثلاث لغات */}
-                      <div className="mb-4 bg-purple-50 border-2 border-purple-200 rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
-                            {index + 1}
-                          </div>
-                          <p className="text-sm font-bold text-gray-700 flex items-center gap-2">
-                            <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            نص السؤال:
-                          </p>
+                      {/* رقم السؤال */}
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-black flex-shrink-0" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
+                          {index + 1}
                         </div>
-                        <div className="space-y-3">
-                          {q.textNL && (
-                            <div className="bg-white p-3 rounded-lg border border-gray-200">
-                              <p className="text-xs font-bold text-gray-600 mb-1">🇳🇱 Nederlands:</p>
-                              <p className="text-sm text-gray-700">{q.textNL}</p>
-                            </div>
-                          )}
-                          {q.textFR && (
-                            <div className="bg-white p-3 rounded-lg border border-gray-200">
-                              <p className="text-xs font-bold text-gray-600 mb-1">🇫🇷 Français:</p>
-                              <p className="text-sm text-gray-700">{q.textFR}</p>
-                            </div>
-                          )}
-                          {q.textAR && (
-                            <div className="bg-white p-3 rounded-lg border border-gray-200">
-                              <p className="text-xs font-bold text-gray-600 mb-1">🇸🇦 العربية:</p>
-                              <p className="text-sm text-gray-700">{q.textAR}</p>
-                            </div>
-                          )}
-                        </div>
+                        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">سؤال #{q.id}</span>
                       </div>
 
+                      {/* 1. الصورة أولاً */}
                       {q.videoUrls && q.videoUrls.length > 0 && (
-                        <div className="mb-4">
-                          <p className="text-sm font-medium text-gray-600 mb-3">
-                            {questionType === "Praktijk" ? "الفيديوهات المرفقة:" : "الصور المرفقة:"}
-                          </p>
-                          <div className="flex gap-3 flex-wrap">
+                        <div className="mb-4 rounded-xl overflow-hidden" style={{ border: "1px solid #e5e7eb" }}>
+                          <div className={`grid gap-0.5 ${q.videoUrls.length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
                             {q.videoUrls.map((url, idx) => (
-                              <div
-                                key={idx}
-                                className="relative group"
-                              >
+                              <div key={idx} className="relative group">
                                 {questionType === "Praktijk" ? (
-                                  // عرض فيديو
-                                  <video
-                                    src={url}
-                                    controls
-                                    className="w-80 h-60 object-cover rounded-lg border-2 border-gray-200"
-                                  />
+                                  <video src={url} controls className="w-full object-cover" style={{ maxHeight: "280px" }} />
                                 ) : (
-                                  // عرض صورة
-                                  <img
-                                    src={url}
-                                    alt={`صورة ${idx + 1}`}
-                                    className="w-80 h-60 object-cover rounded-lg border-2 border-gray-200"
-                                  />
+                                  <img src={url} alt={`صورة ${idx + 1}`} className="w-full object-cover" style={{ maxHeight: "280px" }} />
                                 )}
                                 <button
                                   onClick={() => handleDeleteImage(q.id, url)}
-                                  className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition font-bold shadow-lg hover:bg-red-600"
-                                >
-                                  ×
-                                </button>
-                                <div className="absolute bottom-2 left-2 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded">
-                                  {questionType === "Praktijk" ? `فيديو ${idx + 1}` : `صورة ${idx + 1}`}
-                                </div>
+                                  className="absolute top-2 right-2 w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all font-bold text-sm shadow-lg flex items-center justify-center"
+                                >×</button>
+                                {q.videoUrls!.length > 1 && (
+                                  <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full">
+                                    {idx + 1}/{q.videoUrls!.length}
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>
                         </div>
                       )}
 
+                      {/* صوت */}
                       {q.audioUrl && (
-                        <div className="mb-4">
-                          <p className="text-sm font-medium text-gray-600 mb-2">الملف الصوتي:</p>
-                          <audio controls className="w-full max-w-md">
+                        <div className="mb-4 px-3 py-2 rounded-xl" style={{ background: "#f8fafc", border: "1px solid #e2e8f0" }}>
+                          <p className="text-xs font-bold text-gray-400 mb-1.5">🎵 ملف صوتي</p>
+                          <audio controls className="w-full h-8">
                             <source src={q.audioUrl} type="audio/mpeg" />
                           </audio>
                         </div>
                       )}
 
-                      {/* عرض الشروحات */}
-                      {(q.explanationNL || q.explanationFR || q.explanationAR) && (
-                        <div className="mb-4 bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
-                          <p className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
-                            <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                            </svg>
-                            الشروحات:
-                          </p>
-                          <div className="space-y-3">
-                            {q.explanationNL && (
-                              <div className="bg-white p-3 rounded-lg border border-gray-200">
-                                <p className="text-xs font-bold text-gray-600 mb-1">🇳🇱 Nederlands:</p>
-                                <p className="text-sm text-gray-700">{q.explanationNL}</p>
-                              </div>
-                            )}
-                            {q.explanationFR && (
-                              <div className="bg-white p-3 rounded-lg border border-gray-200">
-                                <p className="text-xs font-bold text-gray-600 mb-1">🇫🇷 Français:</p>
-                                <p className="text-sm text-gray-700">{q.explanationFR}</p>
-                              </div>
-                            )}
-                            {q.explanationAR && (
-                              <div className="bg-white p-3 rounded-lg border border-gray-200">
-                                <p className="text-xs font-bold text-gray-600 mb-1">🇸🇦 العربية:</p>
-                                <p className="text-sm text-gray-700">{q.explanationAR}</p>
-                              </div>
-                            )}
+                      {/* 2. نص السؤال */}
+                      <div className="mb-4 space-y-2">
+                        <p className="text-xs font-black text-gray-400 uppercase tracking-wider mb-2">نص السؤال</p>
+                        {q.textNL && (
+                          <div className="px-4 py-3 rounded-xl" style={{ background: "#f0f4ff", border: "1px solid #c7d2fe" }}>
+                            <span className="text-[10px] font-black text-indigo-400 uppercase tracking-wider">🇳🇱 NL</span>
+                            <p className="text-sm font-medium text-gray-800 mt-1 leading-relaxed">{q.textNL}</p>
                           </div>
+                        )}
+                        {q.textFR && (
+                          <div className="px-4 py-3 rounded-xl" style={{ background: "#fff7ed", border: "1px solid #fed7aa" }}>
+                            <span className="text-[10px] font-black text-orange-400 uppercase tracking-wider">🇫🇷 FR</span>
+                            <p className="text-sm font-medium text-gray-800 mt-1 leading-relaxed">{q.textFR}</p>
+                          </div>
+                        )}
+                        {q.textAR && (
+                          <div className="px-4 py-3 rounded-xl" style={{ background: "#f0fdf4", border: "1px solid #bbf7d0" }}>
+                            <span className="text-[10px] font-black text-green-500 uppercase tracking-wider">🇸🇦 AR</span>
+                            <p className="text-sm font-medium text-gray-800 mt-1 leading-relaxed text-right">{q.textAR}</p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* 3. الشروحات */}
+                      {(q.explanationNL || q.explanationFR || q.explanationAR) && (
+                        <div className="mb-4 space-y-2">
+                          <p className="text-xs font-black text-gray-400 uppercase tracking-wider mb-2">الشروحات</p>
+                          {q.explanationNL && (
+                            <div className="px-4 py-3 rounded-xl" style={{ background: "#eff6ff", border: "1px solid #bfdbfe" }}>
+                              <span className="text-[10px] font-black text-blue-400 uppercase tracking-wider">🇳🇱 NL</span>
+                              <p className="text-sm text-gray-700 mt-1 leading-relaxed">{q.explanationNL}</p>
+                            </div>
+                          )}
+                          {q.explanationFR && (
+                            <div className="px-4 py-3 rounded-xl" style={{ background: "#eff6ff", border: "1px solid #bfdbfe" }}>
+                              <span className="text-[10px] font-black text-blue-400 uppercase tracking-wider">🇫🇷 FR</span>
+                              <p className="text-sm text-gray-700 mt-1 leading-relaxed">{q.explanationFR}</p>
+                            </div>
+                          )}
+                          {q.explanationAR && (
+                            <div className="px-4 py-3 rounded-xl" style={{ background: "#eff6ff", border: "1px solid #bfdbfe" }}>
+                              <span className="text-[10px] font-black text-blue-400 uppercase tracking-wider">🇸🇦 AR</span>
+                              <p className="text-sm text-gray-700 mt-1 leading-relaxed text-right">{q.explanationAR}</p>
+                            </div>
+                          )}
                         </div>
                       )}
 
