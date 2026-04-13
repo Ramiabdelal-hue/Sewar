@@ -14,7 +14,13 @@ import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
 interface Question {
   id: number;
   text: string;
-  imageUrls?: string[];
+  textNL?: string;
+  textFR?: string;
+  textAR?: string;
+  explanationNL?: string;
+  explanationFR?: string;
+  explanationAR?: string;
+  videoUrls?: string[];
   audioUrl?: string;
   answer1?: string;
   answer2?: string;

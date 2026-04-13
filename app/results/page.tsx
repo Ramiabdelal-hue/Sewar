@@ -22,7 +22,7 @@ interface ExamResult {
   answers: Array<{
     questionId: number;
     questionText: string;
-    imageUrls: string[];
+    videoUrls: string[];
     audioUrl: string | null;
     answer1?: string;
     answer2?: string;
@@ -442,9 +442,9 @@ export default function ResultsPage() {
                         <p className="text-lg text-gray-800 font-medium mb-4">{answer.questionText}</p>
 
                         {/* Images */}
-                        {answer.imageUrls && answer.imageUrls.length > 0 && (
+                        {answer.videoUrls && answer.videoUrls.length > 0 && (
                           <div className="mb-4 grid grid-cols-2 md:grid-cols-3 gap-3">
-                            {answer.imageUrls.map((url, idx) => (
+                            {answer.videoUrls.map((url, idx) => (
                               <img
                                 key={idx}
                                 src={url}

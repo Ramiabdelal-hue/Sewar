@@ -20,7 +20,8 @@ interface Question {
   explanationNL?: string;
   explanationFR?: string;
   explanationAR?: string;
-  imageUrls?: string[];
+  imageUrls?: string[];  // legacy - mapped to videoUrls
+  videoUrls?: string[];
   audioUrl?: string;
   answer1?: string;
   answer2?: string;
