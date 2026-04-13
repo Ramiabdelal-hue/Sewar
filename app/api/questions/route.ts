@@ -297,3 +297,81 @@ export async function DELETE(request: NextRequest) {
     }, { status: 500 });
   }
 }
+
+
+// PUT - تعديل سؤال
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const {
+      id,
+      text,
+      textNL,
+      textFR,
+      textAR,
+      explanationNL,
+      explanationFR,
+      explanationAR,
+      answer1,
+      answer2,
+      answer3,
+      correctAnswer,
+      videoUrls,
+      audioUrl,
+    } = body;
+
+    if (!id) {
+      return NextResponse.json({ success: false, message: "معرف السؤال مطلوب" }, { status: 400 });
+    }
+
+    const updateData: any = {};
+    if (text !== undefined) updateData.text = text;
+    if (textNL !== undefined) updateData.textNL = textNL || null;
+    if (textFR !== undefined) updateData.textFR = textFR || null;
+    if (textAR !== undefined) updateData.textAR = textAR || null;
+    if (explanationNL !== undefined) updateData.explanationNL = explanationNL || null;
+    if (explanationFR !== undefined) updateData.explanationFR = explanationFR || null;
+    if (explanationAR !== undefined) updateData.explanationAR = explanationAR || null;
+    if (answer1 !== undefined) updateData.answer1 = answer1 || null;
+    if (answer2 !== undefined) updateData.answer2 = answer2 || null;
+    if (answer3 !== undefined) updateData.answer3 = answer3 || null;
+    if (correctAnswer !== undefined) updateData.correctAnswer = correctAnswer;
+    if (videoUrls !== undefined) updateData.videoUrls = videoUrls;
+    if (audioUrl !== undefined) updateData.audioUrl = audioUrl || null;
+
+    // Try to update in all category tables
+    let updated = false;
+
+    try {
+      await prisma.questionA.update({ where: { id }, data: updateData });
+      updated = true;
+    } catch (e) { /* Not in QuestionA */ }
+
+    if (!updated) {
+      try {
+        await prisma.questionB.update({ where: { id }, data: updateData });
+        updated = true;
+      } catch (e) { /* Not in QuestionB */ }
+    }
+
+    if (!updated) {
+      try {
+        await prisma.questionC.update({ where: { id }, data: updateData });
+        updated = true;
+      } catch (e) { /* Not in QuestionC */ }
+    }
+
+    if (!updated) {
+      return NextResponse.json({ success: false, message: "السؤال غير موجود" }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, message: "تم تعديل السؤال بنجاح" });
+  } catch (error) {
+    console.error("Error updating question:", error);
+    return NextResponse.json({
+      success: false,
+      message: "خطأ في تعديل السؤال",
+      error: error instanceof Error ? error.message : String(error)
+    }, { status: 500 });
+  }
+}

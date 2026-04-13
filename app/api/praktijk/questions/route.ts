@@ -181,3 +181,36 @@ export async function DELETE(request: NextRequest) {
     }, { status: 500 });
   }
 }
+
+
+// PUT - تعديل سؤال Praktijk
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { id, text, textNL, textFR, textAR, explanationNL, explanationFR, explanationAR, videoUrls, audioUrl } = body;
+
+    if (!id) {
+      return NextResponse.json({ success: false, message: "معرف السؤال مطلوب" }, { status: 400 });
+    }
+
+    const updateData: any = {};
+    if (textNL !== undefined || textFR !== undefined || textAR !== undefined) {
+      updateData.text = text || textNL || textFR || textAR || "";
+    }
+    if (textNL !== undefined) updateData.textNL = textNL || null;
+    if (textFR !== undefined) updateData.textFR = textFR || null;
+    if (textAR !== undefined) updateData.textAR = textAR || null;
+    if (explanationNL !== undefined) updateData.explanationNL = explanationNL || null;
+    if (explanationFR !== undefined) updateData.explanationFR = explanationFR || null;
+    if (explanationAR !== undefined) updateData.explanationAR = explanationAR || null;
+    if (videoUrls !== undefined) updateData.videoUrls = videoUrls;
+    if (audioUrl !== undefined) updateData.audioUrl = audioUrl || null;
+
+    await prisma.praktijkQuestion.update({ where: { id }, data: updateData });
+
+    return NextResponse.json({ success: true, message: "تم تعديل السؤال بنجاح" });
+  } catch (error) {
+    console.error("Error updating Praktijk question:", error);
+    return NextResponse.json({ success: false, message: "خطأ في تعديل السؤال", error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+  }
+}

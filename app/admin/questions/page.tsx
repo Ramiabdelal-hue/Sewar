@@ -231,6 +231,12 @@ export default function AdminQuestionsPage() {
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [editText, setEditText] = useState("");
   const [editImages, setEditImages] = useState<File[]>([]);
+  const [editForm, setEditForm] = useState({
+    textNL: "", textFR: "", textAR: "",
+    explanationNL: "", explanationFR: "", explanationAR: "",
+    answer1: "", answer2: "", answer3: "", correctAnswer: 0,
+    videoUrls: [] as string[], audioUrl: "",
+  });
 
   const [newQuestion, setNewQuestion] = useState({
     text: "",
@@ -683,35 +689,49 @@ export default function AdminQuestionsPage() {
     }
   };
   const handleEditQuestion = async (questionId: number) => {
-    if (!editText) {
-      alert("أدخل نص السؤال");
+    if (!editForm.textNL && !editForm.textFR && !editForm.textAR) {
+      alert("أدخل نص السؤال بلغة واحدة على الأقل");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("id", questionId.toString());
-    formData.append("text", editText);
-
-    editImages.forEach(img => {
-      formData.append("images", img);
-    });
-
     try {
-      const res = await fetch("/api/questions", {
+      // اختيار API المناسب حسب نوع السؤال
+      let apiUrl = "/api/questions";
+      if (questionType === "Examen") apiUrl = "/api/exam-questions";
+      else if (questionType === "Praktijk") apiUrl = "/api/praktijk/questions";
+
+      const res = await fetch(apiUrl, {
         method: "PUT",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: questionId,
+          text: editForm.textNL || editForm.textFR || editForm.textAR || "",
+          textNL: editForm.textNL,
+          textFR: editForm.textFR,
+          textAR: editForm.textAR,
+          explanationNL: editForm.explanationNL,
+          explanationFR: editForm.explanationFR,
+          explanationAR: editForm.explanationAR,
+          answer1: editForm.answer1,
+          answer2: editForm.answer2,
+          answer3: editForm.answer3,
+          correctAnswer: editForm.correctAnswer,
+          videoUrls: editForm.videoUrls,
+          audioUrl: editForm.audioUrl,
+        }),
       });
 
       const data = await res.json();
       if (data.success) {
-        alert("تم تعديل السؤال بنجاح");
+        alert("✅ تم تعديل السؤال بنجاح");
         setEditingQuestion(null);
-        setEditImages([]);
         fetchQuestions();
+      } else {
+        alert(data.message || "فشل تعديل السؤال");
       }
     } catch (error) {
       console.error("خطأ في التعديل:", error);
-      alert("فشل تعديل السؤال");
+      alert("فشل الاتصال بالسيرفر");
     }
   };
 
@@ -1439,42 +1459,121 @@ export default function AdminQuestionsPage() {
                 >
                   {editingQuestion?.id === q.id ? (
                     <div className="space-y-4">
-                      <textarea
-                        value={editText}
-                        onChange={(e) => setEditText(e.target.value)}
-                        className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-orange-500 focus:outline-none transition resize-none"
-                        rows={4}
-                      />
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          إضافة صور جديدة
-                        </label>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          multiple
-                          className="w-full p-3 border-2 border-gray-200 rounded-lg"
-                          onChange={(e) => {
-                            const files = Array.from(e.target.files || []);
-                            setEditImages(files);
-                          }}
-                        />
+                      {/* نصوص السؤال بثلاث لغات */}
+                      <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-4">
+                        <h3 className="text-sm font-bold text-gray-800 mb-3">✏️ تعديل نص السؤال</h3>
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-xs font-bold text-gray-600 mb-1">🇳🇱 Nederlands</label>
+                            <textarea
+                              value={editForm.textNL}
+                              onChange={(e) => setEditForm({ ...editForm, textNL: e.target.value })}
+                              className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none resize-none text-sm"
+                              rows={3}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-bold text-gray-600 mb-1">🇫🇷 Français</label>
+                            <textarea
+                              value={editForm.textFR}
+                              onChange={(e) => setEditForm({ ...editForm, textFR: e.target.value })}
+                              className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none resize-none text-sm"
+                              rows={3}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-bold text-gray-600 mb-1">🇸🇦 العربية</label>
+                            <textarea
+                              value={editForm.textAR}
+                              onChange={(e) => setEditForm({ ...editForm, textAR: e.target.value })}
+                              className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none resize-none text-sm"
+                              rows={3}
+                            />
+                          </div>
+                        </div>
                       </div>
+
+                      {/* الشروحات - للدروس فقط */}
+                      {questionType !== "Examen" && (
+                        <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                          <h3 className="text-sm font-bold text-gray-800 mb-3">📖 تعديل الشروحات</h3>
+                          <div className="space-y-3">
+                            <div>
+                              <label className="block text-xs font-bold text-gray-600 mb-1">🇳🇱 Nederlands</label>
+                              <textarea
+                                value={editForm.explanationNL}
+                                onChange={(e) => setEditForm({ ...editForm, explanationNL: e.target.value })}
+                                className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none resize-none text-sm"
+                                rows={3}
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-bold text-gray-600 mb-1">🇫🇷 Français</label>
+                              <textarea
+                                value={editForm.explanationFR}
+                                onChange={(e) => setEditForm({ ...editForm, explanationFR: e.target.value })}
+                                className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none resize-none text-sm"
+                                rows={3}
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-bold text-gray-600 mb-1">🇸🇦 العربية</label>
+                              <textarea
+                                value={editForm.explanationAR}
+                                onChange={(e) => setEditForm({ ...editForm, explanationAR: e.target.value })}
+                                className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none resize-none text-sm"
+                                rows={3}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* الإجابات - للامتحانات */}
+                      {questionType === "Examen" && (
+                        <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
+                          <h3 className="text-sm font-bold text-gray-800 mb-3">✅ تعديل الإجابات</h3>
+                          <div className="space-y-3">
+                            {[1, 2, 3].map((num) => (
+                              <div key={num}>
+                                <label className="block text-xs font-bold text-gray-600 mb-1">الإجابة {num}</label>
+                                <input
+                                  type="text"
+                                  value={editForm[`answer${num}` as "answer1" | "answer2" | "answer3"]}
+                                  onChange={(e) => setEditForm({ ...editForm, [`answer${num}`]: e.target.value })}
+                                  className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none text-sm"
+                                />
+                              </div>
+                            ))}
+                            <div>
+                              <label className="block text-xs font-bold text-gray-600 mb-1">الإجابة الصحيحة</label>
+                              <select
+                                value={editForm.correctAnswer}
+                                onChange={(e) => setEditForm({ ...editForm, correctAnswer: parseInt(e.target.value) })}
+                                className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none text-sm"
+                              >
+                                <option value={0}>اختر الإجابة الصحيحة</option>
+                                <option value={1}>الإجابة الأولى</option>
+                                <option value={2}>الإجابة الثانية</option>
+                                <option value={3}>الإجابة الثالثة</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
                       <div className="flex gap-3">
                         <button
                           onClick={() => handleEditQuestion(q.id)}
                           className="flex-1 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition font-bold"
                         >
-                           حفظ التعديلات
+                          💾 حفظ التعديلات
                         </button>
                         <button
-                          onClick={() => {
-                            setEditingQuestion(null);
-                            setEditImages([]);
-                          }}
+                          onClick={() => setEditingQuestion(null)}
                           className="flex-1 px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition font-bold"
                         >
-                           إلغاء
+                          إلغاء
                         </button>
                       </div>
                     </div>
@@ -1640,6 +1739,20 @@ export default function AdminQuestionsPage() {
                           onClick={() => {
                             setEditingQuestion(q);
                             setEditText(q.text);
+                            setEditForm({
+                              textNL: q.textNL || "",
+                              textFR: q.textFR || "",
+                              textAR: q.textAR || "",
+                              explanationNL: q.explanationNL || "",
+                              explanationFR: q.explanationFR || "",
+                              explanationAR: q.explanationAR || "",
+                              answer1: q.answer1 || "",
+                              answer2: q.answer2 || "",
+                              answer3: q.answer3 || "",
+                              correctAnswer: q.correctAnswer || 0,
+                              videoUrls: q.videoUrls || [],
+                              audioUrl: q.audioUrl || "",
+                            });
                           }}
                           className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-bold flex items-center justify-center gap-2"
                         >

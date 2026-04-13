@@ -211,3 +211,40 @@ export async function DELETE(request: NextRequest) {
     }, { status: 500 });
   }
 }
+
+
+// PUT - تعديل سؤال امتحان
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { id, textNL, answer1, answer2, answer3, correctAnswer, videoUrls, audioUrl } = body;
+
+    if (!id) {
+      return NextResponse.json({ success: false, message: "معرف السؤال مطلوب" }, { status: 400 });
+    }
+
+    const updateData: any = {};
+    if (textNL !== undefined) { updateData.text = textNL; updateData.textNL = textNL; }
+    if (answer1 !== undefined) updateData.answer1 = answer1;
+    if (answer2 !== undefined) updateData.answer2 = answer2;
+    if (answer3 !== undefined) updateData.answer3 = answer3;
+    if (correctAnswer !== undefined) updateData.correctAnswer = correctAnswer;
+    if (videoUrls !== undefined) updateData.videoUrls = videoUrls;
+    if (audioUrl !== undefined) updateData.audioUrl = audioUrl || null;
+
+    let updated = false;
+
+    try { await prisma.examQuestionA.update({ where: { id }, data: updateData }); updated = true; } catch (e) {}
+    if (!updated) { try { await prisma.examQuestionB.update({ where: { id }, data: updateData }); updated = true; } catch (e) {} }
+    if (!updated) { try { await prisma.examQuestionC.update({ where: { id }, data: updateData }); updated = true; } catch (e) {} }
+
+    if (!updated) {
+      return NextResponse.json({ success: false, message: "السؤال غير موجود" }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, message: "تم تعديل السؤال بنجاح" });
+  } catch (error) {
+    console.error("Error updating exam question:", error);
+    return NextResponse.json({ success: false, message: "خطأ في تعديل السؤال", error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+  }
+}
