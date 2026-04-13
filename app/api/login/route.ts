@@ -6,7 +6,7 @@ export async function POST(req: Request) {
   const { email, password } = body;
 
   // 🔹 حالة خاصة (rami / 123)
-  if (email === "rami@gmail.com" && password === "123") {
+  if (email === "sewar" && password === "70709090") {
     return NextResponse.json({
       success: true,
       role: "admin", // ← هذا يفتح صفحة إدخال الدروس

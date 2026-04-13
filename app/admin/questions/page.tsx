@@ -296,7 +296,7 @@ export default function AdminQuestionsPage() {
   };
 
   const handleLogin = () => {
-    if (user === "rami" && password === "123") {
+    if (user === "sewar" && password === "70709090") {
       setIsLogged(true);
     } else {
       alert(t.incorrectCredentials);
