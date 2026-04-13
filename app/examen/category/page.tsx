@@ -417,9 +417,15 @@ function ExamenCategoryContent() {
 
                   let style = "bg-white border-2 border-gray-300 text-gray-800 hover:border-[#003399]";
                   if (isAnswered || locked) {
-                    if (isCorrect) style = "bg-green-50 border-2 border-green-500 text-green-800";
-                    else if (isSelected && !isCorrect) style = "bg-red-50 border-2 border-red-500 text-red-800";
-                    else style = "bg-gray-50 border-2 border-gray-200 text-gray-500";
+                    // فقط إذا اختار المستخدم إجابة نُظهر الصحيحة والخاطئة
+                    if (isAnswered && userAnswer !== null) {
+                      if (isCorrect) style = "bg-green-50 border-2 border-green-500 text-green-800";
+                      else if (isSelected && !isCorrect) style = "bg-red-50 border-2 border-red-500 text-red-800";
+                      else style = "bg-gray-50 border-2 border-gray-200 text-gray-500";
+                    } else {
+                      // انتهى الوقت بدون إجابة - كل الأزرار رمادية
+                      style = "bg-gray-50 border-2 border-gray-200 text-gray-400 opacity-60";
+                    }
                   }
 
                   return (
@@ -427,11 +433,13 @@ function ExamenCategoryContent() {
                       disabled={isAnswered || locked}
                       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all text-left ${style} ${!isAnswered && !locked ? "cursor-pointer active:scale-98" : "cursor-default"}`}>
                       <span className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0 ${
-                        isAnswered || locked
+                        isAnswered && userAnswer !== null
                           ? isCorrect ? "bg-green-500 text-white" : isSelected ? "bg-red-500 text-white" : "bg-gray-200 text-gray-500"
+                          : locked
+                          ? "bg-gray-200 text-gray-400"
                           : "bg-[#003399] text-white"
                       }`}>
-                        {isAnswered || locked ? (isCorrect ? "✓" : isSelected ? "✗" : num) : num}
+                        {isAnswered && userAnswer !== null ? (isCorrect ? "✓" : isSelected ? "✗" : num) : num}
                       </span>
                       <span className={isRtl ? "text-right flex-1" : "text-left flex-1"}>{ansText}</span>
                     </button>
