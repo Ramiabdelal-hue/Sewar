@@ -1545,7 +1545,7 @@ export default function AdminQuestionsPage() {
                                   )}
                                   {/* زر الحذف */}
                                   <button
-                                    onClick={() => setEditForm({ ...editForm, videoUrls: editForm.videoUrls.filter((_, i) => i !== idx) })}
+                                    onClick={() => setEditForm(prev => ({ ...prev, videoUrls: prev.videoUrls.filter((_, i) => i !== idx) }))}
                                     className="absolute top-1 right-1 w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
                                     title="حذف"
                                   >
@@ -1567,7 +1567,7 @@ export default function AdminQuestionsPage() {
                           </p>
                           <FileUploader
                             type={questionType === "Praktijk" ? "video" : "image"}
-                            onUploadComplete={(url) => setEditForm({ ...editForm, videoUrls: [...editForm.videoUrls, url] })}
+                            onUploadComplete={(url) => setEditForm(prev => ({ ...prev, videoUrls: [...prev.videoUrls, url] }))}
                             maxSizeMB={questionType === "Praktijk" ? 100 : 5}
                           />
                         </div>
@@ -1580,7 +1580,7 @@ export default function AdminQuestionsPage() {
                           <div className="space-y-2">
                             <audio src={editForm.audioUrl} controls className="w-full" />
                             <button
-                              onClick={() => setEditForm({ ...editForm, audioUrl: "" })}
+                              onClick={() => setEditForm(prev => ({ ...prev, audioUrl: "" }))}
                               className="w-full py-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg text-sm font-bold transition"
                             >
                               🗑️ حذف الملف الصوتي
@@ -1589,7 +1589,7 @@ export default function AdminQuestionsPage() {
                         ) : (
                           <FileUploader
                             type="audio"
-                            onUploadComplete={(url) => setEditForm({ ...editForm, audioUrl: url })}
+                            onUploadComplete={(url) => setEditForm(prev => ({ ...prev, audioUrl: url }))}
                             maxSizeMB={10}
                           />
                         )}
