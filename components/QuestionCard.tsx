@@ -248,22 +248,7 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
         )}
       </div>
 
-      {/* أزرار التنقل */}
-      <div className="flex border-t border-gray-100">
-        <button onClick={onPrev} disabled={index === 0}
-          className={`flex-1 py-4 font-black text-sm transition-all flex items-center justify-center gap-1 border-r border-gray-100 ${
-            index === 0 ? "text-gray-300 bg-gray-50 cursor-not-allowed" : "text-[#003399] bg-white hover:bg-[#ddeeff] active:scale-95"
-          }`}>
-          ← {lang === "ar" ? "السابق" : lang === "nl" ? "Vorige" : lang === "fr" ? "Précédent" : "Previous"}
-        </button>
-        <button onClick={onNext} disabled={index === total - 1}
-          className={`flex-1 py-4 font-black text-sm transition-all flex items-center justify-center gap-1 ${
-            index === total - 1 ? "text-gray-300 bg-gray-50 cursor-not-allowed" : "text-white active:scale-95"
-          }`}
-          style={index < total - 1 ? { background: "linear-gradient(135deg, #003399, #0055cc)" } : {}}>
-          {lang === "ar" ? "التالي" : lang === "nl" ? "Volgende" : lang === "fr" ? "Suivant" : "Next"} →
-        </button>
-      </div>
+      {/* أزرار التنقل محذوفة - موجودة في الصفحة الأم */}
     </div>
   );
 }
