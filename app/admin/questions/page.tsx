@@ -1150,118 +1150,32 @@ export default function AdminQuestionsPage() {
               <h2 className="text-sm font-black text-gray-700">إضافة سؤال جديد</h2>
             </div>
             <div className="space-y-4">
-              {/* حقول السؤال - للامتحانات بالهولندية فقط */}
-              {questionType === "Examen" ? (
+              {/* نص السؤال - هولندي فقط */}
+              <div>
+                <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">🇳🇱 نص السؤال (Nederlands)</label>
+                <textarea
+                  placeholder="Vraag in het Nederlands..."
+                  className="w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-700 focus:outline-none resize-none transition-all"
+                  style={{ background: "#f0f4ff", border: "1.5px solid #c7d2fe" }}
+                  rows={3}
+                  value={newQuestion.textNL}
+                  onChange={(e) => setNewQuestion({ ...newQuestion, textNL: e.target.value })}
+                />
+              </div>
+
+              {/* الشرح - هولندي فقط - للدروس فقط */}
+              {questionType !== "Examen" && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    🇳🇱 نص السؤال بالهولندية (Nederlands)
-                  </label>
+                  <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">🇳🇱 الشرح (Nederlands)</label>
                   <textarea
-                    placeholder="Vraag in het Nederlands..."
-                    className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-orange-500 focus:outline-none transition resize-none"
-                    rows={4}
-                    value={newQuestion.textNL}
-                    onChange={(e) => setNewQuestion({ ...newQuestion, textNL: e.target.value })}
+                    placeholder="Uitleg in het Nederlands..."
+                    className="w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-700 focus:outline-none resize-none transition-all"
+                    style={{ background: "#eff6ff", border: "1.5px solid #bfdbfe" }}
+                    rows={3}
+                    value={newQuestion.explanationNL}
+                    onChange={(e) => setNewQuestion({ ...newQuestion, explanationNL: e.target.value })}
                   />
                 </div>
-              ) : (
-                /* حقول السؤال بثلاث لغات للدروس */
-                <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-4">
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  نص السؤال بثلاث لغات
-                </h3>
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      🇳🇱 السؤال بالهولندية (Nederlands)
-                    </label>
-                    <textarea
-                      placeholder="Vraag in het Nederlands..."
-                      className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition resize-none"
-                      rows={3}
-                      value={newQuestion.textNL}
-                      onChange={(e) => setNewQuestion({ ...newQuestion, textNL: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      🇫🇷 السؤال بالفرنسية (Français)
-                    </label>
-                    <textarea
-                      placeholder="Question en français..."
-                      className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition resize-none"
-                      rows={3}
-                      value={newQuestion.textFR}
-                      onChange={(e) => setNewQuestion({ ...newQuestion, textFR: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      🇸🇦 السؤال بالعربية (العربية)
-                    </label>
-                    <textarea
-                      placeholder="السؤال بالعربية..."
-                      className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition resize-none"
-                      rows={3}
-                      value={newQuestion.textAR}
-                      onChange={(e) => setNewQuestion({ ...newQuestion, textAR: e.target.value })}
-                    />
-                  </div>
-                </div>
-              </div>
-              )}
-
-              {/* حقول الشرح بثلاث لغات - للدروس فقط */}
-              {questionType !== "Examen" && (
-              <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                  </svg>
-                  الشرح بثلاث لغات
-                </h3>
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      🇳🇱 الشرح بالهولندية (Nederlands)
-                    </label>
-                    <textarea
-                      placeholder="Uitleg in het Nederlands..."
-                      className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition resize-none"
-                      rows={3}
-                      value={newQuestion.explanationNL}
-                      onChange={(e) => setNewQuestion({ ...newQuestion, explanationNL: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      🇫🇷 الشرح بالفرنسية (Français)
-                    </label>
-                    <textarea
-                      placeholder="Explication en français..."
-                      className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition resize-none"
-                      rows={3}
-                      value={newQuestion.explanationFR}
-                      onChange={(e) => setNewQuestion({ ...newQuestion, explanationFR: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      🇸🇦 الشرح بالعربية (العربية)
-                    </label>
-                    <textarea
-                      placeholder="الشرح بالعربية..."
-                      className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition resize-none"
-                      rows={3}
-                      value={newQuestion.explanationAR}
-                      onChange={(e) => setNewQuestion({ ...newQuestion, explanationAR: e.target.value })}
-                    />
-                  </div>
-                </div>
-              </div>
               )}
 
               {/* حقول الإجابات (للامتحانات فقط) */}
@@ -1526,52 +1440,30 @@ export default function AdminQuestionsPage() {
               </span>
             </div>
 
-            <div className="divide-y divide-gray-50 p-4 space-y-3">
+            <div className="divide-y divide-gray-100 p-4 space-y-0">
               {filteredQuestions.map((q, index) => (
                 <div
                   key={q.id}
-                  className="rounded-2xl overflow-hidden transition-all"
-                  style={{ border: editingQuestion?.id === q.id ? "1.5px solid #3b82f6" : "1.5px solid #e5e7eb", background: editingQuestion?.id === q.id ? "#eff6ff" : "white" }}
+                  className="rounded-2xl overflow-hidden transition-all mb-4"
+                  style={{ border: editingQuestion?.id === q.id ? "1.5px solid #3b82f6" : "1.5px solid #e5e7eb", background: editingQuestion?.id === q.id ? "#eff6ff" : "white", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
                 >
                   {editingQuestion?.id === q.id ? (
                     <div className="space-y-4 p-5">
-                      {/* نصوص السؤال بثلاث لغات */}
-                      <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-4">
-                        <h3 className="text-sm font-bold text-gray-800 mb-3">✏️ تعديل نص السؤال</h3>
-                        <div className="space-y-3">
-                          <div>
-                            <label className="block text-xs font-bold text-gray-600 mb-1">🇳🇱 Nederlands</label>
-                            <textarea value={editForm.textNL} onChange={(e) => setEditForm({ ...editForm, textNL: e.target.value })} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none resize-none text-sm" rows={3} />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-bold text-gray-600 mb-1">🇫🇷 Français</label>
-                            <textarea value={editForm.textFR} onChange={(e) => setEditForm({ ...editForm, textFR: e.target.value })} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none resize-none text-sm" rows={3} />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-bold text-gray-600 mb-1">🇸🇦 العربية</label>
-                            <textarea value={editForm.textAR} onChange={(e) => setEditForm({ ...editForm, textAR: e.target.value })} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none resize-none text-sm" rows={3} />
-                          </div>
-                        </div>
+                      {/* نص السؤال - هولندي فقط */}
+                      <div>
+                        <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">🇳🇱 نص السؤال (Nederlands)</label>
+                        <textarea value={editForm.textNL} onChange={(e) => setEditForm({ ...editForm, textNL: e.target.value })}
+                          className="w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-700 focus:outline-none resize-none"
+                          style={{ background: "#f0f4ff", border: "1.5px solid #c7d2fe" }} rows={3} />
                       </div>
 
-                      {/* الشروحات - للدروس فقط */}
+                      {/* الشرح - هولندي فقط - للدروس فقط */}
                       {questionType !== "Examen" && (
-                        <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
-                          <h3 className="text-sm font-bold text-gray-800 mb-3">📖 تعديل الشروحات</h3>
-                          <div className="space-y-3">
-                            <div>
-                              <label className="block text-xs font-bold text-gray-600 mb-1">🇳🇱 Nederlands</label>
-                              <textarea value={editForm.explanationNL} onChange={(e) => setEditForm({ ...editForm, explanationNL: e.target.value })} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none resize-none text-sm" rows={3} />
-                            </div>
-                            <div>
-                              <label className="block text-xs font-bold text-gray-600 mb-1">🇫🇷 Français</label>
-                              <textarea value={editForm.explanationFR} onChange={(e) => setEditForm({ ...editForm, explanationFR: e.target.value })} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none resize-none text-sm" rows={3} />
-                            </div>
-                            <div>
-                              <label className="block text-xs font-bold text-gray-600 mb-1">🇸🇦 العربية</label>
-                              <textarea value={editForm.explanationAR} onChange={(e) => setEditForm({ ...editForm, explanationAR: e.target.value })} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none resize-none text-sm" rows={3} />
-                            </div>
-                          </div>
+                        <div>
+                          <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">🇳🇱 الشرح (Nederlands)</label>
+                          <textarea value={editForm.explanationNL} onChange={(e) => setEditForm({ ...editForm, explanationNL: e.target.value })}
+                            className="w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-700 focus:outline-none resize-none"
+                            style={{ background: "#eff6ff", border: "1.5px solid #bfdbfe" }} rows={3} />
                         </div>
                       )}
 
