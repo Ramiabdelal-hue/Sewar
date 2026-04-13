@@ -479,7 +479,7 @@ function LessonViewContent() {
                 onClick={() => { setCurrentIndex(Math.min(filteredQuestions.length - 1, currentIndex + 1)); window.scrollTo(0, 0); }}
                 disabled={currentIndex + 1 >= filteredQuestions.length}
                 className={`px-6 py-3 font-black text-sm border-2 transition-all ${currentIndex + 1 >= filteredQuestions.length ? "text-gray-300 border-gray-200 cursor-not-allowed" : "text-white border-[#003399] hover:opacity-90"}`}
-                style={currentIndex + 10 < filteredQuestions.length ? { background: "linear-gradient(135deg, #003399, #0055cc)" } : {}}
+                style={currentIndex + 1 <= filteredQuestions.length - 1 ? { background: "linear-gradient(135deg, #003399, #0055cc)" } : {}}
               >
                 {lang === "ar" ? "التالي" : lang === "nl" ? "Volgende" : "Next"} →
               </button>
