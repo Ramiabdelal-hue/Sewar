@@ -72,7 +72,7 @@ export default function AdminSubscribersPage() {
   };
 
   const handleLogin = () => {
-    if (user === "rami" && password === "123") {
+    if (user === "sewar" && password === "70709090") {
       setIsLogged(true);
       fetchSubscribers();
     } else {
