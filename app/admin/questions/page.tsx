@@ -754,12 +754,6 @@ export default function AdminQuestionsPage() {
               >
                 {t.logout}
               </button>
-              <button
-                onClick={() => window.open("/admin/subscribers", "_blank")}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium flex items-center gap-2"
-              >
-                👥 المشتركون
-              </button>
             </div>
           </div>
         </div>
