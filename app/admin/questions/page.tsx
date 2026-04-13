@@ -921,33 +921,62 @@ export default function AdminQuestionsPage() {
   // شاشة اختيار نوع الأسئلة
   if (!questionType) {
     const menuItems = [
-      { type: "Theori", label: t.theori, sub: t.theoryQuestions, color: "#22c55e", icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" },
-      { type: "Praktijk", label: t.praktijk, sub: t.practicalQuestions, color: "#3b82f6", icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" },
-      { type: "Examen", label: t.examen, sub: t.examQuestions, color: "#f97316", icon: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" },
-      { type: "lessons-manager", label: "عناوين الدروس", sub: "إضافة وحذف عناوين", color: "#14b8a6", icon: "M4 6h16M4 10h16M4 14h16M4 18h16" },
-      { type: "subscribers", label: "المشتركون", sub: "عرض قائمة المشتركين", color: "#a855f7", icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" },
+      {
+        type: "Theori", label: t.theori, sub: t.theoryQuestions,
+        color: "#22c55e", glow: "rgba(34,197,94,0.25)",
+        icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253",
+        badge: "نظري"
+      },
+      {
+        type: "Praktijk", label: t.praktijk, sub: t.practicalQuestions,
+        color: "#3b82f6", glow: "rgba(59,130,246,0.25)",
+        icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
+        badge: "عملي"
+      },
+      {
+        type: "Examen", label: t.examen, sub: t.examQuestions,
+        color: "#f97316", glow: "rgba(249,115,22,0.25)",
+        icon: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z",
+        badge: "امتحان"
+      },
+      {
+        type: "lessons-manager", label: "عناوين الدروس", sub: "إضافة وحذف عناوين الدروس",
+        color: "#14b8a6", glow: "rgba(20,184,166,0.25)",
+        icon: "M4 6h16M4 10h16M4 14h16M4 18h16",
+        badge: "إدارة"
+      },
+      {
+        type: "subscribers", label: "المشتركون", sub: "عرض قائمة المشتركين",
+        color: "#a855f7", glow: "rgba(168,85,247,0.25)",
+        icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z",
+        badge: "مستخدمون"
+      },
     ];
+
     return (
-      <div className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0a0a2e 0%, #001a6e 50%, #0a0a2e 100%)" }}>
+      <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden" style={{ background: "linear-gradient(160deg, #060818 0%, #0d1b4b 45%, #060818 100%)" }}>
+        {/* خلفية زخرفية */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-60 -left-60 w-[500px] h-[500px] rounded-full opacity-10 blur-3xl" style={{ background: "#ffcc00" }}></div>
-          <div className="absolute -bottom-60 -right-60 w-[500px] h-[500px] rounded-full opacity-10 blur-3xl" style={{ background: "#003399" }}></div>
+          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full opacity-[0.07] blur-[100px]" style={{ background: "#ffcc00" }}></div>
+          <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full opacity-[0.07] blur-[100px]" style={{ background: "#3b82f6" }}></div>
+          {/* شبكة نقاط */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle, #ffffff 1px, transparent 1px)", backgroundSize: "32px 32px" }}></div>
         </div>
-        <div className="relative z-10 w-full max-w-2xl px-6 py-10">
+
+        <div className="relative z-10 w-full max-w-3xl px-6 py-12">
           {/* Header */}
-          <div className="text-center mb-10">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #ffcc00, #ff9900)", boxShadow: "0 15px 40px rgba(255,204,0,0.35)" }}>
-              <svg className="w-8 h-8" style={{ color: "#003399" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-5 text-xs font-bold" style={{ background: "rgba(255,204,0,0.1)", border: "1px solid rgba(255,204,0,0.25)", color: "#ffcc00" }}>
+              <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse"></span>
+              لوحة التحكم
             </div>
-            <h1 className="text-2xl font-black text-white mb-1">{t.chooseQuestionType}</h1>
-            <p className="text-white/40 text-sm">{t.selectType}</p>
+            <h1 className="text-3xl font-black text-white mb-2 tracking-tight">{t.chooseQuestionType}</h1>
+            <p className="text-white/35 text-sm">{t.selectType}</p>
           </div>
 
-          {/* Grid الأزرار */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {menuItems.map(({ type, label, sub, color, icon }) => (
+          {/* الكروت */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {menuItems.map(({ type, label, sub, color, glow, icon, badge }) => (
               <button
                 key={type}
                 onClick={() => {
@@ -955,23 +984,49 @@ export default function AdminQuestionsPage() {
                   else if (type === "lessons-manager") setQuestionType("lessons-manager" as any);
                   else setQuestionType(type as any);
                 }}
-                className="group relative overflow-hidden rounded-2xl p-5 text-center transition-all duration-300 hover:scale-[1.03] active:scale-95"
-                style={{ background: `${color}10`, border: `1.5px solid ${color}35` }}
+                className="group relative overflow-hidden rounded-2xl text-left transition-all duration-300 hover:-translate-y-1 active:scale-95"
+                style={{
+                  background: "rgba(255,255,255,0.03)",
+                  border: `1px solid rgba(255,255,255,0.08)`,
+                  backdropFilter: "blur(10px)",
+                }}
               >
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" style={{ background: `radial-gradient(circle at center, ${color}18, transparent)` }}></div>
-                <div className="relative z-10">
-                  <div className="w-11 h-11 rounded-xl mx-auto mb-3 flex items-center justify-center transition-transform duration-300 group-hover:scale-110" style={{ background: `linear-gradient(135deg, ${color}, ${color}bb)`, boxShadow: `0 6px 18px ${color}35` }}>
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} /></svg>
+                {/* توهج عند hover */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" style={{ background: `radial-gradient(ellipse at top left, ${glow}, transparent 70%)` }}></div>
+                {/* خط علوي ملون */}
+                <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl opacity-60 group-hover:opacity-100 transition-opacity" style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }}></div>
+
+                <div className="relative z-10 p-6">
+                  {/* أيقونة + badge */}
+                  <div className="flex items-start justify-between mb-5">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3" style={{ background: `linear-gradient(135deg, ${color}22, ${color}11)`, border: `1px solid ${color}40` }}>
+                      <svg className="w-6 h-6" style={{ color }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d={icon} />
+                      </svg>
+                    </div>
+                    <span className="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider" style={{ background: `${color}18`, color, border: `1px solid ${color}30` }}>
+                      {badge}
+                    </span>
                   </div>
-                  <p className="text-sm font-black text-white mb-0.5">{label}</p>
-                  <p className="text-xs text-white/35">{sub}</p>
+
+                  {/* النص */}
+                  <h3 className="text-base font-black text-white mb-1.5 group-hover:text-white transition-colors">{label}</h3>
+                  <p className="text-xs text-white/35 leading-relaxed">{sub}</p>
+
+                  {/* سهم */}
+                  <div className="mt-5 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-[-4px] group-hover:translate-x-0">
+                    <span className="text-xs font-bold" style={{ color }}>فتح</span>
+                    <svg className="w-3.5 h-3.5" style={{ color }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </div>
                 </div>
               </button>
             ))}
           </div>
 
-          <div className="mt-8 text-center">
-            <button onClick={() => setIsLogged(false)} className="inline-flex items-center gap-2 text-white/30 hover:text-white/60 text-xs transition-colors">
+          <div className="mt-10 text-center">
+            <button onClick={() => setIsLogged(false)} className="inline-flex items-center gap-2 text-white/25 hover:text-white/50 text-xs transition-colors">
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
               {t.backToLogin}
             </button>
