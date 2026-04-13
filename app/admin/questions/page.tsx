@@ -30,6 +30,7 @@ export default function AdminQuestionsPage() {
   const [password, setPassword] = useState("");
   const [isLogged, setIsLogged] = useState(false);
   const [questionType, setQuestionType] = useState<"" | "Theori" | "Praktijk" | "Examen">("");
+  const [questionSubType, setQuestionSubType] = useState<"" | "lessons" | "exam">("");
 
   const [category, setCategory] = useState("");
   const [lessonId, setLessonId] = useState("");
@@ -623,6 +624,63 @@ export default function AdminQuestionsPage() {
     );
   }
 
+  // شاشة اختيار subtype لـ Theori
+  if (questionType === "Theori" && !questionSubType) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(135deg, #0a0a2e 0%, #003399 50%, #0a0a2e 100%)" }}>
+        <div className="w-full max-w-xl px-6">
+          <div className="text-center mb-10">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-black text-white">Theorie - اختر النوع</h1>
+            <p className="text-white/60 mt-2 text-sm">أسئلة الدروس أم أسئلة الامتحانات؟</p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <button
+              onClick={() => setQuestionSubType("lessons")}
+              className="group relative overflow-hidden rounded-2xl p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl active:scale-95"
+              style={{ background: "rgba(34,197,94,0.1)", border: "2px solid rgba(34,197,94,0.3)" }}
+            >
+              <div className="w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center"
+                style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", boxShadow: "0 8px 20px rgba(34,197,94,0.4)" }}>
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13" />
+                </svg>
+              </div>
+              <h3 className="text-base font-black text-white mb-1">أسئلة الدروس</h3>
+              <p className="text-xs text-white/50">تظهر في صفحة الدرس</p>
+            </button>
+
+            <button
+              onClick={() => { setQuestionSubType("exam"); setQuestionType("Examen"); }}
+              className="group relative overflow-hidden rounded-2xl p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl active:scale-95"
+              style={{ background: "rgba(249,115,22,0.1)", border: "2px solid rgba(249,115,22,0.3)" }}
+            >
+              <div className="w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center"
+                style={{ background: "linear-gradient(135deg, #f97316, #ea580c)", boxShadow: "0 8px 20px rgba(249,115,22,0.4)" }}>
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138z" />
+                </svg>
+              </div>
+              <h3 className="text-base font-black text-white mb-1">أسئلة الامتحانات</h3>
+              <p className="text-xs text-white/50">تظهر في زر Exam بجانب الدرس</p>
+            </button>
+          </div>
+
+          <div className="mt-6 text-center">
+            <button onClick={() => setQuestionType("")} className="text-white/40 hover:text-white/70 text-sm transition-colors">
+              ← رجوع
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // شاشة اختيار نوع الأسئلة
   if (!questionType) {
     return (
@@ -718,8 +776,7 @@ export default function AdminQuestionsPage() {
                 AR
               </button>
               <button
-                onClick={() => setQuestionType("")}
-                className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-medium"
+                onClick={() => { setQuestionType(""); setQuestionSubType(""); }}
               >
                 {t.changeType}
               </button>
