@@ -117,3 +117,22 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ success: false, message: "Error deleting lesson", error: String(error) }, { status: 500 });
   }
 }
+
+// PUT - تعديل عنوان درس
+export async function PUT(request: NextRequest) {
+  try {
+    const { id, title, category } = await request.json();
+    if (!id || !title || !category) return NextResponse.json({ success: false, message: "id, title and category required" }, { status: 400 });
+
+    const cat = category.toUpperCase();
+    let lesson;
+    if (cat === "A") lesson = await prisma.lessonA.update({ where: { id }, data: { title } });
+    else if (cat === "B") lesson = await prisma.lessonB.update({ where: { id }, data: { title } });
+    else if (cat === "C") lesson = await prisma.lessonC.update({ where: { id }, data: { title } });
+    else return NextResponse.json({ success: false, message: "Invalid category" }, { status: 400 });
+
+    return NextResponse.json({ success: true, lesson });
+  } catch (error) {
+    return NextResponse.json({ success: false, message: "Error updating lesson", error: String(error) }, { status: 500 });
+  }
+}

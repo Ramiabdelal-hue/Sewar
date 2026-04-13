@@ -29,6 +29,8 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
   const [newTitle, setNewTitle] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editTitle, setEditTitle] = useState("");
 
   const fetchLessons = async (cat: string) => {
     setLoading(true);
@@ -68,7 +70,19 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
     } catch (e) { alert("خطأ في الاتصال"); }
   };
 
-  return (
+  const updateLesson = async (id: number) => {
+    if (!editTitle.trim()) return;
+    try {
+      const res = await fetch("/api/lessons", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, title: editTitle, category }),
+      });
+      const data = await res.json();
+      if (data.success) { setEditingId(null); setEditTitle(""); fetchLessons(category); }
+      else alert(data.message || "خطأ في التعديل");
+    } catch (e) { alert("خطأ في الاتصال"); }
+  };
     <div className="min-h-screen" style={{ background: "#f0f4f8" }}>
       {/* Header */}
       <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0a0a2e 0%, #003399 60%, #0055cc 100%)" }}>
@@ -136,18 +150,54 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
           ) : (
             <div className="divide-y divide-gray-50">
               {lessons.map((lesson, i) => (
-                <div key={lesson.id} className="flex items-center justify-between px-6 py-3 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <span className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black text-white flex-shrink-0"
-                      style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>{i + 1}</span>
-                    <span className="text-sm font-bold text-gray-800">{lesson.title}</span>
-                  </div>
-                  <button onClick={() => deleteLesson(lesson.id)}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
+                <div key={lesson.id} className="px-6 py-3 hover:bg-gray-50 transition-colors">
+                  {editingId === lesson.id ? (
+                    // وضع التعديل
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={editTitle}
+                        onChange={e => setEditTitle(e.target.value)}
+                        onKeyDown={e => e.key === "Enter" && updateLesson(lesson.id)}
+                        className="flex-1 px-3 py-2 border-2 border-[#003399] rounded-lg text-sm font-medium focus:outline-none"
+                        autoFocus
+                      />
+                      <button onClick={() => updateLesson(lesson.id)}
+                        className="px-4 py-2 rounded-lg text-xs font-black text-white"
+                        style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
+                        ✓ حفظ
+                      </button>
+                      <button onClick={() => { setEditingId(null); setEditTitle(""); }}
+                        className="px-3 py-2 rounded-lg text-xs font-black bg-gray-200 text-gray-600 hover:bg-gray-300">
+                        ✕
+                      </button>
+                    </div>
+                  ) : (
+                    // وضع العرض
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black text-white flex-shrink-0"
+                          style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>{i + 1}</span>
+                        <span className="text-sm font-bold text-gray-800">{lesson.title}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {/* زر التعديل */}
+                        <button onClick={() => { setEditingId(lesson.id); setEditTitle(lesson.title); }}
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </button>
+                        {/* زر الحذف */}
+                        <button onClick={() => deleteLesson(lesson.id)}
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
