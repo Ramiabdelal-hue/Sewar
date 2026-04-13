@@ -1465,30 +1465,15 @@ export default function AdminQuestionsPage() {
                         <div className="space-y-3">
                           <div>
                             <label className="block text-xs font-bold text-gray-600 mb-1">🇳🇱 Nederlands</label>
-                            <textarea
-                              value={editForm.textNL}
-                              onChange={(e) => setEditForm({ ...editForm, textNL: e.target.value })}
-                              className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none resize-none text-sm"
-                              rows={3}
-                            />
+                            <textarea value={editForm.textNL} onChange={(e) => setEditForm({ ...editForm, textNL: e.target.value })} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none resize-none text-sm" rows={3} />
                           </div>
                           <div>
                             <label className="block text-xs font-bold text-gray-600 mb-1">🇫🇷 Français</label>
-                            <textarea
-                              value={editForm.textFR}
-                              onChange={(e) => setEditForm({ ...editForm, textFR: e.target.value })}
-                              className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none resize-none text-sm"
-                              rows={3}
-                            />
+                            <textarea value={editForm.textFR} onChange={(e) => setEditForm({ ...editForm, textFR: e.target.value })} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none resize-none text-sm" rows={3} />
                           </div>
                           <div>
                             <label className="block text-xs font-bold text-gray-600 mb-1">🇸🇦 العربية</label>
-                            <textarea
-                              value={editForm.textAR}
-                              onChange={(e) => setEditForm({ ...editForm, textAR: e.target.value })}
-                              className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none resize-none text-sm"
-                              rows={3}
-                            />
+                            <textarea value={editForm.textAR} onChange={(e) => setEditForm({ ...editForm, textAR: e.target.value })} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none resize-none text-sm" rows={3} />
                           </div>
                         </div>
                       </div>
@@ -1500,30 +1485,15 @@ export default function AdminQuestionsPage() {
                           <div className="space-y-3">
                             <div>
                               <label className="block text-xs font-bold text-gray-600 mb-1">🇳🇱 Nederlands</label>
-                              <textarea
-                                value={editForm.explanationNL}
-                                onChange={(e) => setEditForm({ ...editForm, explanationNL: e.target.value })}
-                                className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none resize-none text-sm"
-                                rows={3}
-                              />
+                              <textarea value={editForm.explanationNL} onChange={(e) => setEditForm({ ...editForm, explanationNL: e.target.value })} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none resize-none text-sm" rows={3} />
                             </div>
                             <div>
                               <label className="block text-xs font-bold text-gray-600 mb-1">🇫🇷 Français</label>
-                              <textarea
-                                value={editForm.explanationFR}
-                                onChange={(e) => setEditForm({ ...editForm, explanationFR: e.target.value })}
-                                className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none resize-none text-sm"
-                                rows={3}
-                              />
+                              <textarea value={editForm.explanationFR} onChange={(e) => setEditForm({ ...editForm, explanationFR: e.target.value })} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none resize-none text-sm" rows={3} />
                             </div>
                             <div>
                               <label className="block text-xs font-bold text-gray-600 mb-1">🇸🇦 العربية</label>
-                              <textarea
-                                value={editForm.explanationAR}
-                                onChange={(e) => setEditForm({ ...editForm, explanationAR: e.target.value })}
-                                className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none resize-none text-sm"
-                                rows={3}
-                              />
+                              <textarea value={editForm.explanationAR} onChange={(e) => setEditForm({ ...editForm, explanationAR: e.target.value })} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none resize-none text-sm" rows={3} />
                             </div>
                           </div>
                         </div>
@@ -1537,21 +1507,12 @@ export default function AdminQuestionsPage() {
                             {[1, 2, 3].map((num) => (
                               <div key={num}>
                                 <label className="block text-xs font-bold text-gray-600 mb-1">الإجابة {num}</label>
-                                <input
-                                  type="text"
-                                  value={editForm[`answer${num}` as "answer1" | "answer2" | "answer3"]}
-                                  onChange={(e) => setEditForm({ ...editForm, [`answer${num}`]: e.target.value })}
-                                  className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none text-sm"
-                                />
+                                <input type="text" value={editForm[`answer${num}` as "answer1" | "answer2" | "answer3"]} onChange={(e) => setEditForm({ ...editForm, [`answer${num}`]: e.target.value })} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none text-sm" />
                               </div>
                             ))}
                             <div>
                               <label className="block text-xs font-bold text-gray-600 mb-1">الإجابة الصحيحة</label>
-                              <select
-                                value={editForm.correctAnswer}
-                                onChange={(e) => setEditForm({ ...editForm, correctAnswer: parseInt(e.target.value) })}
-                                className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none text-sm"
-                              >
+                              <select value={editForm.correctAnswer} onChange={(e) => setEditForm({ ...editForm, correctAnswer: parseInt(e.target.value) })} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none text-sm">
                                 <option value={0}>اختر الإجابة الصحيحة</option>
                                 <option value={1}>الإجابة الأولى</option>
                                 <option value={2}>الإجابة الثانية</option>
@@ -1562,17 +1523,83 @@ export default function AdminQuestionsPage() {
                         </div>
                       )}
 
+                      {/* إدارة الصور / الفيديوهات */}
+                      <div className="bg-orange-50 border-2 border-orange-200 rounded-lg p-4">
+                        <h3 className="text-sm font-bold text-gray-800 mb-3">
+                          {questionType === "Praktijk" ? "🎬 إدارة الفيديوهات" : "🖼️ إدارة الصور"}
+                        </h3>
+
+                        {/* الصور/الفيديوهات الحالية */}
+                        {editForm.videoUrls.length > 0 && (
+                          <div className="mb-4">
+                            <p className="text-xs font-bold text-gray-600 mb-2">
+                              {questionType === "Praktijk" ? "الفيديوهات الحالية:" : "الصور الحالية:"}
+                            </p>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                              {editForm.videoUrls.map((url, idx) => (
+                                <div key={idx} className="relative group rounded-lg overflow-hidden border-2 border-gray-200">
+                                  {questionType === "Praktijk" ? (
+                                    <video src={url} className="w-full h-28 object-cover" />
+                                  ) : (
+                                    <img src={url} alt={`صورة ${idx + 1}`} className="w-full h-28 object-cover" />
+                                  )}
+                                  {/* زر الحذف */}
+                                  <button
+                                    onClick={() => setEditForm({ ...editForm, videoUrls: editForm.videoUrls.filter((_, i) => i !== idx) })}
+                                    className="absolute top-1 right-1 w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                    title="حذف"
+                                  >
+                                    ×
+                                  </button>
+                                  <div className="absolute bottom-1 left-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded">
+                                    {idx + 1}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* رفع صورة/فيديو جديد */}
+                        <div>
+                          <p className="text-xs font-bold text-gray-600 mb-2">
+                            ➕ {questionType === "Praktijk" ? "إضافة فيديو جديد" : "إضافة صورة جديدة"}
+                          </p>
+                          <FileUploader
+                            type={questionType === "Praktijk" ? "video" : "image"}
+                            onUploadComplete={(url) => setEditForm({ ...editForm, videoUrls: [...editForm.videoUrls, url] })}
+                            maxSizeMB={questionType === "Praktijk" ? 100 : 5}
+                          />
+                        </div>
+                      </div>
+
+                      {/* إدارة الصوت */}
+                      <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4">
+                        <h3 className="text-sm font-bold text-gray-800 mb-3">🎵 إدارة الملف الصوتي</h3>
+                        {editForm.audioUrl ? (
+                          <div className="space-y-2">
+                            <audio src={editForm.audioUrl} controls className="w-full" />
+                            <button
+                              onClick={() => setEditForm({ ...editForm, audioUrl: "" })}
+                              className="w-full py-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg text-sm font-bold transition"
+                            >
+                              🗑️ حذف الملف الصوتي
+                            </button>
+                          </div>
+                        ) : (
+                          <FileUploader
+                            type="audio"
+                            onUploadComplete={(url) => setEditForm({ ...editForm, audioUrl: url })}
+                            maxSizeMB={10}
+                          />
+                        )}
+                      </div>
+
                       <div className="flex gap-3">
-                        <button
-                          onClick={() => handleEditQuestion(q.id)}
-                          className="flex-1 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition font-bold"
-                        >
+                        <button onClick={() => handleEditQuestion(q.id)} className="flex-1 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition font-bold">
                           💾 حفظ التعديلات
                         </button>
-                        <button
-                          onClick={() => setEditingQuestion(null)}
-                          className="flex-1 px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition font-bold"
-                        >
+                        <button onClick={() => setEditingQuestion(null)} className="flex-1 px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition font-bold">
                           إلغاء
                         </button>
                       </div>
