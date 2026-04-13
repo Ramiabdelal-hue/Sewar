@@ -105,7 +105,7 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
               Sewar VerkeersSchool
             </span>
             <span className="text-base font-black tracking-wide uppercase sm:hidden">
-              Sewar
+              Sewar VerkeersSchool
             </span>
           </div>
 
@@ -202,25 +202,6 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
               <span className="text-xl">{isMobileMenuOpen ? "✕" : "☰"}</span>
               <span className="text-xs">{lang === "ar" ? "القائمة" : "Menu"}</span>
             </button>
-            {isLoggedIn && (
-              <div className="flex items-center gap-1.5">
-                {daysLeft !== null && (
-                  <span className={`px-2 py-1 text-xs font-black border ${
-                    isExpired ? "bg-red-600 text-white border-red-600" :
-                    daysLeft <= 3 ? "bg-orange-500 text-white border-orange-500" :
-                    "bg-white text-[#0066cc] border-white"
-                  }`}>
-                    {isExpired ? "!" : `${daysLeft}d`}
-                  </span>
-                )}
-                <button
-                  onClick={() => { localStorage.removeItem("userEmail"); localStorage.removeItem("userCategory"); localStorage.removeItem("userExpiry"); window.location.href = "/"; }}
-                  className="px-3 py-1.5 font-bold text-xs uppercase bg-red-500 text-white"
-                >
-                  {lang === "ar" ? "خروج" : "Logout"}
-                </button>
-              </div>
-            )}
           </div>
 
           {/* Mobile Menu Dropdown */}
