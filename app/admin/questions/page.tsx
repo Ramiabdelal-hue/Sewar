@@ -22,6 +22,142 @@ interface Question {
   audioUrl?: string;
 }
 
+// Component إدارة عناوين الدروس
+function LessonsManager({ onBack }: { onBack: () => void }) {
+  const [category, setCategory] = useState("B");
+  const [lessons, setLessons] = useState<any[]>([]);
+  const [newTitle, setNewTitle] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const fetchLessons = async (cat: string) => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/lessons?category=${cat}`);
+      const data = await res.json();
+      if (data.success) setLessons(data.lessons);
+    } catch (e) { console.error(e); }
+    finally { setLoading(false); }
+  };
+
+  useEffect(() => { fetchLessons(category); }, [category]);
+
+  const addLesson = async () => {
+    if (!newTitle.trim()) return alert("أدخل عنوان الدرس");
+    setSaving(true);
+    try {
+      const res = await fetch("/api/lessons", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: newTitle, category }),
+      });
+      const data = await res.json();
+      if (data.success) { setNewTitle(""); fetchLessons(category); }
+      else alert(data.message || "خطأ في الإضافة");
+    } catch (e) { alert("خطأ في الاتصال"); }
+    finally { setSaving(false); }
+  };
+
+  const deleteLesson = async (id: number) => {
+    if (!confirm("هل تريد حذف هذا الدرس؟ سيتم حذف جميع أسئلته أيضاً!")) return;
+    try {
+      const res = await fetch(`/api/lessons?id=${id}&category=${category}`, { method: "DELETE" });
+      const data = await res.json();
+      if (data.success) fetchLessons(category);
+      else alert(data.message || "خطأ في الحذف");
+    } catch (e) { alert("خطأ في الاتصال"); }
+  };
+
+  return (
+    <div className="min-h-screen" style={{ background: "#f0f4f8" }}>
+      {/* Header */}
+      <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0a0a2e 0%, #003399 60%, #0055cc 100%)" }}>
+        <div className="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #14b8a6, #0d9488)" }}>
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-lg font-black text-white">إدارة عناوين الدروس</h1>
+              <p className="text-white/50 text-xs">إضافة وحذف عناوين الدروس</p>
+            </div>
+          </div>
+          <button onClick={onBack} className="px-4 py-2 rounded-lg text-xs font-black text-white transition-all hover:scale-105" style={{ background: "rgba(255,255,255,0.15)" }}>
+            ← رجوع
+          </button>
+        </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-6 py-8">
+        {/* اختيار الفئة */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+          <h2 className="text-base font-black text-gray-800 mb-4">اختر الفئة</h2>
+          <div className="flex gap-3">
+            {["A","B","C"].map(cat => (
+              <button key={cat} onClick={() => setCategory(cat)}
+                className={`px-6 py-2.5 rounded-xl font-black text-sm transition-all ${category === cat ? "text-white shadow-lg scale-105" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+                style={category === cat ? { background: "linear-gradient(135deg, #003399, #0055cc)" } : {}}>
+                Rijbewijs {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* إضافة درس جديد */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+          <h2 className="text-base font-black text-gray-800 mb-4">➕ إضافة درس جديد</h2>
+          <div className="flex gap-3">
+            <input
+              type="text"
+              value={newTitle}
+              onChange={e => setNewTitle(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && addLesson()}
+              placeholder="عنوان الدرس بالهولندية..."
+              className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#003399] focus:outline-none text-sm font-medium"
+            />
+            <button onClick={addLesson} disabled={saving}
+              className="px-6 py-3 rounded-xl font-black text-sm text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+              style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
+              {saving ? "..." : "إضافة"}
+            </button>
+          </div>
+        </div>
+
+        {/* قائمة الدروس */}
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h2 className="text-base font-black text-gray-800">دروس الفئة {category} ({lessons.length})</h2>
+            {loading && <div className="w-5 h-5 border-2 border-[#003399] border-t-transparent rounded-full animate-spin"></div>}
+          </div>
+          {lessons.length === 0 && !loading ? (
+            <div className="p-10 text-center text-gray-400 font-medium">لا توجد دروس بعد</div>
+          ) : (
+            <div className="divide-y divide-gray-50">
+              {lessons.map((lesson, i) => (
+                <div key={lesson.id} className="flex items-center justify-between px-6 py-3 hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <span className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black text-white flex-shrink-0"
+                      style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>{i + 1}</span>
+                    <span className="text-sm font-bold text-gray-800">{lesson.title}</span>
+                  </div>
+                  <button onClick={() => deleteLesson(lesson.id)}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminQuestionsPage() {
   const { lang, setLang } = useLang();
   const t = adminTranslations[lang as keyof typeof adminTranslations];
@@ -624,6 +760,11 @@ export default function AdminQuestionsPage() {
     );
   }
 
+  // شاشة إدارة عناوين الدروس
+  if (questionType === "lessons-manager") {
+    return <LessonsManager onBack={() => setQuestionType("")} />;
+  }
+
   // شاشة اختيار subtype لـ Theori
   if (questionType === "Theori" && !questionSubType) {
     return (
@@ -702,11 +843,12 @@ export default function AdminQuestionsPage() {
               { type: "Theori", label: t.theori, sub: t.theoryQuestions, color: "#22c55e", bg: "rgba(34,197,94,0.1)", border: "rgba(34,197,94,0.3)", icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" },
               { type: "Praktijk", label: t.praktijk, sub: t.practicalQuestions, color: "#3b82f6", bg: "rgba(59,130,246,0.1)", border: "rgba(59,130,246,0.3)", icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" },
               { type: "Examen", label: t.examen, sub: t.examQuestions, color: "#f97316", bg: "rgba(249,115,22,0.1)", border: "rgba(249,115,22,0.3)", icon: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" },
+              { type: "lessons-manager", label: "عناوين الدروس", sub: "إضافة وحذف عناوين الدروس", color: "#14b8a6", bg: "rgba(20,184,166,0.1)", border: "rgba(20,184,166,0.3)", icon: "M4 6h16M4 10h16M4 14h16M4 18h16" },
               { type: "subscribers", label: "المشتركون", sub: "عرض قائمة المشتركين", color: "#a855f7", bg: "rgba(168,85,247,0.1)", border: "rgba(168,85,247,0.3)", icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" },
             ].map(({ type, label, sub, color, bg, border, icon }) => (
               <button
                 key={type}
-                onClick={() => type === "subscribers" ? window.open("/admin/subscribers", "_blank") : setQuestionType(type as any)}
+                onClick={() => type === "subscribers" ? window.open("/admin/subscribers", "_blank") : type === "lessons-manager" ? setQuestionType("lessons-manager" as any) : setQuestionType(type as any)}
                 className="group relative overflow-hidden rounded-2xl p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl active:scale-95"
                 style={{ background: bg, border: `2px solid ${border}` }}
               >

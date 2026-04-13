@@ -78,3 +78,42 @@ export async function GET(request: NextRequest) {
     }, { status: 500 });
   }
 }
+
+// POST - إضافة درس جديد
+export async function POST(request: NextRequest) {
+  try {
+    const { title, category } = await request.json();
+    if (!title || !category) return NextResponse.json({ success: false, message: "title and category required" }, { status: 400 });
+
+    const cat = category.toUpperCase();
+    let lesson;
+    if (cat === "A") lesson = await prisma.lessonA.create({ data: { title } });
+    else if (cat === "B") lesson = await prisma.lessonB.create({ data: { title } });
+    else if (cat === "C") lesson = await prisma.lessonC.create({ data: { title } });
+    else return NextResponse.json({ success: false, message: "Invalid category" }, { status: 400 });
+
+    return NextResponse.json({ success: true, lesson });
+  } catch (error) {
+    return NextResponse.json({ success: false, message: "Error creating lesson", error: String(error) }, { status: 500 });
+  }
+}
+
+// DELETE - حذف درس
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = parseInt(searchParams.get("id") || "");
+    const category = (searchParams.get("category") || "").toUpperCase();
+
+    if (!id || !category) return NextResponse.json({ success: false, message: "id and category required" }, { status: 400 });
+
+    if (category === "A") await prisma.lessonA.delete({ where: { id } });
+    else if (category === "B") await prisma.lessonB.delete({ where: { id } });
+    else if (category === "C") await prisma.lessonC.delete({ where: { id } });
+    else return NextResponse.json({ success: false, message: "Invalid category" }, { status: 400 });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ success: false, message: "Error deleting lesson", error: String(error) }, { status: 500 });
+  }
+}
