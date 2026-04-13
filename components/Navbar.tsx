@@ -201,15 +201,7 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
               <span className="text-xl">{isMobileMenuOpen ? "✕" : "☰"}</span>
               <span className="text-xs">{lang === "ar" ? "القائمة" : "Menu"}</span>
             </button>
-            {!isLoggedIn ? (
-              <button
-                onClick={() => onOpenLogin ? onOpenLogin() : setShowLoginModal(true)}
-                className="flex items-center gap-1 px-3 py-1.5 font-bold text-xs uppercase bg-white text-[#0066cc]"
-              >
-                <FaSignInAlt />
-                {lang === "ar" ? "دخول" : lang === "nl" ? "Inloggen" : lang === "fr" ? "Connexion" : "Login"}
-              </button>
-            ) : (
+            {isLoggedIn && (
               <div className="flex items-center gap-1.5">
                 {daysLeft !== null && (
                   <span className={`px-2 py-1 text-xs font-black border ${
@@ -221,13 +213,8 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                   </span>
                 )}
                 <button
-                  onClick={() => {
-                    localStorage.removeItem("userEmail");
-                    localStorage.removeItem("userCategory");
-                    localStorage.removeItem("userExpiry");
-                    window.location.href = "/";
-                  }}
-                  className="px-3 py-1.5 font-bold text-xs uppercase bg-red-500"
+                  onClick={() => { localStorage.removeItem("userEmail"); localStorage.removeItem("userCategory"); localStorage.removeItem("userExpiry"); window.location.href = "/"; }}
+                  className="px-3 py-1.5 font-bold text-xs uppercase bg-red-500 text-white"
                 >
                   {lang === "ar" ? "خروج" : "Logout"}
                 </button>
