@@ -42,6 +42,8 @@ function PricesManager({ onBack }: { onBack: () => void }) {
 
   const [prices, setPrices] = useState<Record<string, string>>(defaultPrices);
 
+  const ADMIN_TOKEN = process.env.NEXT_PUBLIC_ADMIN_TOKEN || "";
+
   useEffect(() => {
     fetch("/api/settings")
       .then(r => r.json())
@@ -54,7 +56,7 @@ function PricesManager({ onBack }: { onBack: () => void }) {
     try {
       const res = await fetch("/api/settings", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-admin-token": ADMIN_TOKEN },
         body: JSON.stringify({ settings: prices }),
       });
       const d = await res.json();

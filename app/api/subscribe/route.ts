@@ -1,8 +1,15 @@
 // app/api/subscribe/route.ts
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit, getClientIp } from "@/lib/adminAuth";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  // Rate limiting: max 5 subscriptions per 10 minutes per IP
+  const ip = getClientIp(req);
+  if (!checkRateLimit(ip, 5, 600000)) {
+    return NextResponse.json({ success: false, message: "Too many requests. Try again later." }, { status: 429 });
+  }
+
   try {
     // 1️⃣ قراءة بيانات الطلب
     const body = await req.json();
