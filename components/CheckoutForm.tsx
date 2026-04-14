@@ -9,7 +9,7 @@ import ar from "@/locales/ar.json";
 import en from "@/locales/en.json";
 
 export default function CheckoutForm({ selectedData, onBack, prefillData }: any) {
-  const { lang } = useLang();
+  const { lang, setLang } = useLang();
   const translations: any = { nl, fr, ar, en };
   const t = translations[lang];
   const isRtl = lang === "ar";
@@ -126,8 +126,19 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
               </p>
               <h1 className="text-white font-black text-base leading-tight">{selectedData?.catName || "Rijbewijs"}</h1>
             </div>
-            <div className="ml-auto">
-              <span className="px-3 py-1.5 rounded-xl text-xs font-black" style={{ background: "rgba(255,204,0,0.15)", color: "#ffcc00", border: "1px solid rgba(255,204,0,0.3)" }}>
+            <div className="ml-auto flex items-center gap-2">
+              {/* أزرار اللغة */}
+              <div className="flex gap-1 rounded-lg p-1" style={{ background: "rgba(255,255,255,0.06)" }}>
+                {[["nl","NL"],["fr","FR"],["ar","AR"],["en","EN"]].map(([code, label]) => (
+                  <button key={code} type="button"
+                    onClick={() => setLang(code as any)}
+                    className="px-2 py-1 rounded-md text-[10px] font-black transition-all"
+                    style={lang === code ? { background: "white", color: "#003399" } : { color: "rgba(255,255,255,0.4)" }}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <span className="px-2.5 py-1.5 rounded-xl text-xs font-black" style={{ background: "rgba(255,204,0,0.15)", color: "#ffcc00", border: "1px solid rgba(255,204,0,0.3)" }}>
                 {selectedData?.duration === "2w" ? "2 Weken" : "1 Maand"}
               </span>
             </div>
@@ -145,53 +156,64 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
             <form onSubmit={handleSubmit} className="space-y-3">
               {/* حقول البيانات */}
               <div className="rounded-2xl overflow-hidden" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                {/* 1. Volledige naam */}
                 <div className="flex items-center gap-4 px-5 py-4 border-b" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
                   <FaUser className="text-white/40 flex-shrink-0" />
                   <div className="flex-1">
-                    <p className="text-white/50 text-xs font-black uppercase tracking-wider mb-1">{t.fullNamePlaceholder}</p>
+                    <p className="text-white/50 text-xs font-black uppercase tracking-wider mb-1">
+                      {lang === "ar" ? "الاسم الكامل" : lang === "nl" ? "Volledige naam" : lang === "fr" ? "Nom complet" : "Full name"}
+                    </p>
                     <input required type="text" placeholder="Jan Janssen" value={formData.fullName}
                       className="w-full bg-transparent text-white text-base font-medium placeholder-white/25 focus:outline-none"
                       onChange={e => setFormData({ ...formData, fullName: e.target.value })} />
                   </div>
                 </div>
+                {/* 2. E-mailadres */}
                 <div className="flex items-center gap-4 px-5 py-4 border-b" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
                   <FaEnvelope className="text-white/40 flex-shrink-0" />
                   <div className="flex-1">
-                    <p className="text-white/50 text-xs font-black uppercase tracking-wider mb-1">{t.emailPlaceholder}</p>
+                    <p className="text-white/50 text-xs font-black uppercase tracking-wider mb-1">
+                      {lang === "ar" ? "البريد الإلكتروني" : lang === "nl" ? "E-mailadres" : lang === "fr" ? "Adresse e-mail" : "Email address"}
+                    </p>
                     <input required type="email" placeholder="jan@email.com" value={formData.email}
                       className="w-full bg-transparent text-white text-base font-medium placeholder-white/25 focus:outline-none"
                       onChange={e => setFormData({ ...formData, email: e.target.value })} />
                   </div>
                 </div>
-                <div className="flex items-center gap-4 px-5 py-4 border-b" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
-                  <FaPhone className="text-white/40 flex-shrink-0" />
-                  <div className="flex-1">
-                    <p className="text-white/50 text-xs font-black uppercase tracking-wider mb-1">{t.phonePlaceholder}</p>
-                    <input required type="tel" placeholder="+32 4XX XX XX XX" value={formData.phone}
-                      className="w-full bg-transparent text-white text-base font-medium placeholder-white/25 focus:outline-none"
-                      onChange={e => setFormData({ ...formData, phone: e.target.value })} />
-                  </div>
-                </div>
+                {/* 3. Wachtwoord */}
                 <div className="flex items-center gap-4 px-5 py-4 border-b" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
                   <FaLock className="text-white/40 flex-shrink-0" />
                   <div className="flex-1">
                     <p className="text-white/50 text-xs font-black uppercase tracking-wider mb-1">
-                      {lang === "ar" ? "كلمة المرور" : "Wachtwoord"}
+                      {lang === "ar" ? "كلمة المرور" : lang === "nl" ? "Wachtwoord" : lang === "fr" ? "Mot de passe" : "Password"}
                     </p>
                     <input required type="password" placeholder="••••••••"
                       className="w-full bg-transparent text-white text-base font-medium placeholder-white/25 focus:outline-none"
                       onChange={e => setFormData({ ...formData, password: e.target.value })} />
                   </div>
                 </div>
-                <div className="flex items-center gap-4 px-5 py-4">
+                {/* 4. Bevestig wachtwoord */}
+                <div className="flex items-center gap-4 px-5 py-4 border-b" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
                   <FaLock className="text-white/40 flex-shrink-0" />
                   <div className="flex-1">
                     <p className="text-white/50 text-xs font-black uppercase tracking-wider mb-1">
-                      {lang === "ar" ? "تأكيد كلمة المرور" : "Bevestig wachtwoord"}
+                      {lang === "ar" ? "تأكيد كلمة المرور" : lang === "nl" ? "Bevestig wachtwoord" : lang === "fr" ? "Confirmer le mot de passe" : "Confirm password"}
                     </p>
                     <input required type="password" placeholder="••••••••"
                       className="w-full bg-transparent text-white text-base font-medium placeholder-white/25 focus:outline-none"
                       onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })} />
+                  </div>
+                </div>
+                {/* 5. Telefoonnummer */}
+                <div className="flex items-center gap-4 px-5 py-4">
+                  <FaPhone className="text-white/40 flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-white/50 text-xs font-black uppercase tracking-wider mb-1">
+                      {lang === "ar" ? "رقم الهاتف" : lang === "nl" ? "Telefoonnummer" : lang === "fr" ? "Numéro de téléphone" : "Phone number"}
+                    </p>
+                    <input required type="tel" placeholder="+32 4XX XX XX XX" value={formData.phone}
+                      className="w-full bg-transparent text-white text-base font-medium placeholder-white/25 focus:outline-none"
+                      onChange={e => setFormData({ ...formData, phone: e.target.value })} />
                   </div>
                 </div>
               </div>
