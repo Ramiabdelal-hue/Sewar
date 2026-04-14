@@ -739,7 +739,6 @@ export default function AdminQuestionsPage() {
 
   const handleAddQuestion = async () => {
     if (questionType === "Examen") {
-      // للامتحانات: التحقق من السؤال بالهولندية والإجابات
       if (!lessonId || !newQuestion.textNL) {
         return alert("يجب كتابة السؤال بالهولندية");
       }
@@ -750,9 +749,9 @@ export default function AdminQuestionsPage() {
         return alert("يجب اختيار الإجابة الصحيحة");
       }
     } else {
-      // للدروس و Praktijk: التحقق من السؤال بلغة واحدة على الأقل
-      if (!lessonId || (!newQuestion.textNL && !newQuestion.textFR && !newQuestion.textAR)) {
-        return alert("يجب كتابة السؤال بلغة واحدة على الأقل");
+      // للدروس و Praktijk: لا يشترط نص السؤال - يكفي الشرح أو الصورة أو الصوت
+      if (!lessonId) {
+        return alert("يجب اختيار الدرس");
       }
     }
 
@@ -782,10 +781,8 @@ export default function AdminQuestionsPage() {
         payload.audioUrl = newQuestion.audioUrl;
       } else {
         // للدروس و Praktijk: حفظ في Question أو PraktijkQuestion
-        payload.text = newQuestion.textNL || newQuestion.textFR || newQuestion.textAR || "";
-        payload.textNL = newQuestion.textNL;
-        payload.textFR = newQuestion.textFR;
-        payload.textAR = newQuestion.textAR;
+        payload.text = newQuestion.explanationNL || "";
+        payload.textNL = newQuestion.textNL || null;
         payload.explanationNL = newQuestion.explanationNL;
         payload.explanationFR = newQuestion.explanationFR;
         payload.explanationAR = newQuestion.explanationAR;
@@ -1314,19 +1311,6 @@ export default function AdminQuestionsPage() {
               <h2 className="text-sm font-black text-gray-700">إضافة سؤال جديد</h2>
             </div>
             <div className="space-y-4">
-              {/* نص السؤال - هولندي فقط */}
-              <div>
-                <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">🇳🇱 نص السؤال (Nederlands)</label>
-                <textarea
-                  placeholder="Vraag in het Nederlands..."
-                  className="w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-700 focus:outline-none resize-none transition-all"
-                  style={{ background: "#f0f4ff", border: "1.5px solid #c7d2fe" }}
-                  rows={3}
-                  value={newQuestion.textNL}
-                  onChange={(e) => setNewQuestion({ ...newQuestion, textNL: e.target.value })}
-                />
-              </div>
-
               {/* الشرح - هولندي فقط - للدروس فقط */}
               {questionType !== "Examen" && (
                 <div>
