@@ -75,17 +75,17 @@ export default function ExamenPage() {
     { id: "cat-c", catLetter: "C", name: "Rijbewijs C", description: t.trucks || "Vrachtwagens", icon: <TruckIcon className="w-16 h-10" /> },
   ];
 
-  const [examPrices, setExamPrices] = useState({ "2w": "25", "1m": "50" });
+  const [allExamPrices, setAllExamPrices] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetch("/api/settings").then(r => r.json()).then(d => {
-      if (d.success) setExamPrices({ "2w": d.settings.examen_2w || "25", "1m": d.settings.examen_1m || "50" });
+      if (d.success) setAllExamPrices(d.settings);
     }).catch(() => {});
   }, []);
 
-  const durations = [
-    { key: "2w", label: t.twoWeeks || "2 Weken", price: `€ ${examPrices["2w"]}` },
-    { key: "1m", label: t.oneMonth || "1 Maand", price: `€ ${examPrices["1m"]}` },
+  const getExamDurations = (catLetter: string) => [
+    { key: "2w", label: t.twoWeeks || "2 Weken", price: `€ ${allExamPrices[`examen_${catLetter}_2w`] || "25"}` },
+    { key: "1m", label: t.oneMonth || "1 Maand", price: `€ ${allExamPrices[`examen_${catLetter}_1m`] || "50"}` },
   ];
 
   const fetchLessons = async (catLetter: string) => {
@@ -214,7 +214,7 @@ export default function ExamenPage() {
                       </div>
                     </div>
                   </td>
-                  {durations.map((dur) => (
+                  {getExamDurations(cat.catLetter).map((dur) => (
                     <td key={dur.key} className="px-4 py-3 border border-gray-200 text-center">
                       <button
                         onClick={() => handleSelect(cat.id, dur.key, cat.name)}
@@ -259,7 +259,7 @@ export default function ExamenPage() {
                 </div>
               </div>
               <div className="flex gap-2 mb-3">
-                {durations.map((dur) => (
+                {getExamDurations(cat.catLetter).map((dur) => (
                   <button
                     key={dur.key}
                     onClick={() => handleSelect(cat.id, dur.key, cat.name)}

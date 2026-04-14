@@ -46,11 +46,11 @@ export default function VideoLessonsPage() {
     }
   }, []);
 
-  const [praktijkPrices, setPraktijkPrices] = useState({ training: "49", hazard: "39" });
+  const [praktijkPrices, setPraktijkPrices] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetch("/api/settings").then(r => r.json()).then(d => {
-      if (d.success) setPraktijkPrices({ training: d.settings.praktijk_training || "49", hazard: d.settings.praktijk_hazard || "39" });
+      if (d.success) setPraktijkPrices(d.settings);
     }).catch(() => {});
   }, []);
 
@@ -59,13 +59,13 @@ export default function VideoLessonsPage() {
       id: "lessons",
       title: t.drivingLessons || "Oefenvideo's",
       description: t.lessonsDesc || "Volledige uitleg van alle verkeersregels met beeld en geluid",
-      price: `€${praktijkPrices.training}`
+      price: `€${praktijkPrices["praktijk_B_training"] || praktijkPrices["praktijk_training"] || "49"}`
     },
     {
       id: "exam",
       title: t.practicalExam || "Gevaarherkenning",
       description: t.examDesc || "Praktijkgerichte video-oefeningen om je voor te bereiden op het examen",
-      price: `€${praktijkPrices.hazard}`
+      price: `€${praktijkPrices["praktijk_B_hazard"] || praktijkPrices["praktijk_hazard"] || "39"}`
     }
   ];
 

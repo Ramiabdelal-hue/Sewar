@@ -24,13 +24,23 @@ interface Question {
 
 // Component إدارة الأسعار
 function PricesManager({ onBack }: { onBack: () => void }) {
-  const [prices, setPrices] = useState({
-    theorie_2w: "25", theorie_1m: "50",
-    praktijk_training: "49", praktijk_hazard: "39",
-    examen_2w: "25", examen_1m: "50",
-  });
+  const categories = ["A", "B", "C"];
+  const [selectedCat, setSelectedCat] = useState("B");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  // أسعار لكل فئة: theorie_A_2w, theorie_A_1m, ...
+  const defaultPrices: Record<string, string> = {};
+  categories.forEach(cat => {
+    defaultPrices[`theorie_${cat}_2w`] = "25";
+    defaultPrices[`theorie_${cat}_1m`] = "50";
+    defaultPrices[`examen_${cat}_2w`] = "25";
+    defaultPrices[`examen_${cat}_1m`] = "50";
+    defaultPrices[`praktijk_${cat}_training`] = "49";
+    defaultPrices[`praktijk_${cat}_hazard`] = "39";
+  });
+
+  const [prices, setPrices] = useState<Record<string, string>>(defaultPrices);
 
   useEffect(() => {
     fetch("/api/settings")
@@ -54,14 +64,14 @@ function PricesManager({ onBack }: { onBack: () => void }) {
     finally { setSaving(false); }
   };
 
-  const Field = ({ label, k }: { label: string; k: keyof typeof prices }) => (
+  const Field = ({ label, k }: { label: string; k: string }) => (
     <div className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
       <span className="text-sm font-bold text-gray-700">{label}</span>
       <div className="flex items-center gap-2">
         <span className="text-gray-400 font-bold">€</span>
         <input
           type="number" min="0" step="1"
-          value={prices[k]}
+          value={prices[k] ?? ""}
           onChange={e => setPrices(p => ({ ...p, [k]: e.target.value }))}
           className="w-24 px-3 py-1.5 rounded-lg text-sm font-black text-center focus:outline-none"
           style={{ border: "1.5px solid #e2e8f0", background: "#f8fafc" }}
@@ -70,8 +80,12 @@ function PricesManager({ onBack }: { onBack: () => void }) {
     </div>
   );
 
+  const catColors: Record<string, string> = { A: "#f97316", B: "#3b82f6", C: "#22c55e" };
+  const catLabels: Record<string, string> = { A: "🏍️ Rijbewijs A", B: "🚗 Rijbewijs B", C: "🚛 Rijbewijs C" };
+
   return (
     <div className="min-h-screen" style={{ background: "#f0f4f8" }}>
+      {/* Header */}
       <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0a0a2e 0%, #003399 60%, #0055cc 100%)" }}>
         <div className="max-w-2xl mx-auto px-6 py-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -82,42 +96,44 @@ function PricesManager({ onBack }: { onBack: () => void }) {
             </div>
             <div>
               <h1 className="text-lg font-black text-white">أسعار الاشتراكات</h1>
-              <p className="text-white/50 text-xs">تعديل أسعار جميع الخدمات</p>
+              <p className="text-white/50 text-xs">تعديل أسعار كل فئة بشكل منفصل</p>
             </div>
           </div>
-          <button onClick={onBack} className="px-4 py-2 rounded-lg text-xs font-black text-white transition-all hover:scale-105" style={{ background: "rgba(255,255,255,0.15)" }}>
+          <button onClick={onBack} className="px-4 py-2 rounded-lg text-xs font-black text-white hover:scale-105 transition-all" style={{ background: "rgba(255,255,255,0.15)" }}>
             ← رجوع
           </button>
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-6 py-8 space-y-5">
+      <div className="max-w-2xl mx-auto px-6 py-8">
+        {/* اختيار الفئة */}
+        <div className="flex gap-3 mb-6">
+          {categories.map(cat => (
+            <button key={cat} onClick={() => setSelectedCat(cat)}
+              className="flex-1 py-3 rounded-xl font-black text-sm transition-all hover:scale-[1.02] active:scale-95"
+              style={selectedCat === cat
+                ? { background: `linear-gradient(135deg, ${catColors[cat]}, ${catColors[cat]}cc)`, color: "white", boxShadow: `0 4px 14px ${catColors[cat]}40` }
+                : { background: "white", color: "#6b7280", border: "1.5px solid #e5e7eb" }
+              }>
+              {catLabels[cat]}
+            </button>
+          ))}
+        </div>
+
         {loading ? (
           <div className="flex justify-center py-10"><div className="w-8 h-8 border-2 border-[#003399] border-t-transparent rounded-full animate-spin"></div></div>
         ) : (
-          <>
+          <div className="space-y-4">
             {/* Theorie */}
             <div className="bg-white rounded-2xl shadow-sm p-5" style={{ border: "1px solid #e5e7eb" }}>
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
                   <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13" /></svg>
                 </div>
-                <h2 className="text-sm font-black text-gray-800">Theorie</h2>
+                <h2 className="text-sm font-black text-gray-800">Theorie — Rijbewijs {selectedCat}</h2>
               </div>
-              <Field label="2 Weken" k="theorie_2w" />
-              <Field label="1 Maand" k="theorie_1m" />
-            </div>
-
-            {/* Praktijk */}
-            <div className="bg-white rounded-2xl shadow-sm p-5" style={{ border: "1px solid #e5e7eb" }}>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg, #3b82f6, #2563eb)" }}>
-                  <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                </div>
-                <h2 className="text-sm font-black text-gray-800">Praktijk</h2>
-              </div>
-              <Field label="Oefenvideo's" k="praktijk_training" />
-              <Field label="Gevaarherkenning" k="praktijk_hazard" />
+              <Field label="2 Weken" k={`theorie_${selectedCat}_2w`} />
+              <Field label="1 Maand" k={`theorie_${selectedCat}_1m`} />
             </div>
 
             {/* Examen */}
@@ -126,18 +142,30 @@ function PricesManager({ onBack }: { onBack: () => void }) {
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg, #f97316, #ea580c)" }}>
                   <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138z" /></svg>
                 </div>
-                <h2 className="text-sm font-black text-gray-800">Examen</h2>
+                <h2 className="text-sm font-black text-gray-800">Examen — Rijbewijs {selectedCat}</h2>
               </div>
-              <Field label="2 Weken" k="examen_2w" />
-              <Field label="1 Maand" k="examen_1m" />
+              <Field label="2 Weken" k={`examen_${selectedCat}_2w`} />
+              <Field label="1 Maand" k={`examen_${selectedCat}_1m`} />
+            </div>
+
+            {/* Praktijk */}
+            <div className="bg-white rounded-2xl shadow-sm p-5" style={{ border: "1px solid #e5e7eb" }}>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg, #3b82f6, #2563eb)" }}>
+                  <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                </div>
+                <h2 className="text-sm font-black text-gray-800">Praktijk — Rijbewijs {selectedCat}</h2>
+              </div>
+              <Field label="Oefenvideo's" k={`praktijk_${selectedCat}_training`} />
+              <Field label="Gevaarherkenning" k={`praktijk_${selectedCat}_hazard`} />
             </div>
 
             <button onClick={save} disabled={saving}
               className="w-full py-3 rounded-xl font-black text-sm text-white transition-all hover:scale-[1.01] active:scale-95 disabled:opacity-50"
               style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)", boxShadow: "0 4px 14px rgba(245,158,11,0.35)" }}>
-              {saving ? "جاري الحفظ..." : "💾 حفظ الأسعار"}
+              {saving ? "جاري الحفظ..." : `💾 حفظ أسعار الفئة ${selectedCat}`}
             </button>
-          </>
+          </div>
         )}
       </div>
     </div>

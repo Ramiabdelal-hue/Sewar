@@ -38,17 +38,17 @@ export default function TheoriePage() {
     { id: "C", name: "Rijbewijs C", description: t.trucks || "Vrachtwagens", icon: <TruckIcon className="w-16 h-10" /> },
   ];
 
-  const [prices, setPrices] = useState({ "2w": "25", "1m": "50" });
+  const [allPrices, setAllPrices] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetch("/api/settings").then(r => r.json()).then(d => {
-      if (d.success) setPrices({ "2w": d.settings.theorie_2w || "25", "1m": d.settings.theorie_1m || "50" });
+      if (d.success) setAllPrices(d.settings);
     }).catch(() => {});
   }, []);
 
-  const durations = [
-    { key: "2w", label: t.twoWeeks || "2 Weken", price: `€ ${prices["2w"]}` },
-    { key: "1m", label: t.oneMonth || "1 Maand", price: `€ ${prices["1m"]}` },
+  const getDurations = (catId: string) => [
+    { key: "2w", label: t.twoWeeks || "2 Weken", price: `€ ${allPrices[`theorie_${catId}_2w`] || "25"}` },
+    { key: "1m", label: t.oneMonth || "1 Maand", price: `€ ${allPrices[`theorie_${catId}_1m`] || "50"}` },
   ];
 
   useEffect(() => {
@@ -142,7 +142,7 @@ export default function TheoriePage() {
                         </div>
                       </div>
                     </td>
-                    {durations.map((dur) => (
+                    {getDurations(cat.id).map((dur) => (
                       <td key={dur.key} className="px-4 py-3 border border-gray-200 text-center">
                         <button onClick={() => setGlobalSelection({ catId: cat.id, duration: dur.key, catName: cat.name })}
                           className={`px-4 py-1.5 text-sm font-bold border-2 transition-colors w-full ${globalSelection?.catId === cat.id && globalSelection?.duration === dur.key ? "bg-[#3399ff] text-white border-[#3399ff]" : "bg-white border-gray-400 hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff]"}`}>
@@ -172,7 +172,7 @@ export default function TheoriePage() {
                   </div>
                 </div>
                 <div className="flex gap-2 mb-3">
-                  {durations.map((dur) => (
+                  {getDurations(cat.id).map((dur) => (
                     <button key={dur.key} onClick={() => setGlobalSelection({ catId: cat.id, duration: dur.key, catName: cat.name })}
                       className={`flex-1 py-2 text-sm font-bold border-2 transition-colors ${globalSelection?.catId === cat.id && globalSelection?.duration === dur.key ? "bg-[#3399ff] text-white border-[#3399ff]" : "bg-white border-gray-400"}`}>
                       {dur.label}<br /><span className="font-black">{dur.price}</span>
