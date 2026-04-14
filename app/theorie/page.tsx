@@ -113,12 +113,16 @@ export default function TheoriePage() {
               const durations = getDurations(cat.id);
               const isSelected = globalSelection?.catId === cat.id;
               return (
-                <div key={cat.id} className="rounded-2xl overflow-hidden transition-all duration-300"
+                <div key={cat.id} className="rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer group"
                   style={{
                     background: isSelected ? `${cat.color}15` : "rgba(255,255,255,0.05)",
                     border: isSelected ? `2px solid ${cat.color}60` : "1px solid rgba(255,255,255,0.1)",
                     boxShadow: isSelected ? `0 12px 40px ${cat.glow}` : "none",
-                  }}>
+                    transform: "translateY(0)",
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(-6px)"; (e.currentTarget as HTMLElement).style.boxShadow = `0 20px 50px ${cat.glow}`; (e.currentTarget as HTMLElement).style.border = `1.5px solid ${cat.color}50`; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; (e.currentTarget as HTMLElement).style.boxShadow = isSelected ? `0 12px 40px ${cat.glow}` : "none"; (e.currentTarget as HTMLElement).style.border = isSelected ? `2px solid ${cat.color}60` : "1px solid rgba(255,255,255,0.1)"; }}
+                >
                   {/* رأس الكرت */}
                   <div className="flex items-center gap-4 px-5 py-5">
                     <div className="flex-shrink-0 opacity-90">{cat.icon}</div>
