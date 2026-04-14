@@ -92,7 +92,7 @@ export default function TheoriePage() {
 
         <Navbar />
 
-        <div className="relative z-10 flex-1 px-4 py-8 max-w-lg mx-auto w-full">
+        <div className="relative z-10 flex-1 px-4 py-8 max-w-lg mx-auto w-full md:max-w-2xl lg:max-w-3xl">
           {/* Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 text-xs font-bold" style={{ background: "rgba(255,204,0,0.1)", border: "1px solid rgba(255,204,0,0.25)", color: "#ffcc00" }}>
@@ -108,7 +108,7 @@ export default function TheoriePage() {
           </div>
 
           {/* كروت الفئات */}
-          <div className="space-y-3 mb-6">
+          <div className="space-y-3 md:grid md:grid-cols-3 md:gap-4 md:space-y-0 mb-6">
             {categories.map(cat => {
               const durations = getDurations(cat.id);
               const isSelected = globalSelection?.catId === cat.id;
@@ -172,7 +172,7 @@ export default function TheoriePage() {
           </button>
 
           {/* مميزات */}
-          <div className="mt-6 grid grid-cols-3 gap-3">
+          <div className="mt-6 grid grid-cols-3 gap-3 md:gap-4">
             {[
               { icon: "📚", label: lang === "ar" ? "دروس كاملة" : "Alle lessen" },
               { icon: "❓", label: lang === "ar" ? "أسئلة تدريبية" : "Oefenvragen" },
@@ -228,7 +228,7 @@ export default function TheoriePage() {
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-64 h-64 rounded-full blur-3xl" style={{ background: "#ffcc00", transform: "translate(-30%, -30%)" }}></div>
         </div>
-        <div className="relative max-w-2xl mx-auto px-4 py-5">
+        <div className="relative max-w-2xl md:max-w-4xl mx-auto px-4 py-5">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-white/50 text-xs font-bold uppercase tracking-wider mb-0.5">
@@ -259,7 +259,7 @@ export default function TheoriePage() {
       </div>
 
       {/* قائمة الدروس */}
-      <div className="flex-1 max-w-2xl mx-auto w-full px-4 py-4">
+      <div className="flex-1 max-w-2xl md:max-w-4xl mx-auto w-full px-4 py-4">
         {loading ? (
           <div className="flex justify-center py-16">
             <div className="w-10 h-10 border-3 border-[#003399] border-t-transparent rounded-full animate-spin"></div>
@@ -270,7 +270,7 @@ export default function TheoriePage() {
             <p className="text-gray-500 font-bold">{lang === "ar" ? "لا توجد دروس" : lang === "nl" ? "Geen lessen" : "Aucune leçon"}</p>
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-2 md:grid md:grid-cols-2 md:gap-3 md:space-y-0">
             {filtered.map((lesson, i) => (
               <div key={lesson.id}
                 className="bg-white rounded-2xl overflow-hidden transition-all hover:shadow-md"
