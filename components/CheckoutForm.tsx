@@ -103,7 +103,7 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
       </div>
 
       {/* البطاقة - على الموبايل تملأ الشاشة، على الكمبيوتر بطاقة محدودة */}
-      <div className="relative z-10 w-full md:max-w-md flex-1 md:flex-none flex flex-col md:rounded-3xl md:overflow-hidden"
+      <div className="relative z-10 w-full md:max-w-lg flex-1 md:flex-none flex flex-col md:rounded-3xl md:overflow-hidden"
         style={{ background: "rgba(255,255,255,0.03)", border: "0px solid transparent" }}
         // على md: نضيف border
       >
@@ -145,25 +145,55 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
             <form onSubmit={handleSubmit} className="space-y-3">
               {/* حقول البيانات */}
               <div className="rounded-2xl overflow-hidden" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                {[
-                  { icon: <FaUser />, label: t.fullNamePlaceholder, type: "text", key: "fullName", placeholder: "Jan Janssen", value: formData.fullName },
-                  { icon: <FaEnvelope />, label: t.emailPlaceholder, type: "email", key: "email", placeholder: "jan@email.com", value: formData.email },
-                  { icon: <FaPhone />, label: t.phonePlaceholder, type: "tel", key: "phone", placeholder: "+32 4XX XX XX XX", value: formData.phone },
-                  { icon: <FaLock />, label: lang === "ar" ? "كلمة المرور" : "Wachtwoord", type: "password", key: "password", placeholder: "••••••••", value: "" },
-                  { icon: <FaLock />, label: lang === "ar" ? "تأكيد كلمة المرور" : "Bevestig wachtwoord", type: "password", key: "confirmPassword", placeholder: "••••••••", value: "" },
-                ].map((field, i, arr) => (
-                  <div key={field.key} className={`flex items-center gap-3 px-4 py-3.5 ${i < arr.length - 1 ? "border-b" : ""}`}
-                    style={{ borderColor: "rgba(255,255,255,0.06)" }}>
-                    <span className="text-white/30 flex-shrink-0 text-sm">{field.icon}</span>
-                    <div className="flex-1">
-                      <p className="text-white/40 text-[10px] font-black uppercase tracking-wider mb-0.5">{field.label}</p>
-                      <input required type={field.type} placeholder={field.placeholder}
-                        value={field.value !== undefined ? field.value : undefined}
-                        className="w-full bg-transparent text-white text-sm font-medium placeholder-white/20 focus:outline-none"
-                        onChange={e => setFormData({ ...formData, [field.key]: e.target.value })} />
-                    </div>
+                <div className="flex items-center gap-3 px-4 py-3.5 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+                  <FaUser className="text-white/30 flex-shrink-0 text-sm" />
+                  <div className="flex-1">
+                    <p className="text-white/40 text-[10px] font-black uppercase tracking-wider mb-0.5">{t.fullNamePlaceholder}</p>
+                    <input required type="text" placeholder="Jan Janssen" value={formData.fullName}
+                      className="w-full bg-transparent text-white text-sm font-medium placeholder-white/20 focus:outline-none"
+                      onChange={e => setFormData({ ...formData, fullName: e.target.value })} />
                   </div>
-                ))}
+                </div>
+                <div className="flex items-center gap-3 px-4 py-3.5 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+                  <FaEnvelope className="text-white/30 flex-shrink-0 text-sm" />
+                  <div className="flex-1">
+                    <p className="text-white/40 text-[10px] font-black uppercase tracking-wider mb-0.5">{t.emailPlaceholder}</p>
+                    <input required type="email" placeholder="jan@email.com" value={formData.email}
+                      className="w-full bg-transparent text-white text-sm font-medium placeholder-white/20 focus:outline-none"
+                      onChange={e => setFormData({ ...formData, email: e.target.value })} />
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 px-4 py-3.5 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+                  <FaPhone className="text-white/30 flex-shrink-0 text-sm" />
+                  <div className="flex-1">
+                    <p className="text-white/40 text-[10px] font-black uppercase tracking-wider mb-0.5">{t.phonePlaceholder}</p>
+                    <input required type="tel" placeholder="+32 4XX XX XX XX" value={formData.phone}
+                      className="w-full bg-transparent text-white text-sm font-medium placeholder-white/20 focus:outline-none"
+                      onChange={e => setFormData({ ...formData, phone: e.target.value })} />
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 px-4 py-3.5 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+                  <FaLock className="text-white/30 flex-shrink-0 text-sm" />
+                  <div className="flex-1">
+                    <p className="text-white/40 text-[10px] font-black uppercase tracking-wider mb-0.5">
+                      {lang === "ar" ? "كلمة المرور" : "Wachtwoord"}
+                    </p>
+                    <input required type="password" placeholder="••••••••"
+                      className="w-full bg-transparent text-white text-sm font-medium placeholder-white/20 focus:outline-none"
+                      onChange={e => setFormData({ ...formData, password: e.target.value })} />
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 px-4 py-3.5">
+                  <FaLock className="text-white/30 flex-shrink-0 text-sm" />
+                  <div className="flex-1">
+                    <p className="text-white/40 text-[10px] font-black uppercase tracking-wider mb-0.5">
+                      {lang === "ar" ? "تأكيد كلمة المرور" : "Bevestig wachtwoord"}
+                    </p>
+                    <input required type="password" placeholder="••••••••"
+                      className="w-full bg-transparent text-white text-sm font-medium placeholder-white/20 focus:outline-none"
+                      onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })} />
+                  </div>
+                </div>
               </div>
 
               {/* طريقة الدفع */}
