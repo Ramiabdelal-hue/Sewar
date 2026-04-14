@@ -144,53 +144,53 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
 
             <form onSubmit={handleSubmit} className="space-y-3">
               {/* حقول البيانات */}
-              <div className="rounded-2xl overflow-hidden" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                <div className="flex items-center gap-3 px-4 py-3.5 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
-                  <FaUser className="text-white/30 flex-shrink-0 text-sm" />
+              <div className="rounded-2xl overflow-hidden" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                <div className="flex items-center gap-4 px-5 py-4 border-b" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
+                  <FaUser className="text-white/40 flex-shrink-0" />
                   <div className="flex-1">
-                    <p className="text-white/40 text-[10px] font-black uppercase tracking-wider mb-0.5">{t.fullNamePlaceholder}</p>
+                    <p className="text-white/50 text-xs font-black uppercase tracking-wider mb-1">{t.fullNamePlaceholder}</p>
                     <input required type="text" placeholder="Jan Janssen" value={formData.fullName}
-                      className="w-full bg-transparent text-white text-sm font-medium placeholder-white/20 focus:outline-none"
+                      className="w-full bg-transparent text-white text-base font-medium placeholder-white/25 focus:outline-none"
                       onChange={e => setFormData({ ...formData, fullName: e.target.value })} />
                   </div>
                 </div>
-                <div className="flex items-center gap-3 px-4 py-3.5 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
-                  <FaEnvelope className="text-white/30 flex-shrink-0 text-sm" />
+                <div className="flex items-center gap-4 px-5 py-4 border-b" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
+                  <FaEnvelope className="text-white/40 flex-shrink-0" />
                   <div className="flex-1">
-                    <p className="text-white/40 text-[10px] font-black uppercase tracking-wider mb-0.5">{t.emailPlaceholder}</p>
+                    <p className="text-white/50 text-xs font-black uppercase tracking-wider mb-1">{t.emailPlaceholder}</p>
                     <input required type="email" placeholder="jan@email.com" value={formData.email}
-                      className="w-full bg-transparent text-white text-sm font-medium placeholder-white/20 focus:outline-none"
+                      className="w-full bg-transparent text-white text-base font-medium placeholder-white/25 focus:outline-none"
                       onChange={e => setFormData({ ...formData, email: e.target.value })} />
                   </div>
                 </div>
-                <div className="flex items-center gap-3 px-4 py-3.5 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
-                  <FaPhone className="text-white/30 flex-shrink-0 text-sm" />
+                <div className="flex items-center gap-4 px-5 py-4 border-b" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
+                  <FaPhone className="text-white/40 flex-shrink-0" />
                   <div className="flex-1">
-                    <p className="text-white/40 text-[10px] font-black uppercase tracking-wider mb-0.5">{t.phonePlaceholder}</p>
+                    <p className="text-white/50 text-xs font-black uppercase tracking-wider mb-1">{t.phonePlaceholder}</p>
                     <input required type="tel" placeholder="+32 4XX XX XX XX" value={formData.phone}
-                      className="w-full bg-transparent text-white text-sm font-medium placeholder-white/20 focus:outline-none"
+                      className="w-full bg-transparent text-white text-base font-medium placeholder-white/25 focus:outline-none"
                       onChange={e => setFormData({ ...formData, phone: e.target.value })} />
                   </div>
                 </div>
-                <div className="flex items-center gap-3 px-4 py-3.5 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
-                  <FaLock className="text-white/30 flex-shrink-0 text-sm" />
+                <div className="flex items-center gap-4 px-5 py-4 border-b" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
+                  <FaLock className="text-white/40 flex-shrink-0" />
                   <div className="flex-1">
-                    <p className="text-white/40 text-[10px] font-black uppercase tracking-wider mb-0.5">
+                    <p className="text-white/50 text-xs font-black uppercase tracking-wider mb-1">
                       {lang === "ar" ? "كلمة المرور" : "Wachtwoord"}
                     </p>
                     <input required type="password" placeholder="••••••••"
-                      className="w-full bg-transparent text-white text-sm font-medium placeholder-white/20 focus:outline-none"
+                      className="w-full bg-transparent text-white text-base font-medium placeholder-white/25 focus:outline-none"
                       onChange={e => setFormData({ ...formData, password: e.target.value })} />
                   </div>
                 </div>
-                <div className="flex items-center gap-3 px-4 py-3.5">
-                  <FaLock className="text-white/30 flex-shrink-0 text-sm" />
+                <div className="flex items-center gap-4 px-5 py-4">
+                  <FaLock className="text-white/40 flex-shrink-0" />
                   <div className="flex-1">
-                    <p className="text-white/40 text-[10px] font-black uppercase tracking-wider mb-0.5">
+                    <p className="text-white/50 text-xs font-black uppercase tracking-wider mb-1">
                       {lang === "ar" ? "تأكيد كلمة المرور" : "Bevestig wachtwoord"}
                     </p>
                     <input required type="password" placeholder="••••••••"
-                      className="w-full bg-transparent text-white text-sm font-medium placeholder-white/20 focus:outline-none"
+                      className="w-full bg-transparent text-white text-base font-medium placeholder-white/25 focus:outline-none"
                       onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })} />
                   </div>
                 </div>

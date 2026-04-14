@@ -115,38 +115,42 @@ export default function TheoriePage() {
               return (
                 <div key={cat.id} className="rounded-2xl overflow-hidden transition-all duration-300"
                   style={{
-                    background: isSelected ? `${cat.color}12` : "rgba(255,255,255,0.04)",
-                    border: isSelected ? `1.5px solid ${cat.color}50` : "1px solid rgba(255,255,255,0.08)",
-                    boxShadow: isSelected ? `0 8px 32px ${cat.glow}` : "none",
+                    background: isSelected ? `${cat.color}15` : "rgba(255,255,255,0.05)",
+                    border: isSelected ? `2px solid ${cat.color}60` : "1px solid rgba(255,255,255,0.1)",
+                    boxShadow: isSelected ? `0 12px 40px ${cat.glow}` : "none",
                   }}>
                   {/* رأس الكرت */}
-                  <div className="flex items-center gap-4 px-5 py-4">
+                  <div className="flex items-center gap-4 px-5 py-5">
                     <div className="flex-shrink-0 opacity-90">{cat.icon}</div>
                     <div className="flex-1">
-                      <p className="text-white font-black text-base">{cat.name}</p>
-                      <p className="text-white/40 text-xs">{cat.desc}</p>
+                      <p className="text-white font-black text-lg">{cat.name}</p>
+                      <p className="text-white/50 text-sm mt-0.5">{cat.desc}</p>
                     </div>
                     {isSelected && (
-                      <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: cat.color }}>
-                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: cat.color }}>
+                        <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                       </div>
                     )}
                   </div>
 
+                  {/* فاصل */}
+                  <div style={{ height: "1px", background: "rgba(255,255,255,0.06)", margin: "0 20px" }}></div>
+
                   {/* أزرار المدة */}
-                  <div className="grid grid-cols-2 gap-2 px-4 pb-4">
+                  <div className="grid grid-cols-2 gap-2.5 px-4 py-4">
                     {durations.map(dur => {
                       const active = isSelected && globalSelection?.duration === dur.key;
                       return (
                         <button key={dur.key}
                           onClick={() => setGlobalSelection({ catId: cat.id, duration: dur.key, catName: cat.name })}
-                          className="py-3 rounded-xl transition-all active:scale-95"
+                          className="py-4 rounded-xl transition-all active:scale-95"
                           style={{
-                            background: active ? cat.color : "rgba(255,255,255,0.06)",
-                            border: active ? `1px solid ${cat.color}` : "1px solid rgba(255,255,255,0.1)",
+                            background: active ? cat.color : "rgba(255,255,255,0.07)",
+                            border: active ? `1.5px solid ${cat.color}` : "1.5px solid rgba(255,255,255,0.12)",
+                            boxShadow: active ? `0 4px 16px ${cat.color}40` : "none",
                           }}>
-                          <p className="text-xs font-bold" style={{ color: active ? "white" : "rgba(255,255,255,0.5)" }}>{dur.label}</p>
-                          <p className="text-lg font-black" style={{ color: active ? "white" : "rgba(255,255,255,0.8)" }}>€{dur.price}</p>
+                          <p className="text-xs font-bold mb-1" style={{ color: active ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.45)" }}>{dur.label}</p>
+                          <p className="text-2xl font-black" style={{ color: active ? "white" : "rgba(255,255,255,0.85)" }}>€{dur.price}</p>
                         </button>
                       );
                     })}
