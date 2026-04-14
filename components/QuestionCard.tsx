@@ -68,17 +68,13 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
   return (
     <div className="rounded-3xl overflow-hidden shadow-2xl border border-gray-100 mb-6" dir={isRtl ? "rtl" : "ltr"}>
 
-      {/* شريط العنوان */}
+      {/* شريط الرأس */}
       <div className="flex items-center justify-between px-5 py-3"
         style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center text-white font-black">
             {index + 1}
           </div>
-          <span className="text-white/80 text-sm font-bold">
-            {lang === "ar" ? "السؤال" : lang === "nl" ? "Vraag" : lang === "fr" ? "Question" : "Question"}
-            {translating && <span className="ml-2 animate-pulse">...</span>}
-          </span>
         </div>
         <span className="text-white/60 text-sm font-bold">{index + 1} / {total}</span>
       </div>
@@ -140,18 +136,10 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
         </div>
       )}
 
-      {/* نص السؤال */}
-      <div className="px-5 py-5 bg-white">
-        <div className="flex items-start gap-2 mb-1">
-          <span className="w-1 h-5 bg-[#003399] rounded-full flex-shrink-0 mt-1"></span>
-          <p className={`text-lg font-bold text-gray-900 leading-relaxed ${isRtl ? "text-right" : "text-left"}`}>
-            {qText}
-          </p>
-        </div>
-
-        {/* الشرح */}
-        {expText && (
-          <div className="mt-4 bg-green-50 border border-green-200 rounded-xl p-4">
+      {/* الشرح فقط - بدون نص السؤال */}
+      {expText && (
+        <div className="px-5 py-5 bg-white">
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4">
             <div className="flex items-start gap-2">
               <span className="w-1 h-5 bg-green-500 rounded-full flex-shrink-0 mt-1"></span>
               <div>
@@ -164,8 +152,13 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
               </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* إذا لا يوجد شرح ولا صورة - مساحة فارغة صغيرة */}
+      {!expText && (!question.videoUrls || question.videoUrls.filter(Boolean).length === 0) && !question.audioUrl && (
+        <div className="px-5 py-4 bg-white"></div>
+      )}
 
       {/* أزرار التنقل محذوفة - موجودة في الصفحة الأم */}
     </div>
