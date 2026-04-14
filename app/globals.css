@@ -78,3 +78,32 @@ pre, code {
   overflow-x: auto;
   max-width: 100%;
 }
+
+/* ─── حماية المحتوى من Screenshots ─────────────────────────────────────── */
+
+/* إخفاء الصور عند أخذ screenshot (يعمل على بعض المتصفحات) */
+@media print {
+  body { display: none !important; }
+}
+
+/* منع تحديد النص */
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* إخفاء الصور عند screenshot باستخدام video element trick */
+.protected-image {
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* منع السحب */
+img, video {
+  -webkit-user-drag: none;
+  user-drag: none;
+  -webkit-touch-callout: none;
+}

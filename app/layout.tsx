@@ -38,6 +38,38 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           .wa-btn:hover { transform: scale(1.1); box-shadow: 0 6px 25px rgba(37,211,102,0.7) !important; }
           .wa-btn { transition: transform 0.2s, box-shadow 0.2s; }
         `}</style>
+
+        {/* حماية من Screenshot */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function() {
+            // إخفاء المحتوى عند الضغط على Print Screen
+            document.addEventListener('keyup', function(e) {
+              if (e.key === 'PrintScreen' || e.keyCode === 44) {
+                document.body.style.filter = 'blur(20px)';
+                setTimeout(function() { document.body.style.filter = ''; }, 300);
+                navigator.clipboard && navigator.clipboard.writeText('');
+              }
+            });
+
+            // منع Ctrl+P (طباعة)
+            document.addEventListener('keydown', function(e) {
+              if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                e.preventDefault();
+                return false;
+              }
+            });
+
+            // اكتشاف تغيير visibility (بعض أدوات screenshot تخفي الصفحة)
+            document.addEventListener('visibilitychange', function() {
+              if (document.hidden) {
+                document.body.style.filter = 'blur(20px)';
+              } else {
+                setTimeout(function() { document.body.style.filter = ''; }, 200);
+              }
+            });
+          })();
+        `}} />
+
         <LangProvider>{children}</LangProvider>
 
         {/* زر واتساب عائم */}
