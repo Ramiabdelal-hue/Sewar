@@ -22,6 +22,128 @@ interface Question {
   audioUrl?: string;
 }
 
+// Component إدارة الأسعار
+function PricesManager({ onBack }: { onBack: () => void }) {
+  const [prices, setPrices] = useState({
+    theorie_2w: "25", theorie_1m: "50",
+    praktijk_training: "49", praktijk_hazard: "39",
+    examen_2w: "25", examen_1m: "50",
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then(r => r.json())
+      .then(d => { if (d.success) setPrices(p => ({ ...p, ...d.settings })); })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ settings: prices }),
+      });
+      const d = await res.json();
+      if (d.success) alert("✅ تم حفظ الأسعار بنجاح");
+      else alert(d.message || "خطأ في الحفظ");
+    } catch { alert("خطأ في الاتصال"); }
+    finally { setSaving(false); }
+  };
+
+  const Field = ({ label, k }: { label: string; k: keyof typeof prices }) => (
+    <div className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
+      <span className="text-sm font-bold text-gray-700">{label}</span>
+      <div className="flex items-center gap-2">
+        <span className="text-gray-400 font-bold">€</span>
+        <input
+          type="number" min="0" step="1"
+          value={prices[k]}
+          onChange={e => setPrices(p => ({ ...p, [k]: e.target.value }))}
+          className="w-24 px-3 py-1.5 rounded-lg text-sm font-black text-center focus:outline-none"
+          style={{ border: "1.5px solid #e2e8f0", background: "#f8fafc" }}
+        />
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen" style={{ background: "#f0f4f8" }}>
+      <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0a0a2e 0%, #003399 60%, #0055cc 100%)" }}>
+        <div className="max-w-2xl mx-auto px-6 py-5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)" }}>
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-lg font-black text-white">أسعار الاشتراكات</h1>
+              <p className="text-white/50 text-xs">تعديل أسعار جميع الخدمات</p>
+            </div>
+          </div>
+          <button onClick={onBack} className="px-4 py-2 rounded-lg text-xs font-black text-white transition-all hover:scale-105" style={{ background: "rgba(255,255,255,0.15)" }}>
+            ← رجوع
+          </button>
+        </div>
+      </div>
+
+      <div className="max-w-2xl mx-auto px-6 py-8 space-y-5">
+        {loading ? (
+          <div className="flex justify-center py-10"><div className="w-8 h-8 border-2 border-[#003399] border-t-transparent rounded-full animate-spin"></div></div>
+        ) : (
+          <>
+            {/* Theorie */}
+            <div className="bg-white rounded-2xl shadow-sm p-5" style={{ border: "1px solid #e5e7eb" }}>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
+                  <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13" /></svg>
+                </div>
+                <h2 className="text-sm font-black text-gray-800">Theorie</h2>
+              </div>
+              <Field label="2 Weken" k="theorie_2w" />
+              <Field label="1 Maand" k="theorie_1m" />
+            </div>
+
+            {/* Praktijk */}
+            <div className="bg-white rounded-2xl shadow-sm p-5" style={{ border: "1px solid #e5e7eb" }}>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg, #3b82f6, #2563eb)" }}>
+                  <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                </div>
+                <h2 className="text-sm font-black text-gray-800">Praktijk</h2>
+              </div>
+              <Field label="Oefenvideo's" k="praktijk_training" />
+              <Field label="Gevaarherkenning" k="praktijk_hazard" />
+            </div>
+
+            {/* Examen */}
+            <div className="bg-white rounded-2xl shadow-sm p-5" style={{ border: "1px solid #e5e7eb" }}>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg, #f97316, #ea580c)" }}>
+                  <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138z" /></svg>
+                </div>
+                <h2 className="text-sm font-black text-gray-800">Examen</h2>
+              </div>
+              <Field label="2 Weken" k="examen_2w" />
+              <Field label="1 Maand" k="examen_1m" />
+            </div>
+
+            <button onClick={save} disabled={saving}
+              className="w-full py-3 rounded-xl font-black text-sm text-white transition-all hover:scale-[1.01] active:scale-95 disabled:opacity-50"
+              style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)", boxShadow: "0 4px 14px rgba(245,158,11,0.35)" }}>
+              {saving ? "جاري الحفظ..." : "💾 حفظ الأسعار"}
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // Component إدارة عناوين الدروس
 function LessonsManager({ onBack }: { onBack: () => void }) {
   const [category, setCategory] = useState("B");
@@ -870,6 +992,11 @@ export default function AdminQuestionsPage() {
     return <LessonsManager onBack={() => setQuestionType("")} />;
   }
 
+  // شاشة إدارة الأسعار
+  if (questionType === "prices") {
+    return <PricesManager onBack={() => setQuestionType("")} />;
+  }
+
   // شاشة اختيار subtype لـ Theori
   if (questionType === "Theori" && !questionSubType) {
     return (
@@ -951,6 +1078,12 @@ export default function AdminQuestionsPage() {
         icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z",
         badge: "مستخدمون"
       },
+      {
+        type: "prices", label: "الأسعار", sub: "تعديل أسعار الاشتراكات",
+        color: "#f59e0b", glow: "rgba(245,158,11,0.25)",
+        icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+        badge: "إعدادات"
+      },
     ];
 
     return (
@@ -982,6 +1115,7 @@ export default function AdminQuestionsPage() {
                 onClick={() => {
                   if (type === "subscribers") window.open("/admin/subscribers", "_blank");
                   else if (type === "lessons-manager") setQuestionType("lessons-manager" as any);
+                  else if (type === "prices") setQuestionType("prices" as any);
                   else setQuestionType(type as any);
                 }}
                 className="group relative overflow-hidden rounded-2xl text-left transition-all duration-300 hover:-translate-y-1 active:scale-95"

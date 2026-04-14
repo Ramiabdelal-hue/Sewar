@@ -46,18 +46,26 @@ export default function VideoLessonsPage() {
     }
   }, []);
 
+  const [praktijkPrices, setPraktijkPrices] = useState({ training: "49", hazard: "39" });
+
+  useEffect(() => {
+    fetch("/api/settings").then(r => r.json()).then(d => {
+      if (d.success) setPraktijkPrices({ training: d.settings.praktijk_training || "49", hazard: d.settings.praktijk_hazard || "39" });
+    }).catch(() => {});
+  }, []);
+
   const options = [
     {
       id: "lessons",
       title: t.drivingLessons || "Oefenvideo's",
       description: t.lessonsDesc || "Volledige uitleg van alle verkeersregels met beeld en geluid",
-      price: "€49"
+      price: `€${praktijkPrices.training}`
     },
     {
       id: "exam",
       title: t.practicalExam || "Gevaarherkenning",
       description: t.examDesc || "Praktijkgerichte video-oefeningen om je voor te bereiden op het examen",
-      price: "€39"
+      price: `€${praktijkPrices.hazard}`
     }
   ];
 

@@ -230,3 +230,10 @@ model ExamQuestionC {
   createdAt     DateTime @default(now())
   lesson        LessonC  @relation("ExamQuestionsC", fields: [lessonId], references: [id], onDelete: Cascade)
 }
+
+model Setting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}

@@ -38,9 +38,17 @@ export default function TheoriePage() {
     { id: "C", name: "Rijbewijs C", description: t.trucks || "Vrachtwagens", icon: <TruckIcon className="w-16 h-10" /> },
   ];
 
+  const [prices, setPrices] = useState({ "2w": "25", "1m": "50" });
+
+  useEffect(() => {
+    fetch("/api/settings").then(r => r.json()).then(d => {
+      if (d.success) setPrices({ "2w": d.settings.theorie_2w || "25", "1m": d.settings.theorie_1m || "50" });
+    }).catch(() => {});
+  }, []);
+
   const durations = [
-    { key: "2w", label: t.twoWeeks || "2 Weken", price: "€ 25" },
-    { key: "1m", label: t.oneMonth || "1 Maand", price: "€ 50" },
+    { key: "2w", label: t.twoWeeks || "2 Weken", price: `€ ${prices["2w"]}` },
+    { key: "1m", label: t.oneMonth || "1 Maand", price: `€ ${prices["1m"]}` },
   ];
 
   useEffect(() => {

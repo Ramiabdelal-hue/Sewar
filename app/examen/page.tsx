@@ -75,9 +75,17 @@ export default function ExamenPage() {
     { id: "cat-c", catLetter: "C", name: "Rijbewijs C", description: t.trucks || "Vrachtwagens", icon: <TruckIcon className="w-16 h-10" /> },
   ];
 
+  const [examPrices, setExamPrices] = useState({ "2w": "25", "1m": "50" });
+
+  useEffect(() => {
+    fetch("/api/settings").then(r => r.json()).then(d => {
+      if (d.success) setExamPrices({ "2w": d.settings.examen_2w || "25", "1m": d.settings.examen_1m || "50" });
+    }).catch(() => {});
+  }, []);
+
   const durations = [
-    { key: "2w", label: t.twoWeeks || "2 Weken", price: "€ 25" },
-    { key: "1m", label: t.oneMonth || "1 Maand", price: "€ 50" },
+    { key: "2w", label: t.twoWeeks || "2 Weken", price: `€ ${examPrices["2w"]}` },
+    { key: "1m", label: t.oneMonth || "1 Maand", price: `€ ${examPrices["1m"]}` },
   ];
 
   const fetchLessons = async (catLetter: string) => {
