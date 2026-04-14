@@ -749,7 +749,7 @@ export default function AdminQuestionsPage() {
         return alert("يجب اختيار الإجابة الصحيحة");
       }
     } else {
-      // للدروس و Praktijk: لا يشترط نص السؤال - يكفي الشرح أو الصورة أو الصوت
+      // للدروس و Praktijk: لا يشترط نص السؤال
       if (!lessonId) {
         return alert("يجب اختيار الدرس");
       }
@@ -1311,6 +1311,21 @@ export default function AdminQuestionsPage() {
               <h2 className="text-sm font-black text-gray-700">إضافة سؤال جديد</h2>
             </div>
             <div className="space-y-4">
+              {/* نص السؤال - للامتحانات فقط */}
+              {questionType === "Examen" && (
+                <div>
+                  <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">🇳🇱 نص السؤال (Nederlands)</label>
+                  <textarea
+                    placeholder="Vraag in het Nederlands..."
+                    className="w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-700 focus:outline-none resize-none transition-all"
+                    style={{ background: "#f0f4ff", border: "1.5px solid #c7d2fe" }}
+                    rows={3}
+                    value={newQuestion.textNL}
+                    onChange={(e) => setNewQuestion({ ...newQuestion, textNL: e.target.value })}
+                  />
+                </div>
+              )}
+
               {/* الشرح - هولندي فقط - للدروس فقط */}
               {questionType !== "Examen" && (
                 <div>
