@@ -266,49 +266,55 @@ export default function TheoriePage() {
             <div className="w-10 h-10 border-3 border-[#003399] border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="text-4xl mb-3">📭</div>
-            <p className="text-gray-500 font-bold">{lang === "ar" ? "لا توجد دروس" : lang === "nl" ? "Geen lessen" : "Aucune leçon"}</p>
+          <div className="border border-yellow-300 bg-yellow-50 p-6 text-center">
+            <p className="font-bold text-gray-700">{lang === "ar" ? "لا توجد دروس متاحة" : lang === "nl" ? "Geen lessen beschikbaar" : "Aucune leçon disponible"}</p>
           </div>
         ) : (
-          <div className="space-y-2 md:grid md:grid-cols-2 md:gap-3 md:space-y-0">
-            {filtered.map((lesson, i) => (
-              <div key={lesson.id}
-                className="bg-white rounded-2xl overflow-hidden transition-all hover:shadow-md"
-                style={{ border: "1px solid #e5e7eb" }}>
-                <div className="flex items-center gap-3 px-4 py-3.5">
-                  {/* رقم الدرس */}
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black text-white flex-shrink-0"
-                    style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-                    {i + 1}
-                  </div>
-
-                  {/* عنوان الدرس */}
-                  <p className="flex-1 text-sm font-bold text-gray-800 leading-snug">
-                    {translatedTitles[lessons.indexOf(lesson)] || lesson.title}
-                  </p>
-
-                  {/* أزرار */}
-                  <div className="flex items-center gap-2 flex-shrink-0">
+          <table className="w-full border-collapse lessons-table" style={{ tableLayout: "fixed" }}>
+            <colgroup>
+              <col style={{ width: "60%" }} />
+              <col style={{ width: "20%" }} />
+              <col style={{ width: "20%" }} />
+            </colgroup>
+            <thead>
+              <tr style={{ backgroundColor: "#3399ff" }}>
+                <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc]">
+                  {lang === "ar" ? "الدرس" : lang === "nl" ? "LES" : lang === "fr" ? "LEÇON" : "LESSON"}
+                </th>
+                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
+                  {lang === "ar" ? "فتح" : lang === "nl" ? "OPENEN" : lang === "fr" ? "OUVRIR" : "OPEN"}
+                </th>
+                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
+                  EXAM
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((lesson, i) => (
+                <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#f5f5f5" }}>
+                  <td className="px-4 py-3 border border-gray-200 font-bold text-[#003399] text-base">
+                    {i + 1}. {translatedTitles[lessons.indexOf(lesson)] || lesson.title}
+                  </td>
+                  <td className="px-4 py-3 border border-gray-200 text-center">
                     <button
                       onClick={() => router.push(`/theorie/lesson?lessonId=${lesson.id}&category=${userCategory}&email=${userEmail}&lesson=${encodeURIComponent(lesson.title)}`)}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black transition-all active:scale-95"
-                      style={{ background: "linear-gradient(135deg, #003399, #0055cc)", color: "white" }}>
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13" /></svg>
-                      {lang === "ar" ? "درس" : "Les"}
+                      className="bg-white border-2 border-gray-400 px-4 py-1 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors"
+                    >
+                      {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
                     </button>
+                  </td>
+                  <td className="px-4 py-3 border border-gray-200 text-center">
                     <button
                       onClick={() => router.push(`/examen/category?cat=${userCategory}&email=${userEmail}&lessonId=${lesson.id}`)}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black transition-all active:scale-95"
-                      style={{ background: "linear-gradient(135deg, #f97316, #ea580c)", color: "white" }}>
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138z" /></svg>
-                      Exam
+                      className="bg-white border-2 border-orange-400 px-4 py-1 text-sm font-bold text-orange-600 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-colors"
+                    >
+                      EXAM
                     </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
     </div>
