@@ -232,9 +232,6 @@ function TheorieLessonContent() {
             </div>
 
             <h1 className="text-2xl font-bold text-gray-800 mb-2">{lesson}</h1>
-            <p className="text-gray-600">
-              {lang === "ar" ? `السؤال ${currentIndex + 1} من ${questions.length}` : lang === "nl" ? `Vraag ${currentIndex + 1} van ${questions.length}` : `Question ${currentIndex + 1} sur ${questions.length}`}
-            </p>
           </div>
 
           {/* 10 أسئلة في نفس الصفحة */}

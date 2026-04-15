@@ -394,9 +394,6 @@ function LessonViewContent() {
 
             <h1 className="text-2xl font-bold text-gray-800 mb-2">{translatedLessonTitle || `${lang === "ar" ? "الدرس" : lang === "nl" ? "Les" : "Leçon"} ${lessonId}`}</h1>
             <div className="flex items-center gap-4">
-              <p className="text-gray-600">
-                {lang === "ar" ? `السؤال ${currentIndex + 1} من ${filteredQuestions.length}` : lang === "nl" ? `Vraag ${currentIndex + 1} van ${filteredQuestions.length}` : `Question ${currentIndex + 1} sur ${filteredQuestions.length}`}
-              </p>
               {questions.length !== filteredQuestions.length && (
                 <span className="text-sm bg-orange-100 text-orange-600 px-3 py-1 rounded-full font-medium">
                   {lang === "ar" ? `${filteredQuestions.length} من ${questions.length}` : lang === "nl" ? `${filteredQuestions.length} van ${questions.length}` : `${filteredQuestions.length} sur ${questions.length}`}

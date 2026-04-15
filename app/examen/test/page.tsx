@@ -486,7 +486,7 @@ function ExamenTestContent() {
                   {Object.keys(userAnswers).length}
                 </div>
                 <span className="text-gray-700 font-semibold">
-                  van {questions.length} vragen
+                  {Object.keys(userAnswers).length} / {questions.length}
                 </span>
               </div>
             </div>
