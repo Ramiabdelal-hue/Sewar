@@ -55,15 +55,38 @@ export default function TheoriePage() {
 
   const checkAndFetch = async (email: string, category: string) => {
     try {
-      const res = await fetch("/api/check-subscription", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
+      const res = await fetch("/api/check-subscription", { 
+        method: "POST", 
+        headers: { "Content-Type": "application/json" }, 
+        body: JSON.stringify({ email }) 
+      });
+      
+      // إذا فشل الـ API (network error, 400, 500) - لا نعتبره منتهياً
+      if (!res.ok) {
+        console.warn("check-subscription failed with status:", res.status, "- continuing anyway");
+        // جلب الدروس بدون التحقق
+        const lr = await fetch(`/api/lessons?category=${category}`);
+        const ld = await lr.json();
+        if (ld.success) setLessons(ld.lessons);
+        return;
+      }
+      
       const data = await res.json();
-      if (data.expired || !data.success) { setIsExpired(true); setLoading(false); return; }
+      if (data.expired) { setIsExpired(true); setLoading(false); return; }
 
       // جلب الدروس مباشرة - الاشتراك صالح
       const lr = await fetch(`/api/lessons?category=${category}`);
       const ld = await lr.json();
       if (ld.success) setLessons(ld.lessons);
-    } catch (e) { console.error(e); }
+    } catch (e) { 
+      console.error("checkAndFetch error:", e);
+      // عند خطأ في الشبكة - جلب الدروس بدون التحقق
+      try {
+        const lr = await fetch(`/api/lessons?category=${category}`);
+        const ld = await lr.json();
+        if (ld.success) setLessons(ld.lessons);
+      } catch {}
+    }
     finally { setLoading(false); }
   };
 

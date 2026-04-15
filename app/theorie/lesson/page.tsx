@@ -56,31 +56,33 @@ function TheorieLessonContent() {
     }
 
     const checkSubscription = async () => {
-      // استخدم email من localStorage أولاً، ثم من URL
       const emailToCheck = localStorage.getItem("userEmail") || email;
-      
       if (!emailToCheck) {
         setIsExpired(true);
         setChecking(false);
         setLoading(false);
         return;
       }
-
       try {
         const response = await fetch("/api/check-subscription", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: emailToCheck })
         });
-
+        // إذا فشل الـ API - لا نعتبره منتهياً
+        if (!response.ok) {
+          console.warn("check-subscription failed:", response.status);
+          setChecking(false);
+          return;
+        }
         const data = await response.json();
-
-        if (data.expired || !data.success) {
+        if (data.expired) {
           setIsExpired(true);
           setLoading(false);
         }
       } catch (error) {
         console.error("Error checking subscription:", error);
+        // عند خطأ شبكة - لا نعتبره منتهياً
       } finally {
         setChecking(false);
       }

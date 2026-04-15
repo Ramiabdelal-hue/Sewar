@@ -65,8 +65,13 @@ function ExamenTestContent() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: emailToCheck })
         });
+        if (!response.ok) {
+          console.warn("check-subscription failed:", response.status);
+          setChecking(false);
+          return;
+        }
         const data = await response.json();
-        if (data.expired || !data.success) {
+        if (data.expired) {
           setIsExpired(true);
           setLoading(false);
         }
