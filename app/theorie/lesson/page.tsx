@@ -127,6 +127,17 @@ function TheorieLessonContent() {
     }
   };
 
+  const currentQuestion = questions[currentIndex] || null;
+
+  // Hook يجب أن يكون دائماً في نفس المكان - قبل أي return مشروط
+  const textsToTranslate = currentQuestion ? [
+    currentQuestion.text || "",
+    currentQuestion.answer1 || "",
+    currentQuestion.answer2 || "",
+    currentQuestion.answer3 || "",
+  ] : ["", "", "", ""];
+  const translatedTexts = useAutoTranslateList(textsToTranslate, lang);
+
   if (loading || checking) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -196,15 +207,6 @@ function TheorieLessonContent() {
   }
 
   const currentQuestion = questions[currentIndex];
-
-  // ترجمة نص السؤال والإجابات تلقائياً
-  const textsToTranslate = currentQuestion ? [
-    currentQuestion.text || "",
-    currentQuestion.answer1 || "",
-    currentQuestion.answer2 || "",
-    currentQuestion.answer3 || "",
-  ] : ["", "", "", ""];
-  const translatedTexts = useAutoTranslateList(textsToTranslate, lang);
 
   return (
     <div className="min-h-screen bg-gray-50" dir={lang === "ar" ? "rtl" : "ltr"}>
