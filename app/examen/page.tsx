@@ -90,17 +90,10 @@ export default function ExamenPage() {
 
   const fetchLessons = async (catLetter: string) => {
     try {
-      // جرب أولاً بـ examCategory
-      const res = await fetch(`/api/lessons?category=${catLetter}&questionType=Examen`);
+      // جلب كل دروس الفئة بدون فلتر questionType
+      const res = await fetch(`/api/lessons?category=${catLetter}`);
       const data = await res.json();
-      if (data.success && data.lessons.length > 0) {
-        setAvailableLessons(data.lessons);
-      } else {
-        // جرب بدون questionType
-        const res2 = await fetch(`/api/lessons?category=${catLetter}`);
-        const data2 = await res2.json();
-        if (data2.success) setAvailableLessons(data2.lessons);
-      }
+      if (data.success) setAvailableLessons(data.lessons);
     } catch (e) { console.error(e); }
   };
 
