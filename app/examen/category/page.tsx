@@ -68,18 +68,16 @@ function ExamenCategoryContent() {
     const fetchAll = async () => {
       try {
         if (lessonId) {
-          // جلب أسئلة درس محدد فقط
-          const qRes = await fetch(`/api/exam-questions?lessonId=${lessonId}`);
+          const qRes = await fetch(`/api/exam-questions?lessonId=${lessonId}&category=${cat.toUpperCase()}`);
           const qData = await qRes.json();
           if (qData.success) setQuestions(qData.questions.sort(() => Math.random() - 0.5));
         } else {
-          // جلب كل أسئلة الفئة
           const lessonsRes = await fetch(`/api/lessons?category=${cat.toUpperCase()}`);
           const lessonsData = await lessonsRes.json();
           if (!lessonsData.success) { setLoading(false); return; }
           const allQ: any[] = [];
           for (const lesson of lessonsData.lessons) {
-            const qRes = await fetch(`/api/exam-questions?lessonId=${lesson.id}`);
+            const qRes = await fetch(`/api/exam-questions?lessonId=${lesson.id}&category=${cat.toUpperCase()}`);
             const qData = await qRes.json();
             if (qData.success && qData.questions?.length > 0) allQ.push(...qData.questions);
           }

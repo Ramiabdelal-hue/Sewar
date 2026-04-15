@@ -189,7 +189,7 @@ function LessonViewContent() {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const url = `/api/questions?lessonId=${lessonId}`;
+        const url = `/api/questions?lessonId=${lessonId}&category=${category || "B"}`;
         console.log("🔍 Fetching questions from:", url);
         const res = await fetch(url);
         const data = await res.json();

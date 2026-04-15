@@ -41,24 +41,22 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const lessonId = searchParams.get("lessonId");
+    const categoryParam = searchParams.get("category"); // اختياري - لتجنب تعارض IDs
 
     if (!lessonId) {
-      return NextResponse.json({
-        success: false,
-        message: "يجب تحديد lessonId"
-      }, { status: 400 });
+      return NextResponse.json({ success: false, message: "يجب تحديد lessonId" }, { status: 400 });
     }
 
     const lessonIdNum = parseInt(lessonId);
     
-    // Determine category from lessonId
-    const category = await getCategoryFromLessonId(lessonIdNum);
+    // إذا تم تمرير category مباشرة استخدمه، وإلا ابحث عنه
+    let category = categoryParam?.toUpperCase() || null;
+    if (!category) {
+      category = await getCategoryFromLessonId(lessonIdNum);
+    }
     
     if (!category) {
-      return NextResponse.json({
-        success: false,
-        message: "الدرس غير موجود"
-      }, { status: 404 });
+      return NextResponse.json({ success: false, message: "الدرس غير موجود" }, { status: 404 });
     }
 
     console.log(`🔍 Fetching questions for lessonId ${lessonId} in category ${category}`);

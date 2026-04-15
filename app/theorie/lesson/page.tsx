@@ -99,7 +99,7 @@ function TheorieLessonContent() {
         setLoading(false);
         return;
       }
-      const url = `/api/questions?lessonId=${lessonId}`;
+      const url = `/api/questions?lessonId=${lessonId}&category=${category || "B"}`;
       const res = await fetch(url);
       const data = await res.json();
 

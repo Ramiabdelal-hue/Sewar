@@ -90,24 +90,19 @@ function ExamenTestContent() {
 
   const fetchQuestions = async () => {
     try {
-      // قراءة lessonId من searchParams (Next.js App Router)
       const lessonIdParam = searchParams.get("lessonId");
 
       if (lessonIdParam) {
-        // جلب أسئلة درس محدد من exam-questions
-        const res = await fetch(`/api/exam-questions?lessonId=${lessonIdParam}`);
+        const res = await fetch(`/api/exam-questions?lessonId=${lessonIdParam}&category=${category || "B"}`);
         const data = await res.json();
-        if (data.success) {
-          setQuestions(data.questions);
-        }
+        if (data.success) setQuestions(data.questions);
       } else if (category) {
-        // جلب كل أسئلة الفئة
         const lessonsRes = await fetch(`/api/lessons?category=${category}`);
         const lessonsData = await lessonsRes.json();
         if (lessonsData.success && lessonsData.lessons.length > 0) {
           const allQ: any[] = [];
           for (const l of lessonsData.lessons) {
-            const qRes = await fetch(`/api/exam-questions?lessonId=${l.id}`);
+            const qRes = await fetch(`/api/exam-questions?lessonId=${l.id}&category=${category}`);
             const qData = await qRes.json();
             if (qData.success && qData.questions?.length > 0) allQ.push(...qData.questions);
           }
