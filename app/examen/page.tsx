@@ -145,7 +145,7 @@ export default function ExamenPage() {
                     </td>
                     <td className="px-4 py-3 border border-gray-200 text-center">
                       <button
-                        onClick={() => router.push(`/examen/test?category=${selectedCategory}&lesson=${encodeURIComponent(lesson.title)}&email=${encodeURIComponent(userEmail)}`)}
+                        onClick={() => router.push(`/examen/test?category=${selectedCategory}&lesson=${encodeURIComponent(lesson.title)}&email=${encodeURIComponent(userEmail)}&lessonId=${lesson.id}`)}
                         className="bg-white border-2 border-gray-400 px-6 py-1.5 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors"
                       >
                         {lang === "ar" ? "ابدأ" : lang === "nl" ? "Start" : lang === "fr" ? "Démarrer" : "Start"}

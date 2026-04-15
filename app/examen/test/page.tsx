@@ -88,35 +88,34 @@ function ExamenTestContent() {
 
   const fetchQuestions = async () => {
     try {
-      // استخدام lessonId مباشرة بدلاً من lesson name
-      // نحتاج إلى تحديد lessonId من الدرس المختار
-      // للامتحانات، نستخدم الدروس ذات questionType = "Examen"
-      
-      // تحديد lessonId بناءً على الفئة
-      let examLessonId;
-      if (category === "A") {
-        examLessonId = 20; // Proefexamen categorie A
-      } else if (category === "B") {
-        examLessonId = 32; // Proefexamen categorie B
-      } else if (category === "C") {
-        examLessonId = 45; // Proefexamen categorie C
+      // جلب الأسئلة من exam-questions بـ lessonId إذا موجود في URL
+      const params = new URLSearchParams(window.location.search);
+      const lessonIdParam = params.get("lessonId");
+
+      let url = "";
+      if (lessonIdParam) {
+        // جلب أسئلة درس محدد
+        url = `/api/exam-questions?lessonId=${lessonIdParam}`;
+      } else {
+        // جلب كل أسئلة الفئة
+        const lessonsRes = await fetch(`/api/lessons?category=${category}`);
+        const lessonsData = await lessonsRes.json();
+        if (lessonsData.success && lessonsData.lessons.length > 0) {
+          const allQ: any[] = [];
+          for (const l of lessonsData.lessons) {
+            const qRes = await fetch(`/api/exam-questions?lessonId=${l.id}`);
+            const qData = await qRes.json();
+            if (qData.success && qData.questions?.length > 0) allQ.push(...qData.questions);
+          }
+          setQuestions(allQ.sort(() => Math.random() - 0.5));
+          return;
+        }
       }
 
-      console.log("🔍 Fetching exam questions for category:", category, "lessonId:", examLessonId);
-      
-      const url = `/api/questions?lessonId=${examLessonId}`;
-      console.log("📡 API URL:", url);
-      
-      const res = await fetch(url);
-      const data = await res.json();
-
-      console.log("📊 API Response:", data);
-
-      if (data.success) {
-        setQuestions(data.questions);
-        console.log(`✅ Loaded ${data.questions.length} questions`);
-      } else {
-        console.error("❌ Failed to fetch questions:", data.message);
+      if (url) {
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.success) setQuestions(data.questions);
       }
     } catch (error) {
       console.error("❌ Error fetching questions:", error);
