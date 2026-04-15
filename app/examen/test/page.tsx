@@ -12,6 +12,7 @@ import Navbar from "@/components/Navbar";
 interface Question {
   id: number;
   text: string;
+  textNL?: string;
   videoUrls?: string[];
   audioUrl?: string;
   answer1?: string;
