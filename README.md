@@ -108,8 +108,8 @@ Sewar/
 ## 🔐 بيانات الدخول الافتراضية
 
 **Admin Panel:**
-- Username: `rami`
-- Password: `123`
+- Username: `sewar`
+- Password: `70709090`
 
 ⚠️ **مهم**: غيّر كلمة المرور في الإنتاج!
 
