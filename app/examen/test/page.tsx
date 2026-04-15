@@ -30,6 +30,7 @@ function ExamenTestContent() {
   const category = searchParams.get("category"); // A, B, C
   const lesson = searchParams.get("lesson");
   const email = searchParams.get("email");
+  const lessonId = searchParams.get("lessonId");
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
@@ -81,22 +82,24 @@ function ExamenTestContent() {
   }, [email, category]);
 
   useEffect(() => {
-    if (lesson && category && !isExpired && !checking) {
+    if (category && !isExpired && !checking) {
       fetchQuestions();
     }
-  }, [lesson, category, isExpired, checking]);
+  }, [category, lessonId, isExpired, checking]);
 
   const fetchQuestions = async () => {
     try {
-      // جلب الأسئلة من exam-questions بـ lessonId إذا موجود في URL
-      const params = new URLSearchParams(window.location.search);
-      const lessonIdParam = params.get("lessonId");
+      // قراءة lessonId من searchParams (Next.js App Router)
+      const lessonIdParam = searchParams.get("lessonId");
 
-      let url = "";
       if (lessonIdParam) {
-        // جلب أسئلة درس محدد
-        url = `/api/exam-questions?lessonId=${lessonIdParam}`;
-      } else {
+        // جلب أسئلة درس محدد من exam-questions
+        const res = await fetch(`/api/exam-questions?lessonId=${lessonIdParam}`);
+        const data = await res.json();
+        if (data.success) {
+          setQuestions(data.questions);
+        }
+      } else if (category) {
         // جلب كل أسئلة الفئة
         const lessonsRes = await fetch(`/api/lessons?category=${category}`);
         const lessonsData = await lessonsRes.json();
@@ -108,14 +111,7 @@ function ExamenTestContent() {
             if (qData.success && qData.questions?.length > 0) allQ.push(...qData.questions);
           }
           setQuestions(allQ.sort(() => Math.random() - 0.5));
-          return;
         }
-      }
-
-      if (url) {
-        const res = await fetch(url);
-        const data = await res.json();
-        if (data.success) setQuestions(data.questions);
       }
     } catch (error) {
       console.error("❌ Error fetching questions:", error);
