@@ -211,8 +211,6 @@ function TheorieLessonContent() {
     );
   }
 
-  const currentQuestion = questions[currentIndex];
-
   return (
     <div className="min-h-screen bg-gray-50" dir={lang === "ar" ? "rtl" : "ltr"}>
       <Navbar />
