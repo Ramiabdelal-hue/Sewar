@@ -52,22 +52,20 @@ function ExamenTestContent() {
     }
 
     const checkSubscription = async () => {
-      if (!email) {
+      const emailToCheck = localStorage.getItem("userEmail") || email;
+      if (!emailToCheck) {
         setIsExpired(true);
         setChecking(false);
         setLoading(false);
         return;
       }
-
       try {
         const response = await fetch("/api/check-subscription", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email })
+          body: JSON.stringify({ email: emailToCheck })
         });
-
         const data = await response.json();
-
         if (data.expired || !data.success) {
           setIsExpired(true);
           setLoading(false);

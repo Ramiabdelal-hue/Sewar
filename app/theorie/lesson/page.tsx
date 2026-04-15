@@ -56,7 +56,10 @@ function TheorieLessonContent() {
     }
 
     const checkSubscription = async () => {
-      if (!email) {
+      // استخدم email من localStorage أولاً، ثم من URL
+      const emailToCheck = localStorage.getItem("userEmail") || email;
+      
+      if (!emailToCheck) {
         setIsExpired(true);
         setChecking(false);
         setLoading(false);
@@ -67,7 +70,7 @@ function TheorieLessonContent() {
         const response = await fetch("/api/check-subscription", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email })
+          body: JSON.stringify({ email: emailToCheck })
         });
 
         const data = await response.json();
