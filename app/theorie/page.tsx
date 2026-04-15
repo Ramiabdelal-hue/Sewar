@@ -58,16 +58,9 @@ export default function TheoriePage() {
       const res = await fetch("/api/check-subscription", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
       const data = await res.json();
       if (data.expired || !data.success) { setIsExpired(true); setLoading(false); return; }
-      const subs = data.subscriptions || [];
-      const hasTheorie = subs.some((s: any) => s.subscriptionType === "theorie") || data.user?.subscriptionType === "theorie";
-      if (!hasTheorie && subs.length > 0) {
-        const pl = subs.find((s: any) => s.subscriptionType === "praktijk-lessons");
-        const pe = subs.find((s: any) => s.subscriptionType === "praktijk-exam");
-        if (pl) window.location.assign(`/praktical/lessons?email=${encodeURIComponent(email)}&exp=${new Date(pl.expiryDate).getTime()}`);
-        else if (pe) window.location.assign(`/praktical/exam?email=${encodeURIComponent(email)}&exp=${new Date(pe.expiryDate).getTime()}`);
-        setLoading(false); return;
-      }
-      const lr = await fetch(`/api/lessons?category=${category}&questionType=Theori`);
+
+      // جلب الدروس مباشرة - الاشتراك صالح
+      const lr = await fetch(`/api/lessons?category=${category}`);
       const ld = await lr.json();
       if (ld.success) setLessons(ld.lessons);
     } catch (e) { console.error(e); }
