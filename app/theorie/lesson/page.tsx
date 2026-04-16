@@ -235,7 +235,11 @@ function TheorieLessonContent() {
 
             <h1 className="text-2xl font-bold text-gray-800 mb-2">{lesson}</h1>
             {lessonDescription && (
-              <p className="text-sm text-gray-500">{lessonDescription}</p>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mt-1"
+                style={{ background: "linear-gradient(135deg, #eff6ff, #dbeafe)", border: "1px solid #93c5fd" }}>
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0"></span>
+                <span className="text-sm font-semibold text-blue-700">{lessonDescription}</span>
+              </div>
             )}
           </div>
 

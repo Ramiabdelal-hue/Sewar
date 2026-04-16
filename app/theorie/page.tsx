@@ -309,7 +309,10 @@ export default function TheoriePage() {
                       {i + 1}. {translatedTitles[lessons.indexOf(lesson)] || lesson.title}
                     </div>
                     {lesson.description && (
-                      <div className="text-xs text-gray-500 mt-0.5">{lesson.description}</div>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <span className="w-1 h-3 rounded-full bg-[#3399ff] flex-shrink-0"></span>
+                        <span className="text-xs font-semibold text-[#3399ff]">{lesson.description}</span>
+                      </div>
                     )}
                   </td>
                   <td className="px-4 py-3 border border-gray-200 text-center">
