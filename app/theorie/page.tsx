@@ -304,8 +304,13 @@ export default function TheoriePage() {
             <tbody>
               {filtered.map((lesson, i) => (
                 <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#f5f5f5" }}>
-                  <td className="px-4 py-3 border border-gray-200 font-bold text-[#003399] text-base">
-                    {i + 1}. {translatedTitles[lessons.indexOf(lesson)] || lesson.title}
+                  <td className="px-4 py-3 border border-gray-200">
+                    <div className="font-bold text-[#003399] text-base">
+                      {i + 1}. {translatedTitles[lessons.indexOf(lesson)] || lesson.title}
+                    </div>
+                    {lesson.description && (
+                      <div className="text-xs text-gray-500 mt-0.5">{lesson.description}</div>
+                    )}
                   </td>
                   <td className="px-4 py-3 border border-gray-200 text-center">
                     <button

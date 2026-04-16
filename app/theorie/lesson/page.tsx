@@ -46,6 +46,7 @@ function TheorieLessonContent() {
   const [showAnswer, setShowAnswer] = useState(false);
   const [isExpired, setIsExpired] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [lessonDescription, setLessonDescription] = useState("");
 
   useEffect(() => {
     if (email) {
@@ -110,6 +111,7 @@ function TheorieLessonContent() {
 
       if (data.success) {
         setQuestions(data.questions);
+        if (data.lesson?.description) setLessonDescription(data.lesson.description);
       }
     } catch (error) {
       console.error("Error fetching questions:", error);
@@ -232,6 +234,9 @@ function TheorieLessonContent() {
             </div>
 
             <h1 className="text-2xl font-bold text-gray-800 mb-2">{lesson}</h1>
+            {lessonDescription && (
+              <p className="text-sm text-gray-500">{lessonDescription}</p>
+            )}
           </div>
 
           {/* 10 أسئلة في نفس الصفحة */}
