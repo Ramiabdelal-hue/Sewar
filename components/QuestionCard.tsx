@@ -90,26 +90,14 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
                 draggable={false}
                 onContextMenu={(e) => e.preventDefault()}
               />
-              {/* Watermark شبكي */}
-              <div className="absolute inset-0 pointer-events-none"
-                style={{
-                  backgroundImage: `repeating-linear-gradient(
-                    45deg,
-                    transparent,
-                    transparent 60px,
-                    rgba(255,255,255,0.08) 60px,
-                    rgba(255,255,255,0.08) 61px
-                  )`,
-                }}>
-              </div>
-              {/* Logo watermark في المنتصف */}
+              {/* Logo watermark خفيف جداً */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
                 <img src="/logo.jpg" alt="Sewar"
                   style={{
-                    width: '70%',
-                    height: '70%',
+                    width: '40%',
+                    height: '40%',
                     objectFit: 'contain',
-                    opacity: 0.35,
+                    opacity: 0.08,
                     mixBlendMode: 'luminosity',
                   }}
                   draggable={false}

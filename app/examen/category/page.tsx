@@ -236,7 +236,7 @@ function ExamenCategoryContent() {
                             <div key={idx} className="relative" style={{ aspectRatio: "16/9" }}>
                               <img src={url} alt="" className="w-full h-full object-cover" />
                               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                <img src="/logo.jpg" alt="" style={{ width: '60%', height: '60%', objectFit: 'contain', opacity: 0.3, mixBlendMode: 'luminosity' }} />
+                                <img src="/logo.jpg" alt="" style={{ width: '40%', height: '40%', objectFit: 'contain', opacity: 0.08, mixBlendMode: 'luminosity' }} />
                               </div>
                             </div>
                           ))}
@@ -389,7 +389,7 @@ function ExamenCategoryContent() {
                     <img src={url} alt="" className="w-full h-full object-cover" draggable={false} onContextMenu={e => e.preventDefault()} />
                     {/* watermark */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <img src="/logo.jpg" alt="" style={{ width: '70%', height: '70%', objectFit: 'contain', opacity: 0.35, mixBlendMode: 'luminosity' }} draggable={false} />
+                      <img src="/logo.jpg" alt="" style={{ width: '40%', height: '40%', objectFit: 'contain', opacity: 0.08, mixBlendMode: 'luminosity' }} draggable={false} />
                     </div>
                   </div>
                 ))}
