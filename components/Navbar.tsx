@@ -40,6 +40,26 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [daysLeft, setDaysLeft] = useState<number | null>(null);
   const [isExpired, setIsExpired] = useState(false);
+  const [installPrompt, setInstallPrompt] = useState<any>(null);
+  const [showInstall, setShowInstall] = useState(false);
+
+  // PWA install prompt
+  useEffect(() => {
+    const handler = (e: any) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+      setShowInstall(true);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstall = async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    if (outcome === 'accepted') setShowInstall(false);
+  };
 
   useEffect(() => {
     const check = async () => {
@@ -132,6 +152,25 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                 </button>
               ))}
             </div>
+
+            {/* زر تثبيت PWA - يظهر فقط في الصفحة الرئيسية */}
+            {showInstall && pathname === "/" && (
+              <button
+                onClick={handleInstall}
+                className="w-full flex items-center justify-center gap-1.5 py-1 font-black text-xs uppercase tracking-wide transition-all active:scale-95 hover:scale-105 animate-pulse"
+                style={{
+                  background: "linear-gradient(135deg, #22c55e, #16a34a)",
+                  color: "white",
+                  boxShadow: "0 2px 12px rgba(34,197,94,0.5)",
+                  borderRadius: "2px",
+                }}
+              >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                {lang === "ar" ? "تثبيت التطبيق" : lang === "nl" ? "App installeren" : lang === "fr" ? "Installer l'app" : "Install App"}
+              </button>
+            )}
 
             {/* زر Inloggen يغطي نفس عرض الأزرار الأربعة */}
             {!isLoggedIn ? (

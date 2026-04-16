@@ -4,6 +4,7 @@ import { LangProvider } from '@/context/LangContext';
 export const metadata = {
   title: 'S & A',
   description: 'Next.js + Tailwind example',
+  manifest: '/manifest.json',
 };
 
 export const viewport = {

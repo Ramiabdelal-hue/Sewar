@@ -1,0 +1,14 @@
+{
+  "name": "Sewar VerkeersSchool",
+  "short_name": "Sewar",
+  "description": "Leer rijden met Sewar VerkeersSchool",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#003399",
+  "theme_color": "#003399",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/logo.jpg", "sizes": "192x192", "type": "image/jpeg" },
+    { "src": "/logo.jpg", "sizes": "512x512", "type": "image/jpeg" }
+  ]
+}
