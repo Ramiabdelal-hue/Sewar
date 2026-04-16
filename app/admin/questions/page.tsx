@@ -1328,7 +1328,7 @@ export default function AdminQuestionsPage() {
               <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
                 <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
               </div>
-              <h2 className="text-sm font-black text-gray-700">إضافة سؤال جديد</h2>
+              <h2 className="text-sm font-black text-gray-700">{questionType === "Examen" ? "إضافة سؤال جديد" : "إضافة شرح جديد"}</h2>
             </div>
             <div className="space-y-4">
               {/* نص السؤال - للامتحانات فقط */}
