@@ -236,7 +236,7 @@ function ExamenCategoryContent() {
                             <div key={idx} className="relative" style={{ aspectRatio: "16/9" }}>
                               <img src={url} alt="" className="w-full h-full object-cover" />
                               <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-                                <img src="/logo.jpg" alt="" style={{ width: '45%', height: '45%', objectFit: 'contain', opacity: 0.15, mixBlendMode: 'screen', transform: 'rotate(-15deg)' }} />
+                                <img src="/logo.jpg" alt="" style={{ width: '45%', height: '45%', objectFit: 'contain', opacity: 0.35, mixBlendMode: 'screen', transform: 'rotate(-15deg)' }} />
                               </div>
                             </div>
                           ))}
@@ -389,7 +389,7 @@ function ExamenCategoryContent() {
                     <img src={url} alt="" className="w-full h-full object-cover" draggable={false} onContextMenu={e => e.preventDefault()} />
                     {/* watermark */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-                      <img src="/logo.jpg" alt="" style={{ width: '45%', height: '45%', objectFit: 'contain', opacity: 0.15, mixBlendMode: 'screen', transform: 'rotate(-15deg)' }} draggable={false} />
+                      <img src="/logo.jpg" alt="" style={{ width: '45%', height: '45%', objectFit: 'contain', opacity: 0.35, mixBlendMode: 'screen', transform: 'rotate(-15deg)' }} draggable={false} />
                     </div>
                   </div>
                 ))}
