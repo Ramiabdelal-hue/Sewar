@@ -179,10 +179,12 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
   const [category, setCategory] = useState("B");
   const [lessons, setLessons] = useState<any[]>([]);
   const [newTitle, setNewTitle] = useState("");
+  const [newDescription, setNewDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
 
   const fetchLessons = async (cat: string) => {
     setLoading(true);
@@ -203,10 +205,10 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
       const res = await fetch("/api/lessons", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: newTitle, category }),
+        body: JSON.stringify({ title: newTitle, description: newDescription, category }),
       });
       const data = await res.json();
-      if (data.success) { setNewTitle(""); fetchLessons(category); }
+      if (data.success) { setNewTitle(""); setNewDescription(""); fetchLessons(category); }
       else alert(data.message || "خطأ في الإضافة");
     } catch (e) { alert("خطأ في الاتصال"); }
     finally { setSaving(false); }
@@ -228,10 +230,10 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
       const res = await fetch("/api/lessons", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, title: editTitle, category }),
+        body: JSON.stringify({ id, title: editTitle, description: editDescription, category }),
       });
       const data = await res.json();
-      if (data.success) { setEditingId(null); setEditTitle(""); fetchLessons(category); }
+      if (data.success) { setEditingId(null); setEditTitle(""); setEditDescription(""); fetchLessons(category); }
       else alert(data.message || "خطأ في التعديل");
     } catch (e) { alert("خطأ في الاتصال"); }
   };
@@ -276,17 +278,24 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
         {/* إضافة درس جديد */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
           <h2 className="text-base font-black text-gray-800 mb-4">➕ إضافة درس جديد</h2>
-          <div className="flex gap-3">
+          <div className="space-y-3">
             <input
               type="text"
               value={newTitle}
               onChange={e => setNewTitle(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && addLesson()}
               placeholder="عنوان الدرس بالهولندية..."
-              className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#003399] focus:outline-none text-sm font-medium"
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#003399] focus:outline-none text-sm font-medium"
+            />
+            <input
+              type="text"
+              value={newDescription}
+              onChange={e => setNewDescription(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && addLesson()}
+              placeholder="عنوان فرعي (اختياري)..."
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#003399] focus:outline-none text-sm font-medium text-gray-500"
             />
             <button onClick={addLesson} disabled={saving}
-              className="px-6 py-3 rounded-xl font-black text-sm text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+              className="w-full px-6 py-3 rounded-xl font-black text-sm text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
               style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
               {saving ? "..." : "إضافة"}
             </button>
@@ -307,24 +316,34 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
                 <div key={lesson.id} className="px-6 py-3 hover:bg-gray-50 transition-colors">
                   {editingId === lesson.id ? (
                     // وضع التعديل
-                    <div className="flex items-center gap-2">
+                    <div className="space-y-2">
                       <input
                         type="text"
                         value={editTitle}
                         onChange={e => setEditTitle(e.target.value)}
-                        onKeyDown={e => e.key === "Enter" && updateLesson(lesson.id)}
-                        className="flex-1 px-3 py-2 border-2 border-[#003399] rounded-lg text-sm font-medium focus:outline-none"
+                        placeholder="العنوان..."
+                        className="w-full px-3 py-2 border-2 border-[#003399] rounded-lg text-sm font-medium focus:outline-none"
                         autoFocus
                       />
-                      <button onClick={() => updateLesson(lesson.id)}
-                        className="px-4 py-2 rounded-lg text-xs font-black text-white"
-                        style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-                        ✓ حفظ
-                      </button>
-                      <button onClick={() => { setEditingId(null); setEditTitle(""); }}
-                        className="px-3 py-2 rounded-lg text-xs font-black bg-gray-200 text-gray-600 hover:bg-gray-300">
-                        ✕
-                      </button>
+                      <input
+                        type="text"
+                        value={editDescription}
+                        onChange={e => setEditDescription(e.target.value)}
+                        onKeyDown={e => e.key === "Enter" && updateLesson(lesson.id)}
+                        placeholder="العنوان الفرعي (اختياري)..."
+                        className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm text-gray-500 focus:outline-none"
+                      />
+                      <div className="flex gap-2">
+                        <button onClick={() => updateLesson(lesson.id)}
+                          className="flex-1 px-4 py-2 rounded-lg text-xs font-black text-white"
+                          style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
+                          ✓ حفظ
+                        </button>
+                        <button onClick={() => { setEditingId(null); setEditTitle(""); setEditDescription(""); }}
+                          className="px-3 py-2 rounded-lg text-xs font-black bg-gray-200 text-gray-600 hover:bg-gray-300">
+                          ✕
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     // وضع العرض
@@ -332,17 +351,18 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
                       <div className="flex items-center gap-3">
                         <span className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black text-white flex-shrink-0"
                           style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>{i + 1}</span>
-                        <span className="text-sm font-bold text-gray-800">{lesson.title}</span>
+                        <div>
+                          <p className="text-sm font-bold text-gray-800">{lesson.title}</p>
+                          {lesson.description && <p className="text-xs text-gray-400 mt-0.5">{lesson.description}</p>}
+                        </div>
                       </div>
                       <div className="flex items-center gap-1">
-                        {/* زر التعديل */}
-                        <button onClick={() => { setEditingId(lesson.id); setEditTitle(lesson.title); }}
+                        <button onClick={() => { setEditingId(lesson.id); setEditTitle(lesson.title); setEditDescription(lesson.description || ""); }}
                           className="w-8 h-8 rounded-lg flex items-center justify-center text-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-colors">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                           </svg>
                         </button>
-                        {/* زر الحذف */}
                         <button onClick={() => deleteLesson(lesson.id)}
                           className="w-8 h-8 rounded-lg flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

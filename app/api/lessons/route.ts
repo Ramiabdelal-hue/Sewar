@@ -82,14 +82,14 @@ export async function GET(request: NextRequest) {
 // POST - إضافة درس جديد
 export async function POST(request: NextRequest) {
   try {
-    const { title, category } = await request.json();
+    const { title, description, category } = await request.json();
     if (!title || !category) return NextResponse.json({ success: false, message: "title and category required" }, { status: 400 });
 
     const cat = category.toUpperCase();
     let lesson;
-    if (cat === "A") lesson = await prisma.lessonA.create({ data: { title } });
-    else if (cat === "B") lesson = await prisma.lessonB.create({ data: { title } });
-    else if (cat === "C") lesson = await prisma.lessonC.create({ data: { title } });
+    if (cat === "A") lesson = await prisma.lessonA.create({ data: { title, description: description || null } });
+    else if (cat === "B") lesson = await prisma.lessonB.create({ data: { title, description: description || null } });
+    else if (cat === "C") lesson = await prisma.lessonC.create({ data: { title, description: description || null } });
     else return NextResponse.json({ success: false, message: "Invalid category" }, { status: 400 });
 
     return NextResponse.json({ success: true, lesson });
@@ -121,14 +121,14 @@ export async function DELETE(request: NextRequest) {
 // PUT - تعديل عنوان درس
 export async function PUT(request: NextRequest) {
   try {
-    const { id, title, category } = await request.json();
+    const { id, title, description, category } = await request.json();
     if (!id || !title || !category) return NextResponse.json({ success: false, message: "id, title and category required" }, { status: 400 });
 
     const cat = category.toUpperCase();
     let lesson;
-    if (cat === "A") lesson = await prisma.lessonA.update({ where: { id }, data: { title } });
-    else if (cat === "B") lesson = await prisma.lessonB.update({ where: { id }, data: { title } });
-    else if (cat === "C") lesson = await prisma.lessonC.update({ where: { id }, data: { title } });
+    if (cat === "A") lesson = await prisma.lessonA.update({ where: { id }, data: { title, description: description || null } });
+    else if (cat === "B") lesson = await prisma.lessonB.update({ where: { id }, data: { title, description: description || null } });
+    else if (cat === "C") lesson = await prisma.lessonC.update({ where: { id }, data: { title, description: description || null } });
     else return NextResponse.json({ success: false, message: "Invalid category" }, { status: 400 });
 
     return NextResponse.json({ success: true, lesson });
