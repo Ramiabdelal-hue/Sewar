@@ -205,6 +205,15 @@ function ExamenCategoryContent() {
   const q = questions[currentIndex];
   const isRtl = lang === "ar";
 
+  // Hook يجب أن يكون دائماً قبل أي return مشروط
+  const textsToTranslate = q ? [
+    q.textNL || q.text || "",
+    q.answer1 || "",
+    q.answer2 || "",
+    q.answer3 || "",
+  ] : ["", "", "", ""];
+  const translatedTexts = useAutoTranslateList(textsToTranslate, lang);
+
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="w-12 h-12 border-4 border-[#003399] border-t-transparent rounded-full animate-spin"></div>
@@ -397,15 +406,6 @@ function ExamenCategoryContent() {
   // صفحة السؤال
   const userAnswer = answers[currentIndex];
   const isAnswered = userAnswer !== undefined;
-
-  // ترجمة السؤال والإجابات حسب اللغة المختارة
-  const textsToTranslate = q ? [
-    q.textNL || q.text || "",
-    q.answer1 || "",
-    q.answer2 || "",
-    q.answer3 || "",
-  ] : ["", "", "", ""];
-  const translatedTexts = useAutoTranslateList(textsToTranslate, lang);
 
   return (
     <div className="min-h-screen bg-white" dir={isRtl ? "rtl" : "ltr"}>
