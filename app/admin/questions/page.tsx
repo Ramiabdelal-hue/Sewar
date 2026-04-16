@@ -1064,7 +1064,7 @@ export default function AdminQuestionsPage() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             {[
-              { label: "أسئلة الدروس", sub: "تظهر في صفحة الدرس", color: "#22c55e", icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13", onClick: () => setQuestionSubType("lessons") },
+              { label: "إضافة شرح الدروس", sub: "تظهر في صفحة الدرس", color: "#22c55e", icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13", onClick: () => setQuestionSubType("lessons") },
               { label: "أسئلة الامتحانات", sub: "تظهر في زر Exam", color: "#f97316", icon: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138z", onClick: () => { setQuestionSubType("exam"); setQuestionType("Examen"); } },
             ].map(({ label, sub, color, icon, onClick }) => (
               <button key={label} onClick={onClick}
