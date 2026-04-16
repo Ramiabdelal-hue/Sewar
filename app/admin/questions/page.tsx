@@ -1354,9 +1354,8 @@ export default function AdminQuestionsPage() {
                   <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">🇳🇱 الشرح (Nederlands)</label>
                   <textarea
                     placeholder="Uitleg in het Nederlands..."
-                    className="w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-700 focus:outline-none resize-none transition-all"
-                    style={{ background: "#eff6ff", border: "1.5px solid #bfdbfe" }}
-                    rows={3}
+                    className="w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-700 focus:outline-none transition-all"
+                    style={{ background: "#eff6ff", border: "1.5px solid #bfdbfe", resize: "vertical", minHeight: "96px" }}
                     value={newQuestion.explanationNL}
                     onChange={(e) => setNewQuestion({ ...newQuestion, explanationNL: e.target.value })}
                   />
@@ -1647,8 +1646,8 @@ export default function AdminQuestionsPage() {
                         <div>
                           <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">🇳🇱 الشرح (Nederlands)</label>
                           <textarea value={editForm.explanationNL} onChange={(e) => setEditForm({ ...editForm, explanationNL: e.target.value })}
-                            className="w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-700 focus:outline-none resize-none"
-                            style={{ background: "#eff6ff", border: "1.5px solid #bfdbfe" }} rows={3} />
+                            className="w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-700 focus:outline-none"
+                            style={{ background: "#eff6ff", border: "1.5px solid #bfdbfe", resize: "vertical", minHeight: "96px" }} />
                         </div>
                       )}
 
