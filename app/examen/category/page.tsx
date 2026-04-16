@@ -64,11 +64,13 @@ function ExamenCategoryContent() {
   const [locked, setLocked] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const ttsRef = useRef<NodeJS.Timeout | null>(null);
+  const [readingDone, setReadingDone] = useState(false);
 
   // قراءة تلقائية للسؤال والإجابات
   const speakQuestion = (q: any) => {
     if (!window.speechSynthesis || !q) return;
     window.speechSynthesis.cancel();
+    setReadingDone(false);
 
     const getVoice = () => {
       const voices = window.speechSynthesis.getVoices();
@@ -88,16 +90,19 @@ function ExamenCategoryContent() {
     };
 
     const questionText = q.textNL || q.text || "";
-    const answers = [q.answer1, q.answer2, q.answer3].filter(Boolean);
+    const answersList = [q.answer1, q.answer2, q.answer3].filter(Boolean);
 
     // قراءة السؤال أولاً
     speak(questionText, () => {
-      // ثم الإجابات واحدة واحدة مع فاصل
       let i = 0;
       const readNext = () => {
-        if (i >= answers.length) return;
+        if (i >= answersList.length) {
+          // انتهت القراءة → ابدأ العداد
+          setReadingDone(true);
+          return;
+        }
         const label = i === 0 ? "Eerste antwoord:" : i === 1 ? "Tweede antwoord:" : "Derde antwoord:";
-        speak(`${label} ${answers[i]}`, () => {
+        speak(`${label} ${answersList[i]}`, () => {
           i++;
           ttsRef.current = setTimeout(readNext, 400);
         });
@@ -111,6 +116,7 @@ function ExamenCategoryContent() {
     if (!started || finished) return;
     if (ttsRef.current) clearTimeout(ttsRef.current);
     window.speechSynthesis?.cancel();
+    setReadingDone(false);
 
     ttsRef.current = setTimeout(() => {
       const q = questions[currentIndex];
@@ -148,9 +154,9 @@ function ExamenCategoryContent() {
     fetchAll();
   }, [cat]);
 
-  // مؤقت 15 ثانية
+  // مؤقت 15 ثانية - يبدأ فقط بعد انتهاء القراءة
   useEffect(() => {
-    if (!started || finished || locked) return;
+    if (!started || finished || locked || !readingDone) return;
     setTimeLeft(15);
 
     timerRef.current = setInterval(() => {
@@ -158,7 +164,6 @@ function ExamenCategoryContent() {
         if (prev <= 1) {
           clearInterval(timerRef.current!);
           setLocked(true);
-          // إذا لم يختر إجابة، يُسجل null (خسارة)
           setAnswers(a => ({ ...a, [currentIndex]: a[currentIndex] ?? null }));
           return 0;
         }
@@ -167,18 +172,19 @@ function ExamenCategoryContent() {
     }, 1000);
 
     return () => clearInterval(timerRef.current!);
-  }, [currentIndex, started, finished]);
+  }, [currentIndex, started, finished, readingDone]);
 
   const handleAnswer = (num: number) => {
     if (locked || answers[currentIndex] !== undefined) return;
     clearInterval(timerRef.current!);
-    window.speechSynthesis?.cancel(); // أوقف القراءة عند الإجابة
+    window.speechSynthesis?.cancel();
     if (ttsRef.current) clearTimeout(ttsRef.current);
     setAnswers(a => ({ ...a, [currentIndex]: num }));
     setLocked(true);
   };
 
   const handleNext = () => {
+    setReadingDone(false);
     if (currentIndex + 1 >= questions.length) {
       setFinished(true);
     } else {
@@ -405,17 +411,18 @@ function ExamenCategoryContent() {
               {/* المؤقت بجانب رقم السؤال */}
               <div className={`flex items-center gap-2 px-3 py-1 rounded-full font-black text-sm border-2 transition-all ${
                 locked ? "bg-white/20 border-white/40 text-white" :
+                !readingDone ? "bg-white/20 border-white/40 text-white" :
                 timeLeft <= 5 ? "bg-red-500 border-red-300 text-white animate-pulse" :
                 timeLeft <= 10 ? "bg-orange-500 border-orange-300 text-white" :
                 "bg-white/20 border-white/40 text-white"
               }`}>
-                <span>⏱</span>
+                <span>{!readingDone && !locked ? "🎧" : "⏱"}</span>
                 <span className="text-lg">
                   {locked
                     ? (isAnswered && userAnswer !== null ? (userAnswer === q?.correctAnswer ? "✅" : "❌") : "⏱")
-                    : timeLeft}
+                    : !readingDone ? "..." : timeLeft}
                 </span>
-                {!locked && <span className="text-xs opacity-80">s</span>}
+                {!locked && readingDone && <span className="text-xs opacity-80">s</span>}
               </div>
             </div>
 
