@@ -93,7 +93,7 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
               {/* Logo watermark */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
                 <img src="/logo.jpg" alt="Sewar"
-                  style={{ width: '50%', height: '50%', objectFit: 'contain', opacity: 0.35, mixBlendMode: 'screen', transform: 'rotate(-15deg)' }}
+                  style={{ width: '50%', height: '50%', objectFit: 'contain', opacity: 0.75, mixBlendMode: 'screen', transform: 'rotate(-15deg)' }}
                   draggable={false} onContextMenu={(e) => e.preventDefault()}
                 />
               </div>
