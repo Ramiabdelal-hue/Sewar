@@ -121,17 +121,26 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
       {expText && (
         <div className="px-5 py-5 bg-white">
           <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-            <div className="flex items-start gap-2">
-              <span className="w-1 h-5 bg-green-500 rounded-full flex-shrink-0 mt-1"></span>
-              <div>
-                <p className="text-xs font-black text-green-700 uppercase tracking-wider mb-1">
-                  {lang === "ar" ? "الشرح" : lang === "nl" ? "Uitleg" : lang === "fr" ? "Explication" : "Explanation"}
-                </p>
-                <p className={`text-sm text-green-900 leading-relaxed ${isRtl ? "text-right" : "text-left"}`}>
-                  {expText}
-                </p>
+            <p className="text-xs font-black text-green-700 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+              {lang === "ar" ? "الشرح" : lang === "nl" ? "Uitleg" : lang === "fr" ? "Explication" : "Explanation"}
+            </p>
+            {expText.includes('\n') ? (
+              // إذا يحتوي على أسطر - اعرض كل سطر بشكل منفصل
+              <div className="space-y-2">
+                {expText.split('\n').filter(line => line.trim()).map((line, i) => (
+                  <div key={i} className={`flex items-start gap-2 ${isRtl ? "flex-row-reverse" : ""}`}>
+                    <span className="w-5 h-5 rounded-full bg-green-500 text-white text-xs font-black flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
+                    <p className={`text-sm text-green-900 leading-relaxed flex-1 ${isRtl ? "text-right" : "text-left"}`}>{line.trim()}</p>
+                  </div>
+                ))}
               </div>
-            </div>
+            ) : (
+              // سطر واحد - اعرضه عادي
+              <p className={`text-sm text-green-900 leading-relaxed ${isRtl ? "text-right" : "text-left"}`}>
+                {expText}
+              </p>
+            )}
           </div>
         </div>
       )}
