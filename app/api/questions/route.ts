@@ -123,7 +123,6 @@ export async function GET(request: NextRequest) {
 // POST - إضافة سؤال جديد
 export async function POST(request: NextRequest) {
   try {
-    console.log("📥 Received POST request");
     const body = await request.json();
     
     const {
@@ -140,60 +139,28 @@ export async function POST(request: NextRequest) {
       answer1,
       answer2,
       answer3,
-      correctAnswer
+      correctAnswer,
+      category: categoryParam,
     } = body;
 
-    console.log("📋 Data received:", {
-      lessonId,
-      hasText: !!text,
-      hasTextNL: !!textNL,
-      hasTextFR: !!textFR,
-      hasTextAR: !!textAR,
-      videoCount: videoUrls.length,
-      hasAudio: !!audioUrl,
-      hasExplanationNL: !!explanationNL,
-      hasExplanationFR: !!explanationFR,
-      hasExplanationAR: !!explanationAR,
-      hasAnswer1: !!answer1,
-      hasAnswer2: !!answer2,
-      hasAnswer3: !!answer3,
-      correctAnswer
-    });
-
-    // التحقق من البيانات الأساسية
     if (!lessonId) {
-      return NextResponse.json({
-        success: false,
-        message: "يجب تحديد الدرس"
-      }, { status: 400 });
-    }
-
-    // التحقق من وجود نص السؤال بأي لغة
-    if (!text && !textNL && !textFR && !textAR) {
-      return NextResponse.json({
-        success: false,
-        message: "يجب إدخال نص السؤال بلغة واحدة على الأقل"
-      }, { status: 400 });
+      return NextResponse.json({ success: false, message: "يجب تحديد الدرس" }, { status: 400 });
     }
 
     const lessonIdNum = typeof lessonId === 'string' ? parseInt(lessonId) : lessonId;
     
-    // Determine category from lessonId
-    const category = await getCategoryFromLessonId(lessonIdNum);
+    // استخدم category من الـ payload مباشرة إذا موجود، وإلا ابحث عنه
+    let category = categoryParam?.toUpperCase() || null;
+    if (!category) {
+      category = await getCategoryFromLessonId(lessonIdNum);
+    }
     
     if (!category) {
-      return NextResponse.json({
-        success: false,
-        message: "الدرس غير موجود"
-      }, { status: 404 });
+      return NextResponse.json({ success: false, message: "الدرس غير موجود" }, { status: 404 });
     }
 
-    console.log(`💾 Creating question for category ${category}`);
-
-    // إنشاء السؤال في الجدول المناسب
-    let question;
     const questionData = {
-      text: text || textNL || textFR || textAR || "",
+      text: text || textNL || textFR || textAR || explanationNL || "",
       textNL: textNL || null,
       textFR: textFR || null,
       textAR: textAR || null,
@@ -209,23 +176,14 @@ export async function POST(request: NextRequest) {
       lessonId: lessonIdNum
     };
 
-    if (category === "A") {
-      question = await prisma.questionA.create({ data: questionData });
-    } else if (category === "B") {
-      question = await prisma.questionB.create({ data: questionData });
-    } else if (category === "C") {
-      question = await prisma.questionC.create({ data: questionData });
-    }
+    let question;
+    if (category === "A") question = await prisma.questionA.create({ data: questionData });
+    else if (category === "B") question = await prisma.questionB.create({ data: questionData });
+    else if (category === "C") question = await prisma.questionC.create({ data: questionData });
 
-    console.log("✅ Question created successfully:", question?.id);
-    return NextResponse.json({
-      success: true,
-      question: question
-    });
+    return NextResponse.json({ success: true, question });
 
   } catch (error) {
-    console.error("❌ Error creating question:", error);
-    console.error("❌ Error details:", error instanceof Error ? error.message : String(error));
     return NextResponse.json({
       success: false,
       message: "خطأ في حفظ السؤال",

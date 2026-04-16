@@ -788,6 +788,7 @@ export default function AdminQuestionsPage() {
 
       const payload: any = {
         lessonId: parseInt(lessonId),
+        category: category, // مهم لتجنب تعارض IDs بين الفئات
       };
       
       if (questionType === "Examen") {
