@@ -268,17 +268,6 @@ export default function TheoriePage() {
               </span>
             </div>
           </div>
-
-          {/* بحث */}
-          <div className="mt-4 relative">
-            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-              <svg className="w-4 h-4 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-            </div>
-            <input type="text" value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-              placeholder={lang === "ar" ? "ابحث عن درس..." : lang === "nl" ? "Zoek een les..." : "Rechercher..."}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm font-medium text-white placeholder-white/30 focus:outline-none"
-              style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)" }} />
-          </div>
         </div>
       </div>
 
