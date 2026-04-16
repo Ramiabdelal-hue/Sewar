@@ -92,9 +92,9 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
               />
               {/* Text watermark */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-                <div style={{ textAlign: 'center', opacity: 0.35, transform: 'rotate(-10deg)' }}>
-                  <div style={{ color: 'white', fontSize: '1.6rem', fontWeight: '700', fontStyle: 'italic', fontFamily: 'Georgia, serif', textShadow: '1px 1px 3px rgba(0,0,0,0.5)', letterSpacing: '0.05em' }}>Sewar</div>
-                  <div style={{ color: 'white', fontSize: '0.75rem', fontWeight: '400', fontFamily: 'Arial, sans-serif', textShadow: '1px 1px 2px rgba(0,0,0,0.5)', letterSpacing: '0.1em', marginTop: '2px' }}>Verkeersschool</div>
+                <div style={{ textAlign: 'center', opacity: 0.45, transform: 'rotate(-10deg)' }}>
+                  <div style={{ color: '#cccccc', fontSize: '1.6rem', fontWeight: '700', fontStyle: 'italic', fontFamily: 'Georgia, serif', textShadow: '1px 1px 3px rgba(0,0,0,0.3)', letterSpacing: '0.05em' }}>Sewar</div>
+                  <div style={{ color: '#cccccc', fontSize: '0.75rem', fontWeight: '400', fontFamily: 'Arial, sans-serif', textShadow: '1px 1px 2px rgba(0,0,0,0.3)', letterSpacing: '0.1em', marginTop: '2px' }}>Verkeersschool</div>
                 </div>
               </div>
               {/* رقم الصورة */}
