@@ -729,14 +729,11 @@ export default function AdminQuestionsPage() {
       let url = '';
       
       if (questionType === "Examen") {
-        // للامتحانات: جلب من جداول ExamQuestion
-        url = `/api/exam-questions?lessonId=${lessonId}`;
+        url = `/api/exam-questions?lessonId=${lessonId}&category=${category}`;
       } else if (questionType === "Praktijk") {
-        // لـ Praktijk: جلب من جدول PraktijkQuestion
         url = `/api/praktijk/questions?lessonId=${lessonId}`;
       } else {
-        // للدروس: جلب من جداول Question
-        url = `/api/questions?lessonId=${lessonId}`;
+        url = `/api/questions?lessonId=${lessonId}&category=${category}`;
       }
       
       const res = await fetch(url);
@@ -744,7 +741,6 @@ export default function AdminQuestionsPage() {
 
       if (data.success) {
         setQuestions(data.questions);
-        console.log(`✅ Loaded ${data.questions.length} questions for lessonId:`, lessonId);
       }
     } catch (err) {
       console.error("خطأ عند جلب الأسئلة:", err);
@@ -1610,7 +1606,7 @@ export default function AdminQuestionsPage() {
           </div>
         )}
 
-        {questions.length > 0 && (
+        {lessonId && (
           <div className="rounded-2xl overflow-hidden" style={{ background: "white", border: "1px solid #e5e7eb", boxShadow: "0 1px 8px rgba(0,0,0,0.06)" }}>
             {/* شريط البحث */}
             <div className="p-5 border-b border-gray-100">
@@ -1638,7 +1634,14 @@ export default function AdminQuestionsPage() {
             </div>
 
             <div className="divide-y divide-gray-100 p-4 space-y-0">
-              {filteredQuestions.map((q, index) => (
+              {filteredQuestions.length === 0 ? (
+                <div className="py-10 text-center">
+                  <div className="text-3xl mb-2">📭</div>
+                  <p className="text-sm text-gray-400 font-medium">
+                    {questionType === "Examen" ? "لا توجد أسئلة لهذا الدرس بعد" : "لا يوجد شرح لهذا الدرس بعد"}
+                  </p>
+                </div>
+              ) : filteredQuestions.map((q, index) => (
                 <div
                   key={q.id}
                   className="rounded-2xl overflow-hidden transition-all mb-4"
