@@ -75,6 +75,7 @@ function ExamenCategoryContent() {
     const getVoice = () => {
       const voices = window.speechSynthesis.getVoices();
       return voices.find(v => v.lang === "nl-NL" && !v.name.includes("Xander"))
+        || voices.find(v => v.lang === "nl-BE")
         || voices.find(v => v.lang.startsWith("nl"))
         || null;
     };
@@ -83,16 +84,19 @@ function ExamenCategoryContent() {
       const u = new SpeechSynthesisUtterance(text);
       u.lang = "nl-NL";
       u.rate = 0.9;
+      u.pitch = 1;
       const v = getVoice();
       if (v) u.voice = v;
       if (onEnd) u.onend = onEnd;
+      u.onerror = () => { if (onEnd) onEnd(); };
       window.speechSynthesis.speak(u);
     };
 
     const questionText = q.textNL || q.text || "";
     const answersList = [q.answer1, q.answer2, q.answer3].filter(Boolean);
 
-    // قراءة السؤال أولاً
+    // قراءة السؤال بالهولندية فقط
+    if (!questionText) { setReadingDone(true); return; }
     speak(questionText, () => {
       let i = 0;
       const readNext = () => {
