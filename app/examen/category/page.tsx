@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useLang } from "@/context/LangContext";
 import Navbar from "@/components/Navbar";
+import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
 
 // زر القراءة الصوتية
 function TTSButton({ text }: { text: string }) {
@@ -397,6 +398,15 @@ function ExamenCategoryContent() {
   const userAnswer = answers[currentIndex];
   const isAnswered = userAnswer !== undefined;
 
+  // ترجمة السؤال والإجابات حسب اللغة المختارة
+  const textsToTranslate = q ? [
+    q.textNL || q.text || "",
+    q.answer1 || "",
+    q.answer2 || "",
+    q.answer3 || "",
+  ] : ["", "", "", ""];
+  const translatedTexts = useAutoTranslateList(textsToTranslate, lang);
+
   return (
     <div className="min-h-screen bg-white" dir={isRtl ? "rtl" : "ltr"}>
       <Navbar />
@@ -451,14 +461,14 @@ function ExamenCategoryContent() {
               <TTSButton text={q.textNL || q.text} />
 
               <p className={`text-lg font-bold text-gray-900 leading-relaxed mb-5 ${isRtl ? "text-right" : "text-left"}`}>
-                {q.textNL || q.text}
+                {translatedTexts[0] || q.textNL || q.text}
               </p>
 
               {/* الإجابات */}
               <div className="space-y-3">
                 {[1, 2, 3].map(num => {
-                  const ansText = q[`answer${num}`];
-                  if (!ansText) return null;
+                  const ansText = translatedTexts[num] || q[`answer${num}`];
+                  if (!q[`answer${num}`]) return null;
                   const isCorrect = q.correctAnswer === num;
                   const isSelected = userAnswer === num;
 
