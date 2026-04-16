@@ -63,6 +63,65 @@ function ExamenCategoryContent() {
   const [timeLeft, setTimeLeft] = useState(15);
   const [locked, setLocked] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const ttsRef = useRef<NodeJS.Timeout | null>(null);
+
+  // قراءة تلقائية للسؤال والإجابات
+  const speakQuestion = (q: any) => {
+    if (!window.speechSynthesis || !q) return;
+    window.speechSynthesis.cancel();
+
+    const getVoice = () => {
+      const voices = window.speechSynthesis.getVoices();
+      return voices.find(v => v.lang === "nl-NL" && !v.name.includes("Xander"))
+        || voices.find(v => v.lang.startsWith("nl"))
+        || null;
+    };
+
+    const speak = (text: string, onEnd?: () => void) => {
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "nl-NL";
+      u.rate = 0.9;
+      const v = getVoice();
+      if (v) u.voice = v;
+      if (onEnd) u.onend = onEnd;
+      window.speechSynthesis.speak(u);
+    };
+
+    const questionText = q.textNL || q.text || "";
+    const answers = [q.answer1, q.answer2, q.answer3].filter(Boolean);
+
+    // قراءة السؤال أولاً
+    speak(questionText, () => {
+      // ثم الإجابات واحدة واحدة مع فاصل
+      let i = 0;
+      const readNext = () => {
+        if (i >= answers.length) return;
+        const label = i === 0 ? "Eerste antwoord:" : i === 1 ? "Tweede antwoord:" : "Derde antwoord:";
+        speak(`${label} ${answers[i]}`, () => {
+          i++;
+          ttsRef.current = setTimeout(readNext, 400);
+        });
+      };
+      ttsRef.current = setTimeout(readNext, 500);
+    });
+  };
+
+  // تشغيل القراءة بعد 3 ثوانٍ من كل سؤال جديد
+  useEffect(() => {
+    if (!started || finished) return;
+    if (ttsRef.current) clearTimeout(ttsRef.current);
+    window.speechSynthesis?.cancel();
+
+    ttsRef.current = setTimeout(() => {
+      const q = questions[currentIndex];
+      speakQuestion(q);
+    }, 3000);
+
+    return () => {
+      if (ttsRef.current) clearTimeout(ttsRef.current);
+      window.speechSynthesis?.cancel();
+    };
+  }, [currentIndex, started, finished]);
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -113,6 +172,8 @@ function ExamenCategoryContent() {
   const handleAnswer = (num: number) => {
     if (locked || answers[currentIndex] !== undefined) return;
     clearInterval(timerRef.current!);
+    window.speechSynthesis?.cancel(); // أوقف القراءة عند الإجابة
+    if (ttsRef.current) clearTimeout(ttsRef.current);
     setAnswers(a => ({ ...a, [currentIndex]: num }));
     setLocked(true);
   };
