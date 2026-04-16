@@ -331,37 +331,14 @@ function ExamenCategoryContent() {
       <Navbar />
       <div className="max-w-2xl mx-auto px-4 py-6">
 
-        {/* شريط التقدم */}
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-sm font-bold text-gray-500">{currentIndex + 1} / {questions.length}</span>
-          <div className="flex-1 mx-4 bg-gray-200 rounded-full h-2">
-            <div className="bg-[#003399] h-2 rounded-full transition-all"
-              style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}></div>
-          </div>
-          <span className="text-sm font-bold text-gray-500">
-            {lang === "ar" ? "النقاط:" : lang === "nl" ? "Score:" : "Score:"} {score}
-          </span>
-        </div>
-
-        {/* المؤقت */}
-        <div className="flex justify-center mb-4">
-          <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-black border-4 transition-all ${
-            timeLeft <= 5 ? "border-red-500 text-red-500 animate-pulse" :
-            timeLeft <= 10 ? "border-orange-500 text-orange-500" :
-            "border-[#003399] text-[#003399]"
-          }`}>
-            {locked ? (isAnswered && userAnswer !== null ? (userAnswer === q?.correctAnswer ? "✅" : "❌") : "⏱") : timeLeft}
-          </div>
-        </div>
-
         {/* السؤال */}
         {q && (
           <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-100">
-            {/* رأس السؤال مع المؤقت */}
+            {/* رأس السؤال - العد + المؤقت */}
             <div className="px-5 py-3 flex items-center justify-between"
               style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
               <span className="text-white font-black text-sm">
-                {lang === "ar" ? "السؤال" : lang === "nl" ? "Vraag" : "Question"} {currentIndex + 1}
+                {currentIndex + 1} / {questions.length}
               </span>
 
               {/* المؤقت بجانب رقم السؤال */}
