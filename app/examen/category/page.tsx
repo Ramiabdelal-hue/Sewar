@@ -236,10 +236,7 @@ function ExamenCategoryContent() {
                             <div key={idx} className="relative" style={{ aspectRatio: "16/9" }}>
                               <img src={url} alt="" className="w-full h-full object-cover" />
                               <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-                                <div style={{ textAlign: 'center', opacity: 0.45, transform: 'rotate(-10deg)' }}>
-                                  <div style={{ color: '#cccccc', fontSize: '1.4rem', fontWeight: '700', fontStyle: 'italic', fontFamily: 'Georgia, serif', textShadow: '1px 1px 3px rgba(0,0,0,0.3)' }}>Sewar</div>
-                                  <div style={{ color: '#cccccc', fontSize: '0.65rem', fontFamily: 'Arial, sans-serif', textShadow: '1px 1px 2px rgba(0,0,0,0.3)', letterSpacing: '0.1em', marginTop: '2px' }}>Verkeersschool</div>
-                                </div>
+                                <img src="/logo.jpg" alt="" style={{ width: '45%', height: '45%', objectFit: 'contain', opacity: 0.12, mixBlendMode: 'luminosity' }} />
                               </div>
                             </div>
                           ))}
@@ -392,10 +389,7 @@ function ExamenCategoryContent() {
                     <img src={url} alt="" className="w-full h-full object-cover" draggable={false} onContextMenu={e => e.preventDefault()} />
                     {/* watermark */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-                      <div style={{ textAlign: 'center', opacity: 0.45, transform: 'rotate(-10deg)' }}>
-                        <div style={{ color: '#cccccc', fontSize: '1.6rem', fontWeight: '700', fontStyle: 'italic', fontFamily: 'Georgia, serif', textShadow: '1px 1px 3px rgba(0,0,0,0.3)' }}>Sewar</div>
-                        <div style={{ color: '#cccccc', fontSize: '0.75rem', fontFamily: 'Arial, sans-serif', textShadow: '1px 1px 2px rgba(0,0,0,0.3)', letterSpacing: '0.1em', marginTop: '2px' }}>Verkeersschool</div>
-                      </div>
+                      <img src="/logo.jpg" alt="" style={{ width: '45%', height: '45%', objectFit: 'contain', opacity: 0.12, mixBlendMode: 'luminosity' }} draggable={false} />
                     </div>
                   </div>
                 ))}
