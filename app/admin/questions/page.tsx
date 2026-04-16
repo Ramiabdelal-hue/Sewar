@@ -1350,15 +1350,28 @@ export default function AdminQuestionsPage() {
 
               {/* الشرح - هولندي فقط - للدروس فقط */}
               {questionType !== "Examen" && (
-                <div>
-                  <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">🇳🇱 الشرح (Nederlands)</label>
-                  <textarea
-                    placeholder="Uitleg in het Nederlands..."
-                    className="w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-700 focus:outline-none transition-all"
-                    style={{ background: "#eff6ff", border: "1.5px solid #bfdbfe", resize: "vertical", minHeight: "96px" }}
-                    value={newQuestion.explanationNL}
-                    onChange={(e) => setNewQuestion({ ...newQuestion, explanationNL: e.target.value })}
-                  />
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">📌 عنوان النقطة</label>
+                    <input
+                      type="text"
+                      placeholder="مثال: Maximumsnelheid op autosnelweg..."
+                      className="w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-700 focus:outline-none transition-all"
+                      style={{ background: "#f0f4ff", border: "1.5px solid #c7d2fe" }}
+                      value={newQuestion.textNL || ""}
+                      onChange={(e) => setNewQuestion({ ...newQuestion, textNL: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">🇳🇱 الشرح (Nederlands)</label>
+                    <textarea
+                      placeholder="Uitleg in het Nederlands..."
+                      className="w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-700 focus:outline-none transition-all"
+                      style={{ background: "#eff6ff", border: "1.5px solid #bfdbfe", resize: "vertical", minHeight: "96px" }}
+                      value={newQuestion.explanationNL}
+                      onChange={(e) => setNewQuestion({ ...newQuestion, explanationNL: e.target.value })}
+                    />
+                  </div>
                 </div>
               )}
 
@@ -1643,11 +1656,21 @@ export default function AdminQuestionsPage() {
 
                       {/* الشرح - هولندي فقط - للدروس فقط */}
                       {questionType !== "Examen" && (
-                        <div>
-                          <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">🇳🇱 الشرح (Nederlands)</label>
-                          <textarea value={editForm.explanationNL} onChange={(e) => setEditForm({ ...editForm, explanationNL: e.target.value })}
-                            className="w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-700 focus:outline-none"
-                            style={{ background: "#eff6ff", border: "1.5px solid #bfdbfe", resize: "vertical", minHeight: "96px" }} />
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">📌 عنوان النقطة</label>
+                            <input type="text" value={editForm.textNL}
+                              onChange={(e) => setEditForm({ ...editForm, textNL: e.target.value })}
+                              placeholder="عنوان النقطة..."
+                              className="w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-700 focus:outline-none"
+                              style={{ background: "#f0f4ff", border: "1.5px solid #c7d2fe" }} />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">🇳🇱 الشرح (Nederlands)</label>
+                            <textarea value={editForm.explanationNL} onChange={(e) => setEditForm({ ...editForm, explanationNL: e.target.value })}
+                              className="w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-700 focus:outline-none"
+                              style={{ background: "#eff6ff", border: "1.5px solid #bfdbfe", resize: "vertical", minHeight: "96px" }} />
+                          </div>
                         </div>
                       )}
 
@@ -1806,10 +1829,9 @@ export default function AdminQuestionsPage() {
 
                       {/* 2. نص السؤال - هولندي فقط */}
                       <div className="mb-4">
-                        <p className="text-xs font-black text-gray-400 uppercase tracking-wider mb-2">نص السؤال</p>
+                        <p className="text-xs font-black text-gray-400 uppercase tracking-wider mb-2">عنوان النقطة</p>
                         <div className="px-4 py-3 rounded-xl" style={{ background: "#f0f4ff", border: "1px solid #c7d2fe" }}>
-                          <span className="text-[10px] font-black text-indigo-400 uppercase tracking-wider">🇳🇱 Nederlands</span>
-                          <p className="text-sm font-medium text-gray-800 mt-1 leading-relaxed">
+                          <p className="text-sm font-bold text-gray-800 leading-snug">
                             {q.textNL || q.text || "—"}
                           </p>
                         </div>
