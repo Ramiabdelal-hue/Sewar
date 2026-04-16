@@ -879,6 +879,7 @@ export default function AdminQuestionsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: questionId,
+          category: category, // مهم لتجنب تعارض IDs
           text: form.textNL || form.textFR || form.textAR || "",
           textNL: form.textNL,
           textFR: form.textFR,
@@ -942,7 +943,7 @@ export default function AdminQuestionsPage() {
         apiUrl = "/api/questions";
       }
       
-      const url = `${apiUrl}?id=${questionId}`;
+      const url = `${apiUrl}?id=${questionId}&category=${category}`;
       
       const res = await fetch(url, {
         method: "DELETE",

@@ -78,81 +78,29 @@ export async function GET(request: NextRequest) {
 // POST - إضافة سؤال امتحان جديد
 export async function POST(request: NextRequest) {
   try {
-    console.log("📥 Received POST request for exam question");
     const body = await request.json();
-    
-    const {
-      lessonId,
-      textNL,
-      videoUrls = [],
-      audioUrl = "",
-      answer1,
-      answer2,
-      answer3,
-      correctAnswer
-    } = body;
+    const { lessonId, textNL, videoUrls = [], audioUrl = "", answer1, answer2, answer3, correctAnswer, category: categoryParam } = body;
 
     if (!lessonId || !textNL) {
-      return NextResponse.json({
-        success: false,
-        message: "يجب إدخال lessonId ونص السؤال بالهولندية"
-      }, { status: 400 });
+      return NextResponse.json({ success: false, message: "يجب إدخال lessonId ونص السؤال بالهولندية" }, { status: 400 });
     }
-
     if (!answer1 || !answer2 || !answer3 || !correctAnswer) {
-      return NextResponse.json({
-        success: false,
-        message: "يجب إدخال 3 إجابات واختيار الإجابة الصحيحة"
-      }, { status: 400 });
+      return NextResponse.json({ success: false, message: "يجب إدخال 3 إجابات واختيار الإجابة الصحيحة" }, { status: 400 });
     }
 
     const lessonIdNum = typeof lessonId === 'string' ? parseInt(lessonId) : lessonId;
-    const category = await getCategoryFromLessonId(lessonIdNum);
-    
-    if (!category) {
-      return NextResponse.json({
-        success: false,
-        message: "الدرس غير موجود"
-      }, { status: 404 });
-    }
+    let category = categoryParam?.toUpperCase() || await getCategoryFromLessonId(lessonIdNum);
+    if (!category) return NextResponse.json({ success: false, message: "الدرس غير موجود" }, { status: 404 });
 
-    console.log(`💾 Creating exam question for category ${category}`);
-
-    // إنشاء السؤال
+    const questionData = { text: textNL, textNL, videoUrls, audioUrl: audioUrl || null, answer1, answer2, answer3, correctAnswer, lessonId: lessonIdNum };
     let question;
-    const questionData = {
-      text: textNL,
-      textNL: textNL,
-      videoUrls: videoUrls,
-      audioUrl: audioUrl || null,
-      answer1: answer1,
-      answer2: answer2,
-      answer3: answer3,
-      correctAnswer: correctAnswer,
-      lessonId: lessonIdNum
-    };
+    if (category === "A") question = await prisma.examQuestionA.create({ data: questionData });
+    else if (category === "B") question = await prisma.examQuestionB.create({ data: questionData });
+    else if (category === "C") question = await prisma.examQuestionC.create({ data: questionData });
 
-    if (category === "A") {
-      question = await prisma.examQuestionA.create({ data: questionData });
-    } else if (category === "B") {
-      question = await prisma.examQuestionB.create({ data: questionData });
-    } else if (category === "C") {
-      question = await prisma.examQuestionC.create({ data: questionData });
-    }
-
-    console.log("✅ Exam question created successfully:", question?.id);
-    return NextResponse.json({
-      success: true,
-      question: question
-    });
-
+    return NextResponse.json({ success: true, question });
   } catch (error) {
-    console.error("❌ Error creating exam question:", error);
-    return NextResponse.json({
-      success: false,
-      message: "خطأ في حفظ سؤال الامتحان",
-      error: error instanceof Error ? error.message : String(error)
-    }, { status: 500 });
+    return NextResponse.json({ success: false, message: "خطأ في حفظ سؤال الامتحان", error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }
 
@@ -216,11 +164,9 @@ export async function DELETE(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, textNL, answer1, answer2, answer3, correctAnswer, videoUrls, audioUrl } = body;
+    const { id, textNL, answer1, answer2, answer3, correctAnswer, videoUrls, audioUrl, category: categoryParam } = body;
 
-    if (!id) {
-      return NextResponse.json({ success: false, message: "معرف السؤال مطلوب" }, { status: 400 });
-    }
+    if (!id) return NextResponse.json({ success: false, message: "معرف السؤال مطلوب" }, { status: 400 });
 
     const updateData: any = {};
     if (textNL !== undefined) { updateData.text = textNL; updateData.textNL = textNL; }
@@ -232,18 +178,20 @@ export async function PUT(request: NextRequest) {
     if (audioUrl !== undefined) updateData.audioUrl = audioUrl || null;
 
     let updated = false;
+    const cat = categoryParam?.toUpperCase();
 
-    try { await prisma.examQuestionA.update({ where: { id }, data: updateData }); updated = true; } catch (e) {}
-    if (!updated) { try { await prisma.examQuestionB.update({ where: { id }, data: updateData }); updated = true; } catch (e) {} }
-    if (!updated) { try { await prisma.examQuestionC.update({ where: { id }, data: updateData }); updated = true; } catch (e) {} }
-
-    if (!updated) {
-      return NextResponse.json({ success: false, message: "السؤال غير موجود" }, { status: 404 });
+    if (cat === "A") { await prisma.examQuestionA.update({ where: { id }, data: updateData }); updated = true; }
+    else if (cat === "B") { await prisma.examQuestionB.update({ where: { id }, data: updateData }); updated = true; }
+    else if (cat === "C") { await prisma.examQuestionC.update({ where: { id }, data: updateData }); updated = true; }
+    else {
+      try { await prisma.examQuestionA.update({ where: { id }, data: updateData }); updated = true; } catch {}
+      if (!updated) { try { await prisma.examQuestionB.update({ where: { id }, data: updateData }); updated = true; } catch {} }
+      if (!updated) { try { await prisma.examQuestionC.update({ where: { id }, data: updateData }); updated = true; } catch {} }
     }
 
+    if (!updated) return NextResponse.json({ success: false, message: "السؤال غير موجود" }, { status: 404 });
     return NextResponse.json({ success: true, message: "تم تعديل السؤال بنجاح" });
   } catch (error) {
-    console.error("Error updating exam question:", error);
     return NextResponse.json({ success: false, message: "خطأ في تعديل السؤال", error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }

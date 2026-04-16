@@ -197,60 +197,25 @@ export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const id = parseInt(searchParams.get("id") || "");
+    const categoryParam = searchParams.get("category")?.toUpperCase();
 
-    if (!id) {
-      return NextResponse.json({
-        success: false,
-        message: "معرف السؤال مطلوب"
-      }, { status: 400 });
-    }
+    if (!id) return NextResponse.json({ success: false, message: "معرف السؤال مطلوب" }, { status: 400 });
 
-    // Try to find and delete from all category tables
     let deleted = false;
-    
-    try {
-      await prisma.questionA.delete({ where: { id } });
-      deleted = true;
-    } catch (e) {
-      // Not in QuestionA, try next
-    }
-    
-    if (!deleted) {
-      try {
-        await prisma.questionB.delete({ where: { id } });
-        deleted = true;
-      } catch (e) {
-        // Not in QuestionB, try next
-      }
-    }
-    
-    if (!deleted) {
-      try {
-        await prisma.questionC.delete({ where: { id } });
-        deleted = true;
-      } catch (e) {
-        // Not in QuestionC
-      }
+
+    if (categoryParam === "A") { await prisma.questionA.delete({ where: { id } }); deleted = true; }
+    else if (categoryParam === "B") { await prisma.questionB.delete({ where: { id } }); deleted = true; }
+    else if (categoryParam === "C") { await prisma.questionC.delete({ where: { id } }); deleted = true; }
+    else {
+      try { await prisma.questionA.delete({ where: { id } }); deleted = true; } catch {}
+      if (!deleted) { try { await prisma.questionB.delete({ where: { id } }); deleted = true; } catch {} }
+      if (!deleted) { try { await prisma.questionC.delete({ where: { id } }); deleted = true; } catch {} }
     }
 
-    if (!deleted) {
-      return NextResponse.json({
-        success: false,
-        message: "السؤال غير موجود"
-      }, { status: 404 });
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: "تم حذف السؤال بنجاح"
-    });
-
+    if (!deleted) return NextResponse.json({ success: false, message: "السؤال غير موجود" }, { status: 404 });
+    return NextResponse.json({ success: true, message: "تم حذف السؤال بنجاح" });
   } catch (error) {
-    console.error("Error deleting question:", error);
-    return NextResponse.json({
-      success: false,
-      message: "خطأ في حذف السؤال"
-    }, { status: 500 });
+    return NextResponse.json({ success: false, message: "خطأ في حذف السؤال" }, { status: 500 });
   }
 }
 
@@ -259,26 +224,9 @@ export async function DELETE(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const {
-      id,
-      text,
-      textNL,
-      textFR,
-      textAR,
-      explanationNL,
-      explanationFR,
-      explanationAR,
-      answer1,
-      answer2,
-      answer3,
-      correctAnswer,
-      videoUrls,
-      audioUrl,
-    } = body;
+    const { id, text, textNL, textFR, textAR, explanationNL, explanationFR, explanationAR, answer1, answer2, answer3, correctAnswer, videoUrls, audioUrl, category: categoryParam } = body;
 
-    if (!id) {
-      return NextResponse.json({ success: false, message: "معرف السؤال مطلوب" }, { status: 400 });
-    }
+    if (!id) return NextResponse.json({ success: false, message: "معرف السؤال مطلوب" }, { status: 400 });
 
     const updateData: any = {};
     if (text !== undefined) updateData.text = text;
@@ -295,39 +243,23 @@ export async function PUT(request: NextRequest) {
     if (videoUrls !== undefined) updateData.videoUrls = videoUrls;
     if (audioUrl !== undefined) updateData.audioUrl = audioUrl || null;
 
-    // Try to update in all category tables
     let updated = false;
+    const cat = categoryParam?.toUpperCase();
 
-    try {
-      await prisma.questionA.update({ where: { id }, data: updateData });
-      updated = true;
-    } catch (e) { /* Not in QuestionA */ }
-
-    if (!updated) {
-      try {
-        await prisma.questionB.update({ where: { id }, data: updateData });
-        updated = true;
-      } catch (e) { /* Not in QuestionB */ }
+    // إذا عندنا category نستخدمه مباشرة
+    if (cat === "A") { await prisma.questionA.update({ where: { id }, data: updateData }); updated = true; }
+    else if (cat === "B") { await prisma.questionB.update({ where: { id }, data: updateData }); updated = true; }
+    else if (cat === "C") { await prisma.questionC.update({ where: { id }, data: updateData }); updated = true; }
+    else {
+      // fallback: جرب الثلاثة
+      try { await prisma.questionA.update({ where: { id }, data: updateData }); updated = true; } catch {}
+      if (!updated) { try { await prisma.questionB.update({ where: { id }, data: updateData }); updated = true; } catch {} }
+      if (!updated) { try { await prisma.questionC.update({ where: { id }, data: updateData }); updated = true; } catch {} }
     }
 
-    if (!updated) {
-      try {
-        await prisma.questionC.update({ where: { id }, data: updateData });
-        updated = true;
-      } catch (e) { /* Not in QuestionC */ }
-    }
-
-    if (!updated) {
-      return NextResponse.json({ success: false, message: "السؤال غير موجود" }, { status: 404 });
-    }
-
+    if (!updated) return NextResponse.json({ success: false, message: "السؤال غير موجود" }, { status: 404 });
     return NextResponse.json({ success: true, message: "تم تعديل السؤال بنجاح" });
   } catch (error) {
-    console.error("Error updating question:", error);
-    return NextResponse.json({
-      success: false,
-      message: "خطأ في تعديل السؤال",
-      error: error instanceof Error ? error.message : String(error)
-    }, { status: 500 });
+    return NextResponse.json({ success: false, message: "خطأ في تعديل السؤال", error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }
