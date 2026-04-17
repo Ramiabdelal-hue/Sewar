@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
         include: {
           questions: {
             orderBy: {
-              createdAt: 'desc'
+              createdAt: 'asc'
             }
           }
         }
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
         include: {
           questions: {
             orderBy: {
-              createdAt: 'desc'
+              createdAt: 'asc'
             }
           }
         }
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
         include: {
           questions: {
             orderBy: {
-              createdAt: 'desc'
+              createdAt: 'asc'
             }
           }
         }
