@@ -139,12 +139,11 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
                   {lang === "ar" ? "الشرح" : lang === "nl" ? "Uitleg" : lang === "fr" ? "Explication" : "Explanation"}
                 </p>
                 {expText.includes('\n') ? (
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     {expText.split('\n').filter(line => line.trim()).map((line, i) => (
-                      <div key={i} className={`flex items-start gap-2 ${isRtl ? "flex-row-reverse" : ""}`}>
-                        <span className="w-5 h-5 rounded-full bg-green-500 text-white text-xs font-black flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
-                        <p className={`text-sm text-green-900 leading-relaxed flex-1 ${isRtl ? "text-right" : "text-left"}`}>{line.trim()}</p>
-                      </div>
+                      <p key={i} className={`text-sm text-green-900 leading-relaxed ${isRtl ? "text-right" : "text-left"}`}>
+                        {line.trim()}
+                      </p>
                     ))}
                   </div>
                 ) : (
