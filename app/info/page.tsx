@@ -10,6 +10,7 @@ import en from "@/locales/en.json";
 import Navbar from "@/components/Navbar";
 import CheckoutForm from "@/components/CheckoutForm";
 import { MotorcycleIcon, CarIcon, TruckIcon } from "@/components/VehicleIcons";
+import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
 
 export default function InfoPage() {
   const router = useRouter();
@@ -17,6 +18,19 @@ export default function InfoPage() {
   const translations: any = { nl, fr, ar, en };
   const t = translations[lang];
   const isRtl = lang === "ar";
+
+  // النصوص الأصلية للخطوات
+  const stepsTexts = [
+    "Registreren", "Account maken & starten",
+    "Theorie studeren", "Leer verkeersregels",
+    "Theorie-examen", "50 vragen – min. 41 juist",
+    "Voorlopig rijbewijs", "M18 of M36 kiezen",
+    "Oefenperiode", "Min. 5 maanden oefenen",
+    "Praktijkexamen", "Rijtest op de weg",
+    "Rijbewijs behalen", "Officieel rijbewijs",
+    "Stappen om je rijbewijs te halen",
+  ];
+  const translatedSteps = useAutoTranslateList(stepsTexts, lang);
 
   const [prices, setPrices] = useState<Record<string, string>>({});
   const [showCheckout, setShowCheckout] = useState(false);
@@ -165,17 +179,17 @@ export default function InfoPage() {
                   <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
               </div>
-              {lang === "ar" ? "خطوات الحصول على الرخصة" : lang === "nl" ? "Stappen om je rijbewijs te halen" : "Étapes pour obtenir le permis"}
+              {lang === "ar" ? "خطوات الحصول على الرخصة" : lang === "nl" ? "Stappen om je rijbewijs te halen" : translatedSteps[14] || "Stappen om je rijbewijs te halen"}
             </h2>
             <div className="space-y-3">
               {[
-                { n: 1, icon: "⭐", title: "Registreren", sub: "Account maken & starten", color: "#f97316" },
-                { n: 2, icon: "⭐", title: "Theorie studeren", sub: "Leer verkeersregels", color: "#3b82f6" },
-                { n: 3, icon: "⭐", title: "Theorie-examen", sub: "50 vragen – min. 41 juist", color: "#8b5cf6" },
-                { n: 4, icon: "⭐", title: "Voorlopig rijbewijs", sub: "M18 of M36 kiezen", color: "#ec4899" },
-                { n: 5, icon: "⭐", title: "Oefenperiode", sub: "Min. 5 maanden oefenen", color: "#14b8a6" },
-                { n: 6, icon: "⭐", title: "Praktijkexamen", sub: "Rijtest op de weg", color: "#f59e0b" },
-                { n: 7, icon: "⭐", title: "Rijbewijs behalen", sub: "Officieel rijbewijs", color: "#22c55e" },
+                { n: 1, icon: "⭐", title: translatedSteps[0] || "Registreren", sub: translatedSteps[1] || "Account maken & starten", color: "#f97316" },
+                { n: 2, icon: "⭐", title: translatedSteps[2] || "Theorie studeren", sub: translatedSteps[3] || "Leer verkeersregels", color: "#3b82f6" },
+                { n: 3, icon: "⭐", title: translatedSteps[4] || "Theorie-examen", sub: translatedSteps[5] || "50 vragen – min. 41 juist", color: "#8b5cf6" },
+                { n: 4, icon: "⭐", title: translatedSteps[6] || "Voorlopig rijbewijs", sub: translatedSteps[7] || "M18 of M36 kiezen", color: "#ec4899" },
+                { n: 5, icon: "⭐", title: translatedSteps[8] || "Oefenperiode", sub: translatedSteps[9] || "Min. 5 maanden oefenen", color: "#14b8a6" },
+                { n: 6, icon: "⭐", title: translatedSteps[10] || "Praktijkexamen", sub: translatedSteps[11] || "Rijtest op de weg", color: "#f59e0b" },
+                { n: 7, icon: "⭐", title: translatedSteps[12] || "Rijbewijs behalen", sub: translatedSteps[13] || "Officieel rijbewijs", color: "#22c55e" },
               ].map((step, i) => (
                 <div key={step.n}>
                   {i > 0 && <div className="flex justify-center my-1"><div className="w-0.5 h-4 bg-gray-200"></div></div>}
