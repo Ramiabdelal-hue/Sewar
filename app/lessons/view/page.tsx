@@ -402,53 +402,9 @@ function LessonViewContent() {
             </div>
           </div>
 
-          {/* Search Bar */}
-          <div className="bg-white rounded-2xl shadow-lg p-4 mb-6">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder={lang === "ar" ? "ابحث في الأسئلة..." : lang === "nl" ? "Zoek in vragen..." : "Rechercher dans les questions..."}
-                className="w-full p-4 pr-12 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none transition"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              {searchTerm !== debouncedSearchTerm ? (
-                <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                  <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-                </div>
-              ) : (
-                <svg className="w-6 h-6 text-gray-400 absolute right-4 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              )}
-            </div>
-            {searchTerm && (
-              <div className="mt-2 text-sm text-gray-600">
-                {debouncedSearchTerm === searchTerm ? (
-                  filteredQuestions.length === 0 ? (
-                    <span className="text-red-500">
-                      {lang === "ar" ? "لا توجد نتائج" : lang === "nl" ? "Geen resultaten" : "Aucun résultat"}
-                    </span>
-                  ) : (
-                    <span className="text-green-600">
-                      {lang === "ar" 
-                        ? `تم العثور على ${filteredQuestions.length} من ${questions.length} سؤال`
-                        : lang === "nl"
-                        ? `${filteredQuestions.length} van ${questions.length} vragen gevonden`
-                        : `${filteredQuestions.length} sur ${questions.length} questions trouvées`
-                      }
-                    </span>
-                  )
-                ) : (
-                  <span className="text-gray-400">
-                    {lang === "ar" ? "جاري البحث..." : lang === "nl" ? "Zoeken..." : "Recherche..."}
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
+          {/* Search Bar - محذوف */}
 
-          {/* 10 أسئلة في نفس الصفحة */}
+          {/* الشروح في نفس الصفحة */}
           <div className="space-y-4">
             {filteredQuestions.slice(currentIndex, currentIndex + 1).map((q, i) => (
               <QuestionCard
