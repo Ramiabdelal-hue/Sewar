@@ -758,8 +758,8 @@ export default function AdminQuestionsPage() {
       if (!lessonId || !newQuestion.textNL) {
         return alert("يجب كتابة السؤال بالهولندية");
       }
-      if (!newQuestion.answer1 || !newQuestion.answer2 || !newQuestion.answer3) {
-        return alert("يجب إدخال 3 إجابات");
+      if (!newQuestion.answer1 || !newQuestion.answer2) {
+        return alert("يجب إدخال إجابتين على الأقل (A و B)");
       }
       if (newQuestion.correctAnswer === 0) {
         return alert("يجب اختيار الإجابة الصحيحة");
@@ -1378,28 +1378,20 @@ export default function AdminQuestionsPage() {
                     <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    خيارات الإجابة (3 خيارات)
+                    خيارات الإجابة
                   </h3>
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        الإجابة الأولى
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="الإجابة الأولى..."
+                      <label className="block text-sm font-medium text-gray-700 mb-2">الإجابة A</label>
+                      <input type="text" placeholder="الإجابة A..."
                         className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none transition"
                         value={newQuestion.answer1}
                         onChange={(e) => setNewQuestion({ ...newQuestion, answer1: e.target.value })}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        الإجابة الثانية
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="الإجابة الثانية..."
+                      <label className="block text-sm font-medium text-gray-700 mb-2">الإجابة B</label>
+                      <input type="text" placeholder="الإجابة B..."
                         className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none transition"
                         value={newQuestion.answer2}
                         onChange={(e) => setNewQuestion({ ...newQuestion, answer2: e.target.value })}
@@ -1407,29 +1399,23 @@ export default function AdminQuestionsPage() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        الإجابة الثالثة
+                        الإجابة C <span className="text-xs text-gray-400 font-normal">(اختياري)</span>
                       </label>
-                      <input
-                        type="text"
-                        placeholder="الإجابة الثالثة..."
+                      <input type="text" placeholder="اتركه فارغاً إذا كانت الإجابة نعم/لا..."
                         className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none transition"
                         value={newQuestion.answer3}
                         onChange={(e) => setNewQuestion({ ...newQuestion, answer3: e.target.value })}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        الإجابة الصحيحة
-                      </label>
-                      <select
-                        className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none transition"
+                      <label className="block text-sm font-medium text-gray-700 mb-2">الإجابة الصحيحة</label>
+                      <select className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none transition"
                         value={newQuestion.correctAnswer}
-                        onChange={(e) => setNewQuestion({ ...newQuestion, correctAnswer: parseInt(e.target.value) })}
-                      >
+                        onChange={(e) => setNewQuestion({ ...newQuestion, correctAnswer: parseInt(e.target.value) })}>
                         <option value={0}>اختر الإجابة الصحيحة</option>
-                        <option value={1}>الإجابة الأولى</option>
-                        <option value={2}>الإجابة الثانية</option>
-                        <option value={3}>الإجابة الثالثة</option>
+                        <option value={1}>الإجابة A</option>
+                        <option value={2}>الإجابة B</option>
+                        <option value={3}>الإجابة C</option>
                       </select>
                     </div>
                   </div>
@@ -1684,7 +1670,10 @@ export default function AdminQuestionsPage() {
                           <div className="space-y-3">
                             {[1, 2, 3].map((num) => (
                               <div key={num}>
-                                <label className="block text-xs font-bold text-gray-600 mb-1">الإجابة {num}</label>
+                                <label className="block text-xs font-bold text-gray-600 mb-1">
+                                  الإجابة {["A","B","C"][num-1]}
+                                  {num === 3 && <span className="text-gray-400 font-normal"> (اختياري)</span>}
+                                </label>
                                 <input type="text" value={editForm[`answer${num}` as "answer1" | "answer2" | "answer3"]} onChange={(e) => setEditForm({ ...editForm, [`answer${num}`]: e.target.value })} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none text-sm" />
                               </div>
                             ))}
@@ -1692,9 +1681,9 @@ export default function AdminQuestionsPage() {
                               <label className="block text-xs font-bold text-gray-600 mb-1">الإجابة الصحيحة</label>
                               <select value={editForm.correctAnswer} onChange={(e) => setEditForm({ ...editForm, correctAnswer: parseInt(e.target.value) })} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none text-sm">
                                 <option value={0}>اختر الإجابة الصحيحة</option>
-                                <option value={1}>الإجابة الأولى</option>
-                                <option value={2}>الإجابة الثانية</option>
-                                <option value={3}>الإجابة الثالثة</option>
+                                <option value={1}>الإجابة A</option>
+                                <option value={2}>الإجابة B</option>
+                                <option value={3}>الإجابة C</option>
                               </select>
                             </div>
                           </div>
