@@ -428,18 +428,6 @@ export default function AdminQuestionsPage() {
     audioUrl: "",
     isFree: false,
   });
-    textFR: "",
-    textAR: "",
-    explanationNL: "",
-    explanationFR: "",
-    explanationAR: "",
-    answer1: "",
-    answer2: "",
-    answer3: "",
-    correctAnswer: 0,
-    videoUrls: [] as string[],
-    audioUrl: "",
-  });
 
   const lessonsMap: Record<string, any> = {
     A: {
