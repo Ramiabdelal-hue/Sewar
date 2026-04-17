@@ -408,6 +408,7 @@ export default function AdminQuestionsPage() {
     explanationNL: "", explanationFR: "", explanationAR: "",
     answer1: "", answer2: "", answer3: "", correctAnswer: 0,
     videoUrls: [] as string[], audioUrl: "",
+    isFree: false,
   });
   const editFormRef = React.useRef(editForm);
   useEffect(() => { editFormRef.current = editForm; }, [editForm]);
@@ -892,6 +893,7 @@ export default function AdminQuestionsPage() {
           correctAnswer: form.correctAnswer,
           videoUrls: form.videoUrls,
           audioUrl: form.audioUrl,
+          isFree: form.isFree,
         }),
       });
 
@@ -1777,6 +1779,16 @@ export default function AdminQuestionsPage() {
                       </div>
 
                       <div className="flex gap-3">
+                        {/* checkbox مجاني في التعديل */}
+                        <label className="flex items-center gap-2 px-3 py-2 rounded-xl cursor-pointer flex-1"
+                          style={{ background: editForm.isFree ? "rgba(34,197,94,0.1)" : "#f8fafc", border: `1.5px solid ${editForm.isFree ? "#22c55e" : "#e2e8f0"}` }}>
+                          <input type="checkbox" checked={editForm.isFree}
+                            onChange={e => setEditForm(prev => ({ ...prev, isFree: e.target.checked }))}
+                            className="w-4 h-4 accent-green-500" />
+                          <span className="text-xs font-black text-gray-700">🎁 Gratis</span>
+                        </label>
+                      </div>
+                      <div className="flex gap-3">
                         <button onClick={() => handleEditQuestion(q.id)} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black transition-all hover:scale-[1.02] active:scale-95" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white", boxShadow: "0 4px 14px rgba(34,197,94,0.35)" }}>
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                           حفظ التعديلات
@@ -1794,6 +1806,11 @@ export default function AdminQuestionsPage() {
                         <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-black flex-shrink-0" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
                           {index + 1}
                         </div>
+                        {q.isFree && (
+                          <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(34,197,94,0.1)", color: "#16a34a", border: "1px solid rgba(34,197,94,0.3)" }}>
+                            🎁 Gratis
+                          </span>
+                        )}
                       </div>
 
                       {/* 1. الصورة أولاً */}
@@ -1911,6 +1928,7 @@ export default function AdminQuestionsPage() {
                               correctAnswer: q.correctAnswer || 0,
                               videoUrls: q.videoUrls || [],
                               audioUrl: q.audioUrl || "",
+                              isFree: q.isFree || false,
                             });
                           }}
                           className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-black transition-all hover:scale-[1.02] active:scale-95"
