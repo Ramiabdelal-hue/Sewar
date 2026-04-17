@@ -72,13 +72,25 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
       setIsLoggedIn(true);
 
       try {
-        // جلب تاريخ الانتهاء من قاعدة البيانات مباشرة
+        const sessionToken = localStorage.getItem("sessionToken") || undefined;
         const res = await fetch("/api/check-subscription", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: userEmail }),
+          body: JSON.stringify({ email: userEmail, sessionToken }),
         });
         const data = await res.json();
+
+        // تسجيل دخول من جهاز آخر - أخرجه فوراً
+        if (data.sessionInvalid) {
+          localStorage.removeItem("userEmail");
+          localStorage.removeItem("userCategory");
+          localStorage.removeItem("userExpiry");
+          localStorage.removeItem("sessionToken");
+          setIsLoggedIn(false);
+          setDaysLeft(null);
+          window.location.href = "/";
+          return;
+        }
 
         if (data.success && data.user?.expiryDate) {
           const expiry = new Date(data.user.expiryDate).getTime();

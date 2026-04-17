@@ -47,3 +47,41 @@ export function getClientIp(request: NextRequest): string {
     request.headers.get("x-real-ip") ||
     "unknown";
 }
+
+/**
+ * إرسال طلب check-subscription مع session token
+ * يُستخدم في كل الصفحات للتحقق من الجلسة
+ */
+export async function checkSubscriptionWithSession(email: string): Promise<{
+  success: boolean;
+  expired?: boolean;
+  sessionInvalid?: boolean;
+  message?: string;
+  user?: any;
+  subscriptions?: any[];
+}> {
+  const sessionToken = typeof window !== "undefined" ? localStorage.getItem("sessionToken") || undefined : undefined;
+  try {
+    const res = await fetch("/api/check-subscription", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, sessionToken }),
+    });
+    if (!res.ok) return { success: false };
+    return await res.json();
+  } catch {
+    return { success: false };
+  }
+}
+
+/**
+ * تسجيل الخروج وحذف بيانات الجلسة
+ */
+export function clearSession() {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userCategory");
+    localStorage.removeItem("userExpiry");
+    localStorage.removeItem("sessionToken");
+  }
+}
