@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import AdminManifest from "@/components/AdminManifest";
 
 interface SubscriptionRow {
   id: string;
@@ -181,6 +182,7 @@ export default function AdminSubscribersPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <AdminManifest />
       {/* Header */}
       <div className="bg-white shadow-md border-b-4 border-blue-500">
         <div className="max-w-7xl mx-auto px-6 py-6">

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useLang } from "@/context/LangContext";
 import adminTranslations from "@/locales/admin.json";
 import FileUploader from "@/components/FileUploader";
+import AdminManifest from "@/components/AdminManifest";
 
 interface Question {
   id: number;
@@ -1222,6 +1223,7 @@ export default function AdminQuestionsPage() {
 
   return (
     <div className="min-h-screen" style={{ background: "#f0f4f8" }}>
+      <AdminManifest />
       {/* Header خرافي */}
       <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0a0a2e 0%, #003399 60%, #0055cc 100%)" }}>
         {/* خطوط زخرفية */}
