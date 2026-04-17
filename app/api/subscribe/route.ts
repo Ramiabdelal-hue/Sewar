@@ -4,8 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { checkRateLimit, getClientIp } from "@/lib/adminAuth";
 
 export async function POST(req: NextRequest) {
-  // التحقق من قفل التسجيل
-  if (process.env.REGISTRATION_LOCKED === "true") {
+  // التحقق من قفل التسجيل - غير إلى false لفتح التسجيل
+  const REGISTRATION_LOCKED = true;
+  if (REGISTRATION_LOCKED || process.env.REGISTRATION_LOCKED === "true") {
     return NextResponse.json({
       success: false,
       locked: true,
