@@ -45,9 +45,11 @@ export async function POST(req: NextRequest) {
       expiryDate: existingUser?.expiryDate,
     });
 
-    // 4️⃣ التحقق من وجود اشتراك مماثل نشط
+    // 4️⃣ التحقق من وجود اشتراك نشط بنفس الإيميل ونفس التصنيف
     if (existingUser && !body.forceRenew) {
-      // التحقق من وجود اشتراك مماثل (نفس النوع ونفس الفئة)
+      const now = new Date();
+
+      // تحقق من جدول Subscriptions
       const existingSubscription = await prisma.subscription.findUnique({
         where: {
           userId_subscriptionType_category: {
@@ -58,35 +60,24 @@ export async function POST(req: NextRequest) {
         }
       });
 
-      if (existingSubscription) {
-        const now = new Date();
-        const expiryDate = new Date(existingSubscription.expiryDate);
-        const isActive = expiryDate > now;
-
-        if (isActive) {
-          // التحقق: هل يحاول الاشتراك في نفس الفئة والخدمة؟
-          const isSameSubscription = 
-            existingSubscription.subscriptionType === (body.subscriptionType || "theorie") &&
-            existingSubscription.category === (body.category || "B");
-
-          if (isSameSubscription) {
-            // ممنوع الاشتراك في نفس الفئة والخدمة مرة أخرى
-            console.log("❌ User trying to subscribe to same category and service");
-            return NextResponse.json({
-              success: false,
-              message: "لديك بالفعل اشتراك نشط في هذه الفئة والخدمة! يمكنك الاشتراك في فئة أو خدمة أخرى.",
-              alreadySubscribed: true,
-              email: existingUser.email,
-              cat: body.category,
-              subscriptionType: body.subscriptionType,
-              exp: existingSubscription.expiryDate.getTime(),
-            });
-          }
-          
-          // إذا كان يحاول الاشتراك في خدمة أخرى أو فئة أخرى، فهذا مسموح
-          console.log("✅ User subscribing to different category or service - allowed");
-        }
+      if (existingSubscription && new Date(existingSubscription.expiryDate) > now) {
+        // اشتراك نشط بنفس الإيميل + نفس التصنيف + نفس النوع → ممنوع
+        console.log("❌ Active subscription exists for same email + category + type");
+        const daysLeft = Math.ceil((new Date(existingSubscription.expiryDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        return NextResponse.json({
+          success: false,
+          alreadySubscribed: true,
+          message: "لديك بالفعل اشتراك نشط بهذا الإيميل في نفس التصنيف.",
+          email: existingUser.email,
+          cat: existingSubscription.category,
+          subscriptionType: existingSubscription.subscriptionType,
+          exp: existingSubscription.expiryDate.getTime(),
+          daysLeft,
+        }, { status: 409 });
       }
+
+      // إذا كان التصنيف أو النوع مختلف → مسموح (يكمل)
+      console.log("✅ Different category or type - subscription allowed");
     }
 
     // 5️⃣ حساب تاريخ انتهاء الاشتراك

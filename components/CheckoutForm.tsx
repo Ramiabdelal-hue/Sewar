@@ -302,7 +302,7 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Modal - اشتراك موجود */}
       {alreadySubscribedModal && subscribedData && (
         <div className="fixed inset-0 flex items-end sm:items-center justify-center z-[99999] p-4"
           style={{ background: "rgba(0,0,0,0.8)", backdropFilter: "blur(8px)" }}>
@@ -314,18 +314,34 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
                 </svg>
               </div>
               <h2 className="text-lg font-black text-white mb-2">
-                {lang === "ar" ? "أنت مشترك بالفعل!" : lang === "nl" ? "Al geabonneerd!" : "Déjà abonné!"}
+                {lang === "ar" ? "🚫 اشتراك نشط موجود!" : lang === "nl" ? "🚫 Al een actief abonnement!" : lang === "fr" ? "🚫 Abonnement actif existant!" : "🚫 Active subscription exists!"}
               </h2>
-              <p className="text-white/50 text-sm mb-4 leading-relaxed">
-                {lang === "ar" ? "لديك اشتراك نشط." : lang === "nl" ? "Je hebt al een actief abonnement." : "Vous avez déjà un abonnement actif."}
+              <p className="text-white/60 text-sm mb-3 leading-relaxed">
+                {lang === "ar"
+                  ? "هذا الإيميل لديه اشتراك نشط في نفس التصنيف. يمكنك الاشتراك بإيميل آخر أو في تصنيف مختلف."
+                  : lang === "nl"
+                  ? "Dit e-mailadres heeft al een actief abonnement voor dezelfde categorie. Gebruik een ander e-mailadres of kies een andere categorie."
+                  : lang === "fr"
+                  ? "Cet e-mail a déjà un abonnement actif pour la même catégorie. Utilisez un autre e-mail ou choisissez une autre catégorie."
+                  : "This email already has an active subscription for the same category. Use a different email or choose another category."}
               </p>
-              <div className="px-4 py-3 rounded-xl mb-5 text-xs font-bold text-orange-300 break-all" style={{ background: "rgba(249,115,22,0.1)", border: "1px solid rgba(249,115,22,0.2)" }}>
-                {subscribedData.email}
+              {/* تفاصيل الاشتراك */}
+              <div className="px-4 py-3 rounded-xl mb-2 text-left space-y-1" style={{ background: "rgba(249,115,22,0.1)", border: "1px solid rgba(249,115,22,0.2)" }}>
+                <p className="text-orange-300 text-xs font-bold break-all">📧 {subscribedData.email}</p>
+                {subscribedData.cat && <p className="text-orange-300 text-xs font-bold">📂 {lang === "ar" ? "التصنيف" : "Categorie"}: {subscribedData.cat}</p>}
+                {subscribedData.daysLeft != null && (
+                  <p className="text-orange-300 text-xs font-bold">
+                    ⏳ {lang === "ar" ? `متبقي ${subscribedData.daysLeft} يوم` : lang === "nl" ? `Nog ${subscribedData.daysLeft} dagen geldig` : `${subscribedData.daysLeft} days remaining`}
+                  </p>
+                )}
               </div>
+              <p className="text-white/30 text-xs mb-5">
+                {lang === "ar" ? "✅ يمكنك الاشتراك في تصنيف آخر (A/B/C) أو باستخدام إيميل مختلف" : lang === "nl" ? "✅ Je kunt abonneren op een andere categorie (A/B/C) of met een ander e-mailadres" : "✅ You can subscribe to a different category (A/B/C) or with a different email"}
+              </p>
               <button onClick={() => { setAlreadySubscribedModal(false); setSubscribedData(null); }}
                 className="w-full py-3.5 rounded-xl font-black text-sm transition-all active:scale-95"
                 style={{ background: "linear-gradient(135deg, #f97316, #ea580c)", color: "white" }}>
-                {lang === "ar" ? "إغلاق" : lang === "nl" ? "Sluiten" : "Fermer"}
+                {lang === "ar" ? "إغلاق" : lang === "nl" ? "Sluiten" : lang === "fr" ? "Fermer" : "Close"}
               </button>
             </div>
           </div>
