@@ -76,9 +76,9 @@ model QuestionA {
   answer3       String?
   correctAnswer Int?
   lessonId      Int
+  isFree        Boolean  @default(false)
   createdAt     DateTime @default(now())
   lesson        LessonA  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-
   @@index([lessonId])
 }
 
@@ -98,9 +98,9 @@ model QuestionB {
   answer3       String?
   correctAnswer Int?
   lessonId      Int
+  isFree        Boolean  @default(false)
   createdAt     DateTime @default(now())
   lesson        LessonB  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-
   @@index([lessonId])
 }
 
@@ -120,9 +120,9 @@ model QuestionC {
   answer3       String?
   correctAnswer Int?
   lessonId      Int
+  isFree        Boolean  @default(false)
   createdAt     DateTime @default(now())
   lesson        LessonC  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-
   @@index([lessonId])
 }
 

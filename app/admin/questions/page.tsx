@@ -426,6 +426,19 @@ export default function AdminQuestionsPage() {
     correctAnswer: 0,
     videoUrls: [] as string[],
     audioUrl: "",
+    isFree: false,
+  });
+    textFR: "",
+    textAR: "",
+    explanationNL: "",
+    explanationFR: "",
+    explanationAR: "",
+    answer1: "",
+    answer2: "",
+    answer3: "",
+    correctAnswer: 0,
+    videoUrls: [] as string[],
+    audioUrl: "",
   });
 
   const lessonsMap: Record<string, any> = {
@@ -805,6 +818,7 @@ export default function AdminQuestionsPage() {
         payload.explanationAR = newQuestion.explanationAR;
         payload.videoUrls = newQuestion.videoUrls;
         payload.audioUrl = newQuestion.audioUrl;
+        payload.isFree = newQuestion.isFree;
       }
       
       const res = await fetch(apiUrl, {
@@ -1580,6 +1594,19 @@ export default function AdminQuestionsPage() {
                     )}
                   </div>
                 </div>
+              )}
+              {/* checkbox مجاني - للدروس فقط */}
+              {questionType !== "Examen" && (
+                <label className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all"
+                  style={{ background: newQuestion.isFree ? "rgba(34,197,94,0.1)" : "rgba(255,255,255,0.5)", border: `1.5px solid ${newQuestion.isFree ? "#22c55e" : "#e5e7eb"}` }}>
+                  <input type="checkbox" checked={newQuestion.isFree}
+                    onChange={e => setNewQuestion({ ...newQuestion, isFree: e.target.checked })}
+                    className="w-4 h-4 accent-green-500" />
+                  <div>
+                    <p className="text-sm font-black text-gray-700">🎁 محتوى مجاني (Gratis)</p>
+                    <p className="text-xs text-gray-400">يظهر في صفحة Gratis بدون اشتراك</p>
+                  </div>
+                </label>
               )}
               <button
                 className="w-full py-3 rounded-xl font-black text-sm transition-all hover:scale-[1.01] active:scale-95"

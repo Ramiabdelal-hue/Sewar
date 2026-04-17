@@ -173,6 +173,7 @@ export async function POST(request: NextRequest) {
       answer2: answer2 || null,
       answer3: answer3 || null,
       correctAnswer: correctAnswer || null,
+      isFree: body.isFree === true,
       lessonId: lessonIdNum
     };
 
@@ -224,7 +225,7 @@ export async function DELETE(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, text, textNL, textFR, textAR, explanationNL, explanationFR, explanationAR, answer1, answer2, answer3, correctAnswer, videoUrls, audioUrl, category: categoryParam } = body;
+    const { id, text, textNL, textFR, textAR, explanationNL, explanationFR, explanationAR, answer1, answer2, answer3, correctAnswer, videoUrls, audioUrl, category: categoryParam, isFree } = body;
 
     if (!id) return NextResponse.json({ success: false, message: "معرف السؤال مطلوب" }, { status: 400 });
 
@@ -242,6 +243,7 @@ export async function PUT(request: NextRequest) {
     if (correctAnswer !== undefined) updateData.correctAnswer = correctAnswer;
     if (videoUrls !== undefined) updateData.videoUrls = videoUrls;
     if (audioUrl !== undefined) updateData.audioUrl = audioUrl || null;
+    if (isFree !== undefined) updateData.isFree = isFree;
 
     let updated = false;
     const cat = categoryParam?.toUpperCase();
