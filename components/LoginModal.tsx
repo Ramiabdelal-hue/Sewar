@@ -98,6 +98,10 @@ export default function LoginModal({ lang, onClose }: any) {
         localStorage.setItem("userEmail", email);
         localStorage.setItem("userCategory", cat);
         localStorage.setItem("userExpiry", String(exp));
+        // حفظ session token لمنع تسجيل الدخول المتعدد
+        if (data.sessionToken) {
+          localStorage.setItem("sessionToken", data.sessionToken);
+        }
         
         window.dispatchEvent(new Event('userLoggedIn'));
         

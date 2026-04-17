@@ -55,16 +55,14 @@ export default function TheoriePage() {
 
   const checkAndFetch = async (email: string, category: string) => {
     try {
+      const sessionToken = localStorage.getItem("sessionToken") || undefined;
       const res = await fetch("/api/check-subscription", { 
         method: "POST", 
         headers: { "Content-Type": "application/json" }, 
-        body: JSON.stringify({ email }) 
+        body: JSON.stringify({ email, sessionToken }) 
       });
       
-      // إذا فشل الـ API (network error, 400, 500) - لا نعتبره منتهياً
       if (!res.ok) {
-        console.warn("check-subscription failed with status:", res.status, "- continuing anyway");
-        // جلب الدروس بدون التحقق
         const lr = await fetch(`/api/lessons?category=${category}`);
         const ld = await lr.json();
         if (ld.success) setLessons(ld.lessons);
@@ -72,9 +70,20 @@ export default function TheoriePage() {
       }
       
       const data = await res.json();
+
+      // تسجيل دخول من جهاز آخر
+      if (data.sessionInvalid) {
+        localStorage.removeItem("userEmail");
+        localStorage.removeItem("userCategory");
+        localStorage.removeItem("sessionToken");
+        setIsLoggedIn(false);
+        setLoading(false);
+        alert(data.message || "تم تسجيل الدخول من جهاز آخر");
+        return;
+      }
+
       if (data.expired) { setIsExpired(true); setLoading(false); return; }
 
-      // جلب الدروس مباشرة - الاشتراك صالح
       const lr = await fetch(`/api/lessons?category=${category}`);
       const ld = await lr.json();
       if (ld.success) setLessons(ld.lessons);

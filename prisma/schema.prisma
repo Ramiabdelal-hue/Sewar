@@ -21,6 +21,7 @@ model User {
   phone            String?
   subscriptionType String?
   examCategory     String?
+  sessionToken     String?
   examResults      ExamResult[]
   subscriptions    Subscription[]
 
