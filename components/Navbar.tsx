@@ -16,38 +16,105 @@ interface NavbarProps {
 }
 
 // ── PWA Install Guide Modal ──────────────────────────────────────────────────
-function PWAModal({ lang, onClose }: { lang: string; onClose: () => void }) {
-  const isAr = lang === "ar";
-  const dir = isAr ? "rtl" : "ltr";
+const PWA_TEXT: Record<string, {
+  title: string; subtitle: string; or: string; tip: string;
+  android: string; iphone: string;
+  steps: { android: { icon: string; title: string; desc: string }[]; iphone: { icon: string; title: string; desc: string }[] };
+}> = {
+  nl: {
+    title: "📲 Installeer de app op je telefoon",
+    subtitle: "Gratis • Geen App Store nodig • Werkt offline",
+    or: "OF",
+    tip: "💡 Na installatie werkt de app als een gewone app op je telefoon!",
+    android: "Android (Chrome)",
+    iphone: "iPhone (Safari)",
+    steps: {
+      android: [
+        { icon: "🌐", title: "Open Chrome", desc: "Open onze website in de Chrome-browser op je Android-telefoon" },
+        { icon: "⋮", title: "Tik op het menu", desc: "Tik op de drie puntjes ⋮ rechtsboven in Chrome" },
+        { icon: "📲", title: "Toevoegen aan startscherm", desc: 'Kies "Toevoegen aan startscherm" of "App installeren"' },
+        { icon: "✅", title: "Bevestig installatie", desc: "Tik op Installeren en de app verschijnt op je startscherm" },
+      ],
+      iphone: [
+        { icon: "🌐", title: "Open Safari", desc: "Open onze website in Safari op iPhone (niet Chrome)" },
+        { icon: "⬆️", title: "Deelknop", desc: "Tik op de deelknop ⬆️ onderaan het scherm" },
+        { icon: "➕", title: "Toevoegen aan startscherm", desc: 'Scroll naar beneden en kies "Toevoegen aan startscherm"' },
+        { icon: "✅", title: "Bevestigen", desc: 'Tik op "Voeg toe" en de app verschijnt op je startscherm' },
+      ],
+    },
+  },
+  fr: {
+    title: "📲 Installer l'app sur votre téléphone",
+    subtitle: "Gratuit • Sans App Store • Fonctionne hors ligne",
+    or: "OU",
+    tip: "💡 Après installation, l'app fonctionne comme une vraie application!",
+    android: "Android (Chrome)",
+    iphone: "iPhone (Safari)",
+    steps: {
+      android: [
+        { icon: "🌐", title: "Ouvrir Chrome", desc: "Ouvrez notre site dans Chrome sur votre téléphone Android" },
+        { icon: "⋮", title: "Appuyer sur le menu", desc: "Appuyez sur les trois points ⋮ en haut à droite de Chrome" },
+        { icon: "📲", title: "Ajouter à l'écran d'accueil", desc: 'Choisissez "Ajouter à l\'écran d\'accueil" ou "Installer l\'app"' },
+        { icon: "✅", title: "Confirmer l'installation", desc: "Appuyez sur Installer et l'app apparaîtra sur votre écran" },
+      ],
+      iphone: [
+        { icon: "🌐", title: "Ouvrir Safari", desc: "Ouvrez notre site dans Safari sur iPhone (pas Chrome)" },
+        { icon: "⬆️", title: "Bouton Partager", desc: "Appuyez sur le bouton Partager ⬆️ en bas de l'écran" },
+        { icon: "➕", title: "Ajouter à l'écran d'accueil", desc: 'Faites défiler et choisissez "Ajouter à l\'écran d\'accueil"' },
+        { icon: "✅", title: "Confirmer", desc: 'Appuyez sur "Ajouter" et l\'app apparaîtra sur votre écran' },
+      ],
+    },
+  },
+  ar: {
+    title: "📲 ثبّت التطبيق على هاتفك",
+    subtitle: "مجاناً • بدون متجر تطبيقات • يعمل بدون إنترنت",
+    or: "أو",
+    tip: "💡 بعد التثبيت يعمل التطبيق مثل أي تطبيق عادي على هاتفك!",
+    android: "أندرويد (Chrome)",
+    iphone: "آيفون (Safari)",
+    steps: {
+      android: [
+        { icon: "🌐", title: "افتح المتصفح", desc: "افتح موقعنا في متصفح Chrome على هاتفك الأندرويد" },
+        { icon: "⋮", title: "اضغط على القائمة", desc: "اضغط على النقاط الثلاث ⋮ في أعلى يمين المتصفح" },
+        { icon: "📲", title: "إضافة للشاشة الرئيسية", desc: 'اختر "إضافة إلى الشاشة الرئيسية" أو "Install App"' },
+        { icon: "✅", title: "تأكيد التثبيت", desc: "اضغط على تثبيت وسيظهر التطبيق على شاشتك الرئيسية" },
+      ],
+      iphone: [
+        { icon: "🌐", title: "افتح Safari", desc: "افتح موقعنا في متصفح Safari على iPhone (ليس Chrome)" },
+        { icon: "⬆️", title: "زر المشاركة", desc: "اضغط على زر المشاركة ⬆️ في أسفل الشاشة" },
+        { icon: "➕", title: "إضافة للشاشة الرئيسية", desc: 'مرر للأسفل واختر "إضافة إلى الشاشة الرئيسية"' },
+        { icon: "✅", title: "تأكيد", desc: 'اضغط "إضافة" وسيظهر التطبيق على شاشتك الرئيسية' },
+      ],
+    },
+  },
+  en: {
+    title: "📲 Install the App on Your Phone",
+    subtitle: "Free • No App Store needed • Works offline",
+    or: "OR",
+    tip: "💡 After installing, the app works just like a native app on your phone!",
+    android: "Android (Chrome)",
+    iphone: "iPhone (Safari)",
+    steps: {
+      android: [
+        { icon: "🌐", title: "Open Chrome", desc: "Open our website in Chrome browser on your Android phone" },
+        { icon: "⋮", title: "Tap the menu", desc: "Tap the three dots ⋮ in the top right of Chrome" },
+        { icon: "📲", title: "Add to Home Screen", desc: 'Choose "Add to Home Screen" or "Install App"' },
+        { icon: "✅", title: "Confirm install", desc: "Tap Install and the app will appear on your home screen" },
+      ],
+      iphone: [
+        { icon: "🌐", title: "Open Safari", desc: "Open our website in Safari on iPhone (not Chrome)" },
+        { icon: "⬆️", title: "Share button", desc: "Tap the Share button ⬆️ at the bottom of the screen" },
+        { icon: "➕", title: "Add to Home Screen", desc: 'Scroll down and choose "Add to Home Screen"' },
+        { icon: "✅", title: "Confirm", desc: 'Tap "Add" and the app will appear on your home screen' },
+      ],
+    },
+  },
+};
 
-  const steps = {
-    android: isAr
-      ? [
-          { icon: "🌐", title: "افتح المتصفح", desc: "افتح موقعنا في متصفح Chrome على هاتفك الأندرويد" },
-          { icon: "⋮", title: "اضغط على القائمة", desc: 'اضغط على النقاط الثلاث ⋮ في أعلى يمين المتصفح' },
-          { icon: "📲", title: "إضافة للشاشة الرئيسية", desc: 'اختر "إضافة إلى الشاشة الرئيسية" أو "Install App"' },
-          { icon: "✅", title: "تأكيد التثبيت", desc: "اضغط على تثبيت وسيظهر التطبيق على شاشتك الرئيسية" },
-        ]
-      : [
-          { icon: "🌐", title: "Open Chrome", desc: "Open our website in Chrome browser on your Android phone" },
-          { icon: "⋮", title: "Tap the menu", desc: "Tap the three dots ⋮ in the top right of Chrome" },
-          { icon: "📲", title: "Add to Home Screen", desc: 'Choose "Add to Home Screen" or "Install App"' },
-          { icon: "✅", title: "Confirm install", desc: "Tap Install and the app will appear on your home screen" },
-        ],
-    iphone: isAr
-      ? [
-          { icon: "🌐", title: "افتح Safari", desc: "افتح موقعنا في متصفح Safari على iPhone (ليس Chrome)" },
-          { icon: "⬆️", title: "زر المشاركة", desc: "اضغط على زر المشاركة ⬆️ في أسفل الشاشة" },
-          { icon: "➕", title: "إضافة للشاشة الرئيسية", desc: 'مرر للأسفل واختر "إضافة إلى الشاشة الرئيسية"' },
-          { icon: "✅", title: "تأكيد", desc: 'اضغط "إضافة" وسيظهر التطبيق على شاشتك الرئيسية' },
-        ]
-      : [
-          { icon: "🌐", title: "Open Safari", desc: "Open our website in Safari on iPhone (not Chrome)" },
-          { icon: "⬆️", title: "Share button", desc: "Tap the Share button ⬆️ at the bottom of the screen" },
-          { icon: "➕", title: "Add to Home Screen", desc: 'Scroll down and choose "Add to Home Screen"' },
-          { icon: "✅", title: "Confirm", desc: 'Tap "Add" and the app will appear on your home screen' },
-        ],
-  };
+function PWAModal({ lang, onClose }: { lang: string; onClose: () => void }) {
+  const tx = PWA_TEXT[lang] || PWA_TEXT.nl;
+  const dir = lang === "ar" ? "rtl" : "ltr";
+  const steps = tx.steps;
 
   return (
     <div
@@ -75,10 +142,10 @@ function PWAModal({ lang, onClose }: { lang: string; onClose: () => void }) {
             </div>
           </div>
           <h2 className="text-white font-black text-xl">
-            {isAr ? "📲 ثبّت التطبيق على هاتفك" : "📲 Install App on Your Phone"}
+            {tx.title}
           </h2>
           <p className="text-white/70 text-sm mt-1">
-            {isAr ? "مجاناً • بدون متجر تطبيقات • يعمل بدون إنترنت" : "Free • No App Store • Works offline"}
+            {tx.subtitle}
           </p>
         </div>
 
@@ -90,7 +157,7 @@ function PWAModal({ lang, onClose }: { lang: string; onClose: () => void }) {
             <div className="flex items-center gap-2 mb-3">
               <span className="text-2xl">🤖</span>
               <span className="text-white font-black text-base">
-                {isAr ? "أندرويد (Chrome)" : "Android (Chrome)"}
+                {tx.android}
               </span>
             </div>
             <div className="space-y-2">
@@ -114,7 +181,7 @@ function PWAModal({ lang, onClose }: { lang: string; onClose: () => void }) {
           <div className="flex items-center gap-3">
             <div className="flex-1 h-px bg-white/20" />
             <span className="text-white/40 text-xs font-bold">
-              {isAr ? "أو" : "OR"}
+              {tx.or}
             </span>
             <div className="flex-1 h-px bg-white/20" />
           </div>
@@ -124,7 +191,7 @@ function PWAModal({ lang, onClose }: { lang: string; onClose: () => void }) {
             <div className="flex items-center gap-2 mb-3">
               <span className="text-2xl">🍎</span>
               <span className="text-white font-black text-base">
-                {isAr ? "آيفون (Safari)" : "iPhone (Safari)"}
+                {tx.iphone}
               </span>
             </div>
             <div className="space-y-2">
@@ -148,9 +215,7 @@ function PWAModal({ lang, onClose }: { lang: string; onClose: () => void }) {
           <div className="p-3 rounded-xl text-center"
             style={{ background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.3)" }}>
             <p className="text-green-400 text-xs font-bold">
-              {isAr
-                ? "💡 بعد التثبيت يعمل التطبيق مثل أي تطبيق عادي على هاتفك!"
-                : "💡 After installing, the app works just like a native app on your phone!"}
+              {tx.tip}
             </p>
           </div>
         </div>
