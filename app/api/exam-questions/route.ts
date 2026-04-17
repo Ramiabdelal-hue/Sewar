@@ -84,8 +84,8 @@ export async function POST(request: NextRequest) {
     if (!lessonId || !textNL) {
       return NextResponse.json({ success: false, message: "يجب إدخال lessonId ونص السؤال بالهولندية" }, { status: 400 });
     }
-    if (!answer1 || !answer2 || !answer3 || !correctAnswer) {
-      return NextResponse.json({ success: false, message: "يجب إدخال 3 إجابات واختيار الإجابة الصحيحة" }, { status: 400 });
+    if (!answer1 || !answer2 || !correctAnswer) {
+      return NextResponse.json({ success: false, message: "يجب إدخال إجابتين على الأقل واختيار الإجابة الصحيحة" }, { status: 400 });
     }
 
     const lessonIdNum = typeof lessonId === 'string' ? parseInt(lessonId) : lessonId;
