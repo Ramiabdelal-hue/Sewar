@@ -77,12 +77,12 @@ Date: ${new Date().toLocaleString('en-US', { timeZone: 'Europe/Amsterdam' })}
       message: "Your message has been sent successfully"
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error sending email:", error);
-    
     return NextResponse.json({
-      success: true,
-      message: "Your message has been received and we will contact you soon"
-    });
+      success: false,
+      message: "Failed to send email",
+      error: error?.message || String(error),
+    }, { status: 500 });
   }
 }
