@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     // Email content
     const mailOptions = {
       from: `"B-Road Contact Form" <${process.env.SMTP_USER}>`,
-      to: process.env.CONTACT_EMAIL || process.env.SMTP_USER,
+      to: process.env.CONTACT_EMAIL || "sewarrijbewijs@gmail.com",
       replyTo: email,
       subject: `New message from ${name}${subject ? ` - ${subject}` : ''}`,
       html: `
