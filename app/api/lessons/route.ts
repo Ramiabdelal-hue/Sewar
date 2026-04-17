@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// GET - Ã·» «·œ—Ê” Õ”» «·›∆…
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -9,77 +8,37 @@ export async function GET(request: NextRequest) {
     const questionType = searchParams.get("questionType");
 
     if (!categoryParam) {
-      return NextResponse.json({
-        success: false,
-        message: "ÌÃ»  ÕœÌœ «·›∆…"
-      }, { status: 400 });
+      return NextResponse.json({ success: false, message: "category required" }, { status: 400 });
     }
 
-    //  ÕÊÌ· «·›∆… ≈·Ï √Õ—› ﬂ»Ì—… ·· √ﬂœ „‰ «· Ê«›ﬁ
-    // ≈–« ﬂ«‰  «·›∆…  »œ√ »‹ "exam" ‰” Œ—Ã «·Õ—› („À· examA -> A)
     let category = categoryParam.toUpperCase();
     if (category.startsWith("EXAM")) {
       category = category.replace("EXAM", "");
     }
 
-    console.log(`?? Fetching lessons for category: ${category} (original: ${categoryParam}), questionType: ${questionType || 'all'}`);
-
-    let lessons;
-
-    // »‰«¡ ‘—ÿ «·›· —
     const whereCondition: any = {};
     if (questionType) {
       whereCondition.questionType = questionType;
     }
-    // ≈–« ·„ Ì „  ÕœÌœ questionType° ‰Ã·» Ã„Ì⁄ «·œ—Ê” »œÊ‰ ›· —
 
-    // Ã·» «·œ—Ê” „‰ «·ÃœÊ· «·„‰«”» Õ”» «·›∆…
+    let lessons;
     if (category === "A") {
-      lessons = await prisma.lessonA.findMany({
-        where: whereCondition,
-        orderBy: {
-          id: 'asc'
-        }
-      });
+      lessons = await prisma.lessonA.findMany({ where: whereCondition, orderBy: { id: 'asc' } });
     } else if (category === "B") {
-      lessons = await prisma.lessonB.findMany({
-        where: whereCondition,
-        orderBy: {
-          id: 'asc'
-        }
-      });
+      lessons = await prisma.lessonB.findMany({ where: whereCondition, orderBy: { id: 'asc' } });
     } else if (category === "C") {
-      lessons = await prisma.lessonC.findMany({
-        where: whereCondition,
-        orderBy: {
-          id: 'asc'
-        }
-      });
+      lessons = await prisma.lessonC.findMany({ where: whereCondition, orderBy: { id: 'asc' } });
     } else {
-      return NextResponse.json({
-        success: false,
-        message: `›∆… €Ì— ’ÕÌÕ…: ${category}`
-      }, { status: 400 });
+      return NextResponse.json({ success: false, message: `Invalid category: ${category}` }, { status: 400 });
     }
 
-    console.log(`? Found ${lessons.length} lessons for category ${category}`);
-
-    return NextResponse.json({
-      success: true,
-      lessons: lessons
-    });
+    return NextResponse.json({ success: true, lessons });
 
   } catch (error) {
-    console.error("? Error fetching lessons:", error);
-    return NextResponse.json({
-      success: false,
-      message: "Œÿ√ ›Ì Ã·» «·œ—Ê”",
-      error: error instanceof Error ? error.message : String(error)
-    }, { status: 500 });
+    return NextResponse.json({ success: false, message: "Error fetching lessons", error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }
 
-// POST - ≈÷«›… œ—” ÃœÌœ
 export async function POST(request: NextRequest) {
   try {
     const { title, description, category } = await request.json();
@@ -98,7 +57,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// DELETE - Õ–› œ—”
 export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -118,7 +76,6 @@ export async function DELETE(request: NextRequest) {
   }
 }
 
-// PUT -  ⁄œÌ· ⁄‰Ê«‰ œ—”
 export async function PUT(request: NextRequest) {
   try {
     const { id, title, description, category } = await request.json();
