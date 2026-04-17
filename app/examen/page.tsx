@@ -218,14 +218,18 @@ export default function ExamenPage() {
                       Gratis
                     </button>
                   </td>
-                  {/* زر INSCHRIJVEN */}
+                  {/* زر INSCHRIJVEN - زرين للمدتين */}
                   <td className="px-4 py-3 border border-gray-200 text-center">
-                    <button
-                      onClick={() => { handleSelect(cat.id, "1m", cat.name); setIsCheckout(true); }}
-                      className="px-4 py-1.5 text-sm font-bold border-2 w-full bg-white border-gray-400 hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors"
-                    >
-                      {lang === "ar" ? "اشترك" : lang === "nl" ? "Inschrijven" : lang === "fr" ? "S'inscrire" : "Subscribe"}
-                    </button>
+                    <div className="flex flex-col gap-1.5">
+                      {getExamDurations(cat.catLetter).map((dur) => (
+                        <button key={dur.key}
+                          onClick={() => { handleSelect(cat.id, dur.key, cat.name); setIsCheckout(true); }}
+                          className="px-3 py-1.5 text-xs font-bold border-2 w-full bg-white border-gray-400 hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors"
+                        >
+                          {dur.label} — {dur.price}
+                        </button>
+                      ))}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -257,12 +261,16 @@ export default function ExamenPage() {
                 >
                   Gratis
                 </button>
-                <button
-                  onClick={() => { handleSelect(cat.id, "1m", cat.name); setIsCheckout(true); }}
-                  className="flex-1 py-2.5 text-sm font-bold border-2 bg-white border-gray-400 hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors"
-                >
-                  {lang === "ar" ? "اشترك" : lang === "nl" ? "Inschrijven" : lang === "fr" ? "S'inscrire" : "Subscribe"}
-                </button>
+                <div className="flex-1 flex flex-col gap-1">
+                  {getExamDurations(cat.catLetter).map((dur) => (
+                    <button key={dur.key}
+                      onClick={() => { handleSelect(cat.id, dur.key, cat.name); setIsCheckout(true); }}
+                      className="py-1.5 text-xs font-bold border-2 bg-white border-gray-400 hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors"
+                    >
+                      {dur.label} — {dur.price}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           ))}
