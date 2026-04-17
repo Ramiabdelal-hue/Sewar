@@ -76,7 +76,7 @@ export default function Hero({ onSelect }: HeroProps) {
                 style={{ background: "white", borderColor: "#d4af37", boxShadow: "0 0 30px rgba(212,175,55,0.6)" }}
               >
                 <Image
-                  src="/logo.jpg"
+                  src="/logo.png"
                   alt="S & A Rijacademie"
                   width={130}
                   height={130}

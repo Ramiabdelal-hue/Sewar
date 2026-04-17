@@ -357,7 +357,7 @@ function ExamenCategoryContent() {
                             <div key={idx} className="relative rounded overflow-hidden">
                               <img src={url} alt="" className="w-full h-auto" />
                               <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-                                <img src="/logo.jpg" alt="" style={{ width: '45%', height: '45%', objectFit: 'contain', opacity: 0.75, mixBlendMode: 'screen', transform: 'rotate(-15deg)' }} />
+                                <img src="/logo.png" alt="" style={{ width: '45%', height: '45%', objectFit: 'contain', opacity: 0.75, mixBlendMode: 'screen', transform: 'rotate(-15deg)' }} />
                               </div>
                             </div>
                           ))}
@@ -488,7 +488,7 @@ function ExamenCategoryContent() {
                     <img src={url} alt="" className="w-full h-auto" draggable={false} onContextMenu={e => e.preventDefault()} />
                     {/* watermark */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-                      <img src="/logo.jpg" alt="" style={{ width: '45%', height: '45%', objectFit: 'contain', opacity: 0.75, mixBlendMode: 'screen', transform: 'rotate(-15deg)' }} draggable={false} />
+                      <img src="/logo.png" alt="" style={{ width: '45%', height: '45%', objectFit: 'contain', opacity: 0.75, mixBlendMode: 'screen', transform: 'rotate(-15deg)' }} draggable={false} />
                     </div>
                   </div>
                 ))}

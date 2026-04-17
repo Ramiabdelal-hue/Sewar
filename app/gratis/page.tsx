@@ -225,7 +225,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
                 <div key={i} className="relative overflow-hidden rounded-xl" style={{ aspectRatio: "4/3" }}>
                   <img src={url} alt="" className="w-full h-full object-cover" draggable={false} />
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <img src="/logo.jpg" alt="" style={{ width: '50%', height: '50%', objectFit: 'contain', opacity: 0.75, mixBlendMode: 'screen', transform: 'rotate(-15deg)' }} draggable={false} />
+                    <img src="/logo.png" alt="" style={{ width: '50%', height: '50%', objectFit: 'contain', opacity: 0.75, mixBlendMode: 'screen', transform: 'rotate(-15deg)' }} draggable={false} />
                   </div>
                 </div>
               ))}
