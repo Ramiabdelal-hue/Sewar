@@ -157,7 +157,7 @@ export default function InfoPage() {
             </div>
           </div>
 
-          {/* خطوات الحصول على الرخصة */}
+          {/* خطوات الحصول على الرخصة - الجديدة */}
           <div className="bg-white rounded-3xl shadow-lg p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
@@ -167,45 +167,38 @@ export default function InfoPage() {
               </div>
               {lang === "ar" ? "خطوات الحصول على الرخصة" : lang === "nl" ? "Stappen om je rijbewijs te halen" : "Étapes pour obtenir le permis"}
             </h2>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {[
-                { n: 1, color: "from-orange-500 to-amber-600", title: lang === "ar" ? "التسجيل في مدرسة القيادة" : lang === "nl" ? "Inschrijven bij een rijschool" : "Inscription à une auto-école", desc: lang === "ar" ? "اختر مدرسة قيادة معتمدة وسجل للحصول على دروس القيادة النظرية والعملية." : lang === "nl" ? "Kies een erkende rijschool en schrijf je in voor theoretische en praktische rijlessen." : "Choisissez une auto-école agréée et inscrivez-vous pour des cours théoriques et pratiques." },
-                { n: 2, color: "from-blue-500 to-indigo-600", title: lang === "ar" ? "الامتحان النظري" : lang === "nl" ? "Theoretisch examen" : "Examen théorique", desc: lang === "ar" ? "اجتاز الامتحان النظري الذي يختبر معرفتك بقواعد المرور وإشارات الطريق." : lang === "nl" ? "Slaag voor het theoretisch examen dat je kennis van verkeersregels en verkeersborden test." : "Réussissez l'examen théorique qui teste vos connaissances du code de la route." },
-                { n: 3, color: "from-green-500 to-emerald-600", title: lang === "ar" ? "دروس القيادة العملية" : lang === "nl" ? "Praktische rijlessen" : "Cours de conduite pratique", desc: lang === "ar" ? "خذ دروس القيادة العملية مع مدرب معتمد لتعلم مهارات القيادة الآمنة." : lang === "nl" ? "Neem praktische rijlessen met een erkende instructeur om veilig rijden te leren." : "Prenez des cours pratiques avec un moniteur agréé pour apprendre à conduire en toute sécurité." },
-                { n: 4, color: "from-purple-500 to-pink-600", title: lang === "ar" ? "الامتحان العملي" : lang === "nl" ? "Praktisch examen" : "Examen pratique", desc: lang === "ar" ? "اجتاز الامتحان العملي لإثبات قدرتك على القيادة بأمان في ظروف مرورية حقيقية." : lang === "nl" ? "Slaag voor het praktisch examen om te bewijzen dat je veilig kunt rijden in echte verkeerssituaties." : "Réussissez l'examen pratique pour prouver que vous pouvez conduire en toute sécurité." },
-                { n: 5, color: "from-red-500 to-pink-600", title: lang === "ar" ? "احصل على رخصتك" : lang === "nl" ? "Ontvang je rijbewijs" : "Recevez votre permis", desc: lang === "ar" ? "بعد النجاح في جميع الامتحانات، ستحصل على رخصة القيادة البلجيكية الخاصة بك!" : lang === "nl" ? "Na het slagen voor alle examens ontvang je je Belgisch rijbewijs!" : "Après avoir réussi tous les examens, vous recevrez votre permis de conduire belge!" },
-              ].map(step => (
-                <div key={step.n} className="flex gap-4">
-                  <div className={`flex-shrink-0 w-12 h-12 bg-gradient-to-br ${step.color} rounded-full flex items-center justify-center text-white font-black text-xl`}>{step.n}</div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-gray-800 mb-1">{step.title}</h3>
-                    <p className="text-gray-600 text-sm">{step.desc}</p>
+                { n: 1, icon: "⭐", title: "Registreren", sub: "Account maken & starten", color: "#f97316" },
+                { n: 2, icon: "⭐", title: "Theorie studeren", sub: "Leer verkeersregels", color: "#3b82f6" },
+                { n: 3, icon: "⭐", title: "Theorie-examen", sub: "50 vragen – min. 41 juist", color: "#8b5cf6" },
+                { n: 4, icon: "⭐", title: "Voorlopig rijbewijs", sub: "M18 of M36 kiezen", color: "#ec4899" },
+                { n: 5, icon: "⭐", title: "Oefenperiode", sub: "Min. 5 maanden oefenen", color: "#14b8a6" },
+                { n: 6, icon: "⭐", title: "Praktijkexamen", sub: "Rijtest op de weg", color: "#f59e0b" },
+                { n: 7, icon: "⭐", title: "Rijbewijs behalen", sub: "Officieel rijbewijs", color: "#22c55e" },
+              ].map((step, i) => (
+                <div key={step.n}>
+                  {i > 0 && <div className="flex justify-center my-1"><div className="w-0.5 h-4 bg-gray-200"></div></div>}
+                  <div className="flex items-center gap-4 p-4 rounded-2xl" style={{ background: `${step.color}08`, border: `1.5px solid ${step.color}25` }}>
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-black text-sm flex-shrink-0"
+                      style={{ background: `linear-gradient(135deg, ${step.color}, ${step.color}cc)` }}>
+                      {step.n}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">👉</span>
+                        <p className="font-black text-gray-800 text-sm">{step.title}</p>
+                      </div>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-sm">👉</span>
+                        <p className="text-xs text-gray-500">{step.sub}</p>
+                      </div>
+                    </div>
+                    <span className="text-lg">{step.icon}</span>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* نصائح */}
-          <div className="bg-gradient-to-br from-orange-500 to-amber-600 rounded-3xl shadow-lg p-8 text-white">
-            <h2 className="text-2xl font-bold mb-4">
-              {lang === "ar" ? "💡 نصائح للنجاح" : lang === "nl" ? "💡 Tips voor succes" : "💡 Conseils pour réussir"}
-            </h2>
-            <ul className="space-y-2">
-              {[
-                lang === "ar" ? "تدرب بانتظام على الأسئلة النظرية" : lang === "nl" ? "Oefen regelmatig met theorievragen" : "Pratiquez régulièrement les questions théoriques",
-                lang === "ar" ? "خذ دروس قيادة كافية قبل الامتحان" : lang === "nl" ? "Neem voldoende rijlessen voor het examen" : "Prenez suffisamment de cours avant l'examen",
-                lang === "ar" ? "ابق هادئاً ومركزاً أثناء الامتحان" : lang === "nl" ? "Blijf kalm en gefocust tijdens het examen" : "Restez calme et concentré pendant l'examen",
-                lang === "ar" ? "اسأل مدربك عن أي شيء غير واضح" : lang === "nl" ? "Vraag je instructeur over alles wat onduidelijk is" : "Demandez à votre moniteur tout ce qui n'est pas clair",
-              ].map((tip, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-sm">{tip}</span>
-                </li>
-              ))}
-            </ul>
           </div>
 
         </div>
