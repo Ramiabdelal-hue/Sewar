@@ -42,6 +42,7 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
   const [isExpired, setIsExpired] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<any>(null);
   const [showInstall, setShowInstall] = useState(false);
+  const [userCategory, setUserCategory] = useState<string | null>(null);
 
   // PWA install prompt
   useEffect(() => {
@@ -67,9 +68,11 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
       if (!userEmail) {
         setIsLoggedIn(false);
         setDaysLeft(null);
+        setUserCategory(null);
         return;
       }
       setIsLoggedIn(true);
+      setUserCategory(localStorage.getItem("userCategory"));
 
       try {
         const sessionToken = localStorage.getItem("sessionToken") || undefined;
@@ -88,6 +91,7 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
           localStorage.removeItem("sessionToken");
           setIsLoggedIn(false);
           setDaysLeft(null);
+          setUserCategory(null);
           window.location.href = "/";
           return;
         }
@@ -122,7 +126,7 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
   const navLinks = [
     { label: t.home, href: "/", icon: <FaHome /> },
     { label: t.theorie, href: "/theorie", icon: <FaBook />, onClick: onTheorieClick },
-    { label: t.praktical, href: "/praktical", icon: <FaCar /> },
+    ...(userCategory !== "A" ? [{ label: t.praktical, href: "/praktical", icon: <FaCar /> }] : []),
     ...(!isLoggedIn ? [{ label: "Gratis", href: "/gratis", icon: <FaCheckCircle /> }] : []),
     { label: t.contact, href: "/contact", icon: <FaEnvelope /> },
   ];
