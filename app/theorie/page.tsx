@@ -156,6 +156,18 @@ export default function TheoriePage() {
                   {/* فاصل */}
                   <div style={{ height: "1px", background: "rgba(255,255,255,0.06)", margin: "0 20px" }}></div>
 
+                  {/* زر Gratis */}
+                  <div className="px-4 pt-4">
+                    <button
+                      onClick={() => {
+                        router.push(`/examen?cat=${cat.id}`);
+                      }}
+                      className="w-full py-2.5 rounded-xl font-black text-sm transition-all active:scale-95 flex items-center justify-center gap-2"
+                      style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white", boxShadow: "0 4px 14px rgba(34,197,94,0.35)" }}>
+                      🎁 Gratis proberen
+                    </button>
+                  </div>
+
                   {/* أزرار المدة */}
                   <div className="grid grid-cols-2 gap-2.5 px-4 py-4">
                     {durations.map(dur => {
