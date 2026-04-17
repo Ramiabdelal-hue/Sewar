@@ -1,7 +1,7 @@
 {
-  "name": "Sewar VerkeersSchool",
+  "name": "Sewar Rijbewijsonline",
   "short_name": "Sewar",
-  "description": "Leer rijden met Sewar VerkeersSchool",
+  "description": "Leer rijden met Sewar Rijbewijsonline",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#003399",
