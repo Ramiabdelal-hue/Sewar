@@ -108,13 +108,15 @@ function ExamenCategoryContent() {
 
     // تسميات الإجابات حسب اللغة
     const labels = lang === "ar"
-      ? ["الجواب الأول:", "الجواب الثاني:", "الجواب الثالث:"]
+      ? ["الجواب A:", "الجواب B:", "الجواب C:"]
       : lang === "fr"
-      ? ["Première réponse:", "Deuxième réponse:", "Troisième réponse:"]
+      ? ["Réponse A:", "Réponse B:", "Réponse C:"]
       : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
 
+    // 1. قراءة السؤال أولاً
     if (!questionText) { setReadingDone(true); return; }
     speak(questionText, () => {
+      // 2. ثم الإجابات واحدة واحدة
       let i = 0;
       const readNext = () => {
         if (i >= answersList.length) { setReadingDone(true); return; }
@@ -123,7 +125,7 @@ function ExamenCategoryContent() {
           ttsRef.current = setTimeout(readNext, 400);
         });
       };
-      ttsRef.current = setTimeout(readNext, 500);
+      ttsRef.current = setTimeout(readNext, 600);
     });
   };
 
@@ -136,7 +138,27 @@ function ExamenCategoryContent() {
 
     ttsRef.current = setTimeout(() => {
       const q = questions[currentIndex];
-      speakQuestion(q, translatedRef.current);
+      if (!q) { setReadingDone(true); return; }
+
+      // إذا اللغة هولندية - اقرأ مباشرة
+      if (lang === "nl") {
+        speakQuestion(q, [
+          q.textNL || q.text || "",
+          q.answer1 || "",
+          q.answer2 || "",
+          q.answer3 || "",
+        ]);
+      } else {
+        // لغة أخرى - انتظر الترجمة إذا موجودة، وإلا اقرأ الأصلي
+        const texts = translatedRef.current;
+        const hasTranslation = texts[0] && texts[0] !== (q.textNL || q.text || "");
+        speakQuestion(q, hasTranslation ? texts : [
+          q.textNL || q.text || "",
+          q.answer1 || "",
+          q.answer2 || "",
+          q.answer3 || "",
+        ]);
+      }
     }, 3000);
 
     return () => {
