@@ -1791,7 +1791,7 @@ export default function AdminQuestionsPage() {
                         <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-black flex-shrink-0" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
                           {index + 1}
                         </div>
-                        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">سؤال #{q.id}</span>
+                        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{index + 1}</span>
                       </div>
 
                       {/* 1. الصورة أولاً */}
