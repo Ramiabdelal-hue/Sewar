@@ -315,28 +315,6 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                     {label}
                   </button>
                 ))}
-
-                {/* زر تثبيت التطبيق - تلفون جميل */}
-                <button
-                  onClick={() => setShowPWAModal(true)}
-                  title={lang === "ar" ? "ثبّت التطبيق على هاتفك" : "Install App on your phone"}
-                  className="relative flex items-center gap-1 px-2 py-1 font-black text-xs transition-all active:scale-95 hover:scale-105"
-                  style={{
-                    background: "linear-gradient(135deg, #22c55e, #16a34a)",
-                    color: "white",
-                    borderRadius: "4px",
-                    boxShadow: "0 2px 8px rgba(34,197,94,0.5)",
-                    border: "1.5px solid rgba(255,255,255,0.3)",
-                  }}
-                >
-                  <FaMobileAlt size={14} />
-                  <span className="hidden sm:inline text-xs font-black">
-                    {lang === "ar" ? "تطبيق" : "App"}
-                  </span>
-                  {/* نقطة خضراء نابضة */}
-                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-yellow-400 animate-ping" />
-                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-yellow-400" />
-                </button>
               </div>
 
               {/* زر Inloggen */}
@@ -398,6 +376,22 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                   </li>
                 );
               })}
+              {/* زر تحميل التطبيق - بجانب Contact */}
+              <li>
+                <button
+                  onClick={() => setShowPWAModal(true)}
+                  className="relative flex items-center gap-1.5 px-4 py-2.5 font-bold text-sm uppercase tracking-wide transition-all hover:scale-105 active:scale-95"
+                  style={{
+                    background: "linear-gradient(135deg, #22c55e, #16a34a)",
+                    color: "white",
+                  }}
+                >
+                  <FaMobileAlt size={14} />
+                  {lang === "ar" ? "تطبيق" : lang === "nl" ? "App" : lang === "fr" ? "App" : "App"}
+                  <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-yellow-400 animate-ping" />
+                  <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-yellow-400" />
+                </button>
+              </li>
             </ul>
 
             {/* Mobile - زر القائمة */}
@@ -432,6 +426,15 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                     </button>
                   );
                 })}
+                {/* زر تحميل التطبيق في Mobile */}
+                <button
+                  onClick={() => { setShowPWAModal(true); setIsMobileMenuOpen(false); }}
+                  className="flex items-center gap-2 px-4 py-3 font-bold text-sm uppercase border-t border-white/20 transition-colors text-left"
+                  style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white" }}
+                >
+                  <FaMobileAlt size={14} />
+                  {lang === "ar" ? "📲 تحميل التطبيق" : lang === "nl" ? "📲 App installeren" : lang === "fr" ? "📲 Installer l'app" : "📲 Install App"}
+                </button>
               </div>
             )}
           </div>
