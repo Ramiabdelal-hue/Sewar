@@ -18,6 +18,7 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
   const [successMsg, setSuccessMsg] = useState("");
   const [alreadySubscribedModal, setAlreadySubscribedModal] = useState(false);
   const [subscribedData, setSubscribedData] = useState<any>(null);
+  const [registrationLocked, setRegistrationLocked] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "", email: "", password: "", confirmPassword: "",
     phone: "", paymentMethod: "bancontact",
@@ -31,6 +32,8 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
       const p = JSON.parse(storedData);
       setFormData(f => ({ ...f, fullName: p.fullName || "", email: p.email || "", phone: p.phone || "" }));
     }
+    // فحص حالة القفل
+    fetch("/api/registration-status").then(r => r.json()).then(d => { if (d.locked) setRegistrationLocked(true); }).catch(() => {});
   }, [prefillData]);
 
   const redirectToContent = (data: any) => {
@@ -77,7 +80,20 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
         setSuccessMsg(lang === "ar" ? "🎉 تم التسجيل بنجاح!" : lang === "nl" ? "🎉 Registratie succesvol!" : "🎉 Inscription réussie!");
         setTimeout(() => redirectToContent(data), 1500);
       } else {
-        if (data.alreadySubscribed) { setSubscribedData(data); setAlreadySubscribedModal(true); }
+        if (data.locked) {
+          setSuccessMsg(""); 
+          // عرض رسالة القفل بدل alert
+          setAlreadySubscribedModal(false);
+          alert(
+            lang === "ar" 
+              ? "⏳ الموقع تحت الصيانة\n\nنعمل على تحسين الموقع. يرجى المحاولة لاحقاً.\n\nشكراً لصبركم 🙏" 
+              : lang === "nl" 
+              ? "⏳ Website in onderhoud\n\nWe werken aan verbeteringen. Probeer het later opnieuw.\n\nBedankt voor uw geduld 🙏"
+              : lang === "fr"
+              ? "⏳ Site en maintenance\n\nNous travaillons sur des améliorations. Réessayez plus tard.\n\nMerci de votre patience 🙏"
+              : "⏳ Website under maintenance\n\nWe are working on improvements. Please try again later.\n\nThank you for your patience 🙏"
+          );
+        } else if (data.alreadySubscribed) { setSubscribedData(data); setAlreadySubscribedModal(true); }
         else alert(data.message || "Er is een fout opgetreden");
       }
     } catch { alert(lang === "ar" ? "خطأ في الخادم!" : "Server error!"); }
@@ -146,6 +162,16 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
 
           {/* المحتوى */}
           <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 pb-6">
+            {/* رسالة القفل */}
+            {registrationLocked && (
+              <div className="mb-4 px-5 py-4 rounded-2xl text-center"
+                style={{ background: "linear-gradient(135deg, #f97316, #ea580c)", color: "white" }}>
+                <p className="text-base font-black mb-1">🔧 {lang === "ar" ? "الموقع تحت الصيانة" : lang === "nl" ? "Website in onderhoud" : lang === "fr" ? "Site en maintenance" : "Under maintenance"}</p>
+                <p className="text-xs opacity-90">
+                  {lang === "ar" ? "نعمل على تحسين الموقع. يرجى المحاولة لاحقاً 🙏" : lang === "nl" ? "We werken aan verbeteringen. Probeer het later opnieuw 🙏" : lang === "fr" ? "Nous travaillons sur des améliorations. Réessayez plus tard 🙏" : "We are working on improvements. Please try again later 🙏"}
+                </p>
+              </div>
+            )}
             {successMsg && (
               <div className="mb-4 px-5 py-4 rounded-2xl text-center font-black text-sm"
                 style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white" }}>
@@ -250,7 +276,7 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
               </div>
 
               {/* زر الإرسال */}
-              <button type="submit" disabled={loading}
+              <button type="submit" disabled={loading || registrationLocked}
                 className="w-full py-4 rounded-2xl font-black text-base transition-all active:scale-95 disabled:opacity-50"
                 style={{
                   background: loading ? "rgba(255,255,255,0.1)" : "linear-gradient(135deg, #ffcc00, #ff9900)",

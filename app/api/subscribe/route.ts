@@ -4,6 +4,15 @@ import { prisma } from "@/lib/prisma";
 import { checkRateLimit, getClientIp } from "@/lib/adminAuth";
 
 export async function POST(req: NextRequest) {
+  // التحقق من قفل التسجيل
+  if (process.env.REGISTRATION_LOCKED === "true") {
+    return NextResponse.json({
+      success: false,
+      locked: true,
+      message: "Inschrijving tijdelijk gesloten. Probeer het later opnieuw."
+    }, { status: 503 });
+  }
+
   // Rate limiting: max 5 subscriptions per 10 minutes per IP
   const ip = getClientIp(req);
   if (!checkRateLimit(ip, 5, 600000)) {
