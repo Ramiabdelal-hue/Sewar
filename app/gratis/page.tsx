@@ -64,39 +64,68 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
   const [locked, setLocked] = useState(false);
   const [readingDone, setReadingDone] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const ttsRef = useRef<NodeJS.Timeout | null>(null);
   const isRtl = lang === "ar";
 
   const q = questions[currentIndex];
   const textsToTranslate = q ? [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""] : ["", "", "", ""];
   const translatedTexts = useAutoTranslateList(textsToTranslate, lang);
+  const translatedRef = useRef<string[]>(["", "", "", ""]);
+  useEffect(() => { translatedRef.current = translatedTexts; }, [translatedTexts]);
 
-  useEffect(() => {
-    if (!started || finished || locked || !readingDone) return;
-    setTimeLeft(15);
-    timerRef.current = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(timerRef.current!);
-          setLocked(true);
-          setAnswers(a => ({ ...a, [currentIndex]: a[currentIndex] ?? null }));
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(timerRef.current!);
-  }, [currentIndex, started, finished, readingDone]);
+  // القارئ التلقائي
+  const speakQuestion = (q: any, translated: string[]) => {
+    if (!window.speechSynthesis || !q) return;
+    window.speechSynthesis.cancel();
+    setReadingDone(false);
+    const langMap: Record<string, string> = { nl: "nl-NL", fr: "fr-FR", ar: "ar-SA", en: "en-US" };
+    const speechLang = langMap[lang] || "nl-NL";
+    const getVoice = () => {
+      const voices = window.speechSynthesis.getVoices();
+      return voices.find(v => v.lang === speechLang) || voices.find(v => v.lang.startsWith(lang)) || voices.find(v => v.lang === "nl-NL") || null;
+    };
+    const speak = (text: string, onEnd?: () => void) => {
+      if (!text) { if (onEnd) onEnd(); return; }
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = speechLang; u.rate = 0.75; u.pitch = 1;
+      const v = getVoice(); if (v) u.voice = v;
+      if (onEnd) u.onend = onEnd;
+      u.onerror = () => { if (onEnd) onEnd(); };
+      window.speechSynthesis.speak(u);
+    };
+    const questionText = translated[0] || q.textNL || q.text || "";
+    const answersList = [translated[1] || q.answer1, translated[2] || q.answer2, translated[3] || q.answer3].filter(Boolean);
+    const labels = lang === "ar" ? ["الجواب A:", "الجواب B:", "الجواب C:"] : lang === "fr" ? ["Réponse A:", "Réponse B:", "Réponse C:"] : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
+    if (!questionText) { setReadingDone(true); return; }
+    speak(questionText, () => {
+      let i = 0;
+      const readNext = () => {
+        if (i >= answersList.length) { setReadingDone(true); return; }
+        speak(`${labels[i]} ${answersList[i]}`, () => { i++; ttsRef.current = setTimeout(readNext, 400); });
+      };
+      ttsRef.current = setTimeout(readNext, 600);
+    });
+  };
 
+  // تشغيل القراءة بعد 3 ثوانٍ
   useEffect(() => {
     if (!started || finished) return;
+    if (ttsRef.current) clearTimeout(ttsRef.current);
+    window.speechSynthesis?.cancel();
     setReadingDone(false);
-    const t = setTimeout(() => setReadingDone(true), 3000);
-    return () => clearTimeout(t);
+    ttsRef.current = setTimeout(() => {
+      const q = questions[currentIndex];
+      if (!q) { setReadingDone(true); return; }
+      speakQuestion(q, lang === "nl" ? [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""] : translatedRef.current);
+    }, 3000);
+    return () => { if (ttsRef.current) clearTimeout(ttsRef.current); window.speechSynthesis?.cancel(); };
   }, [currentIndex, started, finished]);
 
   const handleAnswer = (num: number) => {
     if (locked || answers[currentIndex] !== undefined) return;
     clearInterval(timerRef.current!);
+    window.speechSynthesis?.cancel();
+    if (ttsRef.current) clearTimeout(ttsRef.current);
     setAnswers(a => ({ ...a, [currentIndex]: num }));
     setLocked(true);
   };
