@@ -83,10 +83,9 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
       {question.videoUrls && question.videoUrls.filter(Boolean).length > 0 && (
         <div className={`grid gap-1 bg-gray-900 p-2 ${question.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
           {question.videoUrls.filter(Boolean).map((url, i) => (
-            <div key={i} className="relative overflow-hidden rounded-xl select-none"
-              style={{ aspectRatio: question.videoUrls!.filter(Boolean).length === 1 ? "16/9" : "4/3" }}>
+            <div key={i} className="relative rounded-xl overflow-hidden select-none">
               <img src={url} alt={`img ${i + 1}`}
-                className="w-full h-full object-cover"
+                className="w-full h-auto"
                 draggable={false}
                 onContextMenu={(e) => e.preventDefault()}
               />
@@ -97,7 +96,6 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
                   draggable={false} onContextMenu={(e) => e.preventDefault()}
                 />
               </div>
-              {/* رقم الصورة */}
               {question.videoUrls!.filter(Boolean).length > 1 && (
                 <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
                   {i + 1}/{question.videoUrls!.filter(Boolean).length}

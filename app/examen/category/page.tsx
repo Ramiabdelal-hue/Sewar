@@ -354,8 +354,8 @@ function ExamenCategoryContent() {
                       {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
                         <div className={`grid gap-0.5 bg-gray-900 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
                           {q.videoUrls.filter(Boolean).map((url: string, idx: number) => (
-                            <div key={idx} className="relative" style={{ aspectRatio: "16/9" }}>
-                              <img src={url} alt="" className="w-full h-full object-cover" />
+                            <div key={idx} className="relative rounded overflow-hidden">
+                              <img src={url} alt="" className="w-full h-auto" />
                               <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
                                 <img src="/logo.jpg" alt="" style={{ width: '45%', height: '45%', objectFit: 'contain', opacity: 0.75, mixBlendMode: 'screen', transform: 'rotate(-15deg)' }} />
                               </div>
@@ -484,8 +484,8 @@ function ExamenCategoryContent() {
             {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
               <div className={`grid gap-1 bg-gray-900 p-2 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
                 {q.videoUrls.filter(Boolean).map((url: string, i: number) => (
-                  <div key={i} className="relative overflow-hidden rounded-xl" style={{ aspectRatio: "4/3" }}>
-                    <img src={url} alt="" className="w-full h-full object-cover" draggable={false} onContextMenu={e => e.preventDefault()} />
+                  <div key={i} className="relative rounded-xl overflow-hidden">
+                    <img src={url} alt="" className="w-full h-auto" draggable={false} onContextMenu={e => e.preventDefault()} />
                     {/* watermark */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
                       <img src="/logo.jpg" alt="" style={{ width: '45%', height: '45%', objectFit: 'contain', opacity: 0.75, mixBlendMode: 'screen', transform: 'rotate(-15deg)' }} draggable={false} />
