@@ -174,10 +174,9 @@ export default function ExamenPage() {
         <div className="hidden sm:block">
           <table className="w-full border-collapse lessons-table" style={{ tableLayout: "fixed" }}>
             <colgroup>
-              <col style={{ width: "35%" }} />
-              <col style={{ width: "20%" }} />
-              <col style={{ width: "20%" }} />
+              <col style={{ width: "45%" }} />
               <col style={{ width: "25%" }} />
+              <col style={{ width: "30%" }} />
             </colgroup>
             <thead>
               <tr style={{ backgroundColor: "#3399ff" }}>
@@ -185,13 +184,10 @@ export default function ExamenPage() {
                   {lang === "ar" ? "الفئة" : lang === "nl" ? "CATEGORIE" : lang === "fr" ? "CATÉGORIE" : "CATEGORY"}
                 </th>
                 <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
-                  {t.twoWeeks || "2 Weken"}
+                  GRATIS
                 </th>
                 <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
-                  {t.oneMonth || "1 Maand"}
-                </th>
-                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
-                  {lang === "ar" ? "اشترك" : lang === "nl" ? "INSCHRIJVEN" : lang === "fr" ? "S'INSCRIRE" : "SUBSCRIBE"}
+                  INSCHRIJVEN
                 </th>
               </tr>
             </thead>
@@ -207,29 +203,26 @@ export default function ExamenPage() {
                       </div>
                     </div>
                   </td>
-                  {getExamDurations(cat.catLetter).map((dur) => (
-                    <td key={dur.key} className="px-4 py-3 border border-gray-200 text-center">
-                      <button
-                        onClick={() => handleSelect(cat.id, dur.key, cat.name)}
-                        className={`px-4 py-1.5 text-sm font-bold border-2 transition-colors w-full ${
-                          globalSelection?.catId === cat.id && globalSelection?.duration === dur.key
-                            ? "bg-[#3399ff] text-white border-[#3399ff]"
-                            : "bg-white border-gray-400 hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff]"
-                        }`}
-                      >
-                        {dur.price}
-                      </button>
-                    </td>
-                  ))}
+                  {/* زر Gratis - يفتح الامتحان مباشرة */}
                   <td className="px-4 py-3 border border-gray-200 text-center">
                     <button
-                      onClick={() => { if (globalSelection?.catId === cat.id) setIsCheckout(true); }}
-                      disabled={globalSelection?.catId !== cat.id}
-                      className={`px-6 py-1.5 text-sm font-bold border-2 transition-colors ${
-                        globalSelection?.catId === cat.id
-                          ? "bg-white border-gray-400 hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff]"
-                          : "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"
-                      }`}
+                      onClick={() => {
+                        const email = localStorage.getItem("userEmail") || "";
+                        setUserEmail(email || "guest");
+                        setSelectedCategory(cat.catLetter);
+                        fetchLessons(cat.catLetter);
+                        setShowLessons(true);
+                      }}
+                      className="px-4 py-1.5 text-sm font-bold border-2 w-full bg-green-500 text-white border-green-500 hover:bg-green-600 transition-colors"
+                    >
+                      Gratis
+                    </button>
+                  </td>
+                  {/* زر INSCHRIJVEN */}
+                  <td className="px-4 py-3 border border-gray-200 text-center">
+                    <button
+                      onClick={() => { handleSelect(cat.id, "1m", cat.name); setIsCheckout(true); }}
+                      className="px-4 py-1.5 text-sm font-bold border-2 w-full bg-white border-gray-400 hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors"
                     >
                       {lang === "ar" ? "اشترك" : lang === "nl" ? "Inschrijven" : lang === "fr" ? "S'inscrire" : "Subscribe"}
                     </button>
@@ -244,39 +237,33 @@ export default function ExamenPage() {
         <div className="sm:hidden flex flex-col gap-4">
           {categories.map((cat, i) => (
             <div key={cat.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#f5f5f5" }} className="border border-gray-200 p-4 rounded">
-              <div className="flex items-center gap-3 mb-2">
+              <div className="flex items-center gap-3 mb-3">
                 {cat.icon}
                 <div>
                   <div className="font-black text-[#003399] text-base">{cat.name}</div>
                   <div className="text-gray-500 text-sm">{cat.description}</div>
                 </div>
               </div>
-              <div className="flex gap-2 mb-3">
-                {getExamDurations(cat.catLetter).map((dur) => (
-                  <button
-                    key={dur.key}
-                    onClick={() => handleSelect(cat.id, dur.key, cat.name)}
-                    className={`flex-1 py-2 text-sm font-bold border-2 transition-colors ${
-                      globalSelection?.catId === cat.id && globalSelection?.duration === dur.key
-                        ? "bg-[#3399ff] text-white border-[#3399ff]"
-                        : "bg-white border-gray-400"
-                    }`}
-                  >
-                    {dur.label}<br/><span className="font-black">{dur.price}</span>
-                  </button>
-                ))}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    const email = localStorage.getItem("userEmail") || "";
+                    setUserEmail(email || "guest");
+                    setSelectedCategory(cat.catLetter);
+                    fetchLessons(cat.catLetter);
+                    setShowLessons(true);
+                  }}
+                  className="flex-1 py-2.5 text-sm font-bold border-2 bg-green-500 text-white border-green-500"
+                >
+                  Gratis
+                </button>
+                <button
+                  onClick={() => { handleSelect(cat.id, "1m", cat.name); setIsCheckout(true); }}
+                  className="flex-1 py-2.5 text-sm font-bold border-2 bg-white border-gray-400 hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors"
+                >
+                  {lang === "ar" ? "اشترك" : lang === "nl" ? "Inschrijven" : lang === "fr" ? "S'inscrire" : "Subscribe"}
+                </button>
               </div>
-              <button
-                onClick={() => { if (globalSelection?.catId === cat.id) setIsCheckout(true); }}
-                disabled={globalSelection?.catId !== cat.id}
-                className={`w-full py-2.5 text-sm font-bold border-2 transition-colors ${
-                  globalSelection?.catId === cat.id
-                    ? "bg-[#3399ff] text-white border-[#3399ff]"
-                    : "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"
-                }`}
-              >
-                {lang === "ar" ? "اشترك الآن" : lang === "nl" ? "Inschrijven" : lang === "fr" ? "S'inscrire" : "Subscribe"}
-              </button>
             </div>
           ))}
         </div>
