@@ -71,6 +71,30 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           })();
         `}} />
 
+        {/* PWA - حفظ الصفحة الحالية لاستعادتها عند فتح التطبيق */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function() {
+            function savePage() {
+              var path = window.location.pathname + window.location.search;
+              if (path && path !== '/pwa-start') {
+                localStorage.setItem('pwa_last_page', path);
+              }
+            }
+            savePage();
+            var _pushState = history.pushState;
+            history.pushState = function() {
+              _pushState.apply(history, arguments);
+              setTimeout(savePage, 100);
+            };
+            var _replaceState = history.replaceState;
+            history.replaceState = function() {
+              _replaceState.apply(history, arguments);
+              setTimeout(savePage, 100);
+            };
+            window.addEventListener('popstate', savePage);
+          })();
+        `}} />
+
         <LangProvider>{children}</LangProvider>
       </body>
     </html>
