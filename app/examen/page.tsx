@@ -219,14 +219,20 @@ export default function ExamenPage() {
                     </button>
                   </td>
                   {/* زر INSCHRIJVEN - زرين للمدتين */}
-                  <td className="px-4 py-3 border border-gray-200 text-center">
-                    <div className="flex flex-col gap-1.5">
+                  <td className="px-3 py-3 border border-gray-200 text-center">
+                    <div className="flex gap-1.5">
                       {getExamDurations(cat.catLetter).map((dur) => (
                         <button key={dur.key}
                           onClick={() => { handleSelect(cat.id, dur.key, cat.name); setIsCheckout(true); }}
-                          className="px-3 py-1.5 text-xs font-bold border-2 w-full bg-white border-gray-400 hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors"
+                          className="flex-1 flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg font-bold transition-all hover:scale-105 active:scale-95 border-2"
+                          style={dur.key === "2w"
+                            ? { background: "linear-gradient(135deg, #eff6ff, #dbeafe)", borderColor: "#93c5fd", color: "#1d4ed8" }
+                            : { background: "linear-gradient(135deg, #fef3c7, #fde68a)", borderColor: "#f59e0b", color: "#92400e" }
+                          }
                         >
-                          {dur.label} — {dur.price}
+                          <span className="text-base">{dur.key === "2w" ? "📅" : "🗓️"}</span>
+                          <span className="text-[10px] font-black uppercase">{dur.label}</span>
+                          <span className="text-sm font-black">{dur.price}</span>
                         </button>
                       ))}
                     </div>
@@ -261,13 +267,19 @@ export default function ExamenPage() {
                 >
                   Gratis
                 </button>
-                <div className="flex-1 flex flex-col gap-1">
+                <div className="flex-1 flex gap-1.5">
                   {getExamDurations(cat.catLetter).map((dur) => (
                     <button key={dur.key}
                       onClick={() => { handleSelect(cat.id, dur.key, cat.name); setIsCheckout(true); }}
-                      className="py-1.5 text-xs font-bold border-2 bg-white border-gray-400 hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors"
+                      className="flex-1 flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg font-bold transition-all active:scale-95 border-2"
+                      style={dur.key === "2w"
+                        ? { background: "linear-gradient(135deg, #eff6ff, #dbeafe)", borderColor: "#93c5fd", color: "#1d4ed8" }
+                        : { background: "linear-gradient(135deg, #fef3c7, #fde68a)", borderColor: "#f59e0b", color: "#92400e" }
+                      }
                     >
-                      {dur.label} — {dur.price}
+                      <span className="text-sm">{dur.key === "2w" ? "📅" : "🗓️"}</span>
+                      <span className="text-[10px] font-black">{dur.label}</span>
+                      <span className="text-xs font-black">{dur.price}</span>
                     </button>
                   ))}
                 </div>
