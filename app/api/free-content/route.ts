@@ -7,28 +7,38 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get("category")?.toUpperCase() || "B";
 
     let questions: any[] = [];
+    let examQuestions: any[] = [];
 
     if (category === "A") {
       questions = await prisma.questionA.findMany({
-        where: { isFree: true },
-        orderBy: { createdAt: "asc" },
+        where: { isFree: true }, orderBy: { createdAt: "asc" },
         include: { lesson: { select: { title: true, description: true } } }
+      });
+      examQuestions = await prisma.examQuestionA.findMany({
+        where: { isFree: true }, orderBy: { createdAt: "asc" },
+        include: { lesson: { select: { title: true } } }
       });
     } else if (category === "B") {
       questions = await prisma.questionB.findMany({
-        where: { isFree: true },
-        orderBy: { createdAt: "asc" },
+        where: { isFree: true }, orderBy: { createdAt: "asc" },
         include: { lesson: { select: { title: true, description: true } } }
+      });
+      examQuestions = await prisma.examQuestionB.findMany({
+        where: { isFree: true }, orderBy: { createdAt: "asc" },
+        include: { lesson: { select: { title: true } } }
       });
     } else if (category === "C") {
       questions = await prisma.questionC.findMany({
-        where: { isFree: true },
-        orderBy: { createdAt: "asc" },
+        where: { isFree: true }, orderBy: { createdAt: "asc" },
         include: { lesson: { select: { title: true, description: true } } }
+      });
+      examQuestions = await prisma.examQuestionC.findMany({
+        where: { isFree: true }, orderBy: { createdAt: "asc" },
+        include: { lesson: { select: { title: true } } }
       });
     }
 
-    return NextResponse.json({ success: true, questions });
+    return NextResponse.json({ success: true, questions, examQuestions });
   } catch (error) {
     return NextResponse.json({ success: false, message: "خطأ في جلب المحتوى المجاني" }, { status: 500 });
   }

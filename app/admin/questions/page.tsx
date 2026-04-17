@@ -797,6 +797,7 @@ export default function AdminQuestionsPage() {
         payload.correctAnswer = newQuestion.correctAnswer;
         payload.videoUrls = newQuestion.videoUrls;
         payload.audioUrl = newQuestion.audioUrl;
+        payload.isFree = newQuestion.isFree;
       } else {
         // للدروس و Praktijk: حفظ في Question أو PraktijkQuestion
         payload.text = newQuestion.explanationNL || "";
@@ -1583,19 +1584,17 @@ export default function AdminQuestionsPage() {
                   </div>
                 </div>
               )}
-              {/* checkbox مجاني - للدروس فقط */}
-              {questionType !== "Examen" && (
-                <label className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all"
-                  style={{ background: newQuestion.isFree ? "rgba(34,197,94,0.1)" : "rgba(255,255,255,0.5)", border: `1.5px solid ${newQuestion.isFree ? "#22c55e" : "#e5e7eb"}` }}>
-                  <input type="checkbox" checked={newQuestion.isFree}
-                    onChange={e => setNewQuestion({ ...newQuestion, isFree: e.target.checked })}
-                    className="w-4 h-4 accent-green-500" />
-                  <div>
-                    <p className="text-sm font-black text-gray-700">🎁 محتوى مجاني (Gratis)</p>
-                    <p className="text-xs text-gray-400">يظهر في صفحة Gratis بدون اشتراك</p>
-                  </div>
-                </label>
-              )}
+              {/* checkbox مجاني - للجميع */}
+              <label className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all"
+                style={{ background: newQuestion.isFree ? "rgba(34,197,94,0.1)" : "rgba(255,255,255,0.5)", border: `1.5px solid ${newQuestion.isFree ? "#22c55e" : "#e5e7eb"}` }}>
+                <input type="checkbox" checked={newQuestion.isFree}
+                  onChange={e => setNewQuestion({ ...newQuestion, isFree: e.target.checked })}
+                  className="w-4 h-4 accent-green-500" />
+                <div>
+                  <p className="text-sm font-black text-gray-700">🎁 محتوى مجاني (Gratis)</p>
+                  <p className="text-xs text-gray-400">يظهر في صفحة Gratis بدون اشتراك</p>
+                </div>
+              </label>
               <button
                 className="w-full py-3 rounded-xl font-black text-sm transition-all hover:scale-[1.01] active:scale-95"
                 style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white", boxShadow: "0 4px 14px rgba(34,197,94,0.35)" }}

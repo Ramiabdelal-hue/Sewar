@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
     let category = categoryParam?.toUpperCase() || await getCategoryFromLessonId(lessonIdNum);
     if (!category) return NextResponse.json({ success: false, message: "الدرس غير موجود" }, { status: 404 });
 
-    const questionData = { text: textNL, textNL, videoUrls, audioUrl: audioUrl || null, answer1, answer2, answer3, correctAnswer, lessonId: lessonIdNum };
+    const questionData = { text: textNL, textNL, videoUrls, audioUrl: audioUrl || null, answer1, answer2, answer3: answer3 || null, correctAnswer, isFree: body.isFree === true, lessonId: lessonIdNum };
     let question;
     if (category === "A") question = await prisma.examQuestionA.create({ data: questionData });
     else if (category === "B") question = await prisma.examQuestionB.create({ data: questionData });
@@ -164,7 +164,7 @@ export async function DELETE(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, textNL, answer1, answer2, answer3, correctAnswer, videoUrls, audioUrl, category: categoryParam } = body;
+    const { id, textNL, answer1, answer2, answer3, correctAnswer, videoUrls, audioUrl, category: categoryParam, isFree } = body;
 
     if (!id) return NextResponse.json({ success: false, message: "معرف السؤال مطلوب" }, { status: 400 });
 
@@ -173,6 +173,7 @@ export async function PUT(request: NextRequest) {
     if (answer1 !== undefined) updateData.answer1 = answer1;
     if (answer2 !== undefined) updateData.answer2 = answer2;
     if (answer3 !== undefined) updateData.answer3 = answer3;
+    if (isFree !== undefined) updateData.isFree = isFree;
     if (correctAnswer !== undefined) updateData.correctAnswer = correctAnswer;
     if (videoUrls !== undefined) updateData.videoUrls = videoUrls;
     if (audioUrl !== undefined) updateData.audioUrl = audioUrl || null;

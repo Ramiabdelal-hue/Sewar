@@ -197,6 +197,7 @@ model ExamQuestionA {
   answer3       String?
   correctAnswer Int?
   lessonId      Int
+  isFree        Boolean  @default(false)
   createdAt     DateTime @default(now())
   lesson        LessonA  @relation("ExamQuestionsA", fields: [lessonId], references: [id], onDelete: Cascade)
 }
@@ -212,6 +213,7 @@ model ExamQuestionB {
   answer3       String?
   correctAnswer Int?
   lessonId      Int
+  isFree        Boolean  @default(false)
   createdAt     DateTime @default(now())
   lesson        LessonB  @relation("ExamQuestionsB", fields: [lessonId], references: [id], onDelete: Cascade)
 }
@@ -227,6 +229,7 @@ model ExamQuestionC {
   answer3       String?
   correctAnswer Int?
   lessonId      Int
+  isFree        Boolean  @default(false)
   createdAt     DateTime @default(now())
   lesson        LessonC  @relation("ExamQuestionsC", fields: [lessonId], references: [id], onDelete: Cascade)
 }
