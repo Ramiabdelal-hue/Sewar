@@ -68,22 +68,27 @@ function ExamenCategoryContent() {
   const [readingDone, setReadingDone] = useState(false);
 
   // قراءة تلقائية للسؤال والإجابات
-  const speakQuestion = (q: any) => {
+  const speakQuestion = (q: any, translated: string[]) => {
     if (!window.speechSynthesis || !q) return;
     window.speechSynthesis.cancel();
     setReadingDone(false);
 
+    // تحديد اللغة حسب اللغة المختارة
+    const langMap: Record<string, string> = { nl: "nl-NL", fr: "fr-FR", ar: "ar-SA", en: "en-US" };
+    const speechLang = langMap[lang] || "nl-NL";
+
     const getVoice = () => {
       const voices = window.speechSynthesis.getVoices();
-      return voices.find(v => v.lang === "nl-NL" && !v.name.includes("Xander"))
-        || voices.find(v => v.lang === "nl-BE")
-        || voices.find(v => v.lang.startsWith("nl"))
+      return voices.find(v => v.lang === speechLang)
+        || voices.find(v => v.lang.startsWith(lang))
+        || voices.find(v => v.lang === "nl-NL")
         || null;
     };
 
     const speak = (text: string, onEnd?: () => void) => {
+      if (!text) { if (onEnd) onEnd(); return; }
       const u = new SpeechSynthesisUtterance(text);
-      u.lang = "nl-NL";
+      u.lang = speechLang;
       u.rate = 0.9;
       u.pitch = 1;
       const v = getVoice();
@@ -93,21 +98,27 @@ function ExamenCategoryContent() {
       window.speechSynthesis.speak(u);
     };
 
-    const questionText = q.textNL || q.text || "";
-    const answersList = [q.answer1, q.answer2, q.answer3].filter(Boolean);
+    // استخدام النص المترجم إذا موجود
+    const questionText = translated[0] || q.textNL || q.text || "";
+    const answersList = [
+      translated[1] || q.answer1,
+      translated[2] || q.answer2,
+      translated[3] || q.answer3,
+    ].filter(Boolean);
 
-    // قراءة السؤال بالهولندية فقط
+    // تسميات الإجابات حسب اللغة
+    const labels = lang === "ar"
+      ? ["الجواب الأول:", "الجواب الثاني:", "الجواب الثالث:"]
+      : lang === "fr"
+      ? ["Première réponse:", "Deuxième réponse:", "Troisième réponse:"]
+      : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
+
     if (!questionText) { setReadingDone(true); return; }
     speak(questionText, () => {
       let i = 0;
       const readNext = () => {
-        if (i >= answersList.length) {
-          // انتهت القراءة → ابدأ العداد
-          setReadingDone(true);
-          return;
-        }
-        const label = i === 0 ? "Eerste antwoord:" : i === 1 ? "Tweede antwoord:" : "Derde antwoord:";
-        speak(`${label} ${answersList[i]}`, () => {
+        if (i >= answersList.length) { setReadingDone(true); return; }
+        speak(`${labels[i]} ${answersList[i]}`, () => {
           i++;
           ttsRef.current = setTimeout(readNext, 400);
         });
@@ -125,7 +136,7 @@ function ExamenCategoryContent() {
 
     ttsRef.current = setTimeout(() => {
       const q = questions[currentIndex];
-      speakQuestion(q);
+      speakQuestion(q, translatedRef.current);
     }, 3000);
 
     return () => {
@@ -205,6 +216,8 @@ function ExamenCategoryContent() {
   const q = questions[currentIndex];
   const isRtl = lang === "ar";
 
+  const translatedRef = useRef<string[]>(["", "", "", ""]);
+
   // Hook يجب أن يكون دائماً قبل أي return مشروط
   const textsToTranslate = q ? [
     q.textNL || q.text || "",
@@ -213,6 +226,11 @@ function ExamenCategoryContent() {
     q.answer3 || "",
   ] : ["", "", "", ""];
   const translatedTexts = useAutoTranslateList(textsToTranslate, lang);
+
+  // حفظ آخر ترجمة في ref
+  useEffect(() => {
+    translatedRef.current = translatedTexts;
+  }, [translatedTexts]);
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
@@ -467,6 +485,7 @@ function ExamenCategoryContent() {
               {/* الإجابات */}
               <div className="space-y-3">
                 {[1, 2, 3].map(num => {
+                  const label = ["A", "B", "C"][num - 1];
                   const ansText = translatedTexts[num] || q[`answer${num}`];
                   if (!q[`answer${num}`]) return null;
                   const isCorrect = q.correctAnswer === num;
@@ -474,13 +493,11 @@ function ExamenCategoryContent() {
 
                   let style = "bg-white border-2 border-gray-300 text-gray-800 hover:border-[#003399]";
                   if (isAnswered || locked) {
-                    // فقط إذا اختار المستخدم إجابة نُظهر الصحيحة والخاطئة
                     if (isAnswered && userAnswer !== null) {
                       if (isCorrect) style = "bg-green-50 border-2 border-green-500 text-green-800";
                       else if (isSelected && !isCorrect) style = "bg-red-50 border-2 border-red-500 text-red-800";
                       else style = "bg-gray-50 border-2 border-gray-200 text-gray-500";
                     } else {
-                      // انتهى الوقت بدون إجابة - كل الأزرار رمادية
                       style = "bg-gray-50 border-2 border-gray-200 text-gray-400 opacity-60";
                     }
                   }
@@ -492,11 +509,10 @@ function ExamenCategoryContent() {
                       <span className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0 ${
                         isAnswered && userAnswer !== null
                           ? isCorrect ? "bg-green-500 text-white" : isSelected ? "bg-red-500 text-white" : "bg-gray-200 text-gray-500"
-                          : locked
-                          ? "bg-gray-200 text-gray-400"
+                          : locked ? "bg-gray-200 text-gray-400"
                           : "bg-[#003399] text-white"
                       }`}>
-                        {isAnswered && userAnswer !== null ? (isCorrect ? "✓" : isSelected ? "✗" : num) : num}
+                        {isAnswered && userAnswer !== null ? (isCorrect ? "✓" : isSelected ? "✗" : label) : label}
                       </span>
                       <span className={isRtl ? "text-right flex-1" : "text-left flex-1"}>{ansText}</span>
                     </button>
