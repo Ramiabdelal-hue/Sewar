@@ -9,7 +9,7 @@ import ar from "@/locales/ar.json";
 import en from "@/locales/en.json";
 import Navbar from "@/components/Navbar";
 import QuestionCard from "@/components/QuestionCard";
-import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
+import { useAutoTranslate, useAutoTranslateList } from "@/hooks/useAutoTranslate";
 import Footer from "@/components/Footer";
 
 interface Question {
@@ -48,6 +48,9 @@ function TheorieLessonContent() {
   const [isExpired, setIsExpired] = useState(false);
   const [checking, setChecking] = useState(true);
   const [lessonDescription, setLessonDescription] = useState("");
+
+  // ترجمة عنوان الدرس تلقائياً
+  const translatedLessonTitle = useAutoTranslate(lesson || "", lang);
 
   useEffect(() => {
     if (email) {
@@ -238,7 +241,7 @@ function TheorieLessonContent() {
               </button>
             </div>
 
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">{lesson}</h1>
+            <h1 className="text-2xl font-bold text-gray-800 mb-2">{translatedLessonTitle || lesson}</h1>
             {lessonDescription && (
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mt-1"
                 style={{ background: "linear-gradient(135deg, #eff6ff, #dbeafe)", border: "1px solid #93c5fd" }}>
