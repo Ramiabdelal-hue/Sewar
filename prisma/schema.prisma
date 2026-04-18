@@ -199,6 +199,7 @@ model ExamQuestionA {
   correctAnswer Int?
   lessonId      Int
   isFree        Boolean  @default(false)
+  points        Int      @default(1)
   createdAt     DateTime @default(now())
   lesson        LessonA  @relation("ExamQuestionsA", fields: [lessonId], references: [id], onDelete: Cascade)
 }
@@ -215,6 +216,7 @@ model ExamQuestionB {
   correctAnswer Int?
   lessonId      Int
   isFree        Boolean  @default(false)
+  points        Int      @default(1)
   createdAt     DateTime @default(now())
   lesson        LessonB  @relation("ExamQuestionsB", fields: [lessonId], references: [id], onDelete: Cascade)
 }
@@ -231,6 +233,7 @@ model ExamQuestionC {
   correctAnswer Int?
   lessonId      Int
   isFree        Boolean  @default(false)
+  points        Int      @default(1)
   createdAt     DateTime @default(now())
   lesson        LessonC  @relation("ExamQuestionsC", fields: [lessonId], references: [id], onDelete: Cascade)
 }

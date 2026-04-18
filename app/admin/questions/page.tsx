@@ -410,6 +410,7 @@ export default function AdminQuestionsPage() {
     answer1: "", answer2: "", answer3: "", correctAnswer: 0,
     videoUrls: [] as string[], audioUrl: "",
     isFree: false,
+    points: 1,
   });
   const editFormRef = React.useRef(editForm);
   useEffect(() => { editFormRef.current = editForm; }, [editForm]);
@@ -429,6 +430,7 @@ export default function AdminQuestionsPage() {
     videoUrls: [] as string[],
     audioUrl: "",
     isFree: false,
+    points: 1,
   });
 
   const lessonsMap: Record<string, any> = {
@@ -800,6 +802,7 @@ export default function AdminQuestionsPage() {
         payload.videoUrls = newQuestion.videoUrls;
         payload.audioUrl = newQuestion.audioUrl;
         payload.isFree = newQuestion.isFree;
+        payload.points = newQuestion.points || 1;
       } else {
         // للدروس و Praktijk: حفظ في Question أو PraktijkQuestion
         payload.text = newQuestion.explanationNL || "";
@@ -895,6 +898,7 @@ export default function AdminQuestionsPage() {
           videoUrls: form.videoUrls,
           audioUrl: form.audioUrl,
           isFree: form.isFree,
+          points: (form as any).points || 1,
         }),
       });
 
@@ -1599,6 +1603,20 @@ export default function AdminQuestionsPage() {
                   <p className="text-xs text-gray-400">يظهر في صفحة Gratis بدون اشتراك</p>
                 </div>
               </label>
+
+              {/* checkbox 5 نقاط - فقط للامتحانات */}
+              {questionType === "Examen" && (
+                <label className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all"
+                  style={{ background: newQuestion.points === 5 ? "rgba(239,68,68,0.1)" : "rgba(255,255,255,0.5)", border: `1.5px solid ${newQuestion.points === 5 ? "#ef4444" : "#e5e7eb"}` }}>
+                  <input type="checkbox" checked={newQuestion.points === 5}
+                    onChange={e => setNewQuestion({ ...newQuestion, points: e.target.checked ? 5 : 1 })}
+                    className="w-4 h-4 accent-red-500" />
+                  <div>
+                    <p className="text-sm font-black text-gray-700">⭐ سؤال 5 نقاط</p>
+                    <p className="text-xs text-gray-400">هذا السؤال يحسب 5 نقاط بدل نقطة واحدة</p>
+                  </div>
+                </label>
+              )}
               <button
                 className="w-full py-3 rounded-xl font-black text-sm transition-all hover:scale-[1.01] active:scale-95"
                 style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white", boxShadow: "0 4px 14px rgba(34,197,94,0.35)" }}
@@ -1789,6 +1807,16 @@ export default function AdminQuestionsPage() {
                             className="w-4 h-4 accent-green-500" />
                           <span className="text-xs font-black text-gray-700">🎁 Gratis</span>
                         </label>
+                        {/* checkbox 5 نقاط في التعديل - فقط للامتحانات */}
+                        {questionType === "Examen" && (
+                          <label className="flex items-center gap-2 px-3 py-2 rounded-xl cursor-pointer flex-1"
+                            style={{ background: (editForm as any).points === 5 ? "rgba(239,68,68,0.1)" : "#f8fafc", border: `1.5px solid ${(editForm as any).points === 5 ? "#ef4444" : "#e2e8f0"}` }}>
+                            <input type="checkbox" checked={(editForm as any).points === 5}
+                              onChange={e => setEditForm(prev => ({ ...prev, points: e.target.checked ? 5 : 1 } as any))}
+                              className="w-4 h-4 accent-red-500" />
+                            <span className="text-xs font-black text-gray-700">⭐ 5 نقاط</span>
+                          </label>
+                        )}
                       </div>
                       <div className="flex gap-3">
                         <button onClick={() => handleEditQuestion(q.id)} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black transition-all hover:scale-[1.02] active:scale-95" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white", boxShadow: "0 4px 14px rgba(34,197,94,0.35)" }}>
@@ -1811,6 +1839,11 @@ export default function AdminQuestionsPage() {
                         {q.isFree && (
                           <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(34,197,94,0.1)", color: "#16a34a", border: "1px solid rgba(34,197,94,0.3)" }}>
                             🎁 Gratis
+                          </span>
+                        )}
+                        {(q as any).points === 5 && (
+                          <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(239,68,68,0.1)", color: "#dc2626", border: "1px solid rgba(239,68,68,0.3)" }}>
+                            ⭐ 5 pts
                           </span>
                         )}
                       </div>
@@ -1931,7 +1964,8 @@ export default function AdminQuestionsPage() {
                               videoUrls: q.videoUrls || [],
                               audioUrl: q.audioUrl || "",
                               isFree: q.isFree || false,
-                            });
+                              points: (q as any).points || 1,
+                            } as any);
                           }}
                           className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-black transition-all hover:scale-[1.02] active:scale-95"
                           style={{ background: "linear-gradient(135deg, #3b82f6, #2563eb)", color: "white", boxShadow: "0 4px 12px rgba(59,130,246,0.3)" }}

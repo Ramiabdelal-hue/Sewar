@@ -130,13 +130,17 @@ function ExamenTestContent() {
   };
 
   const handleSubmit = async () => {
-    let correctCount = 0;
+    // حساب النقاط مع مراعاة الأسئلة ذات 5 نقاط
+    let totalScore = 0;
+    let maxScore = 0;
     questions.forEach((q) => {
+      const pts = (q as any).points || 1;
+      maxScore += pts;
       if (userAnswers[q.id] === q.correctAnswer) {
-        correctCount++;
+        totalScore += pts;
       }
     });
-    setScore(correctCount);
+    setScore(totalScore);
     setShowResults(true);
 
     // إعداد بيانات الأسئلة والأجوبة للحفظ
@@ -167,8 +171,9 @@ function ExamenTestContent() {
           userEmail: email,
           lessonTitle: lesson,
           category: category,
-          score: correctCount,
+          score: totalScore,
           totalQuestions: questions.length,
+          maxScore,
           answers: answersData
         };
         
@@ -303,10 +308,10 @@ function ExamenTestContent() {
               <span className="font-bold text-blue-600 ml-2">{questions.length}</span>
             </div>
             {showResults && (
-              <div className={`px-4 py-2 rounded-lg ${score >= questions.length * 0.7 ? "bg-green-50" : "bg-red-50"}`}>
+              <div className={`px-4 py-2 rounded-lg ${score >= questions.reduce((s,q)=>(s+((q as any).points||1)),0) * 0.7 ? "bg-green-50" : "bg-red-50"}`}>
                 <span className="text-sm text-gray-600">Score:</span>
-                <span className={`font-bold ml-2 ${score >= questions.length * 0.7 ? "text-green-600" : "text-red-600"}`}>
-                  {score} / {questions.length}
+                <span className={`font-bold ml-2 ${score >= questions.reduce((s,q)=>(s+((q as any).points||1)),0) * 0.7 ? "text-green-600" : "text-red-600"}`}>
+                  {score} / {questions.reduce((s,q)=>(s+((q as any).points||1)),0)} pts
                 </span>
               </div>
             )}
@@ -358,6 +363,11 @@ function ExamenTestContent() {
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
                         Vraag {index + 1}
+                        {(question as any).points === 5 && (
+                          <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(239,68,68,0.1)", color: "#dc2626", border: "1px solid rgba(239,68,68,0.3)" }}>
+                            ⭐ 5 pts
+                          </span>
+                        )}
                       </p>
                       {showResults && (
                         <p className={`text-sm font-bold ${
@@ -528,7 +538,7 @@ function ExamenTestContent() {
           <div className="mt-8 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-3xl shadow-2xl p-8 border-4 border-indigo-200">
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full shadow-2xl mb-6">
-                <span className="text-4xl font-black text-white">{Math.round((score / questions.length) * 100)}%</span>
+                <span className="text-4xl font-black text-white">{Math.round((score / questions.reduce((s,q)=>(s+((q as any).points||1)),0)) * 100)}%</span>
               </div>
               
               <h3 className="text-3xl font-black text-gray-800 mb-4">
@@ -538,7 +548,7 @@ function ExamenTestContent() {
               <div className="flex items-center justify-center gap-6 mb-6">
                 <div className="bg-white rounded-2xl px-8 py-4 shadow-lg">
                   <p className="text-sm text-gray-500 font-semibold uppercase tracking-wide mb-1">
-                    Correct
+                    Score
                   </p>
                   <p className="text-4xl font-black text-green-600">{score}</p>
                 </div>
@@ -547,9 +557,9 @@ function ExamenTestContent() {
                 
                 <div className="bg-white rounded-2xl px-8 py-4 shadow-lg">
                   <p className="text-sm text-gray-500 font-semibold uppercase tracking-wide mb-1">
-                    Totaal
+                    Max
                   </p>
-                  <p className="text-4xl font-black text-indigo-600">{questions.length}</p>
+                  <p className="text-4xl font-black text-indigo-600">{questions.reduce((s,q)=>(s+((q as any).points||1)),0)}</p>
                 </div>
               </div>
 
