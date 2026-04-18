@@ -28,27 +28,30 @@ function ExamenCategoryContent() {
   const [locked, setLocked] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const ttsRef = useRef<NodeJS.Timeout | null>(null);
+  const stopTtsRef = useRef(false);
   const [readingDone, setReadingDone] = useState(false);
 
   // قراءة تلقائية للسؤال والإجابات
   const speakQuestion = (q: any, translated: string[]) => {
     if (!window.speechSynthesis || !q) return;
+    stopTtsRef.current = false;
     window.speechSynthesis.cancel();
     setReadingDone(false);
 
-    // تحديد اللغة حسب اللغة المختارة
     const langMap: Record<string, string> = { nl: "nl-NL", fr: "fr-FR", ar: "ar-SA", en: "en-US" };
     const speechLang = langMap[lang] || "nl-NL";
 
-    const getVoice = () => {
+    const getVoice = (): SpeechSynthesisVoice | null => {
       const voices = window.speechSynthesis.getVoices();
+      if (!voices.length) return null;
       return voices.find(v => v.lang === speechLang)
-        || voices.find(v => v.lang.startsWith(lang))
+        || voices.find(v => v.lang.startsWith(speechLang.split("-")[0]))
         || voices.find(v => v.lang === "nl-NL")
         || null;
     };
 
     const speak = (text: string, onEnd?: () => void) => {
+      if (stopTtsRef.current) return;
       if (!text) { if (onEnd) onEnd(); return; }
       const u = new SpeechSynthesisUtterance(text);
       u.lang = speechLang;
@@ -56,12 +59,11 @@ function ExamenCategoryContent() {
       u.pitch = 1;
       const v = getVoice();
       if (v) u.voice = v;
-      if (onEnd) u.onend = onEnd;
-      u.onerror = () => { if (onEnd) onEnd(); };
+      if (onEnd) u.onend = () => { if (!stopTtsRef.current) onEnd(); };
+      u.onerror = () => { if (!stopTtsRef.current && onEnd) onEnd(); };
       window.speechSynthesis.speak(u);
     };
 
-    // استخدام النص المترجم إذا موجود
     const questionText = translated[0] || q.textNL || q.text || "";
     const answersList = [
       translated[1] || q.answer1,
@@ -69,62 +71,70 @@ function ExamenCategoryContent() {
       translated[3] || q.answer3,
     ].filter(Boolean);
 
-    // تسميات الإجابات حسب اللغة
     const labels = lang === "ar"
       ? ["الجواب A:", "الجواب B:", "الجواب C:"]
       : lang === "fr"
       ? ["Réponse A:", "Réponse B:", "Réponse C:"]
+      : lang === "en"
+      ? ["Answer A:", "Answer B:", "Answer C:"]
       : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
 
-    // 1. قراءة السؤال أولاً
     if (!questionText) { setReadingDone(true); return; }
     speak(questionText, () => {
-      // 2. ثم الإجابات واحدة واحدة
       let i = 0;
       const readNext = () => {
+        if (stopTtsRef.current) return;
         if (i >= answersList.length) { setReadingDone(true); return; }
         speak(`${labels[i]} ${answersList[i]}`, () => {
           i++;
-          ttsRef.current = setTimeout(readNext, 400);
+          ttsRef.current = setTimeout(() => {
+            if (!stopTtsRef.current) readNext();
+          }, 400);
         });
       };
-      ttsRef.current = setTimeout(readNext, 600);
+      ttsRef.current = setTimeout(() => {
+        if (!stopTtsRef.current) readNext();
+      }, 600);
     });
   };
 
-  // تشغيل القراءة بعد 3 ثوانٍ من كل سؤال جديد
+  // تشغيل القراءة بعد ثانية من كل سؤال جديد
   useEffect(() => {
     if (!started || finished) return;
+    stopTtsRef.current = true;
     if (ttsRef.current) clearTimeout(ttsRef.current);
     window.speechSynthesis?.cancel();
     setReadingDone(false);
 
     ttsRef.current = setTimeout(() => {
+      stopTtsRef.current = false;
       const q = questions[currentIndex];
       if (!q) { setReadingDone(true); return; }
 
-      // إذا اللغة هولندية - اقرأ مباشرة
-      if (lang === "nl") {
-        speakQuestion(q, [
-          q.textNL || q.text || "",
-          q.answer1 || "",
-          q.answer2 || "",
-          q.answer3 || "",
-        ]);
+      const startReading = () => {
+        if (lang === "nl") {
+          speakQuestion(q, [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]);
+        } else {
+          const texts = translatedRef.current;
+          const hasTranslation = texts[0] && texts[0] !== (q.textNL || q.text || "");
+          speakQuestion(q, hasTranslation ? texts : [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]);
+        }
+      };
+
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        startReading();
       } else {
-        // لغة أخرى - انتظر الترجمة إذا موجودة، وإلا اقرأ الأصلي
-        const texts = translatedRef.current;
-        const hasTranslation = texts[0] && texts[0] !== (q.textNL || q.text || "");
-        speakQuestion(q, hasTranslation ? texts : [
-          q.textNL || q.text || "",
-          q.answer1 || "",
-          q.answer2 || "",
-          q.answer3 || "",
-        ]);
+        window.speechSynthesis.onvoiceschanged = () => {
+          window.speechSynthesis.onvoiceschanged = null;
+          if (!stopTtsRef.current) startReading();
+        };
+        setTimeout(() => { if (!stopTtsRef.current) startReading(); }, 1000);
       }
     }, 1000);
 
     return () => {
+      stopTtsRef.current = true;
       if (ttsRef.current) clearTimeout(ttsRef.current);
       window.speechSynthesis?.cancel();
     };
@@ -177,14 +187,20 @@ function ExamenCategoryContent() {
 
   const handleAnswer = (num: number) => {
     if (locked || answers[currentIndex] !== undefined) return;
-    clearInterval(timerRef.current!);
-    window.speechSynthesis?.cancel();
+    stopTtsRef.current = true;
     if (ttsRef.current) clearTimeout(ttsRef.current);
+    window.speechSynthesis?.pause();
+    window.speechSynthesis?.cancel();
+    setTimeout(() => window.speechSynthesis?.cancel(), 50);
+    clearInterval(timerRef.current!);
     setAnswers(a => ({ ...a, [currentIndex]: num }));
     setLocked(true);
   };
 
   const handleNext = () => {
+    stopTtsRef.current = true;
+    window.speechSynthesis?.cancel();
+    if (ttsRef.current) clearTimeout(ttsRef.current);
     setReadingDone(false);
     if (currentIndex + 1 >= questions.length) {
       setFinished(true);
