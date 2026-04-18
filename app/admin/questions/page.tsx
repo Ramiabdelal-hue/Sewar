@@ -971,9 +971,13 @@ export default function AdminQuestionsPage() {
     }
   };
 
-  const filteredQuestions = questions.filter(q =>
-    q.text.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredQuestions = questions.filter(q => {
+    // فلتر البحث النصي
+    const matchesSearch = q.text.toLowerCase().includes(searchTerm.toLowerCase());
+    // فلتر الدرس المختار (إذا كان lessonId محدداً)
+    const matchesLesson = lessonId ? (q as any).lessonId === parseInt(lessonId) : true;
+    return matchesSearch && matchesLesson;
+  });
 
   if (!isLogged) {
     return (
@@ -1650,11 +1654,27 @@ export default function AdminQuestionsPage() {
             </div>
 
             {/* عنوان القائمة */}
-            <div className="px-5 py-3 flex items-center justify-between" style={{ background: "#f8fafc", borderBottom: "1px solid #e5e7eb" }}>
-              <span className="text-xs font-black text-gray-500 uppercase tracking-wider">الأسئلة</span>
-              <span className="px-2.5 py-1 rounded-full text-xs font-black" style={{ background: "linear-gradient(135deg, #003399, #0055cc)", color: "white" }}>
-                {filteredQuestions.length}
-              </span>
+            <div className="px-5 py-3 flex items-center justify-between flex-wrap gap-2" style={{ background: "#f8fafc", borderBottom: "1px solid #e5e7eb" }}>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black text-gray-500 uppercase tracking-wider">
+                  {questionType === "Examen" ? "الأسئلة" : "الشروح"}
+                </span>
+                {/* اسم الدرس المختار */}
+                {lessonId && lessons.find(l => l.id === parseInt(lessonId)) && (
+                  <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(99,102,241,0.1)", color: "#4f46e5", border: "1px solid rgba(99,102,241,0.3)" }}>
+                    📚 {lessons.find(l => l.id === parseInt(lessonId))?.name}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                {/* عداد: مفلتر / الكل */}
+                <span className="text-xs text-gray-400 font-medium">
+                  {filteredQuestions.length} / {questions.length}
+                </span>
+                <span className="px-2.5 py-1 rounded-full text-xs font-black" style={{ background: "linear-gradient(135deg, #003399, #0055cc)", color: "white" }}>
+                  {filteredQuestions.length}
+                </span>
+              </div>
             </div>
 
             <div className="divide-y divide-gray-100 p-4 space-y-0">
