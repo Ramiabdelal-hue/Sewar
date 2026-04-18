@@ -251,6 +251,7 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
   const [installPrompt, setInstallPrompt] = useState<any>(null);
   const [showPWAModal, setShowPWAModal] = useState(false);
   const [userCategory, setUserCategory] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
 
   // PWA install prompt listener
   useEffect(() => {
@@ -281,10 +282,12 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
         setIsLoggedIn(false);
         setDaysLeft(null);
         setUserCategory(null);
+        setUserName(null);
         return;
       }
       setIsLoggedIn(true);
       setUserCategory(localStorage.getItem("userCategory"));
+      setUserName(localStorage.getItem("userName"));
 
       try {
         const sessionToken = localStorage.getItem("sessionToken") || undefined;
@@ -300,14 +303,22 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
           localStorage.removeItem("userCategory");
           localStorage.removeItem("userExpiry");
           localStorage.removeItem("sessionToken");
+          localStorage.removeItem("userName");
           setIsLoggedIn(false);
           setDaysLeft(null);
           setUserCategory(null);
+          setUserName(null);
           window.location.href = "/";
           return;
         }
 
         if (data.success && data.user?.expiryDate) {
+          // حفظ اسم المستخدم
+          if (data.user.name) {
+            localStorage.setItem("userName", data.user.name);
+            setUserName(data.user.name);
+          }
+
           // أخذ أقرب تاريخ انتهاء من بين كل الاشتراكات النشطة
           let earliestExpiry = new Date(data.user.expiryDate).getTime();
 
@@ -402,29 +413,42 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                   {lang === "ar" ? "دخول" : lang === "nl" ? "Inloggen" : lang === "fr" ? "Connexion" : "Login"}
                 </button>
               ) : (
-                <div className="flex items-center gap-1 w-full">
-                  {daysLeft !== null && (
-                    <span className={`px-2 py-0.5 text-xs font-black flex-shrink-0 ${
-                      isExpired ? "bg-red-600 text-white" :
-                      daysLeft <= 3 ? "bg-orange-500 text-white" :
-                      "bg-white/20 text-white"
-                    }`}>
-                      {isExpired ? "!" : 
-                        lang === "ar" ? `${daysLeft} يوم` :
-                        lang === "fr" ? `${daysLeft}j` :
-                        lang === "en" ? `${daysLeft}d` :
-                        `${daysLeft}d`
-                      }
-                    </span>
-                  )}
+                <div className="flex flex-col gap-1 w-full">
+                  {/* رسالة الترحيب */}
+                  <div className="text-center text-white text-xs">
+                    {lang === "ar" ? "أهلاً وسهلاً" : 
+                     lang === "nl" ? "Welkom" : 
+                     lang === "fr" ? "Bienvenue" : 
+                     "Welcome"} {userName && `, ${userName}`}
+                    {daysLeft !== null && (
+                      <div className={`mt-0.5 ${
+                        isExpired ? "text-red-300" :
+                        daysLeft <= 3 ? "text-orange-300" :
+                        "text-green-300"
+                      }`}>
+                        {isExpired ? 
+                          (lang === "ar" ? "انتهت الصلاحية" : 
+                           lang === "nl" ? "Verlopen" : 
+                           lang === "fr" ? "Expiré" : 
+                           "Expired") : 
+                          (lang === "ar" ? `${daysLeft} يوم متبقي` :
+                           lang === "fr" ? `${daysLeft}j restants` :
+                           lang === "en" ? `${daysLeft}d left` :
+                           `${daysLeft}d over`)
+                        }
+                      </div>
+                    )}
+                  </div>
+                  {/* زر Logout */}
                   <button
                     onClick={() => {
                       localStorage.removeItem("userEmail");
                       localStorage.removeItem("userCategory");
                       localStorage.removeItem("userExpiry");
+                      localStorage.removeItem("userName");
                       window.location.href = "/";
                     }}
-                    className="flex-1 py-0.5 text-xs font-black uppercase bg-red-500 hover:bg-red-600 transition-colors text-white text-center"
+                    className="w-full py-1 text-xs font-black uppercase bg-red-500 hover:bg-red-600 transition-colors text-white text-center"
                   >
                     {lang === "ar" ? "خروج" : lang === "nl" ? "Logout" : lang === "fr" ? "Déconnexion" : "Logout"}
                   </button>
