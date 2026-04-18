@@ -123,20 +123,32 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
 
   const handleAnswer = (num: number) => {
     if (locked || answers[currentIndex] !== undefined) return;
-    clearInterval(timerRef.current!);
+    // أوقف القارئ فوراً عند الإجابة
     window.speechSynthesis?.cancel();
     if (ttsRef.current) clearTimeout(ttsRef.current);
+    clearInterval(timerRef.current!);
     setAnswers(a => ({ ...a, [currentIndex]: num }));
     setLocked(true);
   };
 
   const handleNext = () => {
+    // أوقف القارئ عند الانتقال للسؤال التالي
+    window.speechSynthesis?.cancel();
+    if (ttsRef.current) clearTimeout(ttsRef.current);
     setReadingDone(false);
     if (currentIndex + 1 >= questions.length) setFinished(true);
     else { setCurrentIndex(i => i + 1); setLocked(false); }
   };
 
-  const score = Object.entries(answers).filter(([i, ans]) => ans !== null && ans !== undefined && questions[parseInt(i)]?.correctAnswer === ans).length;
+  // حساب النتيجة مع مراعاة الـ 5 نقاط
+  const score = Object.entries(answers).reduce((total, [i, ans]) => {
+    if (ans === null || ans === undefined) return total;
+    const q = questions[parseInt(i)];
+    if (!q) return total;
+    const pts = q.points || 1;
+    return total + (q.correctAnswer === ans ? pts : 0);
+  }, 0);
+  const maxScore = questions.reduce((t, q) => t + (q.points || 1), 0);
   const userAnswer = answers[currentIndex];
   const isAnswered = userAnswer !== undefined;
 
@@ -162,18 +174,39 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
   );
 
   if (finished) {
-    const pct = Math.round((score / questions.length) * 100);
+    const pct = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
     const passed = pct >= 60;
     return (
       <div className="py-6">
         <div className={`rounded-2xl p-6 mb-4 text-center border-4 ${passed ? "border-green-400 bg-green-50" : "border-red-400 bg-red-50"}`}>
           <div className="text-5xl mb-2">{passed ? "🏆" : "😔"}</div>
-          <h2 className="text-xl font-black mb-3" style={{ color: passed ? "#16a34a" : "#dc2626" }}>
-            {passed ? (lang === "ar" ? "مبروك!" : "Gefeliciteerd!") : (lang === "ar" ? "حاول مجدداً" : "Probeer opnieuw")}
+          <h2 className="text-xl font-black mb-1" style={{ color: passed ? "#16a34a" : "#dc2626" }}>
+            {passed
+              ? (lang === "ar" ? "🎉 مبروك! نجحت" : "🎉 Geslaagd!")
+              : (lang === "ar" ? "❌ حاول مجدداً" : "❌ Helaas niet geslaagd")}
           </h2>
-          <div className="flex justify-center gap-4">
-            <div className="bg-white rounded-xl px-5 py-3 shadow"><p className="text-xs text-gray-400">Correct</p><p className="text-2xl font-black text-green-600">{score}</p></div>
-            <div className="bg-white rounded-xl px-5 py-3 shadow"><p className="text-xs text-gray-400">Score</p><p className="text-2xl font-black" style={{ color: passed ? "#16a34a" : "#dc2626" }}>{pct}%</p></div>
+          <div className="flex justify-center gap-4 mt-3">
+            <div className="bg-white rounded-xl px-5 py-3 shadow text-center">
+              <p className="text-xs text-gray-400 font-bold uppercase mb-1">{lang === "ar" ? "النقاط" : "Behaald"}</p>
+              <p className="text-3xl font-black text-green-600">{score}</p>
+            </div>
+            <div className="flex items-center text-3xl font-black text-gray-300">/</div>
+            <div className="bg-white rounded-xl px-5 py-3 shadow text-center">
+              <p className="text-xs text-gray-400 font-bold uppercase mb-1">{lang === "ar" ? "المجموع" : "Totaal"}</p>
+              <p className="text-3xl font-black text-indigo-600">{maxScore}</p>
+            </div>
+            <div className="bg-white rounded-xl px-5 py-3 shadow text-center">
+              <p className="text-xs text-gray-400 font-bold uppercase mb-1">Score</p>
+              <p className="text-3xl font-black" style={{ color: passed ? "#16a34a" : "#dc2626" }}>{pct}%</p>
+            </div>
+          </div>
+          <div className="flex justify-center gap-3 mt-3 text-sm">
+            <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 font-bold border border-green-200">
+              ✓ {lang === "ar" ? "صح" : "Correct"}: {questions.filter((q,i) => answers[i] === q.correctAnswer).length}
+            </span>
+            <span className="px-3 py-1 rounded-full bg-red-100 text-red-700 font-bold border border-red-200">
+              ✗ {lang === "ar" ? "خطأ" : "Fout"}: {questions.filter((q,i) => answers[i] !== undefined && answers[i] !== null && answers[i] !== q.correctAnswer).length}
+            </span>
           </div>
         </div>
         <div className="flex gap-3">
