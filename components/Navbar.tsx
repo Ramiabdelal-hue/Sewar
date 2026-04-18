@@ -414,7 +414,20 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                 </button>
               ) : (
                 <div className="flex flex-col gap-1 w-full">
-                  {/* رسالة الترحيب */}
+                  {/* زر Logout في المكان الأول */}
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem("userEmail");
+                      localStorage.removeItem("userCategory");
+                      localStorage.removeItem("userExpiry");
+                      localStorage.removeItem("userName");
+                      window.location.href = "/";
+                    }}
+                    className="w-full py-1 text-xs font-black uppercase bg-red-500 hover:bg-red-600 transition-colors text-white text-center"
+                  >
+                    {lang === "ar" ? "خروج" : lang === "nl" ? "Logout" : lang === "fr" ? "Déconnexion" : "Logout"}
+                  </button>
+                  {/* رسالة الترحيب تحت زر Logout */}
                   <div className="text-center text-white text-xs">
                     {lang === "ar" ? "أهلاً وسهلاً" : 
                      lang === "nl" ? "Welkom" : 
@@ -439,19 +452,6 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                       </div>
                     )}
                   </div>
-                  {/* زر Logout */}
-                  <button
-                    onClick={() => {
-                      localStorage.removeItem("userEmail");
-                      localStorage.removeItem("userCategory");
-                      localStorage.removeItem("userExpiry");
-                      localStorage.removeItem("userName");
-                      window.location.href = "/";
-                    }}
-                    className="w-full py-1 text-xs font-black uppercase bg-red-500 hover:bg-red-600 transition-colors text-white text-center"
-                  >
-                    {lang === "ar" ? "خروج" : lang === "nl" ? "Logout" : lang === "fr" ? "Déconnexion" : "Logout"}
-                  </button>
                 </div>
               )}
             </div>
