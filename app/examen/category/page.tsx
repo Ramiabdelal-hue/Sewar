@@ -289,22 +289,28 @@ function ExamenCategoryContent() {
             <div className="text-6xl mb-3">{passed ? "🏆" : "😔"}</div>
             <h1 className="text-2xl font-black mb-1" style={{ color: passed ? "#16a34a" : "#dc2626" }}>
               {passed
-                ? (lang === "ar" ? "مبروك! نجحت" : lang === "nl" ? "Gefeliciteerd! Geslaagd!" : "Congratulations!")
-                : (lang === "ar" ? "لم تنجح هذه المرة" : lang === "nl" ? "Helaas niet geslaagd" : "Not passed")}
+                ? (lang === "ar" ? "مبروك! نجحت" : lang === "nl" ? "Gefeliciteerd! Geslaagd!" : lang === "fr" ? "Félicitations! Réussi!" : "Congratulations! Passed!")
+                : (lang === "ar" ? "لم تنجح هذه المرة" : lang === "nl" ? "Helaas niet geslaagd" : lang === "fr" ? "Malheureusement pas réussi" : "Unfortunately not passed")}
             </h1>
             <div className="flex items-center justify-center gap-4 mt-4 flex-wrap">
               <div className="bg-white rounded-xl px-5 py-3 shadow text-center">
-                <p className="text-xs text-gray-400 font-bold uppercase mb-1">{lang === "ar" ? "النقاط" : lang === "nl" ? "Behaald" : "Points"}</p>
+                <p className="text-xs text-gray-400 font-bold uppercase mb-1">
+                  {lang === "ar" ? "النقاط" : lang === "nl" ? "Behaald" : lang === "fr" ? "Points" : "Points"}
+                </p>
                 <p className="text-3xl font-black text-green-600">{score}</p>
                 <p className="text-xs text-gray-400">/ {maxScore}</p>
               </div>
               <div className="bg-white rounded-xl px-5 py-3 shadow text-center">
-                <p className="text-xs text-gray-400 font-bold uppercase mb-1">{lang === "ar" ? "صح" : "Correct"}</p>
+                <p className="text-xs text-gray-400 font-bold uppercase mb-1">
+                  {lang === "ar" ? "صح" : lang === "nl" ? "Correct" : lang === "fr" ? "Correct" : "Correct"}
+                </p>
                 <p className="text-3xl font-black text-blue-600">{correctCount}</p>
                 <p className="text-xs text-gray-400">/ {questions.length}</p>
               </div>
               <div className="bg-white rounded-xl px-5 py-3 shadow text-center">
-                <p className="text-xs text-gray-400 font-bold uppercase mb-1">{lang === "ar" ? "خطأ" : "Fout"}</p>
+                <p className="text-xs text-gray-400 font-bold uppercase mb-1">
+                  {lang === "ar" ? "خطأ" : lang === "nl" ? "Fout" : lang === "fr" ? "Faux" : "Wrong"}
+                </p>
                 <p className="text-3xl font-black text-red-500">{questions.length - correctCount}</p>
               </div>
               <div className="bg-white rounded-xl px-5 py-3 shadow text-center">
@@ -319,7 +325,7 @@ function ExamenCategoryContent() {
             <div className="mb-6">
               <h2 className="text-lg font-black text-gray-800 mb-3 flex items-center gap-2">
                 <span className="w-7 h-7 rounded-lg bg-red-500 flex items-center justify-center text-white text-sm">✗</span>
-                {lang === "ar" ? `الأسئلة الخاطئة (${wrongAnswers.length})` : lang === "nl" ? `Foute antwoorden (${wrongAnswers.length})` : `Wrong answers (${wrongAnswers.length})`}
+                {lang === "ar" ? `الأسئلة الخاطئة (${wrongAnswers.length})` : lang === "nl" ? `Foute antwoorden (${wrongAnswers.length})` : lang === "fr" ? `Mauvaises réponses (${wrongAnswers.length})` : `Wrong answers (${wrongAnswers.length})`}
               </h2>
               <div className="space-y-4">
                 {questions.map((q, i) => {
@@ -334,9 +340,12 @@ function ExamenCategoryContent() {
                       {/* رأس */}
                       <div className="px-4 py-2 flex items-center gap-2" style={{ background: "#fef2f2" }}>
                         <span className="w-6 h-6 rounded-full bg-red-500 text-white text-xs font-black flex items-center justify-center">{i + 1}</span>
+                        {q.points === 5 && (
+                          <span className="text-xs font-black px-1.5 py-0.5 rounded-full" style={{ background: "rgba(239,68,68,0.15)", color: "#dc2626" }}>⭐ 5 {lang === "ar" ? "نقاط" : lang === "nl" ? "punten" : "pts"}</span>
+                        )}
                         {timedOut && (
                           <span className="text-xs font-black text-orange-500 flex items-center gap-1">
-                            ⏱ {lang === "ar" ? "انتهى الوقت" : lang === "nl" ? "Tijd verlopen" : "Time out"}
+                            ⏱ {lang === "ar" ? "انتهى الوقت" : lang === "nl" ? "Tijd verlopen" : lang === "fr" ? "Temps écoulé" : "Time out"}
                           </span>
                         )}
                       </div>
@@ -381,8 +390,16 @@ function ExamenCategoryContent() {
                                   {isCorrectAns ? "✓" : isUserAns ? "✗" : num}
                                 </span>
                                 <span className="flex-1">{ansText}</span>
-                                {isCorrectAns && <span className="text-xs font-black text-green-600">{lang === "ar" ? "الصحيحة" : lang === "nl" ? "Correct" : "Correct"}</span>}
-                                {isUserAns && !isCorrectAns && <span className="text-xs font-black text-red-500">{lang === "ar" ? "إجابتك" : lang === "nl" ? "Jouw antwoord" : "Your answer"}</span>}
+                                {isCorrectAns && (
+                                  <span className="text-xs font-black text-green-600">
+                                    {lang === "ar" ? "الصحيحة" : lang === "nl" ? "Correct" : lang === "fr" ? "Correct" : "Correct"}
+                                  </span>
+                                )}
+                                {isUserAns && !isCorrectAns && (
+                                  <span className="text-xs font-black text-red-500">
+                                    {lang === "ar" ? "إجابتك" : lang === "nl" ? "Jouw antwoord" : lang === "fr" ? "Votre réponse" : "Your answer"}
+                                  </span>
+                                )}
                               </div>
                             );
                           })}
@@ -396,11 +413,11 @@ function ExamenCategoryContent() {
           )}
 
           {/* الأسئلة الصحيحة */}
-          {score > 0 && (
+          {correctCount > 0 && (
             <details className="mb-6">
               <summary className="cursor-pointer text-sm font-black text-gray-500 flex items-center gap-2 mb-3 select-none">
                 <span className="w-7 h-7 rounded-lg bg-green-500 flex items-center justify-center text-white text-sm">✓</span>
-                {lang === "ar" ? `الأسئلة الصحيحة (${score})` : lang === "nl" ? `Goede antwoorden (${score})` : `Correct answers (${score})`}
+                {lang === "ar" ? `الأسئلة الصحيحة (${correctCount})` : lang === "nl" ? `Goede antwoorden (${correctCount})` : lang === "fr" ? `Bonnes réponses (${correctCount})` : `Correct answers (${correctCount})`}
               </summary>
               <div className="space-y-2 mt-2">
                 {questions.map((q, i) => {
@@ -409,6 +426,9 @@ function ExamenCategoryContent() {
                     <div key={i} className="bg-white rounded-xl px-4 py-3 border border-green-200 flex items-center gap-3">
                       <span className="w-6 h-6 rounded-full bg-green-500 text-white text-xs font-black flex items-center justify-center flex-shrink-0">{i + 1}</span>
                       <p className="text-sm text-gray-700 flex-1 truncate">{q.textNL || q.text}</p>
+                      {q.points === 5 && (
+                        <span className="text-xs font-black text-red-500">⭐ 5</span>
+                      )}
                       <span className="text-green-500 font-black text-sm">✓</span>
                     </div>
                   );
@@ -422,11 +442,11 @@ function ExamenCategoryContent() {
             <button onClick={() => { setStarted(false); setFinished(false); setCurrentIndex(0); setAnswers({}); setLocked(false); setQuestions(q => [...q].sort(() => Math.random() - 0.5)); }}
               className="flex-1 py-3 font-black text-white rounded-xl transition-all hover:opacity-90 active:scale-95"
               style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-              🔄 {lang === "ar" ? "إعادة" : lang === "nl" ? "Opnieuw" : "Retry"}
+              🔄 {lang === "ar" ? "إعادة" : lang === "nl" ? "Opnieuw" : lang === "fr" ? "Recommencer" : "Retry"}
             </button>
             <button onClick={() => router.back()}
               className="flex-1 py-3 font-black border-2 border-gray-300 text-gray-600 rounded-xl hover:bg-gray-50 active:scale-95">
-              ← {lang === "ar" ? "رجوع" : lang === "nl" ? "Terug" : "Back"}
+              ← {lang === "ar" ? "رجوع" : lang === "nl" ? "Terug" : lang === "fr" ? "Retour" : "Back"}
             </button>
           </div>
         </div>
