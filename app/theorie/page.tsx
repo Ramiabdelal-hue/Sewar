@@ -218,9 +218,9 @@ export default function TheoriePage() {
           {/* مميزات */}
           <div className="mt-6 grid grid-cols-3 gap-3 md:gap-4">
             {[
-              { icon: "📚", label: lang === "ar" ? "دروس كاملة" : "Alle lessen" },
-              { icon: "❓", label: lang === "ar" ? "أسئلة تدريبية" : "Oefenvragen" },
-              { icon: "🎯", label: lang === "ar" ? "امتحانات" : "Examens" },
+              { icon: "📚", label: lang === "ar" ? "دروس كاملة" : lang === "nl" ? "Alle lessen" : lang === "fr" ? "Toutes les leçons" : "All lessons" },
+              { icon: "❓", label: lang === "ar" ? "أسئلة تدريبية" : lang === "nl" ? "Oefenvragen" : lang === "fr" ? "Questions d'entraînement" : "Practice questions" },
+              { icon: "🎯", label: lang === "ar" ? "امتحانات" : lang === "nl" ? "Examens" : lang === "fr" ? "Examens" : "Exams" },
             ].map((f, i) => (
               <div key={i} className="text-center py-3 rounded-xl" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
                 <div className="text-xl mb-1">{f.icon}</div>
@@ -252,7 +252,7 @@ export default function TheoriePage() {
           <button onClick={() => router.push("/")}
             className="flex-1 py-3 rounded-xl font-black text-sm transition-all active:scale-95"
             style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.1)" }}>
-            {lang === "ar" ? "الرئيسية" : "Home"}
+            {lang === "ar" ? "الرئيسية" : lang === "nl" ? "Home" : lang === "fr" ? "Accueil" : "Home"}
           </button>
         </div>
       </div>

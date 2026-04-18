@@ -17,7 +17,7 @@ function LessonsTab({ questions, lang, router }: { questions: any[], lang: strin
   if (questions.length === 0) return (
     <div className="text-center py-16">
       <div className="text-5xl mb-4">📚</div>
-      <p className="text-gray-500 text-sm">{lang === "ar" ? "لا يوجد شروح مجانية بعد" : "Nog geen gratis lessen"}</p>
+      <p className="text-gray-500 text-sm">{lang === "ar" ? "لا يوجد شروح مجانية بعد" : lang === "nl" ? "Nog geen gratis lessen" : lang === "fr" ? "Pas encore de leçons gratuites" : "No free lessons yet"}</p>
     </div>
   );
 
@@ -40,15 +40,15 @@ function LessonsTab({ questions, lang, router }: { questions: any[], lang: strin
         <button onClick={() => { setCurrentIndex(Math.max(0, currentIndex - 1)); window.scrollTo(0, 0); }}
           disabled={currentIndex === 0}
           className={`px-6 py-3 font-black text-sm border-2 transition-all ${currentIndex === 0 ? "text-gray-300 border-gray-200 cursor-not-allowed" : "text-[#003399] border-[#003399] hover:bg-[#003399] hover:text-white"}`}>
-          ← {lang === "ar" ? "السابق" : "Vorige"}
+          ← {lang === "ar" ? "السابق" : lang === "nl" ? "Vorige" : lang === "fr" ? "Précédent" : "Previous"}
         </button>
         <button onClick={() => router.push("/theorie")} className="px-4 py-2 rounded-xl font-black text-xs" style={{ background: "linear-gradient(135deg, #ffcc00, #ff9900)", color: "#003399" }}>
-          🔓 {lang === "ar" ? "اشترك للمزيد" : "Meer? Inschrijven"}
+          🔓 {lang === "ar" ? "اشترك للمزيد" : lang === "nl" ? "Meer? Inschrijven" : lang === "fr" ? "Plus? S'inscrire" : "More? Subscribe"}
         </button>
         <button onClick={() => { setCurrentIndex(Math.min(questions.length - 1, currentIndex + 1)); window.scrollTo(0, 0); }}
           disabled={currentIndex + 1 >= questions.length}
           className={`px-6 py-3 font-black text-sm border-2 transition-all ${currentIndex + 1 >= questions.length ? "text-gray-300 border-gray-200 cursor-not-allowed" : "text-white border-[#003399] bg-[#003399] hover:bg-[#0055cc]"}`}>
-          {lang === "ar" ? "التالي" : "Volgende"} →
+          {lang === "ar" ? "التالي" : lang === "nl" ? "Volgende" : lang === "fr" ? "Suivant" : "Next"} →
         </button>
       </div>
     </>
@@ -217,7 +217,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
   if (questions.length === 0) return (
     <div className="text-center py-16">
       <div className="text-5xl mb-4">🎯</div>
-      <p className="text-gray-500 text-sm">{lang === "ar" ? "لا يوجد أسئلة مجانية بعد" : "Nog geen gratis examenvragen"}</p>
+      <p className="text-gray-500 text-sm">{lang === "ar" ? "لا يوجد أسئلة مجانية بعد" : lang === "nl" ? "Nog geen gratis examenvragen" : lang === "fr" ? "Pas encore de questions gratuites" : "No free exam questions yet"}</p>
     </div>
   );
 
@@ -226,10 +226,10 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
       <div className="border-4 border-[#003399] rounded-2xl p-8 max-w-md mx-auto">
         <div className="text-5xl mb-3">🎯</div>
         <h2 className="text-xl font-black text-[#003399] mb-2">Gratis Examen</h2>
-        <p className="text-gray-500 mb-2">{questions.length} {lang === "ar" ? "سؤال" : "vragen"}</p>
-        <p className="text-sm text-orange-600 font-bold mb-6">⏱ {lang === "ar" ? "15 ثانية لكل سؤال" : "15 seconden per vraag"}</p>
+        <p className="text-gray-500 mb-2">{questions.length} {lang === "ar" ? "سؤال" : lang === "nl" ? "vragen" : lang === "fr" ? "questions" : "questions"}</p>
+        <p className="text-sm text-orange-600 font-bold mb-6">⏱ {lang === "ar" ? "15 ثانية لكل سؤال" : lang === "nl" ? "15 seconden per vraag" : lang === "fr" ? "15 secondes par question" : "15 seconds per question"}</p>
         <button onClick={() => setStarted(true)} className="px-8 py-3 font-black text-white rounded-xl" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-          {lang === "ar" ? "ابدأ" : "Start"} →
+          {lang === "ar" ? "ابدأ" : lang === "nl" ? "Start" : lang === "fr" ? "Démarrer" : "Start"} →
         </button>
       </div>
     </div>
@@ -244,17 +244,17 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
           <div className="text-5xl mb-2">{passed ? "🏆" : "😔"}</div>
           <h2 className="text-xl font-black mb-1" style={{ color: passed ? "#16a34a" : "#dc2626" }}>
             {passed
-              ? (lang === "ar" ? "🎉 مبروك! نجحت" : "🎉 Geslaagd!")
-              : (lang === "ar" ? "❌ حاول مجدداً" : "❌ Helaas niet geslaagd")}
+              ? (lang === "ar" ? "🎉 مبروك! نجحت" : lang === "nl" ? "🎉 Geslaagd!" : lang === "fr" ? "🎉 Réussi!" : "🎉 Passed!")
+              : (lang === "ar" ? "❌ حاول مجدداً" : lang === "nl" ? "❌ Helaas niet geslaagd" : lang === "fr" ? "❌ Malheureusement échoué" : "❌ Not passed")}
           </h2>
           <div className="flex justify-center gap-4 mt-3">
             <div className="bg-white rounded-xl px-5 py-3 shadow text-center">
-              <p className="text-xs text-gray-400 font-bold uppercase mb-1">{lang === "ar" ? "النقاط" : "Behaald"}</p>
+              <p className="text-xs text-gray-400 font-bold uppercase mb-1">{lang === "ar" ? "النقاط" : lang === "nl" ? "Behaald" : lang === "fr" ? "Points" : "Points"}</p>
               <p className="text-3xl font-black text-green-600">{score}</p>
             </div>
             <div className="flex items-center text-3xl font-black text-gray-300">/</div>
             <div className="bg-white rounded-xl px-5 py-3 shadow text-center">
-              <p className="text-xs text-gray-400 font-bold uppercase mb-1">{lang === "ar" ? "المجموع" : "Totaal"}</p>
+              <p className="text-xs text-gray-400 font-bold uppercase mb-1">{lang === "ar" ? "المجموع" : lang === "nl" ? "Totaal" : lang === "fr" ? "Total" : "Total"}</p>
               <p className="text-3xl font-black text-indigo-600">{maxScore}</p>
             </div>
             <div className="bg-white rounded-xl px-5 py-3 shadow text-center">
@@ -264,20 +264,20 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
           </div>
           <div className="flex justify-center gap-3 mt-3 text-sm">
             <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 font-bold border border-green-200">
-              ✓ {lang === "ar" ? "صح" : "Correct"}: {questions.filter((q,i) => answers[i] === q.correctAnswer).length}
+              ✓ {lang === "ar" ? "صح" : lang === "nl" ? "Correct" : lang === "fr" ? "Correct" : "Correct"}: {questions.filter((q,i) => answers[i] === q.correctAnswer).length}
             </span>
             <span className="px-3 py-1 rounded-full bg-red-100 text-red-700 font-bold border border-red-200">
-              ✗ {lang === "ar" ? "خطأ" : "Fout"}: {questions.filter((q,i) => answers[i] !== undefined && answers[i] !== null && answers[i] !== q.correctAnswer).length}
+              ✗ {lang === "ar" ? "خطأ" : lang === "nl" ? "Fout" : lang === "fr" ? "Faux" : "Wrong"}: {questions.filter((q,i) => answers[i] !== undefined && answers[i] !== null && answers[i] !== q.correctAnswer).length}
             </span>
           </div>
         </div>
         <div className="flex gap-3">
           <button onClick={() => { setStarted(false); setFinished(false); setCurrentIndex(0); setAnswers({}); setLocked(false); }}
             className="flex-1 py-3 font-black text-white rounded-xl" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-            🔄 {lang === "ar" ? "إعادة" : "Opnieuw"}
+            🔄 {lang === "ar" ? "إعادة" : lang === "nl" ? "Opnieuw" : lang === "fr" ? "Recommencer" : "Retry"}
           </button>
           <button onClick={() => router.push("/theorie")} className="flex-1 py-3 font-black rounded-xl" style={{ background: "linear-gradient(135deg, #ffcc00, #ff9900)", color: "#003399" }}>
-            🔓 {lang === "ar" ? "اشترك للمزيد" : "Meer? Inschrijven"}
+            🔓 {lang === "ar" ? "اشترك للمزيد" : lang === "nl" ? "Meer? Inschrijven" : lang === "fr" ? "Plus? S'inscrire" : "More? Subscribe"}
           </button>
         </div>
       </div>
@@ -370,7 +370,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
             </div>
             {(isAnswered || locked) && (
               <button onClick={handleNext} className="w-full mt-4 py-3 font-black text-white rounded-xl" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-                {currentIndex + 1 >= questions.length ? (lang === "ar" ? "النتيجة 🏆" : "Resultaat 🏆") : (lang === "ar" ? "التالي ←" : "Volgende →")}
+                {currentIndex + 1 >= questions.length ? (lang === "ar" ? "النتيجة 🏆" : lang === "nl" ? "Resultaat 🏆" : lang === "fr" ? "Résultat 🏆" : "Result 🏆") : (lang === "ar" ? "التالي ←" : lang === "nl" ? "Volgende →" : lang === "fr" ? "Suivant →" : "Next →")}
               </button>
             )}
           </div>
@@ -418,7 +418,7 @@ export default function GratisPage() {
             </div>
             <div>
               <h1 className="text-xl font-black text-white">Gratis Lessen</h1>
-              <p className="text-white/50 text-xs">{lang === "ar" ? "محتوى مجاني بدون اشتراك" : "Gratis inhoud zonder abonnement"}</p>
+              <p className="text-white/50 text-xs">{lang === "ar" ? "محتوى مجاني بدون اشتراك" : lang === "nl" ? "Gratis inhoud zonder abonnement" : lang === "fr" ? "Contenu gratuit sans abonnement" : "Free content without subscription"}</p>
             </div>
           </div>
           <div className="flex gap-2 mb-3">
@@ -433,11 +433,11 @@ export default function GratisPage() {
           <div className="flex gap-2">
             <button onClick={() => setTab("lessons")} className="flex-1 py-2 rounded-xl text-xs font-black transition-all"
               style={tab === "lessons" ? { background: "rgba(255,255,255,0.2)", color: "white" } : { background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.4)" }}>
-              📚 {lang === "ar" ? "شروح" : "Lessen"} ({questions.length})
+              📚 {lang === "ar" ? "شروح" : lang === "nl" ? "Lessen" : lang === "fr" ? "Leçons" : "Lessons"} ({questions.length})
             </button>
             <button onClick={() => setTab("exam")} className="flex-1 py-2 rounded-xl text-xs font-black transition-all"
               style={tab === "exam" ? { background: "rgba(255,255,255,0.2)", color: "white" } : { background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.4)" }}>
-              🎯 {lang === "ar" ? "امتحانات" : "Examens"} ({examQuestions.length})
+              🎯 {lang === "ar" ? "امتحانات" : lang === "nl" ? "Examens" : lang === "fr" ? "Examens" : "Exams"} ({examQuestions.length})
             </button>
           </div>
         </div>

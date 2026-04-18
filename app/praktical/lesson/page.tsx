@@ -122,7 +122,7 @@ function PrakticalLessonContent() {
         {!lesson?.videoUrl && questions.length === 0 && (
           <div className="border border-yellow-300 bg-yellow-50 p-6 text-center rounded">
             <p className="font-bold text-gray-700">
-              {lang === "ar" ? "لا يوجد محتوى لهذا الدرس بعد" : lang === "nl" ? "Nog geen inhoud voor deze les" : "No content yet for this lesson"}
+              {lang === "ar" ? "لا يوجد محتوى لهذا الدرس بعد" : lang === "nl" ? "Nog geen inhoud voor deze les" : lang === "fr" ? "Pas encore de contenu pour cette leçon" : "No content yet for this lesson"}
             </p>
             <p className="text-xs text-gray-400 mt-2">lessonId: {lessonId}</p>
           </div>

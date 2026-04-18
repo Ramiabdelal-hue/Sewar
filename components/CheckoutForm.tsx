@@ -51,7 +51,7 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
-      alert(lang === "ar" ? "كلمات المرور غير متطابقة!" : "Passwords do not match!");
+      alert(lang === "ar" ? "كلمات المرور غير متطابقة!" : lang === "nl" ? "Wachtwoorden komen niet overeen!" : lang === "fr" ? "Les mots de passe ne correspondent pas!" : "Passwords do not match!");
       return;
     }
     setLoading(true);
@@ -96,7 +96,7 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
         } else if (data.alreadySubscribed) { setSubscribedData(data); setAlreadySubscribedModal(true); }
         else alert(data.message || "Er is een fout opgetreden");
       }
-    } catch { alert(lang === "ar" ? "خطأ في الخادم!" : "Server error!"); }
+    } catch { alert(lang === "ar" ? "خطأ في الخادم!" : lang === "nl" ? "Serverfout!" : lang === "fr" ? "Erreur serveur!" : "Server error!"); }
     finally { setLoading(false); }
   };
 
@@ -328,7 +328,7 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
               {/* تفاصيل الاشتراك */}
               <div className="px-4 py-3 rounded-xl mb-2 text-left space-y-1" style={{ background: "rgba(249,115,22,0.1)", border: "1px solid rgba(249,115,22,0.2)" }}>
                 <p className="text-orange-300 text-xs font-bold break-all">📧 {subscribedData.email}</p>
-                {subscribedData.cat && <p className="text-orange-300 text-xs font-bold">📂 {lang === "ar" ? "التصنيف" : "Categorie"}: {subscribedData.cat}</p>}
+                {subscribedData.cat && <p className="text-orange-300 text-xs font-bold">📂 {lang === "ar" ? "التصنيف" : lang === "nl" ? "Categorie" : lang === "fr" ? "Catégorie" : "Category"}: {subscribedData.cat}</p>}
                 {subscribedData.daysLeft != null && (
                   <p className="text-orange-300 text-xs font-bold">
                     ⏳ {lang === "ar" ? `متبقي ${subscribedData.daysLeft} يوم` : lang === "nl" ? `Nog ${subscribedData.daysLeft} dagen geldig` : `${subscribedData.daysLeft} days remaining`}

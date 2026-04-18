@@ -89,10 +89,10 @@ function LessonsContent() {
         <div className="bg-white p-10 rounded-2xl shadow-xl max-w-md border-t-8 border-red-500">
           <FaLock className="text-red-500 text-5xl mx-auto mb-4" />
           <h2 className="text-2xl font-black text-gray-900 mb-3">
-            {lang === "ar" ? "الاشتراك غير متاح" : lang === "nl" ? "Abonnement niet beschikbaar" : "Subscription not available"}
+            {lang === "ar" ? "الاشتراك غير متاح" : lang === "nl" ? "Abonnement niet beschikbaar" : lang === "fr" ? "Abonnement non disponible" : "Subscription not available"}
           </h2>
           <button onClick={() => setRenewing(true)} className="bg-blue-600 text-white px-8 py-3 font-bold hover:bg-blue-700 transition">
-            {lang === "ar" ? "تجديد الاشتراك" : lang === "nl" ? "Vernieuwen" : "Renew"}
+            {lang === "ar" ? "تجديد الاشتراك" : lang === "nl" ? "Vernieuwen" : lang === "fr" ? "Renouveler" : "Renew"}
           </button>
         </div>
       </div>
@@ -118,7 +118,7 @@ function LessonsContent() {
         {filtered.length === 0 ? (
           <div className="border border-yellow-300 bg-yellow-50 p-6 text-center">
             <p className="font-bold text-gray-700">
-              {lang === "ar" ? "لا توجد دروس متاحة" : lang === "nl" ? "Geen lessen beschikbaar" : "No lessons available"}
+              {lang === "ar" ? "لا توجد دروس متاحة" : lang === "nl" ? "Geen lessen beschikbaar" : lang === "fr" ? "Aucune leçon disponible" : "No lessons available"}
             </p>
           </div>
         ) : (
@@ -157,7 +157,7 @@ function LessonsContent() {
           </table>
         )}
         <p className="text-xs text-gray-400 mt-3">
-          {lang === "ar" ? `إجمالي: ${filtered.length} درس` : `Total: ${filtered.length} lessons`}
+          {lang === "ar" ? `إجمالي: ${filtered.length} درس` : lang === "nl" ? `Totaal: ${filtered.length} lessen` : lang === "fr" ? `Total: ${filtered.length} leçons` : `Total: ${filtered.length} lessons`}
         </p>
       </div>
       <Footer />

@@ -412,7 +412,7 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                     }}
                     className="flex-1 py-0.5 text-xs font-black uppercase bg-red-500 hover:bg-red-600 transition-colors text-white text-center"
                   >
-                    {lang === "ar" ? "خروج" : "Logout"}
+                    {lang === "ar" ? "خروج" : lang === "nl" ? "Logout" : lang === "fr" ? "Déconnexion" : "Logout"}
                   </button>
                 </div>
               )}
@@ -466,7 +466,7 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                 className="flex items-center gap-2 font-bold text-sm uppercase px-2"
               >
                 <span className="text-xl">{isMobileMenuOpen ? "✕" : "☰"}</span>
-                <span className="text-xs">{lang === "ar" ? "القائمة" : "Menu"}</span>
+                <span className="text-xs">{lang === "ar" ? "القائمة" : lang === "nl" ? "Menu" : lang === "fr" ? "Menu" : "Menu"}</span>
               </button>
             </div>
 

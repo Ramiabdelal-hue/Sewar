@@ -12,7 +12,7 @@ export default function LoginModal({ lang, onClose }: any) {
     const { type, category, expiryDate } = subscription;
     
     if (!email || !expiryDate) {
-      alert(lang === "ar" ? "خطأ في بيانات الاشتراك" : "Subscription data error");
+      alert(lang === "ar" ? "خطأ في بيانات الاشتراك" : lang === "nl" ? "Fout in abonnementsgegevens" : lang === "fr" ? "Erreur dans les données d'abonnement" : "Subscription data error");
       return;
     }
     
@@ -121,7 +121,7 @@ export default function LoginModal({ lang, onClose }: any) {
         redirectToSubscription(subscription, email);
       } else {
         console.error("❌ Login failed:", data);
-        alert(data.message || (lang === "ar" ? "البيانات غير صحيحة" : "Onjuiste gegevens"));
+        alert(data.message || (lang === "ar" ? "البيانات غير صحيحة" : lang === "nl" ? "Onjuiste gegevens" : lang === "fr" ? "Données incorrectes" : "Incorrect credentials"));
       }
     } catch (error) {
       console.error("Login error:", error);

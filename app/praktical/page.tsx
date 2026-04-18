@@ -187,9 +187,9 @@ export default function VideoLessonsPage() {
         {/* مميزات */}
         <div className="grid grid-cols-3 gap-3 md:gap-4">
           {[
-            { icon: "🎬", label: lang === "ar" ? "فيديوهات HD" : "HD Video's" },
-            { icon: "🚗", label: lang === "ar" ? "تدريب عملي" : "Praktijktraining" },
-            { icon: "🏆", label: lang === "ar" ? "نجاح مضمون" : "Slaag gegarandeerd" },
+            { icon: "🎬", label: lang === "ar" ? "فيديوهات HD" : lang === "nl" ? "HD Video's" : lang === "fr" ? "Vidéos HD" : "HD Videos" },
+            { icon: "🚗", label: lang === "ar" ? "تدريب عملي" : lang === "nl" ? "Praktijktraining" : lang === "fr" ? "Formation pratique" : "Practical training" },
+            { icon: "🏆", label: lang === "ar" ? "نجاح مضمون" : lang === "nl" ? "Slaag gegarandeerd" : lang === "fr" ? "Succès garanti" : "Success guaranteed" },
           ].map((f, i) => (
             <div key={i} className="text-center py-3 rounded-xl"
               style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
