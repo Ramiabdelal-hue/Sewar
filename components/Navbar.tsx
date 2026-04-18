@@ -308,8 +308,17 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
         }
 
         if (data.success && data.user?.expiryDate) {
-          const expiry = new Date(data.user.expiryDate).getTime();
-          const diff = expiry - Date.now();
+          // أخذ أبعد تاريخ انتهاء من بين كل الاشتراكات النشطة
+          let latestExpiry = new Date(data.user.expiryDate).getTime();
+
+          if (data.subscriptions && data.subscriptions.length > 0) {
+            for (const sub of data.subscriptions) {
+              const subExpiry = new Date(sub.expiryDate).getTime();
+              if (subExpiry > latestExpiry) latestExpiry = subExpiry;
+            }
+          }
+
+          const diff = latestExpiry - Date.now();
           if (diff <= 0) {
             setIsExpired(true);
             setDaysLeft(0);
