@@ -59,7 +59,7 @@ export default function HomePage() {
                 <span className="text-sm">©</span>
               </div>
               <div>
-                <p className="text-white font-black text-sm tracking-wide">Sewar Achou</p>
+                <p className="text-white font-black text-sm tracking-wide">Sewar Achour</p>
                 <p className="text-white/40 text-xs">BTW nr: 0766.704.232</p>
               </div>
             </div>
@@ -75,10 +75,10 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* اليمين - رابط */}
+            {/* اليمين - اسم */}
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <p className="text-white/40 text-xs">sewar-1q112.vercel.app</p>
+              <p className="text-white/40 text-xs">Sewar Achour</p>
             </div>
           </div>
         </div>
