@@ -101,7 +101,7 @@ function PrakticalLessonContent() {
                   disabled={currentIndex === 0}
                   className={`px-6 py-3 font-black text-sm border-2 transition-all ${currentIndex === 0 ? "text-gray-300 border-gray-200 cursor-not-allowed" : "text-[#003399] border-[#003399] hover:bg-[#003399] hover:text-white"}`}
                 >
-                  ← {lang === "ar" ? "السابق" : lang === "nl" ? "Vorige" : "Previous"}
+                  ← {lang === "ar" ? "السابق" : lang === "nl" ? "Vorige" : lang === "fr" ? "Précédent" : "Previous"}
                 </button>
                 <span className="text-sm text-gray-500 font-bold">
                   {currentIndex + 1} / {questions.length}
@@ -112,7 +112,7 @@ function PrakticalLessonContent() {
                   className={`px-6 py-3 font-black text-sm border-2 transition-all ${currentIndex + 1 >= questions.length ? "text-gray-300 border-gray-200 cursor-not-allowed" : "text-white border-[#003399] bg-[#003399] hover:bg-[#0055cc]"}`}
                   style={currentIndex + 1 <= questions.length - 1 ? { background: "linear-gradient(135deg, #003399, #0055cc)" } : {}}
                 >
-                  {lang === "ar" ? "التالي" : lang === "nl" ? "Volgende" : "Next"} →
+                  {lang === "ar" ? "التالي" : lang === "nl" ? "Volgende" : lang === "fr" ? "Suivant" : "Next"} →
                 </button>
               </div>
             )}

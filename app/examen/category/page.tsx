@@ -549,8 +549,8 @@ function ExamenCategoryContent() {
                   className="w-full mt-5 py-3 font-black text-white rounded-xl transition-all hover:opacity-90 active:scale-95"
                   style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
                   {currentIndex + 1 >= questions.length
-                    ? (lang === "ar" ? "عرض النتيجة 🏆" : lang === "nl" ? "Resultaat bekijken 🏆" : "View Result 🏆")
-                    : (lang === "ar" ? "التالي ←" : lang === "nl" ? "Volgende →" : "Next →")}
+                    ? (lang === "ar" ? "عرض النتيجة 🏆" : lang === "nl" ? "Resultaat bekijken 🏆" : lang === "fr" ? "Voir le résultat 🏆" : "View Result 🏆")
+                    : (lang === "ar" ? "التالي ←" : lang === "nl" ? "Volgende →" : lang === "fr" ? "Suivant →" : "Next →")}
                 </button>
               )}
             </div>
