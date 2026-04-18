@@ -734,7 +734,8 @@ export default function AdminQuestionsPage() {
       let url = '';
       
       if (questionType === "Examen") {
-        url = `/api/exam-questions?lessonId=${lessonId}&category=${category}`;
+        // جلب كل أسئلة الامتحانات للـ category بدون فلتر lessonId
+        url = `/api/exam-questions?category=${category}&all=1`;
       } else if (questionType === "Praktijk") {
         url = `/api/praktijk/questions?lessonId=${lessonId}`;
       } else {
@@ -753,10 +754,10 @@ export default function AdminQuestionsPage() {
   };
 
   useEffect(() => {
-    if (lessonId) {
+    if (lessonId && category && questionType) {
       fetchQuestions();
     }
-  }, [lessonId]);
+  }, [lessonId, category, questionType]);
 
   const handleAddQuestion = async () => {
     if (questionType === "Examen") {
@@ -1832,10 +1833,16 @@ export default function AdminQuestionsPage() {
                   ) : (
                     <div className="p-5">
                       {/* رقم السؤال */}
-                      <div className="flex items-center gap-2 mb-4">
+                      <div className="flex items-center gap-2 mb-4 flex-wrap">
                         <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-black flex-shrink-0" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
                           {index + 1}
                         </div>
+                        {/* اسم الدرس - يظهر فقط في Examen */}
+                        {questionType === "Examen" && (q as any).lessonId && (
+                          <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(99,102,241,0.1)", color: "#4f46e5", border: "1px solid rgba(99,102,241,0.3)" }}>
+                            📚 {lessons.find(l => l.id === (q as any).lessonId)?.name || `Lesson ${(q as any).lessonId}`}
+                          </span>
+                        )}
                         {q.isFree && (
                           <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(34,197,94,0.1)", color: "#16a34a", border: "1px solid rgba(34,197,94,0.3)" }}>
                             🎁 Gratis

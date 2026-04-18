@@ -23,55 +23,38 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const lessonId = searchParams.get("lessonId");
-    const categoryParam = searchParams.get("category"); // اختياري
+    const categoryParam = searchParams.get("category");
+    const allLessons = searchParams.get("all"); // جلب كل الأسئلة بدون فلتر lessonId
 
-    if (!lessonId) {
-      return NextResponse.json({ success: false, message: "يجب تحديد lessonId" }, { status: 400 });
-    }
-
-    const lessonIdNum = parseInt(lessonId);
+    const lessonIdNum = lessonId ? parseInt(lessonId) : null;
     
     let category = categoryParam?.toUpperCase() || null;
-    if (!category) {
+    if (!category && lessonIdNum) {
       category = await getCategoryFromLessonId(lessonIdNum);
     }
     
     if (!category) {
-      return NextResponse.json({ success: false, message: "الدرس غير موجود" }, { status: 404 });
+      return NextResponse.json({ success: false, message: "يجب تحديد category" }, { status: 400 });
     }
 
-    console.log(`🔍 Fetching exam questions for lessonId ${lessonId} in category ${category}`);
+    console.log(`🔍 Fetching exam questions for category ${category}${lessonIdNum ? ` lessonId ${lessonIdNum}` : " (all lessons)"}`);
+
+    const where = lessonIdNum && !allLessons ? { lessonId: lessonIdNum } : {};
 
     let questions;
-    
     if (category === "A") {
-      questions = await prisma.examQuestionA.findMany({
-        where: { lessonId: lessonIdNum },
-        orderBy: { createdAt: 'desc' }
-      });
+      questions = await prisma.examQuestionA.findMany({ where, orderBy: { createdAt: 'asc' } });
     } else if (category === "B") {
-      questions = await prisma.examQuestionB.findMany({
-        where: { lessonId: lessonIdNum },
-        orderBy: { createdAt: 'desc' }
-      });
+      questions = await prisma.examQuestionB.findMany({ where, orderBy: { createdAt: 'asc' } });
     } else if (category === "C") {
-      questions = await prisma.examQuestionC.findMany({
-        where: { lessonId: lessonIdNum },
-        orderBy: { createdAt: 'desc' }
-      });
+      questions = await prisma.examQuestionC.findMany({ where, orderBy: { createdAt: 'asc' } });
     }
 
-    return NextResponse.json({
-      success: true,
-      questions: questions
-    });
+    return NextResponse.json({ success: true, questions: questions || [] });
 
   } catch (error) {
     console.error("Error fetching exam questions:", error);
-    return NextResponse.json({
-      success: false,
-      message: "خطأ في جلب أسئلة الامتحان"
-    }, { status: 500 });
+    return NextResponse.json({ success: false, message: "خطأ في جلب أسئلة الامتحان" }, { status: 500 });
   }
 }
 
