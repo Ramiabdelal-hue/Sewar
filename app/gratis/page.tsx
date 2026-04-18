@@ -299,7 +299,15 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
         <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-100">
           {/* رأس السؤال */}
           <div className="px-5 py-3 flex items-center justify-between" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-            <span className="text-white font-black text-sm">{currentIndex + 1} / {questions.length}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-white font-black text-sm">{currentIndex + 1} / {questions.length}</span>
+              {q.points === 5 && (
+                <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black"
+                  style={{ background: "rgba(239,68,68,0.85)", color: "white", border: "1.5px solid rgba(255,255,255,0.4)" }}>
+                  ⭐ 5 {lang === "ar" ? "نقاط" : lang === "nl" ? "punten" : "pts"}
+                </span>
+              )}
+            </div>
             <div className={`flex items-center gap-2 px-3 py-1 rounded-full font-black text-sm border-2 transition-all ${
               locked ? "bg-white/20 border-white/40 text-white" :
               !readingDone ? "bg-white/20 border-white/40 text-white" :

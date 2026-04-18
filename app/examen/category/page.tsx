@@ -210,9 +210,14 @@ function ExamenCategoryContent() {
     }
   };
 
-  const score = Object.entries(answers).filter(([i, ans]) =>
-    ans !== null && ans !== undefined && questions[parseInt(i)]?.correctAnswer === ans
-  ).length;
+  const score = Object.entries(answers).reduce((total, [i, ans]) => {
+    if (ans === null || ans === undefined) return total;
+    const question = questions[parseInt(i)];
+    if (!question) return total;
+    const pts = question.points || 1;
+    return total + (question.correctAnswer === ans ? pts : 0);
+  }, 0);
+  const maxScore = questions.reduce((t, q) => t + (q.points || 1), 0);
 
   const q = questions[currentIndex];
   const isRtl = lang === "ar";
@@ -269,9 +274,10 @@ function ExamenCategoryContent() {
 
   // صفحة النتيجة
   if (finished) {
-    const pct = Math.round((score / questions.length) * 100);
+    const pct = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
     const passed = pct >= 60;
     const wrongAnswers = questions.filter((q, i) => answers[i] !== q.correctAnswer);
+    const correctCount = questions.filter((q, i) => answers[i] === q.correctAnswer).length;
 
     return (
       <div className="min-h-screen bg-gray-50" dir={isRtl ? "rtl" : "ltr"}>
@@ -286,17 +292,23 @@ function ExamenCategoryContent() {
                 ? (lang === "ar" ? "مبروك! نجحت" : lang === "nl" ? "Gefeliciteerd! Geslaagd!" : "Congratulations!")
                 : (lang === "ar" ? "لم تنجح هذه المرة" : lang === "nl" ? "Helaas niet geslaagd" : "Not passed")}
             </h1>
-            <div className="flex items-center justify-center gap-6 mt-4">
-              <div className="bg-white rounded-xl px-6 py-3 shadow">
-                <p className="text-xs text-gray-400 font-bold uppercase">Correct</p>
+            <div className="flex items-center justify-center gap-4 mt-4 flex-wrap">
+              <div className="bg-white rounded-xl px-5 py-3 shadow text-center">
+                <p className="text-xs text-gray-400 font-bold uppercase mb-1">{lang === "ar" ? "النقاط" : lang === "nl" ? "Behaald" : "Points"}</p>
                 <p className="text-3xl font-black text-green-600">{score}</p>
+                <p className="text-xs text-gray-400">/ {maxScore}</p>
               </div>
-              <div className="bg-white rounded-xl px-6 py-3 shadow">
-                <p className="text-xs text-gray-400 font-bold uppercase">Fout</p>
-                <p className="text-3xl font-black text-red-500">{questions.length - score}</p>
+              <div className="bg-white rounded-xl px-5 py-3 shadow text-center">
+                <p className="text-xs text-gray-400 font-bold uppercase mb-1">{lang === "ar" ? "صح" : "Correct"}</p>
+                <p className="text-3xl font-black text-blue-600">{correctCount}</p>
+                <p className="text-xs text-gray-400">/ {questions.length}</p>
               </div>
-              <div className="bg-white rounded-xl px-6 py-3 shadow">
-                <p className="text-xs text-gray-400 font-bold uppercase">Score</p>
+              <div className="bg-white rounded-xl px-5 py-3 shadow text-center">
+                <p className="text-xs text-gray-400 font-bold uppercase mb-1">{lang === "ar" ? "خطأ" : "Fout"}</p>
+                <p className="text-3xl font-black text-red-500">{questions.length - correctCount}</p>
+              </div>
+              <div className="bg-white rounded-xl px-5 py-3 shadow text-center">
+                <p className="text-xs text-gray-400 font-bold uppercase mb-1">Score</p>
                 <p className="text-3xl font-black" style={{ color: passed ? "#16a34a" : "#dc2626" }}>{pct}%</p>
               </div>
             </div>
@@ -437,9 +449,18 @@ function ExamenCategoryContent() {
             {/* رأس السؤال - العد + المؤقت */}
             <div className="px-5 py-3 flex items-center justify-between"
               style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-              <span className="text-white font-black text-sm">
-                {currentIndex + 1} / {questions.length}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-white font-black text-sm">
+                  {currentIndex + 1} / {questions.length}
+                </span>
+                {/* شارة 5 نقاط */}
+                {q.points === 5 && (
+                  <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black"
+                    style={{ background: "rgba(239,68,68,0.85)", color: "white", border: "1.5px solid rgba(255,255,255,0.4)" }}>
+                    ⭐ 5 {lang === "ar" ? "نقاط" : lang === "nl" ? "punten" : lang === "fr" ? "pts" : "pts"}
+                  </span>
+                )}
+              </div>
 
               {/* المؤقت بجانب رقم السؤال */}
               <div className={`flex items-center gap-2 px-3 py-1 rounded-full font-black text-sm border-2 transition-all ${
