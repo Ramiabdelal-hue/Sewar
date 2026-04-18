@@ -67,7 +67,11 @@ export default function HomePage() {
             {/* الوسط - حقوق النشر */}
             <div className="text-center">
               <p className="text-white/50 text-xs">
-                © {new Date().getFullYear()} Sewar Rijbewijsonline. Alle rechten voorbehouden.
+                © {new Date().getFullYear()} Sewar Rijbewijsonline.{" "}
+                {lang === "nl" ? "Alle rechten voorbehouden" :
+                 lang === "fr" ? "Tous droits réservés" :
+                 lang === "ar" ? "جميع الحقوق محفوظة" :
+                 "All rights reserved"}
               </p>
             </div>
 
