@@ -29,12 +29,25 @@ function ExamenCategoryContent() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const ttsRef = useRef<NodeJS.Timeout | null>(null);
   const stopTtsRef = useRef(false);
+  const ttsSessionRef = useRef(0); // session ID — كل سؤال له رقم فريد
   const [readingDone, setReadingDone] = useState(false);
+
+  // دالة إيقاف فوري شاملة
+  const killTts = () => {
+    stopTtsRef.current = true;
+    ttsSessionRef.current += 1; // أبطل كل callbacks القديمة فوراً
+    if (ttsRef.current) { clearTimeout(ttsRef.current); ttsRef.current = null; }
+    if (window.speechSynthesis) {
+      window.speechSynthesis.pause();
+      window.speechSynthesis.cancel();
+    }
+  };
 
   // قراءة تلقائية للسؤال والإجابات
   const speakQuestion = (q: any, translated: string[]) => {
     if (!window.speechSynthesis || !q) return;
     stopTtsRef.current = false;
+    const session = ttsSessionRef.current; // احفظ الـ session الحالي
     window.speechSynthesis.cancel();
     setReadingDone(false);
 
@@ -50,8 +63,11 @@ function ExamenCategoryContent() {
         || null;
     };
 
+    // تحقق من صلاحية الـ session قبل أي عمل
+    const isValid = () => ttsSessionRef.current === session && !stopTtsRef.current;
+
     const speak = (text: string, onEnd?: () => void) => {
-      if (stopTtsRef.current) return;
+      if (!isValid()) return;
       if (!text) { if (onEnd) onEnd(); return; }
       const u = new SpeechSynthesisUtterance(text);
       u.lang = speechLang;
@@ -59,8 +75,8 @@ function ExamenCategoryContent() {
       u.pitch = 1;
       const v = getVoice();
       if (v) u.voice = v;
-      if (onEnd) u.onend = () => { if (!stopTtsRef.current) onEnd(); };
-      u.onerror = () => { if (!stopTtsRef.current && onEnd) onEnd(); };
+      if (onEnd) u.onend = () => { if (isValid()) onEnd(); };
+      u.onerror = () => { if (isValid() && onEnd) onEnd(); };
       window.speechSynthesis.speak(u);
     };
 
@@ -83,27 +99,21 @@ function ExamenCategoryContent() {
     speak(questionText, () => {
       let i = 0;
       const readNext = () => {
-        if (stopTtsRef.current) return;
+        if (!isValid()) return;
         if (i >= answersList.length) { setReadingDone(true); return; }
         speak(`${labels[i]} ${answersList[i]}`, () => {
           i++;
-          ttsRef.current = setTimeout(() => {
-            if (!stopTtsRef.current) readNext();
-          }, 400);
+          ttsRef.current = setTimeout(() => { if (isValid()) readNext(); }, 400);
         });
       };
-      ttsRef.current = setTimeout(() => {
-        if (!stopTtsRef.current) readNext();
-      }, 600);
+      ttsRef.current = setTimeout(() => { if (isValid()) readNext(); }, 600);
     });
   };
 
   // تشغيل القراءة بعد ثانية من كل سؤال جديد
   useEffect(() => {
     if (!started || finished) return;
-    stopTtsRef.current = true;
-    if (ttsRef.current) clearTimeout(ttsRef.current);
-    window.speechSynthesis?.cancel();
+    killTts();
     setReadingDone(false);
 
     ttsRef.current = setTimeout(() => {
@@ -133,11 +143,7 @@ function ExamenCategoryContent() {
       }
     }, 1000);
 
-    return () => {
-      stopTtsRef.current = true;
-      if (ttsRef.current) clearTimeout(ttsRef.current);
-      window.speechSynthesis?.cancel();
-    };
+    return () => { killTts(); };
   }, [currentIndex, started, finished]);
 
   useEffect(() => {
@@ -187,20 +193,14 @@ function ExamenCategoryContent() {
 
   const handleAnswer = (num: number) => {
     if (locked || answers[currentIndex] !== undefined) return;
-    stopTtsRef.current = true;
-    if (ttsRef.current) clearTimeout(ttsRef.current);
-    window.speechSynthesis?.pause();
-    window.speechSynthesis?.cancel();
-    setTimeout(() => window.speechSynthesis?.cancel(), 50);
+    killTts();
     clearInterval(timerRef.current!);
     setAnswers(a => ({ ...a, [currentIndex]: num }));
     setLocked(true);
   };
 
   const handleNext = () => {
-    stopTtsRef.current = true;
-    window.speechSynthesis?.cancel();
-    if (ttsRef.current) clearTimeout(ttsRef.current);
+    killTts();
     setReadingDone(false);
     if (currentIndex + 1 >= questions.length) {
       setFinished(true);

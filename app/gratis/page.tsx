@@ -66,8 +66,20 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
   const [readingDone, setReadingDone] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const ttsRef = useRef<NodeJS.Timeout | null>(null);
-  const stopTtsRef = useRef(false); // flag لإيقاف callbacks القراءة فوراً
+  const stopTtsRef = useRef(false);
+  const ttsSessionRef = useRef(0); // session ID فريد لكل سؤال
   const isRtl = lang === "ar";
+
+  // دالة إيقاف فوري شاملة
+  const killTts = () => {
+    stopTtsRef.current = true;
+    ttsSessionRef.current += 1;
+    if (ttsRef.current) { clearTimeout(ttsRef.current); ttsRef.current = null; }
+    if (window.speechSynthesis) {
+      window.speechSynthesis.pause();
+      window.speechSynthesis.cancel();
+    }
+  };
 
   const q = questions[currentIndex];
   const textsToTranslate = q ? [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""] : ["", "", "", ""];
@@ -79,27 +91,26 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
   const speakQuestion = (q: any, translated: string[]) => {
     if (!window.speechSynthesis || !q) return;
     stopTtsRef.current = false;
+    const session = ttsSessionRef.current;
     window.speechSynthesis.cancel();
     setReadingDone(false);
 
     const langMap: Record<string, string> = { nl: "nl-NL", fr: "fr-FR", ar: "ar-SA", en: "en-US" };
     const speechLang = langMap[lang] || "nl-NL";
 
-    // انتظر تحميل الأصوات إذا لم تكن جاهزة
     const getVoice = (): SpeechSynthesisVoice | null => {
       const voices = window.speechSynthesis.getVoices();
       if (!voices.length) return null;
-      // أولاً: صوت مطابق تماماً للغة
       return voices.find(v => v.lang === speechLang)
-        // ثانياً: صوت يبدأ بكود اللغة (مثل ar-EG لو ar-SA غير موجود)
         || voices.find(v => v.lang.startsWith(speechLang.split("-")[0]))
-        // ثالثاً: fallback للهولندي
         || voices.find(v => v.lang === "nl-NL")
         || null;
     };
 
+    const isValid = () => ttsSessionRef.current === session && !stopTtsRef.current;
+
     const speak = (text: string, onEnd?: () => void) => {
-      if (stopTtsRef.current) return;
+      if (!isValid()) return;
       if (!text) { if (onEnd) onEnd(); return; }
       const u = new SpeechSynthesisUtterance(text);
       u.lang = speechLang;
@@ -107,23 +118,22 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
       u.pitch = 1;
       const v = getVoice();
       if (v) u.voice = v;
-      if (onEnd) u.onend = () => { if (!stopTtsRef.current) onEnd(); };
-      u.onerror = () => { if (!stopTtsRef.current && onEnd) onEnd(); };
+      if (onEnd) u.onend = () => { if (isValid()) onEnd(); };
+      u.onerror = () => { if (isValid() && onEnd) onEnd(); };
       window.speechSynthesis.speak(u);
     };
 
-    // استخدم النص المترجم إذا كان جاهزاً، وإلا النص الأصلي
-    const questionText = (translated[0] && translated[0] !== (q.textNL || q.text)) 
-      ? translated[0] 
+    const questionText = (translated[0] && translated[0] !== (q.textNL || q.text))
+      ? translated[0]
       : (q.textNL || q.text || "");
     const ans1 = translated[1] || q.answer1 || "";
     const ans2 = translated[2] || q.answer2 || "";
     const ans3 = translated[3] || q.answer3 || "";
     const answersList = [ans1, ans2, ans3].filter(Boolean);
-    const labels = lang === "ar" 
-      ? ["الجواب A:", "الجواب B:", "الجواب C:"] 
-      : lang === "fr" 
-        ? ["Réponse A:", "Réponse B:", "Réponse C:"] 
+    const labels = lang === "ar"
+      ? ["الجواب A:", "الجواب B:", "الجواب C:"]
+      : lang === "fr"
+        ? ["Réponse A:", "Réponse B:", "Réponse C:"]
         : lang === "en"
           ? ["Answer A:", "Answer B:", "Answer C:"]
           : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
@@ -133,27 +143,21 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
     speak(questionText, () => {
       let i = 0;
       const readNext = () => {
-        if (stopTtsRef.current) return;
+        if (!isValid()) return;
         if (i >= answersList.length) { setReadingDone(true); return; }
         speak(`${labels[i]} ${answersList[i]}`, () => {
           i++;
-          ttsRef.current = setTimeout(() => {
-            if (!stopTtsRef.current) readNext();
-          }, 400);
+          ttsRef.current = setTimeout(() => { if (isValid()) readNext(); }, 400);
         });
       };
-      ttsRef.current = setTimeout(() => {
-        if (!stopTtsRef.current) readNext();
-      }, 600);
+      ttsRef.current = setTimeout(() => { if (isValid()) readNext(); }, 600);
     });
   };
 
-  // تشغيل القراءة بعد 4 ثوانٍ (لإعطاء الترجمة وقتاً كافياً)
+  // تشغيل القراءة بعد ثانية (لإعطاء الترجمة وقتاً كافياً)
   useEffect(() => {
     if (!started || finished) return;
-    stopTtsRef.current = true; // أوقف أي قراءة سابقة
-    if (ttsRef.current) clearTimeout(ttsRef.current);
-    window.speechSynthesis?.cancel();
+    killTts();
     setReadingDone(false);
 
     ttsRef.current = setTimeout(() => {
@@ -161,7 +165,6 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
       const q = questions[currentIndex];
       if (!q) { setReadingDone(true); return; }
 
-      // تأكد من تحميل الأصوات أولاً
       const startReading = () => {
         const texts = lang === "nl"
           ? [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]
@@ -173,44 +176,27 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
       if (voices.length > 0) {
         startReading();
       } else {
-        // انتظر تحميل الأصوات
         window.speechSynthesis.onvoiceschanged = () => {
           window.speechSynthesis.onvoiceschanged = null;
           if (!stopTtsRef.current) startReading();
         };
-        // fallback بعد ثانية إذا لم تُحمَّل الأصوات
-        setTimeout(() => {
-          if (!stopTtsRef.current) startReading();
-        }, 1000);
+        setTimeout(() => { if (!stopTtsRef.current) startReading(); }, 1000);
       }
     }, 1000);
 
-    return () => {
-      stopTtsRef.current = true;
-      if (ttsRef.current) clearTimeout(ttsRef.current);
-      window.speechSynthesis?.cancel();
-    };
+    return () => { killTts(); };
   }, [currentIndex, started, finished]);
 
   const handleAnswer = (num: number) => {
     if (locked || answers[currentIndex] !== undefined) return;
-    // أوقف القارئ فوراً عند الإجابة
-    stopTtsRef.current = true; // أوقف كل callbacks القراءة
-    if (ttsRef.current) clearTimeout(ttsRef.current);
-    ttsRef.current = undefined as any;
-    window.speechSynthesis?.pause();
-    window.speechSynthesis?.cancel();
-    setTimeout(() => window.speechSynthesis?.cancel(), 50);
+    killTts();
     clearInterval(timerRef.current!);
     setAnswers(a => ({ ...a, [currentIndex]: num }));
     setLocked(true);
   };
 
   const handleNext = () => {
-    // أوقف القارئ عند الانتقال للسؤال التالي
-    stopTtsRef.current = true;
-    window.speechSynthesis?.cancel();
-    if (ttsRef.current) clearTimeout(ttsRef.current);
+    killTts();
     setReadingDone(false);
     if (currentIndex + 1 >= questions.length) setFinished(true);
     else { setCurrentIndex(i => i + 1); setLocked(false); }
