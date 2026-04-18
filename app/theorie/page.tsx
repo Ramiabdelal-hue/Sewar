@@ -34,9 +34,9 @@ export default function TheoriePage() {
   const translatedTitles = useAutoTranslateList(lessons.map(l => l.title), lang);
 
   const categories = [
-    { id: "A", name: "Rijbewijs A", desc: t.motorcycles || "Motorfietsen", icon: <MotorcycleIcon className="w-14 h-9" />, color: "#f97316", glow: "rgba(249,115,22,0.2)" },
-    { id: "B", name: "Rijbewijs B", desc: t.cars || "Auto's",            icon: <CarIcon className="w-14 h-9" />,        color: "#3b82f6", glow: "rgba(59,130,246,0.2)" },
-    // { id: "C", name: "Rijbewijs C", desc: t.trucks || "Vrachtwagens",    icon: <TruckIcon className="w-14 h-9" />,      color: "#22c55e", glow: "rgba(34,197,94,0.2)" }, // temp: hidden
+    { id: "A", name: t.categoryA || "Rijbewijs A", desc: t.motorcycles || "Motorfietsen", icon: <MotorcycleIcon className="w-14 h-9" />, color: "#f97316", glow: "rgba(249,115,22,0.2)" },
+    { id: "B", name: t.categoryB || "Rijbewijs B", desc: t.cars || "Auto's",              icon: <CarIcon className="w-14 h-9" />,        color: "#3b82f6", glow: "rgba(59,130,246,0.2)" },
+    // { id: "C", name: t.categoryC || "Rijbewijs C", desc: t.trucks || "Vrachtwagens",    icon: <TruckIcon className="w-14 h-9" />,      color: "#22c55e", glow: "rgba(34,197,94,0.2)" }, // temp: hidden
   ];
 
   const getDurations = (catId: string) => [
@@ -279,7 +279,7 @@ export default function TheoriePage() {
                 {lang === "ar" ? "نظرية رخصة القيادة" : lang === "nl" ? "Theorie Rijbewijs" : "Théorie Permis"}
               </p>
               <h1 className="text-xl font-black text-white">
-                {lang === "ar" ? `فئة ${userCategory}` : `Rijbewijs ${userCategory}`}
+                {userCategory === "A" ? (t.categoryA || "Rijbewijs A") : userCategory === "B" ? (t.categoryB || "Rijbewijs B") : (t.categoryC || "Rijbewijs C")}
               </h1>
             </div>
             <div className="flex items-center gap-2">
