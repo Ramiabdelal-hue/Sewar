@@ -183,7 +183,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
           if (!stopTtsRef.current) startReading();
         }, 1000);
       }
-    }, 4000);
+    }, 1000);
 
     return () => {
       stopTtsRef.current = true;

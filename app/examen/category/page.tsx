@@ -122,7 +122,7 @@ function ExamenCategoryContent() {
           q.answer3 || "",
         ]);
       }
-    }, 3000);
+    }, 1000);
 
     return () => {
       if (ttsRef.current) clearTimeout(ttsRef.current);
