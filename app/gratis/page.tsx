@@ -66,6 +66,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
   const [readingDone, setReadingDone] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const ttsRef = useRef<NodeJS.Timeout | null>(null);
+  const stopTtsRef = useRef(false); // flag لإيقاف callbacks القراءة فوراً
   const isRtl = lang === "ar";
 
   const q = questions[currentIndex];
@@ -77,6 +78,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
   // القارئ التلقائي
   const speakQuestion = (q: any, translated: string[]) => {
     if (!window.speechSynthesis || !q) return;
+    stopTtsRef.current = false; // ابدأ جلسة قراءة جديدة
     window.speechSynthesis.cancel();
     setReadingDone(false);
     const langMap: Record<string, string> = { nl: "nl-NL", fr: "fr-FR", ar: "ar-SA", en: "en-US" };
@@ -86,12 +88,13 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
       return voices.find(v => v.lang === speechLang) || voices.find(v => v.lang.startsWith(lang)) || voices.find(v => v.lang === "nl-NL") || null;
     };
     const speak = (text: string, onEnd?: () => void) => {
+      if (stopTtsRef.current) return; // توقف إذا طُلب الإيقاف
       if (!text) { if (onEnd) onEnd(); return; }
       const u = new SpeechSynthesisUtterance(text);
       u.lang = speechLang; u.rate = 0.75; u.pitch = 1;
       const v = getVoice(); if (v) u.voice = v;
-      if (onEnd) u.onend = onEnd;
-      u.onerror = () => { if (onEnd) onEnd(); };
+      if (onEnd) u.onend = () => { if (!stopTtsRef.current) onEnd(); }; // تحقق قبل الاستمرار
+      u.onerror = () => { if (!stopTtsRef.current && onEnd) onEnd(); };
       window.speechSynthesis.speak(u);
     };
     const questionText = translated[0] || q.textNL || q.text || "";
@@ -101,10 +104,18 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
     speak(questionText, () => {
       let i = 0;
       const readNext = () => {
+        if (stopTtsRef.current) return; // توقف إذا طُلب الإيقاف
         if (i >= answersList.length) { setReadingDone(true); return; }
-        speak(`${labels[i]} ${answersList[i]}`, () => { i++; ttsRef.current = setTimeout(readNext, 400); });
+        speak(`${labels[i]} ${answersList[i]}`, () => {
+          i++;
+          ttsRef.current = setTimeout(() => {
+            if (!stopTtsRef.current) readNext();
+          }, 400);
+        });
       };
-      ttsRef.current = setTimeout(readNext, 600);
+      ttsRef.current = setTimeout(() => {
+        if (!stopTtsRef.current) readNext();
+      }, 600);
     });
   };
 
@@ -125,8 +136,12 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
   const handleAnswer = (num: number) => {
     if (locked || answers[currentIndex] !== undefined) return;
     // أوقف القارئ فوراً عند الإجابة
-    window.speechSynthesis?.cancel();
+    stopTtsRef.current = true; // أوقف كل callbacks القراءة
     if (ttsRef.current) clearTimeout(ttsRef.current);
+    ttsRef.current = undefined as any;
+    window.speechSynthesis?.pause();
+    window.speechSynthesis?.cancel();
+    setTimeout(() => window.speechSynthesis?.cancel(), 50);
     clearInterval(timerRef.current!);
     setAnswers(a => ({ ...a, [currentIndex]: num }));
     setLocked(true);
@@ -134,6 +149,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
 
   const handleNext = () => {
     // أوقف القارئ عند الانتقال للسؤال التالي
+    stopTtsRef.current = true;
     window.speechSynthesis?.cancel();
     if (ttsRef.current) clearTimeout(ttsRef.current);
     setReadingDone(false);
@@ -339,7 +355,7 @@ export default function GratisPage() {
   }, [category]);
 
   return (
-    <div className="min-h-screen bg-gray-50" dir={isRtl ? "rtl" : "ltr"}>
+    <div className="min-h-screen bg-gray-50 flex flex-col" dir={isRtl ? "rtl" : "ltr"}>
       <Navbar />
       <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0a0a2e 0%, #003399 60%, #0055cc 100%)" }}>
         <div className="max-w-3xl mx-auto px-4 py-5">
@@ -374,7 +390,7 @@ export default function GratisPage() {
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 py-6">
+      <div className="max-w-3xl mx-auto px-4 py-6 flex-1">
         {loading ? (
           <div className="flex justify-center py-16"><div className="w-10 h-10 border-4 border-[#003399] border-t-transparent rounded-full animate-spin"></div></div>
         ) : tab === "lessons" ? (
