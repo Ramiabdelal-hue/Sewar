@@ -308,17 +308,17 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
         }
 
         if (data.success && data.user?.expiryDate) {
-          // أخذ أبعد تاريخ انتهاء من بين كل الاشتراكات النشطة
-          let latestExpiry = new Date(data.user.expiryDate).getTime();
+          // أخذ أقرب تاريخ انتهاء من بين كل الاشتراكات النشطة
+          let earliestExpiry = new Date(data.user.expiryDate).getTime();
 
           if (data.subscriptions && data.subscriptions.length > 0) {
             for (const sub of data.subscriptions) {
               const subExpiry = new Date(sub.expiryDate).getTime();
-              if (subExpiry > latestExpiry) latestExpiry = subExpiry;
+              if (subExpiry < earliestExpiry) earliestExpiry = subExpiry;
             }
           }
 
-          const diff = latestExpiry - Date.now();
+          const diff = earliestExpiry - Date.now();
           if (diff <= 0) {
             setIsExpired(true);
             setDaysLeft(0);
@@ -409,7 +409,12 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                       daysLeft <= 3 ? "bg-orange-500 text-white" :
                       "bg-white/20 text-white"
                     }`}>
-                      {isExpired ? "!" : `${daysLeft}d`}
+                      {isExpired ? "!" : 
+                        lang === "ar" ? `${daysLeft} يوم` :
+                        lang === "fr" ? `${daysLeft}j` :
+                        lang === "en" ? `${daysLeft}d` :
+                        `${daysLeft}d`
+                      }
                     </span>
                   )}
                   <button
