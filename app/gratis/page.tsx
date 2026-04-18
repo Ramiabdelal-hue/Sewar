@@ -78,33 +78,62 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
   // القارئ التلقائي
   const speakQuestion = (q: any, translated: string[]) => {
     if (!window.speechSynthesis || !q) return;
-    stopTtsRef.current = false; // ابدأ جلسة قراءة جديدة
+    stopTtsRef.current = false;
     window.speechSynthesis.cancel();
     setReadingDone(false);
+
     const langMap: Record<string, string> = { nl: "nl-NL", fr: "fr-FR", ar: "ar-SA", en: "en-US" };
     const speechLang = langMap[lang] || "nl-NL";
-    const getVoice = () => {
+
+    // انتظر تحميل الأصوات إذا لم تكن جاهزة
+    const getVoice = (): SpeechSynthesisVoice | null => {
       const voices = window.speechSynthesis.getVoices();
-      return voices.find(v => v.lang === speechLang) || voices.find(v => v.lang.startsWith(lang)) || voices.find(v => v.lang === "nl-NL") || null;
+      if (!voices.length) return null;
+      // أولاً: صوت مطابق تماماً للغة
+      return voices.find(v => v.lang === speechLang)
+        // ثانياً: صوت يبدأ بكود اللغة (مثل ar-EG لو ar-SA غير موجود)
+        || voices.find(v => v.lang.startsWith(speechLang.split("-")[0]))
+        // ثالثاً: fallback للهولندي
+        || voices.find(v => v.lang === "nl-NL")
+        || null;
     };
+
     const speak = (text: string, onEnd?: () => void) => {
-      if (stopTtsRef.current) return; // توقف إذا طُلب الإيقاف
+      if (stopTtsRef.current) return;
       if (!text) { if (onEnd) onEnd(); return; }
       const u = new SpeechSynthesisUtterance(text);
-      u.lang = speechLang; u.rate = 0.75; u.pitch = 1;
-      const v = getVoice(); if (v) u.voice = v;
-      if (onEnd) u.onend = () => { if (!stopTtsRef.current) onEnd(); }; // تحقق قبل الاستمرار
+      u.lang = speechLang;
+      u.rate = 0.75;
+      u.pitch = 1;
+      const v = getVoice();
+      if (v) u.voice = v;
+      if (onEnd) u.onend = () => { if (!stopTtsRef.current) onEnd(); };
       u.onerror = () => { if (!stopTtsRef.current && onEnd) onEnd(); };
       window.speechSynthesis.speak(u);
     };
-    const questionText = translated[0] || q.textNL || q.text || "";
-    const answersList = [translated[1] || q.answer1, translated[2] || q.answer2, translated[3] || q.answer3].filter(Boolean);
-    const labels = lang === "ar" ? ["الجواب A:", "الجواب B:", "الجواب C:"] : lang === "fr" ? ["Réponse A:", "Réponse B:", "Réponse C:"] : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
+
+    // استخدم النص المترجم إذا كان جاهزاً، وإلا النص الأصلي
+    const questionText = (translated[0] && translated[0] !== (q.textNL || q.text)) 
+      ? translated[0] 
+      : (q.textNL || q.text || "");
+    const ans1 = translated[1] || q.answer1 || "";
+    const ans2 = translated[2] || q.answer2 || "";
+    const ans3 = translated[3] || q.answer3 || "";
+    const answersList = [ans1, ans2, ans3].filter(Boolean);
+    const labels = lang === "ar" 
+      ? ["الجواب A:", "الجواب B:", "الجواب C:"] 
+      : lang === "fr" 
+        ? ["Réponse A:", "Réponse B:", "Réponse C:"] 
+        : lang === "en"
+          ? ["Answer A:", "Answer B:", "Answer C:"]
+          : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
+
     if (!questionText) { setReadingDone(true); return; }
+
     speak(questionText, () => {
       let i = 0;
       const readNext = () => {
-        if (stopTtsRef.current) return; // توقف إذا طُلب الإيقاف
+        if (stopTtsRef.current) return;
         if (i >= answersList.length) { setReadingDone(true); return; }
         speak(`${labels[i]} ${answersList[i]}`, () => {
           i++;
@@ -119,18 +148,48 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
     });
   };
 
-  // تشغيل القراءة بعد 3 ثوانٍ
+  // تشغيل القراءة بعد 4 ثوانٍ (لإعطاء الترجمة وقتاً كافياً)
   useEffect(() => {
     if (!started || finished) return;
+    stopTtsRef.current = true; // أوقف أي قراءة سابقة
     if (ttsRef.current) clearTimeout(ttsRef.current);
     window.speechSynthesis?.cancel();
     setReadingDone(false);
+
     ttsRef.current = setTimeout(() => {
+      stopTtsRef.current = false;
       const q = questions[currentIndex];
       if (!q) { setReadingDone(true); return; }
-      speakQuestion(q, lang === "nl" ? [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""] : translatedRef.current);
-    }, 3000);
-    return () => { if (ttsRef.current) clearTimeout(ttsRef.current); window.speechSynthesis?.cancel(); };
+
+      // تأكد من تحميل الأصوات أولاً
+      const startReading = () => {
+        const texts = lang === "nl"
+          ? [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]
+          : translatedRef.current;
+        speakQuestion(q, texts);
+      };
+
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        startReading();
+      } else {
+        // انتظر تحميل الأصوات
+        window.speechSynthesis.onvoiceschanged = () => {
+          window.speechSynthesis.onvoiceschanged = null;
+          if (!stopTtsRef.current) startReading();
+        };
+        // fallback بعد ثانية إذا لم تُحمَّل الأصوات
+        setTimeout(() => {
+          if (!stopTtsRef.current) startReading();
+        }, 1000);
+      }
+    }, 4000);
+
+    return () => {
+      stopTtsRef.current = true;
+      if (ttsRef.current) clearTimeout(ttsRef.current);
+      window.speechSynthesis?.cancel();
+    };
   }, [currentIndex, started, finished]);
 
   const handleAnswer = (num: number) => {
