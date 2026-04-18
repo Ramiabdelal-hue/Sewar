@@ -371,10 +371,14 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
             {/* اللوغو + اسم الموقع */}
             <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.href = "/"}>
               <span className="text-base md:text-2xl font-black tracking-wide uppercase hidden sm:inline">
-                Sewar Rijbewijsonline
+                <span style={{ color: '#000000' }}>SEWAR</span>{' '}
+                <span style={{ color: '#FFD700' }}>RIJBEWIJS</span>
+                <span style={{ color: '#FF0000' }}>ONLINE</span>
               </span>
               <span className="text-base font-black tracking-wide uppercase sm:hidden">
-                Sewar Rijbewijsonline
+                <span style={{ color: '#000000' }}>SEWAR</span>{' '}
+                <span style={{ color: '#FFD700' }}>RIJBEWIJS</span>
+                <span style={{ color: '#FF0000' }}>ONLINE</span>
               </span>
             </div>
 
