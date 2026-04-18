@@ -19,6 +19,7 @@ interface Question {
   answer2?: string;
   answer3?: string;
   correctAnswer?: number;
+  points?: number;
 }
 
 function ExamenTestContent() {
@@ -38,6 +39,7 @@ function ExamenTestContent() {
   const [userAnswers, setUserAnswers] = useState<Record<number, number>>({});
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);
+  const [maxScore, setMaxScore] = useState(0);
   const [isExpired, setIsExpired] = useState(false);
   const [checking, setChecking] = useState(true);
 
@@ -130,20 +132,19 @@ function ExamenTestContent() {
   };
 
   const handleSubmit = async () => {
-    // حساب النقاط مع مراعاة الأسئلة ذات 5 نقاط
     let totalScore = 0;
-    let maxScore = 0;
+    let total = 0;
     questions.forEach((q) => {
-      const pts = (q as any).points || 1;
-      maxScore += pts;
+      const pts = q.points || 1;
+      total += pts;
       if (userAnswers[q.id] === q.correctAnswer) {
         totalScore += pts;
       }
     });
     setScore(totalScore);
+    setMaxScore(total);
     setShowResults(true);
 
-    // إعداد بيانات الأسئلة والأجوبة للحفظ
     const answersData = questions.map((q) => ({
       questionId: q.id,
       questionText: q.text,
@@ -157,51 +158,24 @@ function ExamenTestContent() {
       isCorrect: userAnswers[q.id] === q.correctAnswer
     }));
 
-    // حفظ النتيجة في قاعدة البيانات
-    console.log("💾 Attempting to save result...");
-    console.log("Email:", email);
-    console.log("Lesson:", lesson);
-    console.log("Category:", category);
-    console.log("Score:", correctCount);
-    console.log("Total:", questions.length);
-
     if (email && lesson && category) {
       try {
-        const payload = {
-          userEmail: email,
-          lessonTitle: lesson,
-          category: category,
-          score: totalScore,
-          totalQuestions: questions.length,
-          maxScore,
-          answers: answersData
-        };
-        
-        console.log("📤 Sending payload:", payload);
-
-        const response = await fetch("/api/exam-results", {
+        await fetch("/api/exam-results", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({
+            userEmail: email,
+            lessonTitle: lesson,
+            category,
+            score: totalScore,
+            totalQuestions: questions.length,
+            maxScore: total,
+            answers: answersData
+          })
         });
-
-        console.log("📡 Response status:", response.status);
-        
-        const data = await response.json();
-        console.log("✅ Save result response:", data);
-
-        if (!data.success) {
-          console.error("❌ Failed to save result:", data.message);
-          console.error("❌ Error details:", data.error);
-        } else {
-          console.log("🎉 Result saved successfully to database!");
-        }
       } catch (error) {
         console.error("❌ Error saving result:", error);
-        console.error("❌ Error type:", error instanceof Error ? error.message : typeof error);
       }
-    } else {
-      console.error("❌ Missing required data:", { email, lesson, category });
     }
   };
 
@@ -209,6 +183,7 @@ function ExamenTestContent() {
     setUserAnswers({});
     setShowResults(false);
     setScore(0);
+    setMaxScore(0);
   };
 
   if (loading || checking) {
@@ -308,10 +283,10 @@ function ExamenTestContent() {
               <span className="font-bold text-blue-600 ml-2">{questions.length}</span>
             </div>
             {showResults && (
-              <div className={`px-4 py-2 rounded-lg ${score >= questions.reduce((s,q)=>(s+((q as any).points||1)),0) * 0.7 ? "bg-green-50" : "bg-red-50"}`}>
+              <div className={`px-4 py-2 rounded-lg ${score >= maxScore * 0.7 ? "bg-green-50" : "bg-red-50"}`}>
                 <span className="text-sm text-gray-600">Score:</span>
-                <span className={`font-bold ml-2 ${score >= questions.reduce((s,q)=>(s+((q as any).points||1)),0) * 0.7 ? "text-green-600" : "text-red-600"}`}>
-                  {score} / {questions.reduce((s,q)=>(s+((q as any).points||1)),0)} pts
+                <span className={`font-bold ml-2 ${score >= maxScore * 0.7 ? "text-green-600" : "text-red-600"}`}>
+                  {score} / {maxScore} pts
                 </span>
               </div>
             )}
@@ -363,8 +338,7 @@ function ExamenTestContent() {
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
                         Vraag {index + 1}
-                        {(question as any).points === 5 && (
-                          <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(239,68,68,0.1)", color: "#dc2626", border: "1px solid rgba(239,68,68,0.3)" }}>
+                        {question.points === 5 && (                          <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(239,68,68,0.1)", color: "#dc2626", border: "1px solid rgba(239,68,68,0.3)" }}>
                             ⭐ 5 pts
                           </span>
                         )}
@@ -537,35 +511,52 @@ function ExamenTestContent() {
         {showResults && (
           <div className="mt-8 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-3xl shadow-2xl p-8 border-4 border-indigo-200">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full shadow-2xl mb-6">
-                <span className="text-4xl font-black text-white">{Math.round((score / questions.reduce((s,q)=>(s+((q as any).points||1)),0)) * 100)}%</span>
+              {/* نجاح أو رسوب */}
+              <div className={`inline-flex items-center gap-2 px-6 py-2 rounded-full font-black text-lg mb-4 ${
+                score >= maxScore * 0.7
+                  ? "bg-green-100 text-green-700 border-2 border-green-300"
+                  : "bg-red-100 text-red-700 border-2 border-red-300"
+              }`}>
+                {score >= maxScore * 0.7 ? "🎉 Geslaagd!" : "❌ Helaas niet geslaagd"}
               </div>
-              
-              <h3 className="text-3xl font-black text-gray-800 mb-4">
-                Eindresultaat
-              </h3>
-              
-              <div className="flex items-center justify-center gap-6 mb-6">
-                <div className="bg-white rounded-2xl px-8 py-4 shadow-lg">
-                  <p className="text-sm text-gray-500 font-semibold uppercase tracking-wide mb-1">
-                    Score
-                  </p>
-                  <p className="text-4xl font-black text-green-600">{score}</p>
+
+              <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full shadow-2xl mb-6">
+                <span className="text-3xl font-black text-white">
+                  {maxScore > 0 ? Math.round((score / maxScore) * 100) : 0}%
+                </span>
+              </div>
+
+              <h3 className="text-3xl font-black text-gray-800 mb-4">Eindresultaat</h3>
+
+              {/* النتيجة الرئيسية: score / maxScore */}
+              <div className="flex items-center justify-center gap-4 mb-6">
+                <div className="bg-white rounded-2xl px-8 py-5 shadow-lg text-center">
+                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Behaald</p>
+                  <p className="text-5xl font-black text-green-600">{score}</p>
                 </div>
-                
                 <div className="text-4xl font-black text-gray-300">/</div>
-                
-                <div className="bg-white rounded-2xl px-8 py-4 shadow-lg">
-                  <p className="text-sm text-gray-500 font-semibold uppercase tracking-wide mb-1">
-                    Max
-                  </p>
-                  <p className="text-4xl font-black text-indigo-600">{questions.reduce((s,q)=>(s+((q as any).points||1)),0)}</p>
+                <div className="bg-white rounded-2xl px-8 py-5 shadow-lg text-center">
+                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Totaal</p>
+                  <p className="text-5xl font-black text-indigo-600">{maxScore}</p>
                 </div>
+              </div>
+
+              {/* تفاصيل إضافية */}
+              <div className="flex items-center justify-center gap-4 mb-6 text-sm">
+                <span className="px-3 py-1 rounded-full bg-green-50 text-green-700 font-bold border border-green-200">
+                  ✓ Correct: {questions.filter(q => userAnswers[q.id] === q.correctAnswer).length}
+                </span>
+                <span className="px-3 py-1 rounded-full bg-red-50 text-red-700 font-bold border border-red-200">
+                  ✗ Fout: {questions.filter(q => userAnswers[q.id] && userAnswers[q.id] !== q.correctAnswer).length}
+                </span>
+                <span className="px-3 py-1 rounded-full bg-gray-50 text-gray-600 font-bold border border-gray-200">
+                  Vragen: {questions.length}
+                </span>
               </div>
 
               <div className="flex gap-4 justify-center">
                 <button
-                  onClick={() => window.location.reload()}
+                  onClick={() => { handleRetry(); window.scrollTo(0,0); }}
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-10 py-4 rounded-2xl font-black text-lg hover:from-indigo-600 hover:to-purple-700 transition-all shadow-xl hover:scale-105 active:scale-95"
                 >
                   Opnieuw proberen
