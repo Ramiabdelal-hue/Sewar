@@ -8,6 +8,7 @@ import fr from "@/locales/fr.json";
 import ar from "@/locales/ar.json";
 import en from "@/locales/en.json";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 interface Lesson {
   id: number;
@@ -161,6 +162,7 @@ function LessonContent() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

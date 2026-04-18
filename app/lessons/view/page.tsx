@@ -10,6 +10,7 @@ import en from "@/locales/en.json";
 import Navbar from "@/components/Navbar";
 import QuestionCard from "@/components/QuestionCard";
 import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
+import Footer from "@/components/Footer";
 
 interface Question {
   id: number;
@@ -448,6 +449,7 @@ function LessonViewContent() {
           )}
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

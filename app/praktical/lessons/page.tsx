@@ -11,6 +11,7 @@ import en from "@/locales/en.json";
 import CheckoutForm from "@/components/CheckoutForm";
 import Navbar from "@/components/Navbar";
 import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
+import Footer from "@/components/Footer";
 
 function LessonsContent() {
   const searchParams = useSearchParams();
@@ -159,6 +160,7 @@ function LessonsContent() {
           {lang === "ar" ? `إجمالي: ${filtered.length} درس` : `Total: ${filtered.length} lessons`}
         </p>
       </div>
+      <Footer />
     </div>
   );
 }

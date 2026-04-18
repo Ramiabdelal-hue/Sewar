@@ -9,6 +9,7 @@ import fr from "@/locales/fr.json";
 import ar from "@/locales/ar.json";
 import en from "@/locales/en.json";
 import { FaTrophy, FaCalendar, FaCheckCircle, FaTimesCircle, FaChartLine } from "react-icons/fa";
+import Footer from "@/components/Footer";
 
 interface ExamResult {
   id: number;
@@ -548,6 +549,7 @@ export default function ResultsPage() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

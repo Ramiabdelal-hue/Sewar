@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useLang } from "@/context/LangContext";
 import Navbar from "@/components/Navbar";
 import QuestionCard from "@/components/QuestionCard";
+import Footer from "@/components/Footer";
 
 function PrakticalLessonContent() {
   const searchParams = useSearchParams();
@@ -127,6 +128,7 @@ function PrakticalLessonContent() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

@@ -8,6 +8,7 @@ import fr from "@/locales/fr.json";
 import ar from "@/locales/ar.json";
 import en from "@/locales/en.json";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 interface Question {
   id: number;
@@ -573,6 +574,7 @@ function ExamenTestContent() {
         )}
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

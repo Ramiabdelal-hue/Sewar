@@ -9,6 +9,7 @@ import ar from "@/locales/ar.json";
 import en from "@/locales/en.json";
 import Navbar from "@/components/Navbar";
 import CheckoutForm from "@/components/CheckoutForm";
+import Footer from "@/components/Footer";
 import { MotorcycleIcon, CarIcon, TruckIcon } from "@/components/VehicleIcons";
 import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
 
@@ -207,6 +208,7 @@ export default function InfoPage() {
 
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import Footer from "@/components/Footer";
 import { useLang } from "@/context/LangContext";
 import nl from "@/locales/nl.json";
 import fr from "@/locales/fr.json";
@@ -226,6 +227,7 @@ export default function ContactPage() {
           </form>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

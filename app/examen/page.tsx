@@ -11,6 +11,7 @@ import fr from "@/locales/fr.json";
 import ar from "@/locales/ar.json";
 import en from "@/locales/en.json";
 import CheckoutForm from "@/components/CheckoutForm";
+import Footer from "@/components/Footer";
 
 export default function ExamenPage() {
   const { lang } = useLang();
@@ -288,6 +289,7 @@ export default function ExamenPage() {
           ))}
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

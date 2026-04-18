@@ -10,6 +10,7 @@ import ar from "@/locales/ar.json";
 import en from "@/locales/en.json";
 import CheckoutForm from "@/components/CheckoutForm";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 function ExamContent() {
   const searchParams = useSearchParams();
@@ -233,6 +234,7 @@ function ExamContent() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

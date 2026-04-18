@@ -11,6 +11,7 @@ import fr from "@/locales/fr.json";
 import ar from "@/locales/ar.json";
 import en from "@/locales/en.json";
 import CheckoutForm from "@/components/CheckoutForm";
+import Footer from "@/components/Footer";
 
 export default function TheoriePage() {
   const router = useRouter();
@@ -356,6 +357,7 @@ export default function TheoriePage() {
           </table>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

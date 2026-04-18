@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import QuestionCard from "@/components/QuestionCard";
 import { useLang } from "@/context/LangContext";
 import { MotorcycleIcon, CarIcon, TruckIcon } from "@/components/VehicleIcons";
@@ -382,6 +383,7 @@ export default function GratisPage() {
           <ExamTab questions={examQuestions} lang={lang} router={router} />
         )}
       </div>
+      <Footer />
     </div>
   );
 }

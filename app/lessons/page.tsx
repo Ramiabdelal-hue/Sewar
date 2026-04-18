@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { FaLock } from "react-icons/fa";
 import CheckoutForm from "@/components/CheckoutForm";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { useLang } from "@/context/LangContext";
 import nl from "@/locales/nl.json";
 import fr from "@/locales/fr.json";
@@ -224,6 +225,7 @@ function LessonsContent() {
           {lang === "ar" ? `������: ${filteredLessons.length} ���` : lang === "nl" ? `Totaal: ${filteredLessons.length} lessen` : lang === "fr" ? `Total: ${filteredLessons.length} le�ons` : `Total: ${filteredLessons.length} lessons`}
         </p>
       </div>
+      <Footer />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useLang } from "@/context/LangContext";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
 
 // زر القراءة الصوتية
@@ -556,6 +557,7 @@ function ExamenCategoryContent() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }
