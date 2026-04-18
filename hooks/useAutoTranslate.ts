@@ -3,6 +3,11 @@ import { useState, useEffect } from "react";
 
 const cache: Record<string, string> = {};
 
+// تنظيف XML/HTML tags من النص
+function cleanTranslation(text: string): string {
+  return text.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+}
+
 async function translateOne(text: string, targetLang: string): Promise<string> {
   if (!text || targetLang === "nl") return text;
   const key = `${text}__${targetLang}`;
@@ -15,8 +20,9 @@ async function translateOne(text: string, targetLang: string): Promise<string> {
     });
     const data = await res.json();
     if (data.success && data.translated) {
-      cache[key] = data.translated;
-      return data.translated;
+      const result = cleanTranslation(data.translated);
+      cache[key] = result;
+      return result;
     }
   } catch {}
   return text;

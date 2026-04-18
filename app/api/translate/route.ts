@@ -21,7 +21,12 @@ export async function POST(req: NextRequest) {
     const data = await res.json();
 
     if (data.responseStatus === 200 && data.responseData?.translatedText) {
-      return NextResponse.json({ success: true, translated: data.responseData.translatedText });
+      // تنظيف XML/HTML tags التي يُرجعها MyMemory أحياناً مثل <g x=1 id="46"/>
+      const cleaned = data.responseData.translatedText
+        .replace(/<[^>]*>/g, "")   // إزالة كل XML/HTML tags
+        .replace(/\s+/g, " ")      // تنظيف المسافات الزائدة
+        .trim();
+      return NextResponse.json({ success: true, translated: cleaned });
     }
 
     return NextResponse.json({ success: false, translated: text });
