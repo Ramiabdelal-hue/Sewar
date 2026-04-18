@@ -21,6 +21,9 @@ interface Question {
   correctAnswer?: number;
   videoUrls?: string[];
   audioUrl?: string;
+  lessonId?: number;
+  isFree?: boolean;
+  points?: number;
 }
 
 // Component إدارة الأسعار
@@ -972,10 +975,9 @@ export default function AdminQuestionsPage() {
   };
 
   const filteredQuestions = questions.filter(q => {
-    // فلتر البحث النصي
-    const matchesSearch = q.text.toLowerCase().includes(searchTerm.toLowerCase());
-    // فلتر الدرس المختار (إذا كان lessonId محدداً)
-    const matchesLesson = lessonId ? (q as any).lessonId === parseInt(lessonId) : true;
+    const matchesSearch = !searchTerm || q.text.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (q.textNL || "").toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesLesson = lessonId ? q.lessonId === parseInt(lessonId) : true;
     return matchesSearch && matchesLesson;
   });
 
@@ -1859,9 +1861,9 @@ export default function AdminQuestionsPage() {
                           {index + 1}
                         </div>
                         {/* اسم الدرس - يظهر دائماً */}
-                        {(q as any).lessonId && (
+                        {q.lessonId && (
                           <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(99,102,241,0.1)", color: "#4f46e5", border: "1px solid rgba(99,102,241,0.3)" }}>
-                            📚 {lessons.find(l => l.id === (q as any).lessonId)?.name || `Lesson ${(q as any).lessonId}`}
+                            📚 {lessons.find(l => l.id === q.lessonId)?.name || `Lesson ${q.lessonId}`}
                           </span>
                         )}
                         {q.isFree && (
@@ -1869,7 +1871,7 @@ export default function AdminQuestionsPage() {
                             🎁 Gratis
                           </span>
                         )}
-                        {(q as any).points === 5 && (
+                        {q.points === 5 && (
                           <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(239,68,68,0.1)", color: "#dc2626", border: "1px solid rgba(239,68,68,0.3)" }}>
                             ⭐ 5 pts
                           </span>
@@ -1992,8 +1994,8 @@ export default function AdminQuestionsPage() {
                               videoUrls: q.videoUrls || [],
                               audioUrl: q.audioUrl || "",
                               isFree: q.isFree || false,
-                              points: (q as any).points || 1,
-                            } as any);
+                              points: q.points || 1,
+                            });
                           }}
                           className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-black transition-all hover:scale-[1.02] active:scale-95"
                           style={{ background: "linear-gradient(135deg, #3b82f6, #2563eb)", color: "white", boxShadow: "0 4px 12px rgba(59,130,246,0.3)" }}
