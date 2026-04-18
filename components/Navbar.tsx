@@ -370,15 +370,67 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
           <div className="max-w-5xl mx-auto px-3 py-2 flex items-center justify-between">
             {/* اللوغو + اسم الموقع */}
             <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.href = "/"}>
-              <span className="text-base md:text-2xl font-black tracking-wide uppercase hidden sm:inline">
-                <span style={{ color: '#000000' }}>SEWAR</span>{' '}
-                <span style={{ color: '#FFD700' }}>RIJBEWIJS</span>
-                <span style={{ color: '#FF0000' }}>ONLINE</span>
+              <span className="text-base md:text-2xl font-black tracking-wide uppercase hidden sm:inline"
+                style={{ 
+                  fontFamily: 'serif',
+                  textShadow: '2px 2px 4px rgba(0,0,0,0.3)',
+                  letterSpacing: '2px'
+                }}>
+                <span style={{ 
+                  color: '#000000',
+                  background: 'linear-gradient(45deg, #000000, #333333)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  filter: 'drop-shadow(1px 1px 2px rgba(255,255,255,0.3))'
+                }}>SEWAR</span>{' '}
+                <span style={{ 
+                  color: '#FFD700',
+                  background: 'linear-gradient(45deg, #FFD700, #FFA500)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'
+                }}>RIJBEWIJS</span>
+                <span style={{ 
+                  color: '#FF0000',
+                  background: 'linear-gradient(45deg, #FF0000, #CC0000)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  filter: 'drop-shadow(1px 1px 2px rgba(255,255,255,0.3))'
+                }}>ONLINE</span>
               </span>
-              <span className="text-base font-black tracking-wide uppercase sm:hidden">
-                <span style={{ color: '#000000' }}>SEWAR</span>{' '}
-                <span style={{ color: '#FFD700' }}>RIJBEWIJS</span>
-                <span style={{ color: '#FF0000' }}>ONLINE</span>
+              <span className="text-base font-black tracking-wide uppercase sm:hidden"
+                style={{ 
+                  fontFamily: 'serif',
+                  textShadow: '1px 1px 2px rgba(0,0,0,0.3)',
+                  letterSpacing: '1px'
+                }}>
+                <span style={{ 
+                  color: '#000000',
+                  background: 'linear-gradient(45deg, #000000, #333333)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  filter: 'drop-shadow(0.5px 0.5px 1px rgba(255,255,255,0.3))'
+                }}>SEWAR</span>{' '}
+                <span style={{ 
+                  color: '#FFD700',
+                  background: 'linear-gradient(45deg, #FFD700, #FFA500)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  filter: 'drop-shadow(0.5px 0.5px 1px rgba(0,0,0,0.5))'
+                }}>RIJBEWIJS</span>
+                <span style={{ 
+                  color: '#FF0000',
+                  background: 'linear-gradient(45deg, #FF0000, #CC0000)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  filter: 'drop-shadow(0.5px 0.5px 1px rgba(255,255,255,0.3))'
+                }}>ONLINE</span>
               </span>
             </div>
 
