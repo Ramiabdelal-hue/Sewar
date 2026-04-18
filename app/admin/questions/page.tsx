@@ -739,7 +739,8 @@ export default function AdminQuestionsPage() {
       } else if (questionType === "Praktijk") {
         url = `/api/praktijk/questions?lessonId=${lessonId}`;
       } else {
-        url = `/api/questions?lessonId=${lessonId}&category=${category}`;
+        // Theorie: جلب كل شروح الـ category بدون فلتر lessonId
+        url = `/api/questions?category=${category}&all=1`;
       }
       
       const res = await fetch(url);
@@ -1837,8 +1838,8 @@ export default function AdminQuestionsPage() {
                         <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-black flex-shrink-0" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
                           {index + 1}
                         </div>
-                        {/* اسم الدرس - يظهر فقط في Examen */}
-                        {questionType === "Examen" && (q as any).lessonId && (
+                        {/* اسم الدرس - يظهر دائماً */}
+                        {(q as any).lessonId && (
                           <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(99,102,241,0.1)", color: "#4f46e5", border: "1px solid rgba(99,102,241,0.3)" }}>
                             📚 {lessons.find(l => l.id === (q as any).lessonId)?.name || `Lesson ${(q as any).lessonId}`}
                           </span>

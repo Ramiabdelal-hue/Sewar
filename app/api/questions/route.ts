@@ -41,68 +41,56 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const lessonId = searchParams.get("lessonId");
-    const categoryParam = searchParams.get("category"); // اختياري - لتجنب تعارض IDs
+    const categoryParam = searchParams.get("category");
+    const allLessons = searchParams.get("all"); // جلب كل أسئلة الـ category
 
-    if (!lessonId) {
-      return NextResponse.json({ success: false, message: "يجب تحديد lessonId" }, { status: 400 });
+    if (!lessonId && !categoryParam) {
+      return NextResponse.json({ success: false, message: "يجب تحديد lessonId أو category" }, { status: 400 });
     }
 
-    const lessonIdNum = parseInt(lessonId);
-    
-    // إذا تم تمرير category مباشرة استخدمه، وإلا ابحث عنه
+    const lessonIdNum = lessonId ? parseInt(lessonId) : null;
+
     let category = categoryParam?.toUpperCase() || null;
-    if (!category) {
+    if (!category && lessonIdNum) {
       category = await getCategoryFromLessonId(lessonIdNum);
     }
-    
+
     if (!category) {
       return NextResponse.json({ success: false, message: "الدرس غير موجود" }, { status: 404 });
+    }
+
+    // إذا all=1 أو لا يوجد lessonId → جلب كل أسئلة الـ category
+    if (allLessons || !lessonIdNum) {
+      console.log(`🔍 Fetching ALL questions for category ${category}`);
+      let questions;
+      if (category === "A") questions = await prisma.questionA.findMany({ orderBy: { createdAt: 'asc' } });
+      else if (category === "B") questions = await prisma.questionB.findMany({ orderBy: { createdAt: 'asc' } });
+      else if (category === "C") questions = await prisma.questionC.findMany({ orderBy: { createdAt: 'asc' } });
+      return NextResponse.json({ success: true, questions: questions || [] });
     }
 
     console.log(`🔍 Fetching questions for lessonId ${lessonId} in category ${category}`);
 
     let lessonRecord;
-    
     if (category === "A") {
       lessonRecord = await prisma.lessonA.findUnique({
         where: { id: lessonIdNum },
-        include: {
-          questions: {
-            orderBy: {
-              createdAt: 'asc'
-            }
-          }
-        }
+        include: { questions: { orderBy: { createdAt: 'asc' } } }
       });
     } else if (category === "B") {
       lessonRecord = await prisma.lessonB.findUnique({
         where: { id: lessonIdNum },
-        include: {
-          questions: {
-            orderBy: {
-              createdAt: 'asc'
-            }
-          }
-        }
+        include: { questions: { orderBy: { createdAt: 'asc' } } }
       });
     } else if (category === "C") {
       lessonRecord = await prisma.lessonC.findUnique({
         where: { id: lessonIdNum },
-        include: {
-          questions: {
-            orderBy: {
-              createdAt: 'asc'
-            }
-          }
-        }
+        include: { questions: { orderBy: { createdAt: 'asc' } } }
       });
     }
 
     if (!lessonRecord) {
-      return NextResponse.json({
-        success: false,
-        message: "الدرس غير موجود"
-      }, { status: 404 });
+      return NextResponse.json({ success: false, message: "الدرس غير موجود" }, { status: 404 });
     }
 
     return NextResponse.json({
@@ -113,10 +101,7 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error("Error fetching questions:", error);
-    return NextResponse.json({
-      success: false,
-      message: "خطأ في جلب الأسئلة"
-    }, { status: 500 });
+    return NextResponse.json({ success: false, message: "خطأ في جلب الأسئلة" }, { status: 500 });
   }
 }
 
