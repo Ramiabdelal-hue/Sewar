@@ -252,19 +252,19 @@ function ExamenCategoryContent() {
         <div className="border-4 border-[#003399] rounded-2xl p-10">
           <div className="text-6xl mb-4">🎯</div>
           <h1 className="text-2xl font-black text-[#003399] mb-2 uppercase">
-            {lang === "ar" ? `امتحان الفئة ${cat}` : lang === "nl" ? `Examen Categorie ${cat}` : `Exam Category ${cat}`}
+            {lang === "ar" ? `امتحان الفئة ${cat}` : lang === "nl" ? `Examen Categorie ${cat}` : lang === "fr" ? `Examen Catégorie ${cat}` : `Exam Category ${cat}`}
           </h1>
-          <p className="text-gray-500 mb-2">{questions.length} {lang === "ar" ? "سؤال" : lang === "nl" ? "vragen" : "questions"}</p>
+          <p className="text-gray-500 mb-2">{questions.length} {lang === "ar" ? "سؤال" : lang === "nl" ? "vragen" : lang === "fr" ? "questions" : "questions"}</p>
           <p className="text-sm text-orange-600 font-bold mb-8">
-            ⏱ {lang === "ar" ? "15 ثانية لكل سؤال" : lang === "nl" ? "15 seconden per vraag" : "15 seconds per question"}
+            ⏱ {lang === "ar" ? "15 ثانية لكل سؤال" : lang === "nl" ? "15 seconden per vraag" : lang === "fr" ? "15 secondes par question" : "15 seconds per question"}
           </p>
           {questions.length === 0 ? (
-            <p className="text-red-500 font-bold">{lang === "ar" ? "لا توجد أسئلة بعد" : "Geen vragen beschikbaar"}</p>
+            <p className="text-red-500 font-bold">{lang === "ar" ? "لا توجد أسئلة بعد" : lang === "nl" ? "Geen vragen beschikbaar" : lang === "fr" ? "Pas encore de questions" : "No questions yet"}</p>
           ) : (
             <button onClick={() => setStarted(true)}
               className="px-10 py-4 font-black text-white text-lg rounded-xl transition-all hover:scale-105 active:scale-95"
               style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-              {lang === "ar" ? "ابدأ الامتحان" : lang === "nl" ? "Start Examen" : "Start Exam"} →
+              {lang === "ar" ? "ابدأ الامتحان" : lang === "nl" ? "Start Examen" : lang === "fr" ? "Démarrer l'examen" : "Start Exam"} →
             </button>
           )}
         </div>
@@ -341,8 +341,7 @@ function ExamenCategoryContent() {
                       <div className="px-4 py-2 flex items-center gap-2" style={{ background: "#fef2f2" }}>
                         <span className="w-6 h-6 rounded-full bg-red-500 text-white text-xs font-black flex items-center justify-center">{i + 1}</span>
                         {q.points === 5 && (
-                          <span className="text-xs font-black px-1.5 py-0.5 rounded-full" style={{ background: "rgba(239,68,68,0.15)", color: "#dc2626" }}>⭐ 5 {lang === "ar" ? "نقاط" : lang === "nl" ? "punten" : "pts"}</span>
-                        )}
+                          <span className="text-xs font-black px-1.5 py-0.5 rounded-full" style={{ background: "rgba(239,68,68,0.15)", color: "#dc2626" }}>⭐ 5 {lang === "ar" ? "نقاط" : lang === "nl" ? "punten" : "pts"}</span>)}
                         {timedOut && (
                           <span className="text-xs font-black text-orange-500 flex items-center gap-1">
                             ⏱ {lang === "ar" ? "انتهى الوقت" : lang === "nl" ? "Tijd verlopen" : lang === "fr" ? "Temps écoulé" : "Time out"}

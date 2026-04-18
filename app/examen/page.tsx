@@ -124,17 +124,17 @@ export default function ExamenPage() {
             {lang === "ar" ? "اختر الدرس" : lang === "nl" ? "KIES EEN LES" : lang === "fr" ? "CHOISISSEZ UNE LEÇON" : "CHOOSE A LESSON"}
           </h1>
           {availableLessons.length === 0 ? (
-            <p className="text-gray-500 p-4">{lang === "ar" ? "لا توجد دروس" : "Geen lessen beschikbaar"}</p>
+            <p className="text-gray-500 p-4">{lang === "ar" ? "لا توجد دروس" : lang === "nl" ? "Geen lessen beschikbaar" : lang === "fr" ? "Aucune leçon disponible" : "No lessons available"}</p>
           ) : (
             <table className="w-full border-collapse" style={{ tableLayout: "fixed" }}>
               <colgroup><col style={{ width: "75%" }} /><col style={{ width: "25%" }} /></colgroup>
               <thead>
                 <tr style={{ backgroundColor: "#3399ff" }}>
                   <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc]">
-                    {lang === "ar" ? "الدرس" : "LES"}
+                    {lang === "ar" ? "الدرس" : lang === "nl" ? "LES" : lang === "fr" ? "LEÇON" : "LESSON"}
                   </th>
                   <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
-                    {lang === "ar" ? "ابدأ" : "START"}
+                    {lang === "ar" ? "ابدأ" : lang === "nl" ? "START" : lang === "fr" ? "DÉMARRER" : "START"}
                   </th>
                 </tr>
               </thead>
