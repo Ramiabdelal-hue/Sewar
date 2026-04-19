@@ -332,7 +332,6 @@ function ExamenCategoryContent() {
     killTts();
     clearInterval(timerRef.current!);
     if (questions[currentIndex]?.correctAnswer === num) {
-      playApplause();
       launchRoses();
     }
     setAnswers(a => ({ ...a, [currentIndex]: num }));

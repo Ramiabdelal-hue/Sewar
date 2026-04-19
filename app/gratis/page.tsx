@@ -322,7 +322,6 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
     killTts();
     clearInterval(timerRef.current!);
     if (shuffledQuestions[currentIndex]?.correctAnswer === num) {
-      playApplause();
       launchRoses();
     }
     setAnswers(a => ({ ...a, [currentIndex]: num }));
