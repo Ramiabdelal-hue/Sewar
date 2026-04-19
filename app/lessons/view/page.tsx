@@ -257,7 +257,7 @@ function LessonViewContent() {
       
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = speechLang;
-      utterance.rate = 0.7; // سرعة أبطأ للوضوح
+      utterance.rate = 0.5; // سرعة أبطأ للوضوح
       utterance.pitch = 1;
       
       const voice = getVoice();
