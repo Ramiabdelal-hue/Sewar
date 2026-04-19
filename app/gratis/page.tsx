@@ -151,7 +151,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
       if (!text) { if (onEnd) onEnd(); else setReadingDone(true); return; }
       const u = new SpeechSynthesisUtterance(text);
       u.lang = speechLang;
-      u.rate = 0.5;
+      u.rate = 0.3;
       u.pitch = 1;
       const v = getVoice();
       if (v) u.voice = v;

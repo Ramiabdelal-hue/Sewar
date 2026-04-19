@@ -112,7 +112,7 @@ function ExamenCategoryContent() {
       }
       const u = new SpeechSynthesisUtterance(text);
       u.lang = speechLang;
-      u.rate = 0.5; // سرعة أبطأ للوضوح
+      u.rate = 0.3; // سرعة أبطأ للوضوح
       u.pitch = 1;
       const v = getVoice();
       if (v) u.voice = v;
