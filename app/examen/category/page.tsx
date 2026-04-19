@@ -51,8 +51,8 @@ function ExamenCategoryContent() {
       setAudioEnabled(true);
       setShowAudioPrompt(false);
       
-      // بدء القراءة فوراً بعد تفعيل الصوت
-      if (started && !finished && questions[currentIndex]) {
+      // بدء القراءة فوراً بعد تفعيل الصوت - فقط إذا لم يتم قراءة السؤال بعد
+      if (started && !finished && questions[currentIndex] && !hasReadCurrentQuestion) {
         setTimeout(() => {
           const q = questions[currentIndex];
           if (lang === "nl") {
@@ -62,6 +62,7 @@ function ExamenCategoryContent() {
             const hasTranslation = texts[0] && texts[0] !== (q.textNL || q.text || "");
             speakQuestion(q, hasTranslation ? texts : [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]);
           }
+          setHasReadCurrentQuestion(true);
         }, 500);
       }
     } catch (error) {
@@ -225,10 +226,10 @@ function ExamenCategoryContent() {
 
   // تشغيل القراءة بعد ثانية من كل سؤال جديد
   useEffect(() => {
-    if (!started || finished) return;
+    if (!started || finished || hasReadCurrentQuestion) return; // منع القراءة إذا تم قراءة السؤال بالفعل
+    
     killTts();
     setReadingDone(false);
-    setHasReadCurrentQuestion(false); // إعادة تعيين حالة القراءة للسؤال الجديد
 
     // Don't auto-read on mobile unless audio is enabled
     if (isMobile && !audioEnabled) {
@@ -238,48 +239,59 @@ function ExamenCategoryContent() {
     }
 
     // بدء القراءة بعد ثانية واحدة من الدخول للسؤال - مرة واحدة فقط
-    if (!hasReadCurrentQuestion) {
-      ttsRef.current = setTimeout(() => {
-        stopTtsRef.current = false;
-        const q = questions[currentIndex];
-        if (!q) { setReadingDone(true); return; }
+    ttsRef.current = setTimeout(() => {
+      if (hasReadCurrentQuestion) return; // فحص إضافي لمنع التكرار
+      
+      stopTtsRef.current = false;
+      const q = questions[currentIndex];
+      if (!q) { 
+        setReadingDone(true); 
+        return; 
+      }
 
-        setHasReadCurrentQuestion(true); // تسجيل أن السؤال تم قراءته
+      setHasReadCurrentQuestion(true); // تسجيل أن السؤال تم قراءته
 
-        const startReading = () => {
-          if (lang === "nl") {
-            speakQuestion(q, [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]);
-          } else {
-            const texts = translatedRef.current;
-            const hasTranslation = texts[0] && texts[0] !== (q.textNL || q.text || "");
-            speakQuestion(q, hasTranslation ? texts : [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]);
-          }
-        };
-
-        const voices = window.speechSynthesis.getVoices();
-        if (voices.length > 0) {
-          startReading();
+      const startReading = () => {
+        if (lang === "nl") {
+          speakQuestion(q, [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]);
         } else {
-          window.speechSynthesis.onvoiceschanged = () => {
-            window.speechSynthesis.onvoiceschanged = null;
-            if (!stopTtsRef.current && !hasReadCurrentQuestion) startReading();
-          };
-          setTimeout(() => { if (!stopTtsRef.current && !hasReadCurrentQuestion) startReading(); }, 1000);
+          const texts = translatedRef.current;
+          const hasTranslation = texts[0] && texts[0] !== (q.textNL || q.text || "");
+          speakQuestion(q, hasTranslation ? texts : [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]);
         }
+      };
 
-        // Fallback: إذا لم تبدأ القراءة خلال 10 ثوانٍ، ابدأ المؤقت
-        setTimeout(() => {
-          if (!readingDone && !stopTtsRef.current) {
-            console.log("Fallback: Starting timer after 10 seconds");
-            setReadingDone(true);
-          }
-        }, 10000);
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        startReading();
+      } else {
+        window.speechSynthesis.onvoiceschanged = () => {
+          window.speechSynthesis.onvoiceschanged = null;
+          if (!stopTtsRef.current && !hasReadCurrentQuestion) startReading();
+        };
+        setTimeout(() => { 
+          if (!stopTtsRef.current && !hasReadCurrentQuestion) startReading(); 
+        }, 1000);
+      }
 
-      }, 1000); // بدء القراءة بعد ثانية واحدة بالضبط
-    }
+      // Fallback: إذا لم تبدأ القراءة خلال 10 ثوانٍ، ابدأ المؤقت
+      setTimeout(() => {
+        if (!readingDone && !stopTtsRef.current) {
+          console.log("Fallback: Starting timer after 10 seconds");
+          setReadingDone(true);
+        }
+      }, 10000);
+
+    }, 1000); // بدء القراءة بعد ثانية واحدة بالضبط
 
     return () => { killTts(); };
-  }, [currentIndex, started, finished, audioEnabled]); // إزالة lang من dependencies لمنع إعادة القراءة عند تغيير اللغة
+  }, [currentIndex, started, finished]); // إزالة audioEnabled لمنع إعادة التشغيل
+
+  // إعادة تعيين حالة القراءة عند تغيير السؤال فقط
+  useEffect(() => {
+    setHasReadCurrentQuestion(false);
+    setReadingDone(false);
+  }, [currentIndex]);
 
   useEffect(() => {
     const fetchAll = async () => {
