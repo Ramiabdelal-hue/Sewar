@@ -404,6 +404,33 @@ export default function AdminQuestionsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterFivePoints, setFilterFivePoints] = useState(false);
   const [filterGratis, setFilterGratis] = useState(false);
+  const [fixingPoints, setFixingPoints] = useState(false);
+
+  const ADMIN_TOKEN = process.env.NEXT_PUBLIC_ADMIN_TOKEN || "";
+
+  const fixPointsToOne = async (cat: string) => {
+    const count = questions.filter(q => q.points === 5).length;
+    if (count === 0) return alert("لا توجد أسئلة بـ 5 نقاط");
+    if (!confirm(`هل تريد تحويل ${count} سؤال من 5 نقاط إلى 1 نقطة في الفئة ${cat}؟`)) return;
+    setFixingPoints(true);
+    try {
+      const res = await fetch("/api/admin/fix-points", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "x-admin-token": ADMIN_TOKEN },
+        body: JSON.stringify({ category: cat, fromPoints: 5, toPoints: 1 }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(`✅ ${data.message}`);
+        // تحديث القائمة المحلية
+        setQuestions(prev => prev.map(q => q.points === 5 ? { ...q, points: 1 } : q));
+        setFilterFivePoints(false);
+      } else {
+        alert(data.message || "خطأ في التحديث");
+      }
+    } catch { alert("خطأ في الاتصال"); }
+    finally { setFixingPoints(false); }
+  };
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
@@ -1686,6 +1713,17 @@ export default function AdminQuestionsPage() {
                     {filterFivePoints && (
                       <span className="w-4 h-4 rounded-full bg-white/30 flex items-center justify-center text-white text-xs">✕</span>
                     )}
+                  </button>
+                )}
+                {/* زر تحويل 5 نقاط → 1 نقطة - يظهر فقط إذا كان هناك أسئلة بـ 5 نقاط */}
+                {questionType === "Examen" && questions.filter(q => q.points === 5).length > 0 && (
+                  <button
+                    onClick={() => fixPointsToOne(category)}
+                    disabled={fixingPoints}
+                    className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-black transition-all whitespace-nowrap disabled:opacity-50"
+                    style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)", color: "white", boxShadow: "0 2px 8px rgba(245,158,11,0.4)" }}
+                  >
+                    {fixingPoints ? "⏳..." : `🔧 تحويل ${questions.filter(q => q.points === 5).length} سؤال → 1`}
                   </button>
                 )}
               </div>
