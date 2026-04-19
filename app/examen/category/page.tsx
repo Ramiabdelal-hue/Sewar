@@ -553,16 +553,16 @@ function ExamenCategoryContent() {
               {/* المؤقت بجانب رقم السؤال */}
               <div className={`flex items-center gap-2 px-3 py-1 rounded-full font-black text-sm border-2 transition-all ${
                 locked ? "bg-white/20 border-white/40 text-white" :
-                !readingDone ? "bg-white/20 border-white/40 text-white" :
+                !readingDone ? "bg-blue-500 border-blue-300 text-white animate-pulse" :
                 timeLeft <= 5 ? "bg-red-500 border-red-300 text-white animate-pulse" :
                 timeLeft <= 10 ? "bg-orange-500 border-orange-300 text-white" :
-                "bg-white/20 border-white/40 text-white"
+                "bg-green-500 border-green-300 text-white"
               }`}>
                 <span>{!readingDone && !locked ? "🎧" : "⏱"}</span>
                 <span className="text-lg">
                   {locked
                     ? (isAnswered && userAnswer !== null ? (userAnswer === q?.correctAnswer ? "✅" : "❌") : "⏱")
-                    : !readingDone ? "..." : timeLeft}
+                    : !readingDone ? (lang === "ar" ? "قراءة..." : lang === "nl" ? "Lezen..." : lang === "fr" ? "Lecture..." : "Reading...") : timeLeft}
                 </span>
                 {!locked && readingDone && <span className="text-xs opacity-80">s</span>}
               </div>
@@ -585,9 +585,29 @@ function ExamenCategoryContent() {
 
             {/* نص السؤال */}
             <div className="px-5 py-4 bg-white">
-              <p className={`text-lg font-bold text-gray-900 leading-relaxed mb-5 ${isRtl ? "text-right" : "text-left"}`}>
+              <p className={`text-lg font-bold text-gray-900 leading-relaxed mb-3 ${isRtl ? "text-right" : "text-left"}`}>
                 {translatedTexts[0] || q.textNL || q.text}
               </p>
+
+              {/* مؤشر حالة القراءة والمؤقت */}
+              {!locked && (
+                <div className={`text-center mb-4 p-2 rounded-lg text-sm font-bold ${
+                  !readingDone 
+                    ? "bg-blue-50 text-blue-700 border border-blue-200" 
+                    : "bg-green-50 text-green-700 border border-green-200"
+                }`}>
+                  {!readingDone 
+                    ? (lang === "ar" ? "🎧 جاري قراءة السؤال والإجابات..." : 
+                       lang === "nl" ? "🎧 Vraag en antwoorden worden voorgelezen..." : 
+                       lang === "fr" ? "🎧 Lecture de la question et des réponses..." : 
+                       "🎧 Reading question and answers...")
+                    : (lang === "ar" ? `⏱ لديك ${timeLeft} ثانية للإجابة` : 
+                       lang === "nl" ? `⏱ Je hebt ${timeLeft} seconden om te antwoorden` : 
+                       lang === "fr" ? `⏱ Vous avez ${timeLeft} secondes pour répondre` : 
+                       `⏱ You have ${timeLeft} seconds to answer`)
+                  }
+                </div>
+              )}
 
               {/* الإجابات */}
               <div className="space-y-3">
