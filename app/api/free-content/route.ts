@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
         include: { lesson: { select: { title: true, description: true } } }
       });
       examQuestions = await prisma.examQuestionA.findMany({
-        orderBy: { createdAt: "asc" },
+        where: { isFree: true }, orderBy: { createdAt: "asc" },
         include: { lesson: { select: { title: true } } }
       });
     } else if (category === "B") {
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
         include: { lesson: { select: { title: true, description: true } } }
       });
       examQuestions = await prisma.examQuestionB.findMany({
-        orderBy: { createdAt: "asc" },
+        where: { isFree: true }, orderBy: { createdAt: "asc" },
         include: { lesson: { select: { title: true } } }
       });
     } else if (category === "C") {
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
         include: { lesson: { select: { title: true, description: true } } }
       });
       examQuestions = await prisma.examQuestionC.findMany({
-        orderBy: { createdAt: "asc" },
+        where: { isFree: true }, orderBy: { createdAt: "asc" },
         include: { lesson: { select: { title: true } } }
       });
     }
