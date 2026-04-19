@@ -403,6 +403,7 @@ export default function AdminQuestionsPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterFivePoints, setFilterFivePoints] = useState(false);
+  const [filterGratis, setFilterGratis] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
@@ -980,7 +981,8 @@ export default function AdminQuestionsPage() {
       (q.textNL || "").toLowerCase().includes(searchTerm.toLowerCase());
     const matchesLesson = lessonId ? q.lessonId === parseInt(lessonId) : true;
     const matchesFivePoints = !filterFivePoints || q.points === 5;
-    return matchesSearch && matchesLesson && matchesFivePoints;
+    const matchesGratis = !filterGratis || q.isFree === true;
+    return matchesSearch && matchesLesson && matchesFivePoints && matchesGratis;
   });
 
   if (!isLogged) {
@@ -1656,6 +1658,20 @@ export default function AdminQuestionsPage() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
+                {/* زر فلتر Gratis */}
+                <button
+                  onClick={() => setFilterGratis(p => !p)}
+                  className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-black transition-all whitespace-nowrap"
+                  style={filterGratis
+                    ? { background: "linear-gradient(135deg, #16a34a, #15803d)", color: "white", boxShadow: "0 2px 8px rgba(22,163,74,0.4)" }
+                    : { background: "#f8fafc", color: "#6b7280", border: "1.5px solid #e2e8f0" }
+                  }
+                >
+                  🎁 Gratis
+                  {filterGratis && (
+                    <span className="w-4 h-4 rounded-full bg-white/30 flex items-center justify-center text-white text-xs">✕</span>
+                  )}
+                </button>
                 {/* زر فلتر 5 نقاط - يظهر فقط في قسم الامتحانات */}
                 {questionType === "Examen" && (
                   <button
@@ -1673,13 +1689,20 @@ export default function AdminQuestionsPage() {
                   </button>
                 )}
               </div>
-              {/* عداد نتائج الفلتر */}
-              {filterFivePoints && questionType === "Examen" && (
-                <div className="mt-2 flex items-center gap-2">
-                  <span className="px-2.5 py-1 rounded-full text-xs font-black" style={{ background: "rgba(239,68,68,0.1)", color: "#dc2626", border: "1px solid rgba(239,68,68,0.3)" }}>
-                    ⭐ {filteredQuestions.length} سؤال بـ 5 نقاط
-                  </span>
-                  <span className="text-xs text-gray-400">من أصل {questions.length} سؤال</span>
+              {/* عداد نتائج الفلاتر */}
+              {(filterGratis || filterFivePoints) && (
+                <div className="mt-2 flex items-center gap-2 flex-wrap">
+                  {filterGratis && (
+                    <span className="px-2.5 py-1 rounded-full text-xs font-black" style={{ background: "rgba(22,163,74,0.1)", color: "#16a34a", border: "1px solid rgba(22,163,74,0.3)" }}>
+                      🎁 {questions.filter(q => q.isFree).length} سؤال Gratis
+                    </span>
+                  )}
+                  {filterFivePoints && questionType === "Examen" && (
+                    <span className="px-2.5 py-1 rounded-full text-xs font-black" style={{ background: "rgba(239,68,68,0.1)", color: "#dc2626", border: "1px solid rgba(239,68,68,0.3)" }}>
+                      ⭐ {questions.filter(q => q.points === 5).length} سؤال بـ 5 نقاط
+                    </span>
+                  )}
+                  <span className="text-xs text-gray-400">نتائج: {filteredQuestions.length} من {questions.length}</span>
                 </div>
               )}
             </div>
