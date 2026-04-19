@@ -89,16 +89,8 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
       setAudioEnabled(true);
       setShowAudioPrompt(false);
       
-      // بدء القراءة فوراً بعد تفعيل الصوت
-      if (started && !finished && questions[currentIndex]) {
-        setTimeout(() => {
-          const q = questions[currentIndex];
-          const texts = lang === "nl"
-            ? [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]
-            : translatedRef.current;
-          speakQuestion(q, texts);
-        }, 500);
-      }
+      // لا نبدأ القراءة هنا - سيتولى useEffect الرئيسي هذا الأمر
+      // هذا يمنع التكرار في القراءة
     } catch (error) {
       console.error('Error enabling audio:', error);
     }
@@ -270,13 +262,13 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
     setReadingDone(false);
     setHasReadCurrentQuestion(false); // إعادة تعيين حالة القراءة للسؤال الجديد
 
-    // Don't auto-read on mobile unless audio is enabled
+    // على الهاتف: إذا لم يتم تفعيل الصوت، عرض النافذة وانتظار التفعيل
     if (isMobile && !audioEnabled) {
       setShowAudioPrompt(true);
-      return; // لا تبدأ المؤقت حتى يتم تفعيل الصوت
+      return; // لا تبدأ القراءة - ستبدأ عند تفعيل الصوت
     }
 
-    // بدء القراءة بعد ثانية واحدة من الدخول للسؤال
+    // على الكمبيوتر أو بعد تفعيل الصوت: بدء القراءة بعد ثانية واحدة
     ttsRef.current = setTimeout(() => {
       stopTtsRef.current = false;
       const q = questions[currentIndex];
@@ -304,7 +296,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
     }, 1000); // بدء القراءة بعد ثانية واحدة بالضبط
 
     return () => { killTts(); };
-  }, [currentIndex, started, finished, audioEnabled]);
+  }, [currentIndex, started, finished, audioEnabled]); // إضافة audioEnabled كـ dependency
 
   // مؤقت 15 ثانية - يبدأ فقط بعد انتهاء القراءة
   useEffect(() => {

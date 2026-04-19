@@ -51,19 +51,8 @@ function ExamenCategoryContent() {
       setAudioEnabled(true);
       setShowAudioPrompt(false);
       
-      // بدء القراءة فوراً بعد تفعيل الصوت
-      if (started && !finished && questions[currentIndex]) {
-        setTimeout(() => {
-          const q = questions[currentIndex];
-          if (lang === "nl") {
-            speakQuestion(q, [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]);
-          } else {
-            const texts = translatedRef.current;
-            const hasTranslation = texts[0] && texts[0] !== (q.textNL || q.text || "");
-            speakQuestion(q, hasTranslation ? texts : [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]);
-          }
-        }, 500);
-      }
+      // لا نبدأ القراءة هنا - سيتولى useEffect الرئيسي هذا الأمر
+      // هذا يمنع التكرار في القراءة
     } catch (error) {
       console.error('Error enabling audio:', error);
     }
@@ -230,13 +219,13 @@ function ExamenCategoryContent() {
     setReadingDone(false);
     setHasReadCurrentQuestion(false); // إعادة تعيين حالة القراءة للسؤال الجديد
 
-    // Don't auto-read on mobile unless audio is enabled
+    // على الهاتف: إذا لم يتم تفعيل الصوت، عرض النافذة وانتظار التفعيل
     if (isMobile && !audioEnabled) {
       setShowAudioPrompt(true);
-      return; // لا تبدأ المؤقت حتى يتم تفعيل الصوت
+      return; // لا تبدأ القراءة - ستبدأ عند تفعيل الصوت
     }
 
-    // بدء القراءة بعد ثانية واحدة من الدخول للسؤال
+    // على الكمبيوتر أو بعد تفعيل الصوت: بدء القراءة بعد ثانية واحدة
     ttsRef.current = setTimeout(() => {
       stopTtsRef.current = false;
       const q = questions[currentIndex];
@@ -267,7 +256,7 @@ function ExamenCategoryContent() {
     }, 1000); // بدء القراءة بعد ثانية واحدة بالضبط
 
     return () => { killTts(); };
-  }, [currentIndex, started, finished, audioEnabled]);
+  }, [currentIndex, started, finished, audioEnabled]); // إضافة audioEnabled كـ dependency
 
   useEffect(() => {
     const fetchAll = async () => {
