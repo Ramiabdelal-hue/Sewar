@@ -7,6 +7,15 @@ export default function PWAStart() {
   const router = useRouter();
 
   useEffect(() => {
+    // تحقق إذا كان الـ manifest الحالي هو Admin
+    const manifestLink = document.querySelector('link[rel="manifest"]') as HTMLLinkElement;
+    const isAdminPWA = manifestLink?.href?.includes("manifest-admin");
+
+    if (isAdminPWA) {
+      router.replace("/admin/questions");
+      return;
+    }
+
     // اقرأ آخر صفحة كانت مفتوحة
     const lastPage = localStorage.getItem("pwa_last_page") || "/";
     router.replace(lastPage);

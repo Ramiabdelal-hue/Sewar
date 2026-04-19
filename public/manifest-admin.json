@@ -3,7 +3,7 @@
   "short_name": "Sewar Admin",
   "description": "Sewar Rijbewijsonline - Admin Panel",
   "start_url": "/admin/questions",
-  "scope": "/",
+  "scope": "/admin/",
   "display": "standalone",
   "background_color": "#1e1b4b",
   "theme_color": "#1e1b4b",
