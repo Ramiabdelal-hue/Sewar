@@ -286,7 +286,7 @@ function ExamenCategoryContent() {
     } catch {}
   };
 
-  // صوت تصفيق + ورود عند الإجابة الصحيحة
+  // صوت تصفيق احترافي + ورود عند الإجابة الصحيحة
   const playApplause = () => {
     try {
       if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
@@ -295,26 +295,70 @@ function ExamenCategoryContent() {
       const ctx = audioCtxRef.current;
       if (ctx.state === 'suspended') ctx.resume();
 
-      const duration = 1.5;
       const sampleRate = ctx.sampleRate;
-      const bufferSize = sampleRate * duration;
-      const buffer = ctx.createBuffer(1, bufferSize, sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
+
+      const makeClap = (startTime: number, intensity: number) => {
+        const clapDuration = 0.12;
+        const bufSize = Math.floor(sampleRate * clapDuration);
+        const buf = ctx.createBuffer(2, bufSize, sampleRate);
+        for (let ch = 0; ch < 2; ch++) {
+          const d = buf.getChannelData(ch);
+          for (let i = 0; i < bufSize; i++) {
+            const t = i / sampleRate;
+            const env = Math.exp(-t * 35) * (1 - Math.exp(-t * 800));
+            const noise = (Math.random() * 2 - 1);
+            const snap = Math.sin(2 * Math.PI * 1200 * t) * Math.exp(-t * 80);
+            d[i] = (noise * 0.7 + snap * 0.3) * env * intensity;
+          }
+        }
+        const src = ctx.createBufferSource();
+        src.buffer = buf;
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 1100;
+        filter.Q.value = 0.8;
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(intensity, ctx.currentTime + startTime);
+        src.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+        src.start(ctx.currentTime + startTime);
+      };
+
+      const clapPattern = [
+        0.00, 0.05, 0.08, 0.12, 0.16,
+        0.35, 0.38, 0.42, 0.46, 0.50,
+        0.65, 0.68, 0.70, 0.73, 0.76, 0.79,
+        1.00, 1.03, 1.07, 1.12, 1.18,
+        1.40, 1.45, 1.52, 1.60,
+        1.80, 1.90, 2.05, 2.20,
+      ];
+      clapPattern.forEach((t) => {
+        const intensity = 0.5 + Math.random() * 0.5;
+        const jitter = (Math.random() - 0.5) * 0.015;
+        makeClap(t + jitter, intensity);
+      });
+
+      const cheerDuration = 2.0;
+      const cheerBuf = ctx.createBuffer(1, Math.floor(sampleRate * cheerDuration), sampleRate);
+      const cheerData = cheerBuf.getChannelData(0);
+      for (let i = 0; i < cheerData.length; i++) {
         const t = i / sampleRate;
-        const envelope = Math.sin((t / duration) * Math.PI);
-        const pulse = Math.abs(Math.sin(t * 6 * Math.PI)) > 0.5 ? 1 : 0.2;
-        const noise = (Math.random() * 2 - 1);
-        data[i] = noise * envelope * pulse * 0.5;
+        const env = Math.sin((t / cheerDuration) * Math.PI) * 0.15;
+        cheerData[i] = (Math.random() * 2 - 1) * env;
       }
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
-      const gain = ctx.createGain();
-      gain.gain.setValueAtTime(1, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-      source.connect(gain);
-      gain.connect(ctx.destination);
-      source.start();
+      const cheerSrc = ctx.createBufferSource();
+      cheerSrc.buffer = cheerBuf;
+      const cheerFilter = ctx.createBiquadFilter();
+      cheerFilter.type = 'lowpass';
+      cheerFilter.frequency.value = 400;
+      const cheerGain = ctx.createGain();
+      cheerGain.gain.setValueAtTime(0.3, ctx.currentTime);
+      cheerSrc.connect(cheerFilter);
+      cheerFilter.connect(cheerGain);
+      cheerGain.connect(ctx.destination);
+      cheerSrc.start(ctx.currentTime + 0.1);
+
     } catch (e) { console.error('Applause error:', e); }
   };
 
