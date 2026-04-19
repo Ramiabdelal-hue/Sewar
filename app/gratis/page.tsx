@@ -89,14 +89,13 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
       setAudioEnabled(true);
       setShowAudioPrompt(false);
       
-      // بدء القراءة فوراً بعد تفعيل الصوت - فقط إذا لم يتم قراءة السؤال بعد
-      if (started && !finished && questions[currentIndex] && !hasReadCurrentQuestion) {
+      // بدء القراءة فوراً بعد تفعيل الصوت
+      if (started && !finished && questions[currentIndex]) {
         setTimeout(() => {
           const q = questions[currentIndex];
           const texts = lang === "nl"
             ? [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]
             : translatedRef.current;
-          setHasReadCurrentQuestion(true);
           speakQuestion(q, texts);
         }, 500);
       }
@@ -266,28 +265,22 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
 
   // تشغيل القراءة بعد ثانية (لإعطاء الترجمة وقتاً كافياً)
   useEffect(() => {
-    if (!started || finished || hasReadCurrentQuestion) return; // منع القراءة إذا تم قراءة السؤال بالفعل
-    
+    if (!started || finished) return;
     killTts();
     setReadingDone(false);
+    setHasReadCurrentQuestion(false); // إعادة تعيين حالة القراءة للسؤال الجديد
 
     // Don't auto-read on mobile unless audio is enabled
     if (isMobile && !audioEnabled) {
       setShowAudioPrompt(true);
-      setReadingDone(true); // ابدأ المؤقت حتى لو لم يتم تفعيل الصوت
-      return;
+      return; // لا تبدأ المؤقت حتى يتم تفعيل الصوت
     }
 
-    // بدء القراءة بعد ثانية واحدة من الدخول للسؤال - مرة واحدة فقط
+    // بدء القراءة بعد ثانية واحدة من الدخول للسؤال
     ttsRef.current = setTimeout(() => {
-      if (hasReadCurrentQuestion) return; // فحص إضافي لمنع التكرار
-      
       stopTtsRef.current = false;
       const q = questions[currentIndex];
-      if (!q) { 
-        setReadingDone(true); 
-        return; 
-      }
+      if (!q) { setReadingDone(true); return; }
 
       setHasReadCurrentQuestion(true); // تسجيل أن السؤال تم قراءته
 
@@ -304,31 +297,14 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
       } else {
         window.speechSynthesis.onvoiceschanged = () => {
           window.speechSynthesis.onvoiceschanged = null;
-          if (!stopTtsRef.current && !hasReadCurrentQuestion) startReading();
+          if (!stopTtsRef.current) startReading();
         };
-        setTimeout(() => { 
-          if (!stopTtsRef.current && !hasReadCurrentQuestion) startReading(); 
-        }, 1000);
+        setTimeout(() => { if (!stopTtsRef.current) startReading(); }, 1000);
       }
-
-      // Fallback: إذا لم تبدأ القراءة خلال 10 ثوانٍ، ابدأ المؤقت
-      setTimeout(() => {
-        if (!readingDone && !stopTtsRef.current) {
-          console.log("Fallback: Starting timer after 10 seconds");
-          setReadingDone(true);
-        }
-      }, 10000);
-
     }, 1000); // بدء القراءة بعد ثانية واحدة بالضبط
 
     return () => { killTts(); };
-  }, [currentIndex, started, finished]); // إزالة audioEnabled لمنع إعادة التشغيل
-
-  // إعادة تعيين حالة القراءة عند تغيير السؤال فقط
-  useEffect(() => {
-    setHasReadCurrentQuestion(false);
-    setReadingDone(false);
-  }, [currentIndex]);
+  }, [currentIndex, started, finished, audioEnabled]);
 
   // مؤقت 15 ثانية - يبدأ فقط بعد انتهاء القراءة
   useEffect(() => {
