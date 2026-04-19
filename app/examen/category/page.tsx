@@ -67,9 +67,13 @@ function ExamenCategoryContent() {
 
   // قراءة تلقائية للسؤال والإجابات
   const speakQuestion = (q: any, translated: string[]) => {
-    if (!window.speechSynthesis || !q) return;
+    if (!window.speechSynthesis || !q) {
+      setReadingDone(true);
+      return;
+    }
     if (isMobile && !audioEnabled) {
       setShowAudioPrompt(true);
+      setReadingDone(true); // إذا لم يتم تفعيل الصوت، ابدأ المؤقت
       return;
     }
     
@@ -94,16 +98,33 @@ function ExamenCategoryContent() {
     const isValid = () => ttsSessionRef.current === session && !stopTtsRef.current;
 
     const speak = (text: string, onEnd?: () => void) => {
-      if (!isValid()) return;
-      if (!text) { if (onEnd) onEnd(); return; }
+      if (!isValid()) {
+        setReadingDone(true);
+        return;
+      }
+      if (!text) { 
+        if (onEnd) onEnd(); 
+        else setReadingDone(true);
+        return; 
+      }
       const u = new SpeechSynthesisUtterance(text);
       u.lang = speechLang;
       u.rate = 0.75;
       u.pitch = 1;
       const v = getVoice();
       if (v) u.voice = v;
-      if (onEnd) u.onend = () => { if (isValid()) onEnd(); };
-      u.onerror = () => { if (isValid() && onEnd) onEnd(); };
+      if (onEnd) {
+        u.onend = () => { 
+          if (isValid()) onEnd(); 
+          else setReadingDone(true);
+        };
+      } else {
+        u.onend = () => setReadingDone(true);
+      }
+      u.onerror = () => { 
+        if (isValid() && onEnd) onEnd(); 
+        else setReadingDone(true);
+      };
       window.speechSynthesis.speak(u);
     };
 
@@ -122,18 +143,48 @@ function ExamenCategoryContent() {
       ? ["Answer A:", "Answer B:", "Answer C:"]
       : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
 
-    if (!questionText) { setReadingDone(true); return; }
+    if (!questionText) { 
+      setReadingDone(true); 
+      return; 
+    }
+
     speak(questionText, () => {
+      if (!isValid()) {
+        setReadingDone(true);
+        return;
+      }
+      
       let i = 0;
       const readNext = () => {
-        if (!isValid()) return;
-        if (i >= answersList.length) { setReadingDone(true); return; }
+        if (!isValid()) {
+          setReadingDone(true);
+          return;
+        }
+        if (i >= answersList.length) { 
+          setReadingDone(true); 
+          return; 
+        }
         speak(`${labels[i]} ${answersList[i]}`, () => {
           i++;
-          ttsRef.current = setTimeout(() => { if (isValid()) readNext(); }, 400);
+          if (i >= answersList.length) {
+            setReadingDone(true);
+          } else {
+            ttsRef.current = setTimeout(() => { 
+              if (isValid()) readNext(); 
+              else setReadingDone(true);
+            }, 400);
+          }
         });
       };
-      ttsRef.current = setTimeout(() => { if (isValid()) readNext(); }, 600);
+      
+      if (answersList.length === 0) {
+        setReadingDone(true);
+      } else {
+        ttsRef.current = setTimeout(() => { 
+          if (isValid()) readNext(); 
+          else setReadingDone(true);
+        }, 600);
+      }
     });
   };
 
@@ -146,6 +197,7 @@ function ExamenCategoryContent() {
     // Don't auto-read on mobile unless audio is enabled
     if (isMobile && !audioEnabled) {
       setShowAudioPrompt(true);
+      setReadingDone(true); // ابدأ المؤقت حتى لو لم يتم تفعيل الصوت
       return;
     }
 
@@ -174,6 +226,15 @@ function ExamenCategoryContent() {
         };
         setTimeout(() => { if (!stopTtsRef.current) startReading(); }, 1000);
       }
+
+      // Fallback: إذا لم تبدأ القراءة خلال 10 ثوانٍ، ابدأ المؤقت
+      setTimeout(() => {
+        if (!readingDone && !stopTtsRef.current) {
+          console.log("Fallback: Starting timer after 10 seconds");
+          setReadingDone(true);
+        }
+      }, 10000);
+
     }, 1000);
 
     return () => { killTts(); };
