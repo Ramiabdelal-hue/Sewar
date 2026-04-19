@@ -145,14 +145,40 @@ function LessonViewContent() {
   const ttsSessionRef = useRef(0);
   const [isReading, setIsReading] = useState(false);
   const [readingDone, setReadingDone] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(false);
+  const [showAudioPrompt, setShowAudioPrompt] = useState(false);
 
-  // Language mapping for TTS
-  const langMap: Record<string, string> = {
-    nl: "nl-NL",
-    fr: "fr-FR", 
-    ar: "ar-SA",
-    en: "en-US"
+  // Check if device is mobile
+  const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+  // Enable audio function for mobile
+  const enableAudio = async () => {
+    if (!window.speechSynthesis) return;
+    
+    try {
+      // Create a silent utterance to initialize speech synthesis
+      const utterance = new SpeechSynthesisUtterance(' ');
+      utterance.volume = 0;
+      window.speechSynthesis.speak(utterance);
+      
+      setAudioEnabled(true);
+      setShowAudioPrompt(false);
+      
+      // Start reading current question after enabling
+      if (filteredQuestions[currentIndex]) {
+        setTimeout(() => speakContent(filteredQuestions[currentIndex]), 500);
+      }
+    } catch (error) {
+      console.error('Error enabling audio:', error);
+    }
   };
+
+  // Check if audio prompt should be shown
+  useEffect(() => {
+    if (isMobile && !audioEnabled && filteredQuestions.length > 0) {
+      setShowAudioPrompt(true);
+    }
+  }, [isMobile, audioEnabled, filteredQuestions.length]);
 
   // Stop TTS function
   const killTts = () => {
@@ -169,9 +195,21 @@ function LessonViewContent() {
     setIsReading(false);
   };
 
+  // Language mapping for TTS
+  const langMap: Record<string, string> = {
+    nl: "nl-NL",
+    fr: "fr-FR", 
+    ar: "ar-SA",
+    en: "en-US"
+  };
+
   // Read question and explanation
   const speakContent = (question: Question) => {
     if (!window.speechSynthesis || !question) return;
+    if (isMobile && !audioEnabled) {
+      setShowAudioPrompt(true);
+      return;
+    }
     
     stopTtsRef.current = false;
     const session = ttsSessionRef.current;
@@ -252,6 +290,12 @@ function LessonViewContent() {
     killTts();
     setReadingDone(false);
 
+    // Don't auto-read on mobile unless audio is enabled
+    if (isMobile && !audioEnabled) {
+      setShowAudioPrompt(true);
+      return;
+    }
+
     ttsRef.current = setTimeout(() => {
       const question = filteredQuestions[currentIndex];
       if (!question) return;
@@ -267,7 +311,7 @@ function LessonViewContent() {
     }, 500);
 
     return () => killTts();
-  }, [currentIndex, filteredQuestions, lang]);
+  }, [currentIndex, filteredQuestions, lang, audioEnabled]);
 
   // Debounce search term
   useEffect(() => {
@@ -513,6 +557,40 @@ function LessonViewContent() {
       
       <div className="py-8 px-4">
         <div className="max-w-4xl mx-auto">
+          {/* Audio Enable Prompt for Mobile */}
+          {showAudioPrompt && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.7)" }}>
+              <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
+                <div className="text-4xl mb-4">🔊</div>
+                <h3 className="text-lg font-bold text-gray-800 mb-2">
+                  {lang === "ar" ? "تفعيل القراءة الصوتية" : 
+                   lang === "nl" ? "Audio inschakelen" : 
+                   lang === "fr" ? "Activer l'audio" : 
+                   "Enable Audio"}
+                </h3>
+                <p className="text-sm text-gray-600 mb-6">
+                  {lang === "ar" ? "اضغط لتفعيل القراءة الصوتية للأسئلة والشروحات" : 
+                   lang === "nl" ? "Tik om audio voor vragen en uitleg in te schakelen" : 
+                   lang === "fr" ? "Appuyez pour activer l'audio des questions et explications" : 
+                   "Tap to enable audio for questions and explanations"}
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={enableAudio}
+                    className="flex-1 py-3 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition-colors"
+                  >
+                    {lang === "ar" ? "تفعيل" : lang === "nl" ? "Inschakelen" : lang === "fr" ? "Activer" : "Enable"}
+                  </button>
+                  <button
+                    onClick={() => setShowAudioPrompt(false)}
+                    className="flex-1 py-3 bg-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-400 transition-colors"
+                  >
+                    {lang === "ar" ? "تخطي" : lang === "nl" ? "Overslaan" : lang === "fr" ? "Ignorer" : "Skip"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           {/* Header */}
           <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
             <div className="flex items-center justify-between mb-4">

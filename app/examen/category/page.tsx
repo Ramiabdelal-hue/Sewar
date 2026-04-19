@@ -31,6 +31,28 @@ function ExamenCategoryContent() {
   const stopTtsRef = useRef(false);
   const ttsSessionRef = useRef(0); // session ID — كل سؤال له رقم فريد
   const [readingDone, setReadingDone] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(false);
+  const [showAudioPrompt, setShowAudioPrompt] = useState(false);
+
+  // Check if device is mobile
+  const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+  // Enable audio function for mobile
+  const enableAudio = async () => {
+    if (!window.speechSynthesis) return;
+    
+    try {
+      // Create a silent utterance to initialize speech synthesis
+      const utterance = new SpeechSynthesisUtterance(' ');
+      utterance.volume = 0;
+      window.speechSynthesis.speak(utterance);
+      
+      setAudioEnabled(true);
+      setShowAudioPrompt(false);
+    } catch (error) {
+      console.error('Error enabling audio:', error);
+    }
+  };
 
   // دالة إيقاف فوري شاملة
   const killTts = () => {
@@ -46,6 +68,11 @@ function ExamenCategoryContent() {
   // قراءة تلقائية للسؤال والإجابات
   const speakQuestion = (q: any, translated: string[]) => {
     if (!window.speechSynthesis || !q) return;
+    if (isMobile && !audioEnabled) {
+      setShowAudioPrompt(true);
+      return;
+    }
+    
     stopTtsRef.current = false;
     const session = ttsSessionRef.current; // احفظ الـ session الحالي
     window.speechSynthesis.cancel();
@@ -116,6 +143,12 @@ function ExamenCategoryContent() {
     killTts();
     setReadingDone(false);
 
+    // Don't auto-read on mobile unless audio is enabled
+    if (isMobile && !audioEnabled) {
+      setShowAudioPrompt(true);
+      return;
+    }
+
     ttsRef.current = setTimeout(() => {
       stopTtsRef.current = false;
       const q = questions[currentIndex];
@@ -144,7 +177,7 @@ function ExamenCategoryContent() {
     }, 1000);
 
     return () => { killTts(); };
-  }, [currentIndex, started, finished]);
+  }, [currentIndex, started, finished, audioEnabled]);
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -460,6 +493,42 @@ function ExamenCategoryContent() {
   return (
     <div className="min-h-screen bg-white" dir={isRtl ? "rtl" : "ltr"}>
       <Navbar />
+      
+      {/* Audio Enable Prompt for Mobile */}
+      {showAudioPrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.7)" }}>
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
+            <div className="text-4xl mb-4">🔊</div>
+            <h3 className="text-lg font-bold text-gray-800 mb-2">
+              {lang === "ar" ? "تفعيل القراءة الصوتية" : 
+               lang === "nl" ? "Audio inschakelen" : 
+               lang === "fr" ? "Activer l'audio" : 
+               "Enable Audio"}
+            </h3>
+            <p className="text-sm text-gray-600 mb-6">
+              {lang === "ar" ? "اضغط لتفعيل القراءة الصوتية للأسئلة والإجابات" : 
+               lang === "nl" ? "Tik om audio voor vragen en antwoorden in te schakelen" : 
+               lang === "fr" ? "Appuyez pour activer l'audio des questions et réponses" : 
+               "Tap to enable audio for questions and answers"}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={enableAudio}
+                className="flex-1 py-3 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition-colors"
+              >
+                {lang === "ar" ? "تفعيل" : lang === "nl" ? "Inschakelen" : lang === "fr" ? "Activer" : "Enable"}
+              </button>
+              <button
+                onClick={() => setShowAudioPrompt(false)}
+                className="flex-1 py-3 bg-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-400 transition-colors"
+              >
+                {lang === "ar" ? "تخطي" : lang === "nl" ? "Overslaan" : lang === "fr" ? "Ignorer" : "Skip"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <div className="max-w-2xl mx-auto px-4 py-6">
 
         {/* السؤال */}
