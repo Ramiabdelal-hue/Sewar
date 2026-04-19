@@ -49,6 +49,20 @@ function ExamenCategoryContent() {
       
       setAudioEnabled(true);
       setShowAudioPrompt(false);
+      
+      // بدء القراءة فوراً بعد تفعيل الصوت
+      if (started && !finished && questions[currentIndex]) {
+        setTimeout(() => {
+          const q = questions[currentIndex];
+          if (lang === "nl") {
+            speakQuestion(q, [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]);
+          } else {
+            const texts = translatedRef.current;
+            const hasTranslation = texts[0] && texts[0] !== (q.textNL || q.text || "");
+            speakQuestion(q, hasTranslation ? texts : [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]);
+          }
+        }, 500);
+      }
     } catch (error) {
       console.error('Error enabling audio:', error);
     }
@@ -201,6 +215,7 @@ function ExamenCategoryContent() {
       return;
     }
 
+    // بدء القراءة بعد ثانية واحدة من الدخول للسؤال
     ttsRef.current = setTimeout(() => {
       stopTtsRef.current = false;
       const q = questions[currentIndex];
@@ -235,7 +250,7 @@ function ExamenCategoryContent() {
         }
       }, 10000);
 
-    }, 1000);
+    }, 1000); // بدء القراءة بعد ثانية واحدة بالضبط
 
     return () => { killTts(); };
   }, [currentIndex, started, finished, audioEnabled]);
@@ -287,7 +302,7 @@ function ExamenCategoryContent() {
 
   const handleAnswer = (num: number) => {
     if (locked || answers[currentIndex] !== undefined) return;
-    killTts();
+    killTts(); // إيقاف القراءة فوراً عند اختيار الإجابة
     clearInterval(timerRef.current!);
     setAnswers(a => ({ ...a, [currentIndex]: num }));
     setLocked(true);

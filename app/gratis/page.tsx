@@ -87,6 +87,17 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
       
       setAudioEnabled(true);
       setShowAudioPrompt(false);
+      
+      // بدء القراءة فوراً بعد تفعيل الصوت
+      if (started && !finished && questions[currentIndex]) {
+        setTimeout(() => {
+          const q = questions[currentIndex];
+          const texts = lang === "nl"
+            ? [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]
+            : translatedRef.current;
+          speakQuestion(q, texts);
+        }, 500);
+      }
     } catch (error) {
       console.error('Error enabling audio:', error);
     }
@@ -244,6 +255,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
       return;
     }
 
+    // بدء القراءة بعد ثانية واحدة من الدخول للسؤال
     ttsRef.current = setTimeout(() => {
       stopTtsRef.current = false;
       const q = questions[currentIndex];
@@ -275,7 +287,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
         }
       }, 10000);
 
-    }, 1000);
+    }, 1000); // بدء القراءة بعد ثانية واحدة بالضبط
 
     return () => { killTts(); };
   }, [currentIndex, started, finished, audioEnabled]);
@@ -302,7 +314,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
 
   const handleAnswer = (num: number) => {
     if (locked || answers[currentIndex] !== undefined) return;
-    killTts();
+    killTts(); // إيقاف القراءة فوراً عند اختيار الإجابة
     clearInterval(timerRef.current!);
     setAnswers(a => ({ ...a, [currentIndex]: num }));
     setLocked(true);
