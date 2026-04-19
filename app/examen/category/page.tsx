@@ -32,6 +32,8 @@ function ExamenCategoryContent() {
   const ttsSessionRef = useRef(0);
   const [readingDone, setReadingDone] = useState(false);
   const [hasReadCurrentQuestion, setHasReadCurrentQuestion] = useState(false);
+  const [showRoses, setShowRoses] = useState(false);
+  const audioCtxRef = useRef<AudioContext | null>(null);
 
   // دالة إيقاف فوري شاملة
   const killTts = () => {
@@ -42,15 +44,6 @@ function ExamenCategoryContent() {
       window.speechSynthesis.pause();
       window.speechSynthesis.cancel();
     }
-  };
-
-  // فتح قناة الصوت عند أول تفاعل (مطلوب على iOS/Android)
-  const unlockAudio = () => {
-    if (!window.speechSynthesis) return;
-    const u = new SpeechSynthesisUtterance('');
-    u.volume = 0;
-    u.rate = 1;
-    window.speechSynthesis.speak(u);
   };
 
   // قراءة تلقائية للسؤال والإجابات - نفس السلوك على كل الأجهزة
@@ -278,38 +271,65 @@ function ExamenCategoryContent() {
     return () => clearInterval(timerRef.current!);
   }, [currentIndex, started, finished, readingDone]);
 
-  // صوت تصفيق عند الإجابة الصحيحة
+  // فتح قناة الصوت عند أول تفاعل (مطلوب على iOS/Android)
+  const unlockAudio = () => {
+    if (!window.speechSynthesis) return;
+    const u = new SpeechSynthesisUtterance('');
+    u.volume = 0;
+    u.rate = 1;
+    window.speechSynthesis.speak(u);
+    try {
+      if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
+        audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      if (audioCtxRef.current.state === 'suspended') audioCtxRef.current.resume();
+    } catch {}
+  };
+
+  // صوت تصفيق + ورود عند الإجابة الصحيحة
   const playApplause = () => {
     try {
-      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const duration = 1.2;
-      const bufferSize = ctx.sampleRate * duration;
-      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
+        audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      const ctx = audioCtxRef.current;
+      if (ctx.state === 'suspended') ctx.resume();
+
+      const duration = 1.5;
+      const sampleRate = ctx.sampleRate;
+      const bufferSize = sampleRate * duration;
+      const buffer = ctx.createBuffer(1, bufferSize, sampleRate);
       const data = buffer.getChannelData(0);
       for (let i = 0; i < bufferSize; i++) {
-        const envelope = Math.sin((i / bufferSize) * Math.PI);
-        const burst = Math.random() < 0.3 ? (Math.random() * 2 - 1) : 0;
-        data[i] = burst * envelope * 0.6;
+        const t = i / sampleRate;
+        const envelope = Math.sin((t / duration) * Math.PI);
+        const pulse = Math.abs(Math.sin(t * 6 * Math.PI)) > 0.5 ? 1 : 0.2;
+        const noise = (Math.random() * 2 - 1);
+        data[i] = noise * envelope * pulse * 0.5;
       }
       const source = ctx.createBufferSource();
       source.buffer = buffer;
-      const gainNode = ctx.createGain();
-      gainNode.gain.setValueAtTime(0.8, ctx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-      source.connect(gainNode);
-      gainNode.connect(ctx.destination);
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      source.connect(gain);
+      gain.connect(ctx.destination);
       source.start();
-      source.onended = () => ctx.close();
-    } catch {}
+    } catch (e) { console.error('Applause error:', e); }
+  };
+
+  const launchRoses = () => {
+    setShowRoses(true);
+    setTimeout(() => setShowRoses(false), 2500);
   };
 
   const handleAnswer = (num: number) => {
     if (locked || answers[currentIndex] !== undefined) return;
     killTts();
     clearInterval(timerRef.current!);
-    // تصفيق إذا كانت الإجابة صحيحة
     if (questions[currentIndex]?.correctAnswer === num) {
       playApplause();
+      launchRoses();
     }
     setAnswers(a => ({ ...a, [currentIndex]: num }));
     setLocked(true);
@@ -576,6 +596,35 @@ function ExamenCategoryContent() {
   return (
     <div className="min-h-screen bg-white" dir={isRtl ? "rtl" : "ltr"}>
       <Navbar />
+
+      {/* تأثير الورود عند الإجابة الصحيحة */}
+      {showRoses && (
+        <div className="fixed inset-0 z-[9999] pointer-events-none overflow-hidden">
+          {Array.from({ length: 18 }).map((_, i) => (
+            <div
+              key={i}
+              style={{
+                position: 'absolute',
+                left: `${Math.random() * 100}%`,
+                top: '-60px',
+                fontSize: `${1.5 + Math.random() * 1.5}rem`,
+                animation: `roseFall ${1.2 + Math.random() * 1.2}s ease-in forwards`,
+                animationDelay: `${Math.random() * 0.6}s`,
+                transform: `rotate(${Math.random() * 360}deg)`,
+              }}
+            >
+              {['🌹','🌸','🌺','💐','🌷'][Math.floor(Math.random() * 5)]}
+            </div>
+          ))}
+          <style>{`
+            @keyframes roseFall {
+              0%   { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+              80%  { opacity: 1; }
+              100% { transform: translateY(110vh) rotate(720deg) scale(0.5); opacity: 0; }
+            }
+          `}</style>
+        </div>
+      )}
       
       <div className="max-w-2xl mx-auto px-4 py-6">
 
