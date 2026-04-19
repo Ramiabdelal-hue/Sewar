@@ -70,6 +70,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
   const ttsRef = useRef<NodeJS.Timeout | null>(null);
   const stopTtsRef = useRef(false);
   const ttsSessionRef = useRef(0);
+  const audioCtxRef = useRef<AudioContext | null>(null);
   const isRtl = lang === "ar";
 
   // خلط الأسئلة عند أول تحميل أو عند تغيير الأسئلة
@@ -273,8 +274,6 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
   const [showRoses, setShowRoses] = useState(false);
 
   // صوت تصفيق + ورود عند الإجابة الصحيحة
-  const audioCtxRef = useRef<AudioContext | null>(null);
-
   const playApplause = () => {
     try {
       // أعد استخدام نفس AudioContext المفتوح من unlockAudio
