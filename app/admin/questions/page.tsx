@@ -393,6 +393,7 @@ export default function AdminQuestionsPage() {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [isLogged, setIsLogged] = useState(false);
+  const [showInstallGuide, setShowInstallGuide] = useState(false);
   const [questionType, setQuestionType] = useState<"" | "Theori" | "Praktijk" | "Examen">("");
   const [questionSubType, setQuestionSubType] = useState<"" | "lessons" | "exam">("");
 
@@ -1315,7 +1316,12 @@ export default function AdminQuestionsPage() {
               </button>
 
               {/* زر تثبيت الأدمن */}
-              <AdminManifest />
+              <button
+                onClick={() => setShowInstallGuide(true)}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-black transition-all hover:scale-105 active:scale-95"
+                style={{ background: "rgba(99,102,241,0.7)", color: "white", border: "1px solid rgba(99,102,241,0.4)" }}>
+                📲 تثبيت
+              </button>
 
               {/* زر الخروج */}
               <button onClick={() => setIsLogged(false)}
@@ -2131,6 +2137,58 @@ export default function AdminQuestionsPage() {
               className="max-w-full max-h-[90vh] object-contain rounded-lg"
               onClick={(e) => e.stopPropagation()}
             />
+          </div>
+        </div>
+      )}
+
+      {/* دليل تثبيت تطبيق الأدمن */}
+      {showInstallGuide && (
+        <div className="fixed inset-0 z-[9999] flex items-end justify-center p-4" style={{ background: "rgba(0,0,0,0.85)" }} onClick={() => setShowInstallGuide(false)}>
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm mb-4" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-black text-gray-800 mb-3 text-center">📲 تثبيت تطبيق الأدمن</h3>
+
+            <div className="mb-4 p-3 rounded-xl text-xs font-bold text-center" style={{ background: "#fef3c7", border: "1.5px solid #f59e0b" }}>
+              ⚠️ تأكد أنك الآن على هذه الصفحة<br/>
+              <span className="text-[#003399] font-black text-sm">/admin/questions</span>
+            </div>
+
+            <div className="mb-4">
+              <p className="text-sm font-black text-gray-700 mb-2">🍎 iPhone (Safari فقط):</p>
+              <div className="space-y-1.5">
+                {[
+                  "1️⃣ اضغط زر المشاركة ⬆️ في أسفل Safari",
+                  "2️⃣ مرر للأسفل → اضغط 'Add to Home Screen'",
+                  "3️⃣ اضغط Add في الأعلى الأيمن",
+                ].map((step, i) => (
+                  <div key={i} className="text-xs text-gray-700 bg-blue-50 rounded-lg p-2.5 font-medium">{step}</div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mb-5">
+              <p className="text-sm font-black text-gray-700 mb-2">🤖 Android (Chrome):</p>
+              <div className="space-y-1.5">
+                {[
+                  "1️⃣ اضغط القائمة ⋮ في أعلى يمين Chrome",
+                  "2️⃣ اضغط 'Add to Home Screen' أو 'Install App'",
+                  "3️⃣ اضغط Install للتأكيد",
+                ].map((step, i) => (
+                  <div key={i} className="text-xs text-gray-700 bg-blue-50 rounded-lg p-2.5 font-medium">{step}</div>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-3 rounded-xl text-xs text-center mb-4" style={{ background: "#f0fdf4", border: "1px solid #86efac" }}>
+              ✅ بعد التثبيت سيفتح التطبيق مباشرة على صفحة الأدمن
+            </div>
+
+            <button
+              onClick={() => setShowInstallGuide(false)}
+              className="w-full py-3 rounded-xl font-black text-white text-sm"
+              style={{ background: "linear-gradient(135deg, #1e1b4b, #3730a3)" }}
+            >
+              فهمت ✓
+            </button>
           </div>
         </div>
       )}
