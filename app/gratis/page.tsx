@@ -232,7 +232,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
     }, 1000);
 
     return () => { killTts(); };
-  }, [currentIndex, started, finished, audioEnabled]);
+  }, [currentIndex, started, finished]);
 
   // مؤقت 15 ثانية - يبدأ فقط بعد انتهاء القراءة
   useEffect(() => {
