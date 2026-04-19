@@ -143,6 +143,26 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
     const getVoice = (): SpeechSynthesisVoice | null => {
       const voices = window.speechSynthesis.getVoices();
       if (!voices.length) return null;
+      
+      // البحث عن صوت أنثى أولاً
+      const femaleVoice = voices.find(v => 
+        v.lang === speechLang && 
+        (v.name.toLowerCase().includes('female') || 
+         v.name.toLowerCase().includes('woman') ||
+         v.name.toLowerCase().includes('zira') ||
+         v.name.toLowerCase().includes('hazel') ||
+         v.name.toLowerCase().includes('samantha') ||
+         v.name.toLowerCase().includes('karen') ||
+         v.name.toLowerCase().includes('tessa') ||
+         v.name.toLowerCase().includes('moira') ||
+         v.name.toLowerCase().includes('fiona') ||
+         v.name.toLowerCase().includes('amelie') ||
+         v.name.toLowerCase().includes('thomas') === false)
+      );
+      
+      if (femaleVoice) return femaleVoice;
+      
+      // إذا لم نجد صوت أنثى محدد، نبحث عن أي صوت باللغة المطلوبة
       return voices.find(v => v.lang === speechLang)
         || voices.find(v => v.lang.startsWith(speechLang.split("-")[0]))
         || voices.find(v => v.lang === "nl-NL")
@@ -163,7 +183,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
       }
       const u = new SpeechSynthesisUtterance(text);
       u.lang = speechLang;
-      u.rate = 0.75;
+      u.rate = 0.7; // سرعة أبطأ للوضوح
       u.pitch = 1;
       const v = getVoice();
       if (v) u.voice = v;
