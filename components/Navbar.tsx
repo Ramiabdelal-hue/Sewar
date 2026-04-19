@@ -358,7 +358,7 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
     { label: t.home, href: "/", icon: <FaHome /> },
     { label: t.theorie, href: "/theorie", icon: <FaBook />, onClick: onTheorieClick },
     ...(userCategory !== "A" ? [{ label: t.praktical, href: "/praktical", icon: <FaCar /> }] : []),
-    ...(!isLoggedIn ? [{ label: "Gratis", href: "/gratis", icon: <FaCheckCircle /> }] : []),
+    ...(!isLoggedIn ? [{ label: t.gratis, href: "/gratis", icon: <FaCheckCircle /> }] : []),
     { label: t.contact, href: "/contact", icon: <FaEnvelope /> },
   ];
 

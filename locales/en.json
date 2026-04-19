@@ -87,5 +87,6 @@
   "subscriptionExpires": "Subscription expires in",
   "daysRemaining": "days remaining",
   "hoursRemaining": "hours remaining",
-  "expired": "Expired"
+  "expired": "Expired",
+  "gratis": "Free"
 }

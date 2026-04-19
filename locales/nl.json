@@ -87,5 +87,6 @@
   "subscriptionExpires": "Abonnement verloopt over",
   "daysRemaining": "dagen resterend",
   "hoursRemaining": "uren resterend",
-  "expired": "Verlopen"
+  "expired": "Verlopen",
+  "gratis": "Gratis"
 }
