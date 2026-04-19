@@ -260,43 +260,47 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
     if (!started || finished) return;
     killTts();
     setReadingDone(false);
-    setHasReadCurrentQuestion(false); // إعادة تعيين حالة القراءة للسؤال الجديد
+    setHasReadCurrentQuestion(false);
 
     // على الهاتف: إذا لم يتم تفعيل الصوت، عرض النافذة وانتظار التفعيل
     if (isMobile && !audioEnabled) {
       setShowAudioPrompt(true);
-      return; // لا تبدأ القراءة - ستبدأ عند تفعيل الصوت
+      return;
     }
 
-    // على الكمبيوتر أو بعد تفعيل الصوت: بدء القراءة بعد ثانية واحدة
+    // بدء القراءة بعد ثانية واحدة
     ttsRef.current = setTimeout(() => {
       stopTtsRef.current = false;
       const q = questions[currentIndex];
       if (!q) { setReadingDone(true); return; }
 
-      setHasReadCurrentQuestion(true); // تسجيل أن السؤال تم قراءته
+      setHasReadCurrentQuestion(true);
 
-      const startReading = () => {
-        const texts = lang === "nl"
-          ? [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]
-          : translatedRef.current;
-        speakQuestion(q, texts);
-      };
+      const texts = lang === "nl"
+        ? [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]
+        : translatedRef.current;
 
       const voices = window.speechSynthesis.getVoices();
       if (voices.length > 0) {
-        startReading();
+        // الأصوات جاهزة - ابدأ مباشرة
+        speakQuestion(q, texts);
       } else {
-        window.speechSynthesis.onvoiceschanged = () => {
+        // انتظر الأصوات مرة واحدة فقط
+        let voiceStarted = false;
+        const startOnce = () => {
+          if (voiceStarted || stopTtsRef.current) return;
+          voiceStarted = true;
           window.speechSynthesis.onvoiceschanged = null;
-          if (!stopTtsRef.current) startReading();
+          speakQuestion(q, texts);
         };
-        setTimeout(() => { if (!stopTtsRef.current) startReading(); }, 1000);
+        window.speechSynthesis.onvoiceschanged = startOnce;
+        // fallback بعد ثانية إذا لم تأتِ الأصوات
+        setTimeout(startOnce, 1000);
       }
-    }, 1000); // بدء القراءة بعد ثانية واحدة بالضبط
+    }, 1000);
 
     return () => { killTts(); };
-  }, [currentIndex, started, finished, audioEnabled]); // إضافة audioEnabled كـ dependency
+  }, [currentIndex, started, finished, audioEnabled]);
 
   // مؤقت 15 ثانية - يبدأ فقط بعد انتهاء القراءة
   useEffect(() => {

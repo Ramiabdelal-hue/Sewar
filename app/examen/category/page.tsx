@@ -217,46 +217,51 @@ function ExamenCategoryContent() {
     if (!started || finished) return;
     killTts();
     setReadingDone(false);
-    setHasReadCurrentQuestion(false); // إعادة تعيين حالة القراءة للسؤال الجديد
+    setHasReadCurrentQuestion(false);
 
     // على الهاتف: إذا لم يتم تفعيل الصوت، عرض النافذة وانتظار التفعيل
     if (isMobile && !audioEnabled) {
       setShowAudioPrompt(true);
-      return; // لا تبدأ القراءة - ستبدأ عند تفعيل الصوت
+      return;
     }
 
-    // على الكمبيوتر أو بعد تفعيل الصوت: بدء القراءة بعد ثانية واحدة
+    // بدء القراءة بعد ثانية واحدة
     ttsRef.current = setTimeout(() => {
       stopTtsRef.current = false;
       const q = questions[currentIndex];
       if (!q) { setReadingDone(true); return; }
 
-      setHasReadCurrentQuestion(true); // تسجيل أن السؤال تم قراءته
+      setHasReadCurrentQuestion(true);
 
-      const startReading = () => {
-        if (lang === "nl") {
-          speakQuestion(q, [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]);
-        } else {
-          const texts = translatedRef.current;
-          const hasTranslation = texts[0] && texts[0] !== (q.textNL || q.text || "");
-          speakQuestion(q, hasTranslation ? texts : [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]);
-        }
-      };
+      const texts = lang === "nl"
+        ? [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]
+        : (() => {
+            const t = translatedRef.current;
+            const hasTranslation = t[0] && t[0] !== (q.textNL || q.text || "");
+            return hasTranslation ? t : [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""];
+          })();
 
       const voices = window.speechSynthesis.getVoices();
       if (voices.length > 0) {
-        startReading();
+        // الأصوات جاهزة - ابدأ مباشرة
+        speakQuestion(q, texts);
       } else {
-        window.speechSynthesis.onvoiceschanged = () => {
+        // انتظر الأصوات مرة واحدة فقط
+        let voiceStarted = false;
+        const startOnce = () => {
+          if (voiceStarted || stopTtsRef.current) return;
+          voiceStarted = true;
           window.speechSynthesis.onvoiceschanged = null;
-          if (!stopTtsRef.current) startReading();
+          speakQuestion(q, texts);
         };
-        setTimeout(() => { if (!stopTtsRef.current) startReading(); }, 1000);
+        window.speechSynthesis.onvoiceschanged = startOnce;
+        // fallback بعد ثانية إذا لم تأتِ الأصوات
+        setTimeout(startOnce, 1000);
       }
-    }, 1000); // بدء القراءة بعد ثانية واحدة بالضبط
+    }, 1000);
 
     return () => { killTts(); };
-  }, [currentIndex, started, finished, audioEnabled]); // إضافة audioEnabled كـ dependency
+  }, [currentIndex, started, finished, audioEnabled]);
 
   useEffect(() => {
     const fetchAll = async () => {
