@@ -64,8 +64,6 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
   const [timeLeft, setTimeLeft] = useState(15);
   const [locked, setLocked] = useState(false);
   const [readingDone, setReadingDone] = useState(false);
-  const [audioEnabled, setAudioEnabled] = useState(false);
-  const [showAudioPrompt, setShowAudioPrompt] = useState(false);
   const [hasReadCurrentQuestion, setHasReadCurrentQuestion] = useState(false);
   const [shuffledQuestions, setShuffledQuestions] = useState<any[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -80,29 +78,6 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
       setShuffledQuestions([...questions].sort(() => Math.random() - 0.5));
     }
   }, [questions]);
-
-  // Check if device is mobile
-  const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-  // Enable audio function for mobile
-  const enableAudio = async () => {
-    if (!window.speechSynthesis) return;
-    
-    try {
-      // Create a silent utterance to initialize speech synthesis
-      const utterance = new SpeechSynthesisUtterance(' ');
-      utterance.volume = 0;
-      window.speechSynthesis.speak(utterance);
-      
-      setAudioEnabled(true);
-      setShowAudioPrompt(false);
-      
-      // لا نبدأ القراءة هنا - سيتولى useEffect الرئيسي هذا الأمر
-      // هذا يمنع التكرار في القراءة
-    } catch (error) {
-      console.error('Error enabling audio:', error);
-    }
-  };
 
   // دالة إيقاف فوري شاملة
   const killTts = () => {
@@ -127,12 +102,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
       setReadingDone(true);
       return;
     }
-    if (isMobile && !audioEnabled) {
-      setShowAudioPrompt(true);
-      setReadingDone(true); // إذا لم يتم تفعيل الصوت، ابدأ المؤقت
-      return;
-    }
-    
+
     stopTtsRef.current = false;
     const session = ttsSessionRef.current;
     window.speechSynthesis.cancel();
@@ -144,11 +114,9 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
     const getVoice = (): SpeechSynthesisVoice | null => {
       const voices = window.speechSynthesis.getVoices();
       if (!voices.length) return null;
-      
-      // البحث عن صوت أنثى أولاً
-      const femaleVoice = voices.find(v => 
-        v.lang === speechLang && 
-        (v.name.toLowerCase().includes('female') || 
+      const femaleVoice = voices.find(v =>
+        v.lang === speechLang &&
+        (v.name.toLowerCase().includes('female') ||
          v.name.toLowerCase().includes('woman') ||
          v.name.toLowerCase().includes('zira') ||
          v.name.toLowerCase().includes('hazel') ||
@@ -160,10 +128,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
          v.name.toLowerCase().includes('amelie') ||
          v.name.toLowerCase().includes('thomas') === false)
       );
-      
       if (femaleVoice) return femaleVoice;
-      
-      // إذا لم نجد صوت أنثى محدد، نبحث عن أي صوت باللغة المطلوبة
       return voices.find(v => v.lang === speechLang)
         || voices.find(v => v.lang.startsWith(speechLang.split("-")[0]))
         || voices.find(v => v.lang === "nl-NL")
@@ -173,110 +138,72 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
     const isValid = () => ttsSessionRef.current === session && !stopTtsRef.current;
 
     const speak = (text: string, onEnd?: () => void) => {
-      if (!isValid()) {
-        setReadingDone(true);
-        return;
-      }
-      if (!text) { 
-        if (onEnd) onEnd(); 
-        else setReadingDone(true);
-        return; 
-      }
+      if (!isValid()) { setReadingDone(true); return; }
+      if (!text) { if (onEnd) onEnd(); else setReadingDone(true); return; }
       const u = new SpeechSynthesisUtterance(text);
       u.lang = speechLang;
-      u.rate = 0.6; // سرعة أبطأ للوضوح
+      u.rate = 0.6;
       u.pitch = 1;
       const v = getVoice();
       if (v) u.voice = v;
       if (onEnd) {
-        u.onend = () => { 
-          if (isValid()) onEnd(); 
-          else setReadingDone(true);
-        };
+        u.onend = () => { if (isValid()) onEnd(); else setReadingDone(true); };
       } else {
         u.onend = () => setReadingDone(true);
       }
-      u.onerror = () => { 
-        if (isValid() && onEnd) onEnd(); 
-        else setReadingDone(true);
-      };
+      u.onerror = () => { if (isValid() && onEnd) onEnd(); else setReadingDone(true); };
       window.speechSynthesis.speak(u);
     };
 
     const questionText = (translated[0] && translated[0] !== (q.textNL || q.text))
-      ? translated[0]
-      : (q.textNL || q.text || "");
+      ? translated[0] : (q.textNL || q.text || "");
     const ans1 = translated[1] || q.answer1 || "";
     const ans2 = translated[2] || q.answer2 || "";
     const ans3 = translated[3] || q.answer3 || "";
     const answersList = [ans1, ans2, ans3].filter(Boolean);
     const labels = lang === "ar"
       ? ["الجواب A:", "الجواب B:", "الجواب C:"]
-      : lang === "fr"
-        ? ["Réponse A:", "Réponse B:", "Réponse C:"]
-        : lang === "en"
-          ? ["Answer A:", "Answer B:", "Answer C:"]
-          : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
+      : lang === "fr" ? ["Réponse A:", "Réponse B:", "Réponse C:"]
+      : lang === "en" ? ["Answer A:", "Answer B:", "Answer C:"]
+      : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
 
-    if (!questionText) { 
-      setReadingDone(true); 
-      return; 
-    }
+    if (!questionText) { setReadingDone(true); return; }
 
     speak(questionText, () => {
-      if (!isValid()) {
-        setReadingDone(true);
-        return;
-      }
-      
+      if (!isValid()) { setReadingDone(true); return; }
       let i = 0;
       const readNext = () => {
-        if (!isValid()) {
-          setReadingDone(true);
-          return;
-        }
-        if (i >= answersList.length) { 
-          setReadingDone(true); 
-          return; 
-        }
+        if (!isValid()) { setReadingDone(true); return; }
+        if (i >= answersList.length) { setReadingDone(true); return; }
         speak(`${labels[i]} ${answersList[i]}`, () => {
           i++;
           if (i >= answersList.length) {
             setReadingDone(true);
           } else {
-            ttsRef.current = setTimeout(() => { 
-              if (isValid()) readNext(); 
-              else setReadingDone(true);
+            ttsRef.current = setTimeout(() => {
+              if (isValid()) readNext(); else setReadingDone(true);
             }, 400);
           }
         });
       };
-      
       if (answersList.length === 0) {
         setReadingDone(true);
       } else {
-        ttsRef.current = setTimeout(() => { 
-          if (isValid()) readNext(); 
-          else setReadingDone(true);
+        ttsRef.current = setTimeout(() => {
+          if (isValid()) readNext(); else setReadingDone(true);
         }, 600);
       }
     });
   };
 
-  // تشغيل القراءة بعد ثانية (لإعطاء الترجمة وقتاً كافياً)
+  // تشغيل القراءة بعد ثانية - نفس السلوك على كل الأجهزة
   useEffect(() => {
     if (!started || finished) return;
     killTts();
     setReadingDone(false);
     setHasReadCurrentQuestion(false);
 
-    // على الهاتف: إذا لم يتم تفعيل الصوت، عرض النافذة وانتظار التفعيل
-    if (isMobile && !audioEnabled) {
-      setShowAudioPrompt(true);
-      return;
-    }
-
-    // بدء القراءة بعد ثانية واحدة
+    // بدء القراءة بعد ثانية واحدة على كل الأجهزة
     ttsRef.current = setTimeout(() => {
       stopTtsRef.current = false;
       const q = shuffledQuestions[currentIndex];
@@ -290,10 +217,8 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
 
       const voices = window.speechSynthesis.getVoices();
       if (voices.length > 0) {
-        // الأصوات جاهزة - ابدأ مباشرة
         speakQuestion(q, texts);
       } else {
-        // انتظر الأصوات مرة واحدة فقط
         let voiceStarted = false;
         const startOnce = () => {
           if (voiceStarted || stopTtsRef.current) return;
@@ -302,7 +227,6 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
           speakQuestion(q, texts);
         };
         window.speechSynthesis.onvoiceschanged = startOnce;
-        // fallback بعد ثانية إذا لم تأتِ الأصوات
         setTimeout(startOnce, 1000);
       }
     }, 1000);
@@ -429,41 +353,6 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
 
   return (
     <div>
-      {/* Audio Enable Prompt for Mobile */}
-      {showAudioPrompt && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.7)" }}>
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
-            <div className="text-4xl mb-4">🔊</div>
-            <h3 className="text-lg font-bold text-gray-800 mb-2">
-              {lang === "ar" ? "تفعيل القراءة الصوتية" : 
-               lang === "nl" ? "Audio inschakelen" : 
-               lang === "fr" ? "Activer l'audio" : 
-               "Enable Audio"}
-            </h3>
-            <p className="text-sm text-gray-600 mb-6">
-              {lang === "ar" ? "اضغط لتفعيل القراءة الصوتية للأسئلة والإجابات" : 
-               lang === "nl" ? "Tik om audio voor vragen en antwoorden in te schakelen" : 
-               lang === "fr" ? "Appuyez pour activer l'audio des questions et réponses" : 
-               "Tap to enable audio for questions and answers"}
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={enableAudio}
-                className="flex-1 py-3 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition-colors"
-              >
-                {lang === "ar" ? "تفعيل" : lang === "nl" ? "Inschakelen" : lang === "fr" ? "Activer" : "Enable"}
-              </button>
-              <button
-                onClick={() => setShowAudioPrompt(false)}
-                className="flex-1 py-3 bg-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-400 transition-colors"
-              >
-                {lang === "ar" ? "تخطي" : lang === "nl" ? "Overslaan" : lang === "fr" ? "Ignorer" : "Skip"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* شريط التقدم */}
       <div className="flex items-center justify-between mb-3">
         <span className="text-sm font-bold text-gray-500">{currentIndex + 1} / {shuffledQuestions.length}</span>

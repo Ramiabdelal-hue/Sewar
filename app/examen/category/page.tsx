@@ -29,39 +29,14 @@ function ExamenCategoryContent() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const ttsRef = useRef<NodeJS.Timeout | null>(null);
   const stopTtsRef = useRef(false);
-  const ttsSessionRef = useRef(0); // session ID — كل سؤال له رقم فريد
+  const ttsSessionRef = useRef(0);
   const [readingDone, setReadingDone] = useState(false);
-  const [audioEnabled, setAudioEnabled] = useState(false);
-  const [showAudioPrompt, setShowAudioPrompt] = useState(false);
-  const [hasReadCurrentQuestion, setHasReadCurrentQuestion] = useState(false); // منع التكرار
-
-  // Check if device is mobile
-  const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-  // Enable audio function for mobile
-  const enableAudio = async () => {
-    if (!window.speechSynthesis) return;
-    
-    try {
-      // Create a silent utterance to initialize speech synthesis
-      const utterance = new SpeechSynthesisUtterance(' ');
-      utterance.volume = 0;
-      window.speechSynthesis.speak(utterance);
-      
-      setAudioEnabled(true);
-      setShowAudioPrompt(false);
-      
-      // لا نبدأ القراءة هنا - سيتولى useEffect الرئيسي هذا الأمر
-      // هذا يمنع التكرار في القراءة
-    } catch (error) {
-      console.error('Error enabling audio:', error);
-    }
-  };
+  const [hasReadCurrentQuestion, setHasReadCurrentQuestion] = useState(false);
 
   // دالة إيقاف فوري شاملة
   const killTts = () => {
     stopTtsRef.current = true;
-    ttsSessionRef.current += 1; // أبطل كل callbacks القديمة فوراً
+    ttsSessionRef.current += 1;
     if (ttsRef.current) { clearTimeout(ttsRef.current); ttsRef.current = null; }
     if (window.speechSynthesis) {
       window.speechSynthesis.pause();
@@ -69,20 +44,15 @@ function ExamenCategoryContent() {
     }
   };
 
-  // قراءة تلقائية للسؤال والإجابات
+  // قراءة تلقائية للسؤال والإجابات - نفس السلوك على كل الأجهزة
   const speakQuestion = (q: any, translated: string[]) => {
     if (!window.speechSynthesis || !q) {
       setReadingDone(true);
       return;
     }
-    if (isMobile && !audioEnabled) {
-      setShowAudioPrompt(true);
-      setReadingDone(true); // إذا لم يتم تفعيل الصوت، ابدأ المؤقت
-      return;
-    }
-    
+
     stopTtsRef.current = false;
-    const session = ttsSessionRef.current; // احفظ الـ session الحالي
+    const session = ttsSessionRef.current;
     window.speechSynthesis.cancel();
     setReadingDone(false);
 
@@ -212,20 +182,14 @@ function ExamenCategoryContent() {
     });
   };
 
-  // تشغيل القراءة بعد ثانية من كل سؤال جديد
+  // تشغيل القراءة بعد ثانية من كل سؤال جديد - نفس السلوك على كل الأجهزة
   useEffect(() => {
     if (!started || finished) return;
     killTts();
     setReadingDone(false);
     setHasReadCurrentQuestion(false);
 
-    // على الهاتف: إذا لم يتم تفعيل الصوت، عرض النافذة وانتظار التفعيل
-    if (isMobile && !audioEnabled) {
-      setShowAudioPrompt(true);
-      return;
-    }
-
-    // بدء القراءة بعد ثانية واحدة
+    // بدء القراءة بعد ثانية واحدة على كل الأجهزة
     ttsRef.current = setTimeout(() => {
       stopTtsRef.current = false;
       const q = questions[currentIndex];
@@ -243,10 +207,8 @@ function ExamenCategoryContent() {
 
       const voices = window.speechSynthesis.getVoices();
       if (voices.length > 0) {
-        // الأصوات جاهزة - ابدأ مباشرة
         speakQuestion(q, texts);
       } else {
-        // انتظر الأصوات مرة واحدة فقط
         let voiceStarted = false;
         const startOnce = () => {
           if (voiceStarted || stopTtsRef.current) return;
@@ -255,13 +217,12 @@ function ExamenCategoryContent() {
           speakQuestion(q, texts);
         };
         window.speechSynthesis.onvoiceschanged = startOnce;
-        // fallback بعد ثانية إذا لم تأتِ الأصوات
         setTimeout(startOnce, 1000);
       }
     }, 1000);
 
     return () => { killTts(); };
-  }, [currentIndex, started, finished, audioEnabled]);
+  }, [currentIndex, started, finished]);
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -577,41 +538,6 @@ function ExamenCategoryContent() {
   return (
     <div className="min-h-screen bg-white" dir={isRtl ? "rtl" : "ltr"}>
       <Navbar />
-      
-      {/* Audio Enable Prompt for Mobile */}
-      {showAudioPrompt && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.7)" }}>
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
-            <div className="text-4xl mb-4">🔊</div>
-            <h3 className="text-lg font-bold text-gray-800 mb-2">
-              {lang === "ar" ? "تفعيل القراءة الصوتية" : 
-               lang === "nl" ? "Audio inschakelen" : 
-               lang === "fr" ? "Activer l'audio" : 
-               "Enable Audio"}
-            </h3>
-            <p className="text-sm text-gray-600 mb-6">
-              {lang === "ar" ? "اضغط لتفعيل القراءة الصوتية للأسئلة والإجابات" : 
-               lang === "nl" ? "Tik om audio voor vragen en antwoorden in te schakelen" : 
-               lang === "fr" ? "Appuyez pour activer l'audio des questions et réponses" : 
-               "Tap to enable audio for questions and answers"}
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={enableAudio}
-                className="flex-1 py-3 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition-colors"
-              >
-                {lang === "ar" ? "تفعيل" : lang === "nl" ? "Inschakelen" : lang === "fr" ? "Activer" : "Enable"}
-              </button>
-              <button
-                onClick={() => setShowAudioPrompt(false)}
-                className="flex-1 py-3 bg-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-400 transition-colors"
-              >
-                {lang === "ar" ? "تخطي" : lang === "nl" ? "Overslaan" : lang === "fr" ? "Ignorer" : "Skip"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
       
       <div className="max-w-2xl mx-auto px-4 py-6">
 
