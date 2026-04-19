@@ -68,29 +68,23 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
   return (
     <div className="rounded-3xl overflow-hidden shadow-2xl border border-gray-100 mb-6" dir={isRtl ? "rtl" : "ltr"}>
 
-      {/* شريط الرأس */}
-      <div className="flex items-center justify-between px-5 py-3"
+      {/* شريط الرأس الأزرق - الرقم + العنوان */}
+      <div className="flex items-center gap-3 px-5 py-3"
         style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center text-white font-black">
-            {index + 1}
-          </div>
+        {/* رقم الكرت */}
+        <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center text-white font-black flex-shrink-0">
+          {index + 1}
         </div>
-        <span className="text-white/60 text-sm font-bold">{index + 1} / {total}</span>
-      </div>
-
-      {/* عنوان الشرح فوق الصورة مباشرة */}
-      {(question.textNL || question.text) && (
-        <div className="px-5 py-3 flex items-center gap-2"
-          style={{ background: "linear-gradient(135deg, #16a34a, #15803d)" }}>
-          <span className="text-white text-base flex-shrink-0">📌</span>
-          <p className={`text-sm font-black text-white leading-snug ${isRtl ? "text-right" : "text-left"}`}>
+        {/* العنوان بجانب الرقم */}
+        {(question.textNL || question.text) && (
+          <p className={`text-sm font-black text-white leading-snug flex-1 ${isRtl ? "text-right" : "text-left"}`}>
             {translating ? (question.textNL || question.text) : qText}
           </p>
-        </div>
-      )}
+        )}
+        <span className="text-white/50 text-xs font-bold flex-shrink-0">{index + 1} / {total}</span>
+      </div>
 
-      {/* الصور - متصلة مباشرة بالعنوان */}
+      {/* الصور */}
       {question.videoUrls && question.videoUrls.filter(Boolean).length > 0 && (
         <div className={`grid gap-1 bg-gray-900 p-2 ${question.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
           {question.videoUrls.filter(Boolean).map((url, i) => (
@@ -100,7 +94,6 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
                 draggable={false}
                 onContextMenu={(e) => e.preventDefault()}
               />
-              {/* Logo watermark */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
                 <img src="/logo.png" alt="Sewar"
                   style={{ width: '50%', height: '50%', objectFit: 'contain', opacity: 0.75, mixBlendMode: 'screen', transform: 'rotate(-15deg)' }}
@@ -126,29 +119,24 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
         </div>
       )}
 
-      {/* الشرح - متصل بالصورة */}
+      {/* الشرح */}
       {expText && (
-        <div className="px-5 py-4 bg-green-50">
-          <p className="text-xs font-black text-green-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-            {lang === "ar" ? "الشرح" : lang === "nl" ? "Uitleg" : lang === "fr" ? "Explication" : "Explanation"}
-            {translating && <span className="text-green-400 animate-pulse">...</span>}
-          </p>
+        <div className="px-5 py-4 bg-white">
+          {translating && <span className="text-xs text-gray-400 animate-pulse">...</span>}
           {expText.includes('\n') ? (
             <div className="space-y-1.5">
               {expText.split('\n').filter(line => line.trim()).map((line, i) => (
-                <p key={i} className={`text-sm text-green-900 leading-relaxed ${isRtl ? "text-right" : "text-left"}`}>
+                <p key={i} className={`text-sm text-gray-800 leading-relaxed ${isRtl ? "text-right" : "text-left"}`}>
                   {line.trim()}
                 </p>
               ))}
             </div>
           ) : (
-            <p className={`text-sm text-green-900 leading-relaxed ${isRtl ? "text-right" : "text-left"}`}>{expText}</p>
+            <p className={`text-sm text-gray-800 leading-relaxed ${isRtl ? "text-right" : "text-left"}`}>{expText}</p>
           )}
         </div>
       )}
 
-      {/* إذا لا يوجد شرح ولا صورة */}
       {!expText && (!question.videoUrls || question.videoUrls.filter(Boolean).length === 0) && !question.audioUrl && (
         <div className="px-5 py-4 bg-white"></div>
       )}
