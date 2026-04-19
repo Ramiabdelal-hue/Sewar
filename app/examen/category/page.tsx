@@ -44,6 +44,15 @@ function ExamenCategoryContent() {
     }
   };
 
+  // فتح قناة الصوت عند أول تفاعل (مطلوب على iOS/Android)
+  const unlockAudio = () => {
+    if (!window.speechSynthesis) return;
+    const u = new SpeechSynthesisUtterance('');
+    u.volume = 0;
+    u.rate = 1;
+    window.speechSynthesis.speak(u);
+  };
+
   // قراءة تلقائية للسؤال والإجابات - نفس السلوك على كل الأجهزة
   const speakQuestion = (q: any, translated: string[]) => {
     if (!window.speechSynthesis || !q) {
@@ -339,7 +348,7 @@ function ExamenCategoryContent() {
           {questions.length === 0 ? (
             <p className="text-red-500 font-bold">{lang === "ar" ? "لا توجد أسئلة بعد" : lang === "nl" ? "Geen vragen beschikbaar" : lang === "fr" ? "Pas encore de questions" : "No questions yet"}</p>
           ) : (
-            <button onClick={() => setStarted(true)}
+            <button onClick={() => { unlockAudio(); setStarted(true); }}
               className="px-10 py-4 font-black text-white text-lg rounded-xl transition-all hover:scale-105 active:scale-95"
               style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
               {lang === "ar" ? "ابدأ الامتحان" : lang === "nl" ? "Start Examen" : lang === "fr" ? "Démarrer l'examen" : "Start Exam"} →
@@ -516,7 +525,7 @@ function ExamenCategoryContent() {
 
           {/* أزرار */}
           <div className="flex gap-3">
-            <button onClick={() => { setStarted(false); setFinished(false); setCurrentIndex(0); setAnswers({}); setLocked(false); setQuestions(q => [...q].sort(() => Math.random() - 0.5)); }}
+            <button onClick={() => { unlockAudio(); setStarted(false); setFinished(false); setCurrentIndex(0); setAnswers({}); setLocked(false); setQuestions(q => [...q].sort(() => Math.random() - 0.5)); }}
               className="flex-1 py-3 font-black text-white rounded-xl transition-all hover:opacity-90 active:scale-95"
               style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
               🔄 {lang === "ar" ? "إعادة" : lang === "nl" ? "Opnieuw" : lang === "fr" ? "Recommencer" : "Retry"}

@@ -79,6 +79,15 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
     }
   }, [questions]);
 
+  // فتح قناة الصوت عند أول تفاعل (مطلوب على iOS/Android)
+  const unlockAudio = () => {
+    if (!window.speechSynthesis) return;
+    const u = new SpeechSynthesisUtterance('');
+    u.volume = 0;
+    u.rate = 1;
+    window.speechSynthesis.speak(u);
+  };
+
   // دالة إيقاف فوري شاملة
   const killTts = () => {
     stopTtsRef.current = true;
@@ -295,7 +304,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
         <h2 className="text-xl font-black text-[#003399] mb-2">Gratis Examen</h2>
         <p className="text-gray-500 mb-2">{shuffledQuestions.length} {lang === "ar" ? "سؤال" : lang === "nl" ? "vragen" : lang === "fr" ? "questions" : "questions"}</p>
         <p className="text-sm text-orange-600 font-bold mb-6">⏱ {lang === "ar" ? "15 ثانية لكل سؤال" : lang === "nl" ? "15 seconden per vraag" : lang === "fr" ? "15 secondes par question" : "15 seconds per question"}</p>
-        <button onClick={() => setStarted(true)} className="px-8 py-3 font-black text-white rounded-xl" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
+        <button onClick={() => { unlockAudio(); setStarted(true); }} className="px-8 py-3 font-black text-white rounded-xl" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
           {lang === "ar" ? "ابدأ" : lang === "nl" ? "Start" : lang === "fr" ? "Démarrer" : "Start"} →
         </button>
       </div>
@@ -339,7 +348,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
           </div>
         </div>
         <div className="flex gap-3">
-          <button onClick={() => { setStarted(false); setFinished(false); setCurrentIndex(0); setAnswers({}); setLocked(false); setShuffledQuestions([...questions].sort(() => Math.random() - 0.5)); }}
+          <button onClick={() => { unlockAudio(); setStarted(false); setFinished(false); setCurrentIndex(0); setAnswers({}); setLocked(false); setShuffledQuestions([...questions].sort(() => Math.random() - 0.5)); }}
             className="flex-1 py-3 font-black text-white rounded-xl" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
             🔄 {lang === "ar" ? "إعادة" : lang === "nl" ? "Opnieuw" : lang === "fr" ? "Recommencer" : "Retry"}
           </button>
