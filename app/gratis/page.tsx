@@ -64,11 +64,33 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
   const [timeLeft, setTimeLeft] = useState(15);
   const [locked, setLocked] = useState(false);
   const [readingDone, setReadingDone] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(false);
+  const [showAudioPrompt, setShowAudioPrompt] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const ttsRef = useRef<NodeJS.Timeout | null>(null);
   const stopTtsRef = useRef(false);
   const ttsSessionRef = useRef(0); // session ID فريد لكل سؤال
   const isRtl = lang === "ar";
+
+  // Check if device is mobile
+  const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+  // Enable audio function for mobile
+  const enableAudio = async () => {
+    if (!window.speechSynthesis) return;
+    
+    try {
+      // Create a silent utterance to initialize speech synthesis
+      const utterance = new SpeechSynthesisUtterance(' ');
+      utterance.volume = 0;
+      window.speechSynthesis.speak(utterance);
+      
+      setAudioEnabled(true);
+      setShowAudioPrompt(false);
+    } catch (error) {
+      console.error('Error enabling audio:', error);
+    }
+  };
 
   // دالة إيقاف فوري شاملة
   const killTts = () => {
@@ -89,7 +111,16 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
 
   // القارئ التلقائي
   const speakQuestion = (q: any, translated: string[]) => {
-    if (!window.speechSynthesis || !q) return;
+    if (!window.speechSynthesis || !q) {
+      setReadingDone(true);
+      return;
+    }
+    if (isMobile && !audioEnabled) {
+      setShowAudioPrompt(true);
+      setReadingDone(true); // إذا لم يتم تفعيل الصوت، ابدأ المؤقت
+      return;
+    }
+    
     stopTtsRef.current = false;
     const session = ttsSessionRef.current;
     window.speechSynthesis.cancel();
@@ -110,16 +141,33 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
     const isValid = () => ttsSessionRef.current === session && !stopTtsRef.current;
 
     const speak = (text: string, onEnd?: () => void) => {
-      if (!isValid()) return;
-      if (!text) { if (onEnd) onEnd(); return; }
+      if (!isValid()) {
+        setReadingDone(true);
+        return;
+      }
+      if (!text) { 
+        if (onEnd) onEnd(); 
+        else setReadingDone(true);
+        return; 
+      }
       const u = new SpeechSynthesisUtterance(text);
       u.lang = speechLang;
       u.rate = 0.75;
       u.pitch = 1;
       const v = getVoice();
       if (v) u.voice = v;
-      if (onEnd) u.onend = () => { if (isValid()) onEnd(); };
-      u.onerror = () => { if (isValid() && onEnd) onEnd(); };
+      if (onEnd) {
+        u.onend = () => { 
+          if (isValid()) onEnd(); 
+          else setReadingDone(true);
+        };
+      } else {
+        u.onend = () => setReadingDone(true);
+      }
+      u.onerror = () => { 
+        if (isValid() && onEnd) onEnd(); 
+        else setReadingDone(true);
+      };
       window.speechSynthesis.speak(u);
     };
 
@@ -138,19 +186,48 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
           ? ["Answer A:", "Answer B:", "Answer C:"]
           : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
 
-    if (!questionText) { setReadingDone(true); return; }
+    if (!questionText) { 
+      setReadingDone(true); 
+      return; 
+    }
 
     speak(questionText, () => {
+      if (!isValid()) {
+        setReadingDone(true);
+        return;
+      }
+      
       let i = 0;
       const readNext = () => {
-        if (!isValid()) return;
-        if (i >= answersList.length) { setReadingDone(true); return; }
+        if (!isValid()) {
+          setReadingDone(true);
+          return;
+        }
+        if (i >= answersList.length) { 
+          setReadingDone(true); 
+          return; 
+        }
         speak(`${labels[i]} ${answersList[i]}`, () => {
           i++;
-          ttsRef.current = setTimeout(() => { if (isValid()) readNext(); }, 400);
+          if (i >= answersList.length) {
+            setReadingDone(true);
+          } else {
+            ttsRef.current = setTimeout(() => { 
+              if (isValid()) readNext(); 
+              else setReadingDone(true);
+            }, 400);
+          }
         });
       };
-      ttsRef.current = setTimeout(() => { if (isValid()) readNext(); }, 600);
+      
+      if (answersList.length === 0) {
+        setReadingDone(true);
+      } else {
+        ttsRef.current = setTimeout(() => { 
+          if (isValid()) readNext(); 
+          else setReadingDone(true);
+        }, 600);
+      }
     });
   };
 
@@ -159,6 +236,13 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
     if (!started || finished) return;
     killTts();
     setReadingDone(false);
+
+    // Don't auto-read on mobile unless audio is enabled
+    if (isMobile && !audioEnabled) {
+      setShowAudioPrompt(true);
+      setReadingDone(true); // ابدأ المؤقت حتى لو لم يتم تفعيل الصوت
+      return;
+    }
 
     ttsRef.current = setTimeout(() => {
       stopTtsRef.current = false;
@@ -182,10 +266,39 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
         };
         setTimeout(() => { if (!stopTtsRef.current) startReading(); }, 1000);
       }
+
+      // Fallback: إذا لم تبدأ القراءة خلال 10 ثوانٍ، ابدأ المؤقت
+      setTimeout(() => {
+        if (!readingDone && !stopTtsRef.current) {
+          console.log("Fallback: Starting timer after 10 seconds");
+          setReadingDone(true);
+        }
+      }, 10000);
+
     }, 1000);
 
     return () => { killTts(); };
-  }, [currentIndex, started, finished]);
+  }, [currentIndex, started, finished, audioEnabled]);
+
+  // مؤقت 15 ثانية - يبدأ فقط بعد انتهاء القراءة
+  useEffect(() => {
+    if (!started || finished || locked || !readingDone) return;
+    setTimeLeft(15);
+
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current!);
+          setLocked(true);
+          setAnswers(a => ({ ...a, [currentIndex]: a[currentIndex] ?? null }));
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timerRef.current!);
+  }, [currentIndex, started, finished, readingDone]);
 
   const handleAnswer = (num: number) => {
     if (locked || answers[currentIndex] !== undefined) return;
@@ -286,6 +399,41 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
 
   return (
     <div>
+      {/* Audio Enable Prompt for Mobile */}
+      {showAudioPrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.7)" }}>
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
+            <div className="text-4xl mb-4">🔊</div>
+            <h3 className="text-lg font-bold text-gray-800 mb-2">
+              {lang === "ar" ? "تفعيل القراءة الصوتية" : 
+               lang === "nl" ? "Audio inschakelen" : 
+               lang === "fr" ? "Activer l'audio" : 
+               "Enable Audio"}
+            </h3>
+            <p className="text-sm text-gray-600 mb-6">
+              {lang === "ar" ? "اضغط لتفعيل القراءة الصوتية للأسئلة والإجابات" : 
+               lang === "nl" ? "Tik om audio voor vragen en antwoorden in te schakelen" : 
+               lang === "fr" ? "Appuyez pour activer l'audio des questions et réponses" : 
+               "Tap to enable audio for questions and answers"}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={enableAudio}
+                className="flex-1 py-3 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition-colors"
+              >
+                {lang === "ar" ? "تفعيل" : lang === "nl" ? "Inschakelen" : lang === "fr" ? "Activer" : "Enable"}
+              </button>
+              <button
+                onClick={() => setShowAudioPrompt(false)}
+                className="flex-1 py-3 bg-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-400 transition-colors"
+              >
+                {lang === "ar" ? "تخطي" : lang === "nl" ? "Overslaan" : lang === "fr" ? "Ignorer" : "Skip"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* شريط التقدم */}
       <div className="flex items-center justify-between mb-3">
         <span className="text-sm font-bold text-gray-500">{currentIndex + 1} / {questions.length}</span>
@@ -310,13 +458,13 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
             </div>
             <div className={`flex items-center gap-2 px-3 py-1 rounded-full font-black text-sm border-2 transition-all ${
               locked ? "bg-white/20 border-white/40 text-white" :
-              !readingDone ? "bg-white/20 border-white/40 text-white" :
+              !readingDone ? "bg-blue-500 border-blue-300 text-white animate-pulse" :
               timeLeft <= 5 ? "bg-red-500 border-red-300 text-white animate-pulse" :
               timeLeft <= 10 ? "bg-orange-500 border-orange-300 text-white" :
-              "bg-white/20 border-white/40 text-white"
+              "bg-green-500 border-green-300 text-white"
             }`}>
               <span>{!readingDone && !locked ? "🎧" : "⏱"}</span>
-              <span>{locked ? (isAnswered && userAnswer !== null ? (userAnswer === q?.correctAnswer ? "✅" : "❌") : "⏱") : !readingDone ? "..." : timeLeft}</span>
+              <span>{locked ? (isAnswered && userAnswer !== null ? (userAnswer === q?.correctAnswer ? "✅" : "❌") : "⏱") : !readingDone ? (lang === "ar" ? "قراءة..." : lang === "nl" ? "Lezen..." : lang === "fr" ? "Lecture..." : "Reading...") : timeLeft}</span>
               {!locked && readingDone && <span className="text-xs opacity-80">s</span>}
             </div>
           </div>
@@ -336,9 +484,29 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
           )}
 
           <div className="px-5 py-4 bg-white">
-            <p className={`text-lg font-bold text-gray-900 leading-relaxed mb-5 ${isRtl ? "text-right" : "text-left"}`}>
+            <p className={`text-lg font-bold text-gray-900 leading-relaxed mb-3 ${isRtl ? "text-right" : "text-left"}`}>
               {translatedTexts[0] || q.textNL || q.text}
             </p>
+
+            {/* مؤشر حالة القراءة والمؤقت */}
+            {!locked && (
+              <div className={`text-center mb-4 p-2 rounded-lg text-sm font-bold ${
+                !readingDone 
+                  ? "bg-blue-50 text-blue-700 border border-blue-200" 
+                  : "bg-green-50 text-green-700 border border-green-200"
+              }`}>
+                {!readingDone 
+                  ? (lang === "ar" ? "🎧 جاري قراءة السؤال والإجابات..." : 
+                     lang === "nl" ? "🎧 Vraag en antwoorden worden voorgelezen..." : 
+                     lang === "fr" ? "🎧 Lecture de la question et des réponses..." : 
+                     "🎧 Reading question and answers...")
+                  : (lang === "ar" ? `⏱ لديك ${timeLeft} ثانية للإجابة` : 
+                     lang === "nl" ? `⏱ Je hebt ${timeLeft} seconden om te antwoorden` : 
+                     lang === "fr" ? `⏱ Vous avez ${timeLeft} secondes pour répondre` : 
+                     `⏱ You have ${timeLeft} seconds to answer`)
+                }
+              </div>
+            )}
             <div className="space-y-3">
               {[1, 2, 3].map(num => {
                 const label = ["A", "B", "C"][num - 1];
