@@ -278,10 +278,39 @@ function ExamenCategoryContent() {
     return () => clearInterval(timerRef.current!);
   }, [currentIndex, started, finished, readingDone]);
 
+  // صوت تصفيق عند الإجابة الصحيحة
+  const playApplause = () => {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const duration = 1.2;
+      const bufferSize = ctx.sampleRate * duration;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        const envelope = Math.sin((i / bufferSize) * Math.PI);
+        const burst = Math.random() < 0.3 ? (Math.random() * 2 - 1) : 0;
+        data[i] = burst * envelope * 0.6;
+      }
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      const gainNode = ctx.createGain();
+      gainNode.gain.setValueAtTime(0.8, ctx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      source.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      source.start();
+      source.onended = () => ctx.close();
+    } catch {}
+  };
+
   const handleAnswer = (num: number) => {
     if (locked || answers[currentIndex] !== undefined) return;
-    killTts(); // إيقاف القراءة فوراً عند اختيار الإجابة
+    killTts();
     clearInterval(timerRef.current!);
+    // تصفيق إذا كانت الإجابة صحيحة
+    if (questions[currentIndex]?.correctAnswer === num) {
+      playApplause();
+    }
     setAnswers(a => ({ ...a, [currentIndex]: num }));
     setLocked(true);
   };
