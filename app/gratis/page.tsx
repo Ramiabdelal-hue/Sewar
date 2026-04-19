@@ -273,101 +273,42 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
 
   const [showRoses, setShowRoses] = useState(false);
 
-  // صوت تصفيق احترافي + ورود عند الإجابة الصحيحة
+  // صوت "Bravo!" عند الإجابة الصحيحة
   const playApplause = () => {
     try {
-      if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
-        audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      }
-      const ctx = audioCtxRef.current;
-      if (ctx.state === 'suspended') ctx.resume();
+      if (!window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
 
-      const sampleRate = ctx.sampleRate;
-      const duration = 2.5;
-
-      // دالة لإنشاء طبقة تصفيق واحدة
-      const makeClap = (startTime: number, intensity: number) => {
-        const clapDuration = 0.12;
-        const bufSize = Math.floor(sampleRate * clapDuration);
-        const buf = ctx.createBuffer(2, bufSize, sampleRate);
-
-        for (let ch = 0; ch < 2; ch++) {
-          const d = buf.getChannelData(ch);
-          for (let i = 0; i < bufSize; i++) {
-            const t = i / sampleRate;
-            // envelope: attack سريع جداً + decay
-            const env = Math.exp(-t * 35) * (1 - Math.exp(-t * 800));
-            // ضجيج أبيض مع تلوين طيفي
-            const noise = (Math.random() * 2 - 1);
-            // إضافة طبقة تردد متوسط لإعطاء "صفعة" واضحة
-            const snap = Math.sin(2 * Math.PI * 1200 * t) * Math.exp(-t * 80);
-            d[i] = (noise * 0.7 + snap * 0.3) * env * intensity;
-          }
-        }
-
-        const src = ctx.createBufferSource();
-        src.buffer = buf;
-
-        // فلتر bandpass لإعطاء صوت تصفيق طبيعي
-        const filter = ctx.createBiquadFilter();
-        filter.type = 'bandpass';
-        filter.frequency.value = 1100;
-        filter.Q.value = 0.8;
-
-        const gain = ctx.createGain();
-        gain.gain.setValueAtTime(intensity, ctx.currentTime + startTime);
-
-        src.connect(filter);
-        filter.connect(gain);
-        gain.connect(ctx.destination);
-        src.start(ctx.currentTime + startTime);
+      const bravoTexts: Record<string, string[]> = {
+        nl: ["Bravo!", "Uitstekend!", "Geweldig!", "Perfect!"],
+        fr: ["Bravo!", "Excellent!", "Parfait!", "Très bien!"],
+        ar: ["برافو!", "ممتاز!", "أحسنت!", "رائع!"],
+        en: ["Bravo!", "Excellent!", "Well done!", "Perfect!"],
       };
+      const options = bravoTexts[lang] || bravoTexts.nl;
+      const text = options[Math.floor(Math.random() * options.length)];
 
-      // جمهور يصفق: موجات متعددة بإيقاع طبيعي
-      const clapPattern = [
-        // موجة أولى قوية
-        0.00, 0.05, 0.08, 0.12, 0.16,
-        // موجة ثانية
-        0.35, 0.38, 0.42, 0.46, 0.50,
-        // موجة ثالثة أقوى
-        0.65, 0.68, 0.70, 0.73, 0.76, 0.79,
-        // موجة رابعة تتلاشى
-        1.00, 1.03, 1.07, 1.12, 1.18,
-        1.40, 1.45, 1.52, 1.60,
-        1.80, 1.90, 2.05, 2.20,
-      ];
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = { nl: "nl-NL", fr: "fr-FR", ar: "ar-SA", en: "en-US" }[lang] || "nl-NL";
+      u.rate = 1.1;
+      u.pitch = 1.4;
+      u.volume = 1;
 
-      clapPattern.forEach((t, i) => {
-        // تفاوت في الشدة لإعطاء طابع بشري
-        const intensity = 0.5 + Math.random() * 0.5;
-        // تفاوت طفيف في التوقيت
-        const jitter = (Math.random() - 0.5) * 0.015;
-        makeClap(t + jitter, intensity);
-      });
+      // صوت أنثى إن أمكن
+      const voices = window.speechSynthesis.getVoices();
+      const femaleVoice = voices.find(v =>
+        v.lang.startsWith(u.lang.split('-')[0]) &&
+        (v.name.toLowerCase().includes('female') ||
+         v.name.toLowerCase().includes('samantha') ||
+         v.name.toLowerCase().includes('karen') ||
+         v.name.toLowerCase().includes('zira') ||
+         v.name.toLowerCase().includes('hazel'))
+      );
+      if (femaleVoice) u.voice = femaleVoice;
 
-      // صوت "هورا" خفيف في الخلفية
-      const cheerDuration = 2.0;
-      const cheerBuf = ctx.createBuffer(1, Math.floor(sampleRate * cheerDuration), sampleRate);
-      const cheerData = cheerBuf.getChannelData(0);
-      for (let i = 0; i < cheerData.length; i++) {
-        const t = i / sampleRate;
-        const env = Math.sin((t / cheerDuration) * Math.PI) * 0.15;
-        cheerData[i] = (Math.random() * 2 - 1) * env;
-      }
-      const cheerSrc = ctx.createBufferSource();
-      cheerSrc.buffer = cheerBuf;
-      const cheerFilter = ctx.createBiquadFilter();
-      cheerFilter.type = 'lowpass';
-      cheerFilter.frequency.value = 400;
-      const cheerGain = ctx.createGain();
-      cheerGain.gain.setValueAtTime(0.3, ctx.currentTime);
-      cheerSrc.connect(cheerFilter);
-      cheerFilter.connect(cheerGain);
-      cheerGain.connect(ctx.destination);
-      cheerSrc.start(ctx.currentTime + 0.1);
-
+      window.speechSynthesis.speak(u);
     } catch (e) {
-      console.error('Applause error:', e);
+      console.error('Bravo error:', e);
     }
   };
 
