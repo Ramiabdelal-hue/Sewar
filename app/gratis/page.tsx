@@ -534,14 +534,14 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
                   : "bg-green-50 text-green-700 border border-green-200"
               }`}>
                 {!readingDone 
-                  ? (lang === "ar" ? "🎧 جاري قراءة السؤال والإجابات..." : 
-                     lang === "nl" ? "🎧 Vraag en antwoorden worden voorgelezen..." : 
-                     lang === "fr" ? "🎧 Lecture de la question et des réponses..." : 
-                     "🎧 Reading question and answers...")
-                  : (lang === "ar" ? `⏱ لديك ${timeLeft} ثانية للإجابة` : 
-                     lang === "nl" ? `⏱ Je hebt ${timeLeft} seconden om te antwoorden` : 
-                     lang === "fr" ? `⏱ Vous avez ${timeLeft} secondes pour répondre` : 
-                     `⏱ You have ${timeLeft} seconds to answer`)
+                  ? (lang === "ar" ? "🎧 جاري قراءة السؤال والإجابات A, B, C..." : 
+                     lang === "nl" ? "🎧 Vraag en antwoorden A, B, C worden voorgelezen..." : 
+                     lang === "fr" ? "🎧 Lecture de la question et réponses A, B, C..." : 
+                     "🎧 Reading question and answers A, B, C...")
+                  : (lang === "ar" ? `⏱ انتهت القراءة - لديك ${timeLeft} ثانية للإجابة` : 
+                     lang === "nl" ? `⏱ Voorlezen klaar - Je hebt ${timeLeft} seconden om te antwoorden` : 
+                     lang === "fr" ? `⏱ Lecture terminée - Vous avez ${timeLeft} secondes pour répondre` : 
+                     `⏱ Reading finished - You have ${timeLeft} seconds to answer`)
                 }
               </div>
             )}
