@@ -66,12 +66,20 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
   const [readingDone, setReadingDone] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [showAudioPrompt, setShowAudioPrompt] = useState(false);
-  const [hasReadCurrentQuestion, setHasReadCurrentQuestion] = useState(false); // منع التكرار
+  const [hasReadCurrentQuestion, setHasReadCurrentQuestion] = useState(false);
+  const [shuffledQuestions, setShuffledQuestions] = useState<any[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const ttsRef = useRef<NodeJS.Timeout | null>(null);
   const stopTtsRef = useRef(false);
-  const ttsSessionRef = useRef(0); // session ID فريد لكل سؤال
+  const ttsSessionRef = useRef(0);
   const isRtl = lang === "ar";
+
+  // خلط الأسئلة عند أول تحميل أو عند تغيير الأسئلة
+  useEffect(() => {
+    if (questions.length > 0) {
+      setShuffledQuestions([...questions].sort(() => Math.random() - 0.5));
+    }
+  }, [questions]);
 
   // Check if device is mobile
   const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -107,7 +115,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
     }
   };
 
-  const q = questions[currentIndex];
+  const q = shuffledQuestions[currentIndex];
   const textsToTranslate = q ? [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""] : ["", "", "", ""];
   const translatedTexts = useAutoTranslateList(textsToTranslate, lang);
   const translatedRef = useRef<string[]>(["", "", "", ""]);
@@ -176,7 +184,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
       }
       const u = new SpeechSynthesisUtterance(text);
       u.lang = speechLang;
-      u.rate = 0.7; // سرعة أبطأ للوضوح
+      u.rate = 0.6; // سرعة أبطأ للوضوح
       u.pitch = 1;
       const v = getVoice();
       if (v) u.voice = v;
@@ -271,7 +279,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
     // بدء القراءة بعد ثانية واحدة
     ttsRef.current = setTimeout(() => {
       stopTtsRef.current = false;
-      const q = questions[currentIndex];
+      const q = shuffledQuestions[currentIndex];
       if (!q) { setReadingDone(true); return; }
 
       setHasReadCurrentQuestion(true);
@@ -333,23 +341,23 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
   const handleNext = () => {
     killTts();
     setReadingDone(false);
-    if (currentIndex + 1 >= questions.length) setFinished(true);
+    if (currentIndex + 1 >= shuffledQuestions.length) setFinished(true);
     else { setCurrentIndex(i => i + 1); setLocked(false); }
   };
 
   // حساب النتيجة مع مراعاة الـ 5 نقاط
   const score = Object.entries(answers).reduce((total, [i, ans]) => {
     if (ans === null || ans === undefined) return total;
-    const q = questions[parseInt(i)];
+    const q = shuffledQuestions[parseInt(i)];
     if (!q) return total;
     const pts = q.points || 1;
     return total + (q.correctAnswer === ans ? pts : 0);
   }, 0);
-  const maxScore = questions.reduce((t, q) => t + (q.points || 1), 0);
+  const maxScore = shuffledQuestions.reduce((t, q) => t + (q.points || 1), 0);
   const userAnswer = answers[currentIndex];
   const isAnswered = userAnswer !== undefined;
 
-  if (questions.length === 0) return (
+  if (shuffledQuestions.length === 0) return (
     <div className="text-center py-16">
       <div className="text-5xl mb-4">🎯</div>
       <p className="text-gray-500 text-sm">{lang === "ar" ? "لا يوجد أسئلة مجانية بعد" : lang === "nl" ? "Nog geen gratis examenvragen" : lang === "fr" ? "Pas encore de questions gratuites" : "No free exam questions yet"}</p>
@@ -361,7 +369,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
       <div className="border-4 border-[#003399] rounded-2xl p-8 max-w-md mx-auto">
         <div className="text-5xl mb-3">🎯</div>
         <h2 className="text-xl font-black text-[#003399] mb-2">Gratis Examen</h2>
-        <p className="text-gray-500 mb-2">{questions.length} {lang === "ar" ? "سؤال" : lang === "nl" ? "vragen" : lang === "fr" ? "questions" : "questions"}</p>
+        <p className="text-gray-500 mb-2">{shuffledQuestions.length} {lang === "ar" ? "سؤال" : lang === "nl" ? "vragen" : lang === "fr" ? "questions" : "questions"}</p>
         <p className="text-sm text-orange-600 font-bold mb-6">⏱ {lang === "ar" ? "15 ثانية لكل سؤال" : lang === "nl" ? "15 seconden per vraag" : lang === "fr" ? "15 secondes par question" : "15 seconds per question"}</p>
         <button onClick={() => setStarted(true)} className="px-8 py-3 font-black text-white rounded-xl" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
           {lang === "ar" ? "ابدأ" : lang === "nl" ? "Start" : lang === "fr" ? "Démarrer" : "Start"} →
@@ -399,15 +407,15 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
           </div>
           <div className="flex justify-center gap-3 mt-3 text-sm">
             <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 font-bold border border-green-200">
-              ✓ {lang === "ar" ? "صح" : lang === "nl" ? "Correct" : lang === "fr" ? "Correct" : "Correct"}: {questions.filter((q,i) => answers[i] === q.correctAnswer).length}
+              ✓ {lang === "ar" ? "صح" : lang === "nl" ? "Correct" : lang === "fr" ? "Correct" : "Correct"}: {shuffledQuestions.filter((q,i) => answers[i] === q.correctAnswer).length}
             </span>
             <span className="px-3 py-1 rounded-full bg-red-100 text-red-700 font-bold border border-red-200">
-              ✗ {lang === "ar" ? "خطأ" : lang === "nl" ? "Fout" : lang === "fr" ? "Faux" : "Wrong"}: {questions.filter((q,i) => answers[i] !== undefined && answers[i] !== null && answers[i] !== q.correctAnswer).length}
+              ✗ {lang === "ar" ? "خطأ" : lang === "nl" ? "Fout" : lang === "fr" ? "Faux" : "Wrong"}: {shuffledQuestions.filter((q,i) => answers[i] !== undefined && answers[i] !== null && answers[i] !== q.correctAnswer).length}
             </span>
           </div>
         </div>
         <div className="flex gap-3">
-          <button onClick={() => { setStarted(false); setFinished(false); setCurrentIndex(0); setAnswers({}); setLocked(false); }}
+          <button onClick={() => { setStarted(false); setFinished(false); setCurrentIndex(0); setAnswers({}); setLocked(false); setShuffledQuestions([...questions].sort(() => Math.random() - 0.5)); }}
             className="flex-1 py-3 font-black text-white rounded-xl" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
             🔄 {lang === "ar" ? "إعادة" : lang === "nl" ? "Opnieuw" : lang === "fr" ? "Recommencer" : "Retry"}
           </button>
@@ -458,9 +466,9 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
 
       {/* شريط التقدم */}
       <div className="flex items-center justify-between mb-3">
-        <span className="text-sm font-bold text-gray-500">{currentIndex + 1} / {questions.length}</span>
+        <span className="text-sm font-bold text-gray-500">{currentIndex + 1} / {shuffledQuestions.length}</span>
         <div className="flex-1 mx-3 bg-gray-200 rounded-full h-2">
-          <div className="bg-[#003399] h-2 rounded-full transition-all" style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}></div>
+          <div className="bg-[#003399] h-2 rounded-full transition-all" style={{ width: `${((currentIndex + 1) / shuffledQuestions.length) * 100}%` }}></div>
         </div>
         <span className="text-sm font-bold text-gray-500">Score: {score}</span>
       </div>
@@ -470,7 +478,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
           {/* رأس السؤال */}
           <div className="px-5 py-3 flex items-center justify-between" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
             <div className="flex items-center gap-2">
-              <span className="text-white font-black text-sm">{currentIndex + 1} / {questions.length}</span>
+              <span className="text-white font-black text-sm">{currentIndex + 1} / {shuffledQuestions.length}</span>
               {q.points === 5 && (
                 <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black"
                   style={{ background: "rgba(239,68,68,0.85)", color: "white", border: "1.5px solid rgba(255,255,255,0.4)" }}>
@@ -560,7 +568,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
             </div>
             {(isAnswered || locked) && (
               <button onClick={handleNext} className="w-full mt-4 py-3 font-black text-white rounded-xl" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-                {currentIndex + 1 >= questions.length ? (lang === "ar" ? "النتيجة 🏆" : lang === "nl" ? "Resultaat 🏆" : lang === "fr" ? "Résultat 🏆" : "Result 🏆") : (lang === "ar" ? "التالي ←" : lang === "nl" ? "Volgende →" : lang === "fr" ? "Suivant →" : "Next →")}
+                {currentIndex + 1 >= shuffledQuestions.length ? (lang === "ar" ? "النتيجة 🏆" : lang === "nl" ? "Resultaat 🏆" : lang === "fr" ? "Résultat 🏆" : "Result 🏆") : (lang === "ar" ? "التالي ←" : lang === "nl" ? "Volgende →" : lang === "fr" ? "Suivant →" : "Next →")}
               </button>
             )}
           </div>
@@ -592,7 +600,7 @@ export default function GratisPage() {
     setLoading(true);
     fetch(`/api/free-content?category=${category}`)
       .then(r => r.json())
-      .then(d => { if (d.success) { setQuestions(d.questions || []); setExamQuestions(d.examQuestions || []); } })
+      .then(d => { if (d.success) { setQuestions(d.questions || []); setExamQuestions((d.examQuestions || []).sort(() => Math.random() - 0.5)); } })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [category]);
