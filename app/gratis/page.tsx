@@ -66,6 +66,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
   const [readingDone, setReadingDone] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [showAudioPrompt, setShowAudioPrompt] = useState(false);
+  const [hasReadCurrentQuestion, setHasReadCurrentQuestion] = useState(false); // منع التكرار
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const ttsRef = useRef<NodeJS.Timeout | null>(null);
   const stopTtsRef = useRef(false);
@@ -267,6 +268,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
     if (!started || finished) return;
     killTts();
     setReadingDone(false);
+    setHasReadCurrentQuestion(false); // إعادة تعيين حالة القراءة للسؤال الجديد
 
     // Don't auto-read on mobile unless audio is enabled
     if (isMobile && !audioEnabled) {
@@ -275,42 +277,46 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
       return;
     }
 
-    // بدء القراءة بعد ثانية واحدة من الدخول للسؤال
-    ttsRef.current = setTimeout(() => {
-      stopTtsRef.current = false;
-      const q = questions[currentIndex];
-      if (!q) { setReadingDone(true); return; }
+    // بدء القراءة بعد ثانية واحدة من الدخول للسؤال - مرة واحدة فقط
+    if (!hasReadCurrentQuestion) {
+      ttsRef.current = setTimeout(() => {
+        stopTtsRef.current = false;
+        const q = questions[currentIndex];
+        if (!q) { setReadingDone(true); return; }
 
-      const startReading = () => {
-        const texts = lang === "nl"
-          ? [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]
-          : translatedRef.current;
-        speakQuestion(q, texts);
-      };
+        setHasReadCurrentQuestion(true); // تسجيل أن السؤال تم قراءته
 
-      const voices = window.speechSynthesis.getVoices();
-      if (voices.length > 0) {
-        startReading();
-      } else {
-        window.speechSynthesis.onvoiceschanged = () => {
-          window.speechSynthesis.onvoiceschanged = null;
-          if (!stopTtsRef.current) startReading();
+        const startReading = () => {
+          const texts = lang === "nl"
+            ? [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]
+            : translatedRef.current;
+          speakQuestion(q, texts);
         };
-        setTimeout(() => { if (!stopTtsRef.current) startReading(); }, 1000);
-      }
 
-      // Fallback: إذا لم تبدأ القراءة خلال 10 ثوانٍ، ابدأ المؤقت
-      setTimeout(() => {
-        if (!readingDone && !stopTtsRef.current) {
-          console.log("Fallback: Starting timer after 10 seconds");
-          setReadingDone(true);
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length > 0) {
+          startReading();
+        } else {
+          window.speechSynthesis.onvoiceschanged = () => {
+            window.speechSynthesis.onvoiceschanged = null;
+            if (!stopTtsRef.current && !hasReadCurrentQuestion) startReading();
+          };
+          setTimeout(() => { if (!stopTtsRef.current && !hasReadCurrentQuestion) startReading(); }, 1000);
         }
-      }, 10000);
 
-    }, 1000); // بدء القراءة بعد ثانية واحدة بالضبط
+        // Fallback: إذا لم تبدأ القراءة خلال 10 ثوانٍ، ابدأ المؤقت
+        setTimeout(() => {
+          if (!readingDone && !stopTtsRef.current) {
+            console.log("Fallback: Starting timer after 10 seconds");
+            setReadingDone(true);
+          }
+        }, 10000);
+
+      }, 1000); // بدء القراءة بعد ثانية واحدة بالضبط
+    }
 
     return () => { killTts(); };
-  }, [currentIndex, started, finished, audioEnabled]);
+  }, [currentIndex, started, finished, audioEnabled]); // إزالة lang من dependencies لمنع إعادة القراءة عند تغيير اللغة
 
   // مؤقت 15 ثانية - يبدأ فقط بعد انتهاء القراءة
   useEffect(() => {

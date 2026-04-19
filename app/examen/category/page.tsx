@@ -33,6 +33,7 @@ function ExamenCategoryContent() {
   const [readingDone, setReadingDone] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [showAudioPrompt, setShowAudioPrompt] = useState(false);
+  const [hasReadCurrentQuestion, setHasReadCurrentQuestion] = useState(false); // منع التكرار
 
   // Check if device is mobile
   const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -227,6 +228,7 @@ function ExamenCategoryContent() {
     if (!started || finished) return;
     killTts();
     setReadingDone(false);
+    setHasReadCurrentQuestion(false); // إعادة تعيين حالة القراءة للسؤال الجديد
 
     // Don't auto-read on mobile unless audio is enabled
     if (isMobile && !audioEnabled) {
@@ -235,45 +237,49 @@ function ExamenCategoryContent() {
       return;
     }
 
-    // بدء القراءة بعد ثانية واحدة من الدخول للسؤال
-    ttsRef.current = setTimeout(() => {
-      stopTtsRef.current = false;
-      const q = questions[currentIndex];
-      if (!q) { setReadingDone(true); return; }
+    // بدء القراءة بعد ثانية واحدة من الدخول للسؤال - مرة واحدة فقط
+    if (!hasReadCurrentQuestion) {
+      ttsRef.current = setTimeout(() => {
+        stopTtsRef.current = false;
+        const q = questions[currentIndex];
+        if (!q) { setReadingDone(true); return; }
 
-      const startReading = () => {
-        if (lang === "nl") {
-          speakQuestion(q, [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]);
-        } else {
-          const texts = translatedRef.current;
-          const hasTranslation = texts[0] && texts[0] !== (q.textNL || q.text || "");
-          speakQuestion(q, hasTranslation ? texts : [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]);
-        }
-      };
+        setHasReadCurrentQuestion(true); // تسجيل أن السؤال تم قراءته
 
-      const voices = window.speechSynthesis.getVoices();
-      if (voices.length > 0) {
-        startReading();
-      } else {
-        window.speechSynthesis.onvoiceschanged = () => {
-          window.speechSynthesis.onvoiceschanged = null;
-          if (!stopTtsRef.current) startReading();
+        const startReading = () => {
+          if (lang === "nl") {
+            speakQuestion(q, [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]);
+          } else {
+            const texts = translatedRef.current;
+            const hasTranslation = texts[0] && texts[0] !== (q.textNL || q.text || "");
+            speakQuestion(q, hasTranslation ? texts : [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]);
+          }
         };
-        setTimeout(() => { if (!stopTtsRef.current) startReading(); }, 1000);
-      }
 
-      // Fallback: إذا لم تبدأ القراءة خلال 10 ثوانٍ، ابدأ المؤقت
-      setTimeout(() => {
-        if (!readingDone && !stopTtsRef.current) {
-          console.log("Fallback: Starting timer after 10 seconds");
-          setReadingDone(true);
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length > 0) {
+          startReading();
+        } else {
+          window.speechSynthesis.onvoiceschanged = () => {
+            window.speechSynthesis.onvoiceschanged = null;
+            if (!stopTtsRef.current && !hasReadCurrentQuestion) startReading();
+          };
+          setTimeout(() => { if (!stopTtsRef.current && !hasReadCurrentQuestion) startReading(); }, 1000);
         }
-      }, 10000);
 
-    }, 1000); // بدء القراءة بعد ثانية واحدة بالضبط
+        // Fallback: إذا لم تبدأ القراءة خلال 10 ثوانٍ، ابدأ المؤقت
+        setTimeout(() => {
+          if (!readingDone && !stopTtsRef.current) {
+            console.log("Fallback: Starting timer after 10 seconds");
+            setReadingDone(true);
+          }
+        }, 10000);
+
+      }, 1000); // بدء القراءة بعد ثانية واحدة بالضبط
+    }
 
     return () => { killTts(); };
-  }, [currentIndex, started, finished, audioEnabled]);
+  }, [currentIndex, started, finished, audioEnabled]); // إزالة lang من dependencies لمنع إعادة القراءة عند تغيير اللغة
 
   useEffect(() => {
     const fetchAll = async () => {
