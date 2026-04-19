@@ -43,11 +43,11 @@ export async function GET(request: NextRequest) {
 
     let questions;
     if (category === "A") {
-      questions = await prisma.examQuestionA.findMany({ where, orderBy: { createdAt: 'asc' } });
+      questions = await prisma.examQuestionA.findMany({ where, orderBy: { createdAt: 'desc' } });
     } else if (category === "B") {
-      questions = await prisma.examQuestionB.findMany({ where, orderBy: { createdAt: 'asc' } });
+      questions = await prisma.examQuestionB.findMany({ where, orderBy: { createdAt: 'desc' } });
     } else if (category === "C") {
-      questions = await prisma.examQuestionC.findMany({ where, orderBy: { createdAt: 'asc' } });
+      questions = await prisma.examQuestionC.findMany({ where, orderBy: { createdAt: 'desc' } });
     }
 
     return NextResponse.json({ success: true, questions: questions || [] });
