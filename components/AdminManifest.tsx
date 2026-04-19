@@ -30,8 +30,8 @@ export default function AdminManifest() {
   const handleInstall = async () => {
     if (installPrompt) {
       installPrompt.prompt();
-      const { outcome } = await installPrompt.userChoice;
-      if (outcome === "accepted") setInstallPrompt(null);
+      await installPrompt.userChoice;
+      setInstallPrompt(null);
     } else {
       setShowGuide(true);
     }
@@ -39,13 +39,13 @@ export default function AdminManifest() {
 
   return (
     <>
-      {/* زر التثبيت - يظهر دائماً */}
+      {/* زر تثبيت في الـ header - inline وليس fixed */}
       <button
         onClick={handleInstall}
-        className="fixed bottom-6 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-2xl text-sm font-black text-white shadow-2xl transition-all hover:scale-105 active:scale-95"
-        style={{ background: "linear-gradient(135deg, #1e1b4b, #3730a3)", boxShadow: "0 4px 20px rgba(55,48,163,0.5)" }}
+        className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-black transition-all hover:scale-105 active:scale-95"
+        style={{ background: "rgba(99,102,241,0.7)", color: "white", border: "1px solid rgba(99,102,241,0.4)" }}
       >
-        📲 تثبيت الأدمن
+        📲 تثبيت
       </button>
 
       {/* دليل التثبيت */}
@@ -60,11 +60,9 @@ export default function AdminManifest() {
 
             <div className="mb-4 p-3 rounded-xl text-xs font-bold text-center" style={{ background: "#fef3c7", border: "1.5px solid #f59e0b" }}>
               ⚠️ تأكد أنك الآن على صفحة<br/>
-              <span className="text-[#003399] font-black">/admin/questions</span><br/>
-              وليس أي صفحة أخرى
+              <span className="text-[#003399] font-black">/admin/questions</span>
             </div>
 
-            {/* iPhone */}
             <div className="mb-4">
               <p className="text-sm font-black text-gray-700 mb-2">🍎 iPhone (Safari):</p>
               <div className="space-y-1.5">
@@ -78,7 +76,6 @@ export default function AdminManifest() {
               </div>
             </div>
 
-            {/* Android */}
             <div className="mb-5">
               <p className="text-sm font-black text-gray-700 mb-2">🤖 Android (Chrome):</p>
               <div className="space-y-1.5">

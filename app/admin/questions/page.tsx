@@ -1266,7 +1266,6 @@ export default function AdminQuestionsPage() {
 
   return (
     <div className="min-h-screen" style={{ background: "#f0f4f8" }}>
-      <AdminManifest />
       {/* Header خرافي */}
       <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0a0a2e 0%, #003399 60%, #0055cc 100%)" }}>
         {/* خطوط زخرفية */}
@@ -1314,6 +1313,9 @@ export default function AdminQuestionsPage() {
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
                 {t.changeType}
               </button>
+
+              {/* زر تثبيت الأدمن */}
+              <AdminManifest />
 
               {/* زر الخروج */}
               <button onClick={() => setIsLogged(false)}
