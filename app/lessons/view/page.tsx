@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState, useMemo, useCallback } from "react";
+import { Suspense, useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useLang } from "@/context/LangContext";
 import nl from "@/locales/nl.json";
@@ -138,6 +138,136 @@ function LessonViewContent() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isExpired, setIsExpired] = useState(false);
   const [checking, setChecking] = useState(true);
+
+  // TTS functionality
+  const ttsRef = useRef<NodeJS.Timeout | null>(null);
+  const stopTtsRef = useRef(false);
+  const ttsSessionRef = useRef(0);
+  const [isReading, setIsReading] = useState(false);
+  const [readingDone, setReadingDone] = useState(false);
+
+  // Language mapping for TTS
+  const langMap: Record<string, string> = {
+    nl: "nl-NL",
+    fr: "fr-FR", 
+    ar: "ar-SA",
+    en: "en-US"
+  };
+
+  // Stop TTS function
+  const killTts = () => {
+    stopTtsRef.current = true;
+    ttsSessionRef.current += 1;
+    if (ttsRef.current) { 
+      clearTimeout(ttsRef.current); 
+      ttsRef.current = null; 
+    }
+    if (window.speechSynthesis) {
+      window.speechSynthesis.pause();
+      window.speechSynthesis.cancel();
+    }
+    setIsReading(false);
+  };
+
+  // Read question and explanation
+  const speakContent = (question: Question) => {
+    if (!window.speechSynthesis || !question) return;
+    
+    stopTtsRef.current = false;
+    const session = ttsSessionRef.current;
+    window.speechSynthesis.cancel();
+    setIsReading(true);
+    setReadingDone(false);
+
+    const speechLang = langMap[lang] || "nl-NL";
+
+    const getVoice = (): SpeechSynthesisVoice | null => {
+      const voices = window.speechSynthesis.getVoices();
+      if (!voices.length) return null;
+      return voices.find(v => v.lang === speechLang)
+        || voices.find(v => v.lang.startsWith(speechLang.split("-")[0]))
+        || voices.find(v => v.lang === "nl-NL")
+        || voices[0]
+        || null;
+    };
+
+    const isValid = () => ttsSessionRef.current === session && !stopTtsRef.current;
+
+    const speak = (text: string, onEnd?: () => void) => {
+      if (!isValid()) return;
+      if (!text) { if (onEnd) onEnd(); return; }
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = speechLang;
+      utterance.rate = 0.75;
+      utterance.pitch = 1;
+      
+      const voice = getVoice();
+      if (voice) utterance.voice = voice;
+
+      if (onEnd) utterance.onend = () => { if (isValid()) onEnd(); };
+      utterance.onerror = () => { if (isValid() && onEnd) onEnd(); };
+      
+      window.speechSynthesis.speak(utterance);
+    };
+
+    // Get question text
+    const questionText = question.textNL || question.textFR || question.textAR || question.text || "";
+    
+    // Get explanation text
+    const explanationText = question.explanationNL || question.explanationFR || question.explanationAR || "";
+
+    // Read question first, then explanation
+    if (questionText) {
+      speak(questionText, () => {
+        if (explanationText) {
+          ttsRef.current = setTimeout(() => {
+            if (isValid()) {
+              speak(explanationText, () => {
+                setIsReading(false);
+                setReadingDone(true);
+              });
+            }
+          }, 600);
+        } else {
+          setIsReading(false);
+          setReadingDone(true);
+        }
+      });
+    } else if (explanationText) {
+      speak(explanationText, () => {
+        setIsReading(false);
+        setReadingDone(true);
+      });
+    } else {
+      setIsReading(false);
+      setReadingDone(true);
+    }
+  };
+
+  // Auto-read when question changes
+  useEffect(() => {
+    if (!filteredQuestions[currentIndex]) return;
+    
+    killTts();
+    setReadingDone(false);
+
+    ttsRef.current = setTimeout(() => {
+      const question = filteredQuestions[currentIndex];
+      if (!question) return;
+
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        speakContent(question);
+      } else {
+        window.speechSynthesis.onvoiceschanged = () => {
+          speakContent(question);
+        };
+      }
+    }, 500);
+
+    return () => killTts();
+  }, [currentIndex, filteredQuestions, lang]);
 
   // Debounce search term
   useEffect(() => {
@@ -434,6 +564,34 @@ function LessonViewContent() {
               >
                 ← {lang === "ar" ? "السابق" : lang === "nl" ? "Vorige" : lang === "fr" ? "Précédent" : "Previous"}
               </button>
+              
+              {/* أزرار التحكم في القراءة */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => speakContent(filteredQuestions[currentIndex])}
+                  disabled={isReading}
+                  className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${
+                    isReading 
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
+                      : "bg-green-500 text-white hover:bg-green-600"
+                  }`}
+                >
+                  {isReading ? "🔊" : "▶️"} {lang === "ar" ? "قراءة" : lang === "nl" ? "Lezen" : lang === "fr" ? "Lire" : "Read"}
+                </button>
+                
+                <button
+                  onClick={killTts}
+                  disabled={!isReading}
+                  className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${
+                    !isReading 
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
+                      : "bg-red-500 text-white hover:bg-red-600"
+                  }`}
+                >
+                  ⏹️ {lang === "ar" ? "إيقاف" : lang === "nl" ? "Stop" : lang === "fr" ? "Arrêter" : "Stop"}
+                </button>
+              </div>
+
               <span className="text-sm text-gray-500 font-bold">
                 {currentIndex + 1} / {filteredQuestions.length}
               </span>
