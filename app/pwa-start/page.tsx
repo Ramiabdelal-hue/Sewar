@@ -7,11 +7,11 @@ export default function PWAStart() {
   const router = useRouter();
 
   useEffect(() => {
-    // تحقق إذا كان الـ manifest الحالي هو Admin
-    const manifestLink = document.querySelector('link[rel="manifest"]') as HTMLLinkElement;
-    const isAdminPWA = manifestLink?.href?.includes("manifest-admin");
+    // تحقق من URL parameter للأدمن
+    const params = new URLSearchParams(window.location.search);
+    const isAdmin = params.get("admin") === "1";
 
-    if (isAdminPWA) {
+    if (isAdmin) {
       router.replace("/admin/questions");
       return;
     }
