@@ -79,7 +79,18 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
         <span className="text-white/60 text-sm font-bold">{index + 1} / {total}</span>
       </div>
 
-      {/* الصور */}
+      {/* عنوان الشرح فوق الصورة مباشرة */}
+      {(question.textNL || question.text) && (
+        <div className="px-5 py-3 flex items-center gap-2"
+          style={{ background: "linear-gradient(135deg, #16a34a, #15803d)" }}>
+          <span className="text-white text-base flex-shrink-0">📌</span>
+          <p className={`text-sm font-black text-white leading-snug ${isRtl ? "text-right" : "text-left"}`}>
+            {translating ? (question.textNL || question.text) : qText}
+          </p>
+        </div>
+      )}
+
+      {/* الصور - متصلة مباشرة بالعنوان */}
       {question.videoUrls && question.videoUrls.filter(Boolean).length > 0 && (
         <div className={`grid gap-1 bg-gray-900 p-2 ${question.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
           {question.videoUrls.filter(Boolean).map((url, i) => (
@@ -115,50 +126,32 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
         </div>
       )}
 
-      {/* الشرح فقط - بدون نص السؤال */}
-      {(expText || question.textNL || question.text) && (
-        <div className="px-5 py-5 bg-white">
-          <div className="bg-green-50 border border-green-200 rounded-xl overflow-hidden">
-            {/* عنوان النقطة */}
-            {(question.textNL || question.text) && (
-              <div className="px-4 py-3 flex items-center gap-2" style={{ background: "linear-gradient(135deg, #16a34a, #15803d)" }}>
-                <span className="text-white text-base">📌</span>
-                <p className="text-sm font-black text-white leading-snug">
-                  {question.textNL || question.text}
+      {/* الشرح - متصل بالصورة */}
+      {expText && (
+        <div className="px-5 py-4 bg-green-50">
+          <p className="text-xs font-black text-green-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+            {lang === "ar" ? "الشرح" : lang === "nl" ? "Uitleg" : lang === "fr" ? "Explication" : "Explanation"}
+            {translating && <span className="text-green-400 animate-pulse">...</span>}
+          </p>
+          {expText.includes('\n') ? (
+            <div className="space-y-1.5">
+              {expText.split('\n').filter(line => line.trim()).map((line, i) => (
+                <p key={i} className={`text-sm text-green-900 leading-relaxed ${isRtl ? "text-right" : "text-left"}`}>
+                  {line.trim()}
                 </p>
-              </div>
-            )}
-
-            {/* الشرح */}
-            {expText && (
-              <div className="p-4">
-                <p className="text-xs font-black text-green-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                  {lang === "ar" ? "الشرح" : lang === "nl" ? "Uitleg" : lang === "fr" ? "Explication" : "Explanation"}
-                </p>
-                {expText.includes('\n') ? (
-                  <div className="space-y-1.5">
-                    {expText.split('\n').filter(line => line.trim()).map((line, i) => (
-                      <p key={i} className={`text-sm text-green-900 leading-relaxed ${isRtl ? "text-right" : "text-left"}`}>
-                        {line.trim()}
-                      </p>
-                    ))}
-                  </div>
-                ) : (
-                  <p className={`text-sm text-green-900 leading-relaxed ${isRtl ? "text-right" : "text-left"}`}>{expText}</p>
-                )}
-              </div>
-            )}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <p className={`text-sm text-green-900 leading-relaxed ${isRtl ? "text-right" : "text-left"}`}>{expText}</p>
+          )}
         </div>
       )}
 
-      {/* إذا لا يوجد شرح ولا صورة - مساحة فارغة صغيرة */}
+      {/* إذا لا يوجد شرح ولا صورة */}
       {!expText && (!question.videoUrls || question.videoUrls.filter(Boolean).length === 0) && !question.audioUrl && (
         <div className="px-5 py-4 bg-white"></div>
       )}
-
-      {/* أزرار التنقل محذوفة - موجودة في الصفحة الأم */}
     </div>
   );
 }
