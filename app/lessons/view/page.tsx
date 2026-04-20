@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState, useMemo, useCallback, useRef } from "react";
+import { Suspense, useEffect, useState, useMemo, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useLang } from "@/context/LangContext";
 import nl from "@/locales/nl.json";
@@ -139,116 +139,7 @@ function LessonViewContent() {
   const [isExpired, setIsExpired] = useState(false);
   const [checking, setChecking] = useState(true);
 
-  // TTS functionality
-  const ttsRef = useRef<NodeJS.Timeout | null>(null);
-  const stopTtsRef = useRef(false);
-  const ttsSessionRef = useRef(0);
-  const [isReading, setIsReading] = useState(false);
-  const translatedRef = useRef<string[]>(["", "", ""]);
 
-  // فتح قناة الصوت عند أول تفاعل (مطلوب على iOS/Android)
-  const unlockAudio = () => {
-    if (!window.speechSynthesis) return;
-    const u = new SpeechSynthesisUtterance('');
-    u.volume = 0;
-    u.rate = 1;
-    window.speechSynthesis.speak(u);
-  };
-
-  // إيقاف فوري
-  const killTts = () => {
-    stopTtsRef.current = true;
-    ttsSessionRef.current += 1;
-    if (ttsRef.current) { clearTimeout(ttsRef.current); ttsRef.current = null; }
-    if (window.speechSynthesis) {
-      window.speechSynthesis.pause();
-      window.speechSynthesis.cancel();
-    }
-    setIsReading(false);
-  };
-
-  // قراءة السؤال والشرح
-  const speakContent = (question: Question) => {
-    if (!window.speechSynthesis || !question) return;
-
-    stopTtsRef.current = false;
-    const session = ttsSessionRef.current;
-    window.speechSynthesis.cancel();
-    setIsReading(true);
-
-    const langMap: Record<string, string> = { nl: "nl-NL", fr: "fr-FR", ar: "ar-SA", en: "en-US" };
-    const speechLang = langMap[lang] || "nl-NL";
-
-    const getVoice = (): SpeechSynthesisVoice | null => {
-      const voices = window.speechSynthesis.getVoices();
-      if (!voices.length) return null;
-      const femaleVoice = voices.find(v =>
-        v.lang === speechLang &&
-        (v.name.toLowerCase().includes('female') ||
-         v.name.toLowerCase().includes('woman') ||
-         v.name.toLowerCase().includes('zira') ||
-         v.name.toLowerCase().includes('hazel') ||
-         v.name.toLowerCase().includes('samantha') ||
-         v.name.toLowerCase().includes('karen') ||
-         v.name.toLowerCase().includes('tessa') ||
-         v.name.toLowerCase().includes('moira') ||
-         v.name.toLowerCase().includes('fiona') ||
-         v.name.toLowerCase().includes('amelie') ||
-         v.name.toLowerCase().includes('thomas') === false)
-      );
-      if (femaleVoice) return femaleVoice;
-      return voices.find(v => v.lang === speechLang)
-        || voices.find(v => v.lang.startsWith(speechLang.split("-")[0]))
-        || voices.find(v => v.lang === "nl-NL")
-        || voices[0] || null;
-    };
-
-    const isValid = () => ttsSessionRef.current === session && !stopTtsRef.current;
-
-    const speak = (text: string, onEnd?: () => void) => {
-      if (!isValid()) { setIsReading(false); return; }
-      if (!text) { if (onEnd) onEnd(); else setIsReading(false); return; }
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = speechLang;
-      u.rate = 0.3;
-      u.pitch = 1;
-      const v = getVoice();
-      if (v) u.voice = v;
-      if (onEnd) {
-        u.onend = () => { if (isValid()) onEnd(); else setIsReading(false); };
-      } else {
-        u.onend = () => setIsReading(false);
-      }
-      u.onerror = () => { if (isValid() && onEnd) onEnd(); else setIsReading(false); };
-      window.speechSynthesis.speak(u);
-    };
-
-    const questionText = question.textNL || question.textFR || question.textAR || question.text || "";
-    const explanationText = question.explanationNL || question.explanationFR || question.explanationAR || "";
-
-    if (questionText) {
-      speak(questionText, () => {
-        if (!isValid()) { setIsReading(false); return; }
-        if (explanationText) {
-          ttsRef.current = setTimeout(() => {
-            if (isValid()) speak(explanationText, () => setIsReading(false));
-            else setIsReading(false);
-          }, 600);
-        } else {
-          setIsReading(false);
-        }
-      });
-    } else if (explanationText) {
-      speak(explanationText, () => setIsReading(false));
-    } else {
-      setIsReading(false);
-    }
-  };
-
-  // لا قراءة تلقائية - الصوت اختياري فقط عند ضغط زر القراءة
-  useEffect(() => {
-    killTts();
-  }, [currentIndex, filteredQuestions]);
 
   // Debounce search term
   useEffect(() => {
@@ -539,45 +430,19 @@ function LessonViewContent() {
           {filteredQuestions.length > 1 && (
             <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
               <button
-                onClick={() => { unlockAudio(); setCurrentIndex(Math.max(0, currentIndex - 1)); window.scrollTo(0, 0); }}
+                onClick={() => { setCurrentIndex(Math.max(0, currentIndex - 1)); window.scrollTo(0, 0); }}
                 disabled={currentIndex === 0}
                 className={`px-6 py-3 font-black text-sm border-2 transition-all ${currentIndex === 0 ? "text-gray-300 border-gray-200 cursor-not-allowed" : "text-[#003399] border-[#003399] hover:bg-[#003399] hover:text-white"}`}
               >
                 ← {lang === "ar" ? "السابق" : lang === "nl" ? "Vorige" : lang === "fr" ? "Précédent" : "Previous"}
               </button>
               
-              {/* أزرار التحكم في القراءة */}
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => { unlockAudio(); speakContent(filteredQuestions[currentIndex]); }}
-                  disabled={isReading}
-                  className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${
-                    isReading 
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
-                      : "bg-green-500 text-white hover:bg-green-600"
-                  }`}
-                >
-                  {isReading ? "🔊" : "▶️"} {lang === "ar" ? "قراءة" : lang === "nl" ? "Lezen" : lang === "fr" ? "Lire" : "Read"}
-                </button>
-                
-                <button
-                  onClick={killTts}
-                  disabled={!isReading}
-                  className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${
-                    !isReading 
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
-                      : "bg-red-500 text-white hover:bg-red-600"
-                  }`}
-                >
-                  ⏹️ {lang === "ar" ? "إيقاف" : lang === "nl" ? "Stop" : lang === "fr" ? "Arrêter" : "Stop"}
-                </button>
-              </div>
-
               <span className="text-sm text-gray-500 font-bold">
                 {currentIndex + 1} / {filteredQuestions.length}
               </span>
+
               <button
-                onClick={() => { unlockAudio(); setCurrentIndex(Math.min(filteredQuestions.length - 1, currentIndex + 1)); window.scrollTo(0, 0); }}
+                onClick={() => { setCurrentIndex(Math.min(filteredQuestions.length - 1, currentIndex + 1)); window.scrollTo(0, 0); }}
                 disabled={currentIndex + 1 >= filteredQuestions.length}
                 className={`px-6 py-3 font-black text-sm border-2 transition-all ${currentIndex + 1 >= filteredQuestions.length ? "text-gray-300 border-gray-200 cursor-not-allowed" : "text-white border-[#003399] hover:opacity-90"}`}
                 style={currentIndex + 1 <= filteredQuestions.length - 1 ? { background: "linear-gradient(135deg, #003399, #0055cc)" } : {}}
