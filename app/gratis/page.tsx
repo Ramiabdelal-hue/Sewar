@@ -273,6 +273,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
   }, [currentIndex, started, finished, readingDone]);
 
   const [showRoses, setShowRoses] = useState(false);
+  const [showWrong, setShowWrong] = useState(false);
 
   // صوت "Bravo!" عند الإجابة الصحيحة
   const playApplause = () => {
@@ -318,12 +319,19 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
     setTimeout(() => setShowRoses(false), 2500);
   };
 
+  const launchWrong = () => {
+    setShowWrong(true);
+    setTimeout(() => setShowWrong(false), 800);
+  };
+
   const handleAnswer = (num: number) => {
     if (locked || answers[currentIndex] !== undefined) return;
     killTts();
     clearInterval(timerRef.current!);
     if (shuffledQuestions[currentIndex]?.correctAnswer === num) {
       launchRoses();
+    } else {
+      launchWrong();
     }
     setAnswers(a => ({ ...a, [currentIndex]: num }));
     setLocked(true);
@@ -444,6 +452,25 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
               0%   { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
               80%  { opacity: 1; }
               100% { transform: translateY(110vh) rotate(720deg) scale(0.5); opacity: 0; }
+            }
+          `}</style>
+        </div>
+      )}
+
+      {/* تأثير الإجابة الخاطئة - اهتزاز أحمر */}
+      {showWrong && (
+        <div className="fixed inset-0 z-[9999] pointer-events-none">
+          <div className="absolute inset-0 bg-red-500 opacity-20 animate-pulse"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-8xl animate-bounce" style={{ animationDuration: '0.3s', animationIterationCount: '3' }}>
+              ❌
+            </div>
+          </div>
+          <style>{`
+            @keyframes shake {
+              0%, 100% { transform: translateX(0); }
+              25% { transform: translateX(-10px); }
+              75% { transform: translateX(10px); }
             }
           `}</style>
         </div>

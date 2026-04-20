@@ -34,6 +34,7 @@ function ExamenCategoryContent() {
   const [readingDone, setReadingDone] = useState(false);
   const [hasReadCurrentQuestion, setHasReadCurrentQuestion] = useState(false);
   const [showRoses, setShowRoses] = useState(false);
+  const [showWrong, setShowWrong] = useState(false);
   const audioCtxRef = useRef<AudioContext | null>(null);
 
   // دالة إيقاف فوري شاملة
@@ -328,12 +329,19 @@ function ExamenCategoryContent() {
     setTimeout(() => setShowRoses(false), 2500);
   };
 
+  const launchWrong = () => {
+    setShowWrong(true);
+    setTimeout(() => setShowWrong(false), 800);
+  };
+
   const handleAnswer = (num: number) => {
     if (locked || answers[currentIndex] !== undefined) return;
     killTts();
     clearInterval(timerRef.current!);
     if (questions[currentIndex]?.correctAnswer === num) {
       launchRoses();
+    } else {
+      launchWrong();
     }
     setAnswers(a => ({ ...a, [currentIndex]: num }));
     setLocked(true);
@@ -622,6 +630,24 @@ function ExamenCategoryContent() {
               0%   { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
               80%  { opacity: 1; }
               100% { transform: translateY(110vh) rotate(720deg) scale(0.5); opacity: 0; }
+            }
+          `}</style>
+        </div>
+      )}
+
+      {/* تأثير الإجابة الخاطئة */}
+      {showWrong && (
+        <div className="fixed inset-0 z-[9999] pointer-events-none">
+          <div className="absolute inset-0 bg-red-500 opacity-20 animate-pulse"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-8xl" style={{ animation: 'wrongBounce 0.3s ease-in-out 3' }}>
+              ❌
+            </div>
+          </div>
+          <style>{`
+            @keyframes wrongBounce {
+              0%, 100% { transform: scale(1); }
+              50% { transform: scale(1.3); }
             }
           `}</style>
         </div>
