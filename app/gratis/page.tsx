@@ -32,7 +32,7 @@ function LessonsTab({ questions, lang, router }: { questions: any[], lang: strin
         <span className="text-xs font-bold px-2 py-1 rounded-full" style={{ background: "rgba(34,197,94,0.1)", color: "#16a34a" }}>🎁 Gratis</span>
       </div>
       {questions[currentIndex]?.lesson && (
-        <div className="mb-3 px-4 py-2 rounded-xl text-xs font-bold text-[#003399]" style={{ background: "#eff6ff", border: "1px solid #bfdbfe" }}>
+        <div className="mb-1.5 px-4 py-2 rounded-xl text-xs font-bold text-[#003399]" style={{ background: "#eff6ff", border: "1px solid #bfdbfe" }}>
           📚 {questions[currentIndex].lesson.title}
         </div>
       )}
