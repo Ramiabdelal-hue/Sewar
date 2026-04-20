@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
         include: { lesson: { select: { title: true, description: true } } }
       });
       examQuestions = await prisma.examQuestionA.findMany({
-        where: { isFree: true }, orderBy: { createdAt: "asc" },
+        where: { isFree: true }, orderBy: [{ freeGroup: "asc" }, { createdAt: "asc" }],
         include: { lesson: { select: { title: true } } }
       });
     } else if (category === "B") {
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
         include: { lesson: { select: { title: true, description: true } } }
       });
       examQuestions = await prisma.examQuestionB.findMany({
-        where: { isFree: true }, orderBy: { createdAt: "asc" },
+        where: { isFree: true }, orderBy: [{ freeGroup: "asc" }, { createdAt: "asc" }],
         include: { lesson: { select: { title: true } } }
       });
     } else if (category === "C") {
@@ -33,12 +33,36 @@ export async function GET(request: NextRequest) {
         include: { lesson: { select: { title: true, description: true } } }
       });
       examQuestions = await prisma.examQuestionC.findMany({
-        where: { isFree: true }, orderBy: { createdAt: "asc" },
+        where: { isFree: true }, orderBy: [{ freeGroup: "asc" }, { createdAt: "asc" }],
         include: { lesson: { select: { title: true } } }
       });
     }
 
-    return NextResponse.json({ success: true, questions, examQuestions });
+    // تجميع أسئلة الامتحان حسب freeGroup
+    // الأسئلة بدون freeGroup تُجمع في مجموعة واحدة (group 0)
+    const groupsMap: Record<number, any[]> = {};
+    for (const q of examQuestions) {
+      const g = q.freeGroup ?? 0;
+      if (!groupsMap[g]) groupsMap[g] = [];
+      groupsMap[g].push(q);
+    }
+
+    // ترتيب المجموعات: 1, 2, 3... ثم 0 (بدون مجموعة) في النهاية
+    const sortedKeys = Object.keys(groupsMap)
+      .map(Number)
+      .sort((a, b) => {
+        if (a === 0) return 1;
+        if (b === 0) return -1;
+        return a - b;
+      });
+
+    const examGroups = sortedKeys.map(g => ({
+      group: g,
+      label: g === 0 ? null : `Examen ${g}`,
+      questions: groupsMap[g],
+    }));
+
+    return NextResponse.json({ success: true, questions, examQuestions, examGroups });
   } catch (error) {
     return NextResponse.json({ success: false, message: "خطأ في جلب المحتوى المجاني" }, { status: 500 });
   }

@@ -200,6 +200,7 @@ model ExamQuestionA {
   lessonId      Int
   isFree        Boolean  @default(false)
   points        Int      @default(1)
+  freeGroup     Int?
   createdAt     DateTime @default(now())
   lesson        LessonA  @relation("ExamQuestionsA", fields: [lessonId], references: [id], onDelete: Cascade)
 }
@@ -217,6 +218,7 @@ model ExamQuestionB {
   lessonId      Int
   isFree        Boolean  @default(false)
   points        Int      @default(1)
+  freeGroup     Int?
   createdAt     DateTime @default(now())
   lesson        LessonB  @relation("ExamQuestionsB", fields: [lessonId], references: [id], onDelete: Cascade)
 }
@@ -234,6 +236,7 @@ model ExamQuestionC {
   lessonId      Int
   isFree        Boolean  @default(false)
   points        Int      @default(1)
+  freeGroup     Int?
   createdAt     DateTime @default(now())
   lesson        LessonC  @relation("ExamQuestionsC", fields: [lessonId], references: [id], onDelete: Cascade)
 }

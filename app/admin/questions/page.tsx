@@ -464,6 +464,7 @@ export default function AdminQuestionsPage() {
     audioUrl: "",
     isFree: false,
     points: 1,
+    freeGroup: null as number | null,
   });
 
   const lessonsMap: Record<string, any> = {
@@ -1653,6 +1654,26 @@ export default function AdminQuestionsPage() {
                 </div>
               </label>
 
+              {/* اختيار مجموعة الامتحان المجاني - فقط للامتحانات عند تفعيل isFree */}
+              {questionType === "Examen" && newQuestion.isFree && (
+                <div className="px-4 py-3 rounded-xl" style={{ background: "rgba(34,197,94,0.06)", border: "1.5px solid rgba(34,197,94,0.3)" }}>
+                  <p className="text-sm font-black text-gray-700 mb-2">📦 مجموعة الامتحان المجاني</p>
+                  <p className="text-xs text-gray-400 mb-3">كل 50 سؤال في مجموعة = امتحان منفصل في صفحة Gratis</p>
+                  <div className="flex gap-2 flex-wrap">
+                    {[null, 1, 2, 3, 4, 5].map(g => (
+                      <button key={g ?? "none"} type="button"
+                        onClick={() => setNewQuestion({ ...newQuestion, freeGroup: g })}
+                        className="px-3 py-1.5 rounded-lg text-xs font-black transition-all"
+                        style={newQuestion.freeGroup === g
+                          ? { background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white", boxShadow: "0 2px 8px rgba(34,197,94,0.4)" }
+                          : { background: "#f1f5f9", color: "#64748b", border: "1.5px solid #e2e8f0" }}>
+                        {g === null ? "بدون مجموعة" : `Examen ${g}`}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* checkbox 5 نقاط - فقط للامتحانات */}
               {questionType === "Examen" && (
                 <label className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all"
@@ -1942,6 +1963,25 @@ export default function AdminQuestionsPage() {
                           </label>
                         )}
                       </div>
+
+                      {/* اختيار مجموعة الامتحان المجاني في التعديل */}
+                      {questionType === "Examen" && editForm.isFree && (
+                        <div className="px-3 py-3 rounded-xl mt-2" style={{ background: "rgba(34,197,94,0.06)", border: "1.5px solid rgba(34,197,94,0.25)" }}>
+                          <p className="text-xs font-black text-gray-600 mb-2">📦 مجموعة الامتحان المجاني</p>
+                          <div className="flex gap-1.5 flex-wrap">
+                            {[null, 1, 2, 3, 4, 5].map(g => (
+                              <button key={g ?? "none"} type="button"
+                                onClick={() => setEditForm(prev => ({ ...prev, freeGroup: g } as any))}
+                                className="px-2.5 py-1 rounded-lg text-xs font-black transition-all"
+                                style={(editForm as any).freeGroup === g
+                                  ? { background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white" }
+                                  : { background: "#f1f5f9", color: "#64748b", border: "1.5px solid #e2e8f0" }}>
+                                {g === null ? "بدون" : `Examen ${g}`}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                       <div className="flex gap-3">
                         <button onClick={() => handleEditQuestion(q.id)} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black transition-all hover:scale-[1.02] active:scale-95" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white", boxShadow: "0 4px 14px rgba(34,197,94,0.35)" }}>
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>

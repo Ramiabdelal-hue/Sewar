@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     let category = categoryParam?.toUpperCase() || await getCategoryFromLessonId(lessonIdNum);
     if (!category) return NextResponse.json({ success: false, message: "الدرس غير موجود" }, { status: 404 });
 
-    const questionData = { text: textNL, textNL, videoUrls, audioUrl: audioUrl || null, answer1, answer2, answer3: answer3 || null, correctAnswer, isFree: body.isFree === true, points: body.points || 1, lessonId: lessonIdNum };
+    const questionData = { text: textNL, textNL, videoUrls, audioUrl: audioUrl || null, answer1, answer2, answer3: answer3 || null, correctAnswer, isFree: body.isFree === true, points: body.points || 1, freeGroup: body.freeGroup ?? null, lessonId: lessonIdNum };
     let question;
     if (category === "A") question = await prisma.examQuestionA.create({ data: questionData });
     else if (category === "B") question = await prisma.examQuestionB.create({ data: questionData });
@@ -158,6 +158,7 @@ export async function PUT(request: NextRequest) {
     if (answer3 !== undefined) updateData.answer3 = answer3;
     if (isFree !== undefined) updateData.isFree = isFree;
     if (body.points !== undefined) updateData.points = body.points || 1;
+    if (body.freeGroup !== undefined) updateData.freeGroup = body.freeGroup ?? null;
     if (correctAnswer !== undefined) updateData.correctAnswer = correctAnswer;
     if (videoUrls !== undefined) updateData.videoUrls = videoUrls;
     if (audioUrl !== undefined) updateData.audioUrl = audioUrl || null;

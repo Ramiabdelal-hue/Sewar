@@ -63,7 +63,72 @@ function LessonsTab({ questions, lang, router }: { questions: any[], lang: strin
 }
 
 // ─── تبويب الامتحان المجاني ───────────────────────────────────────────────────
-function ExamTab({ questions, lang, router }: { questions: any[], lang: string, router: any }) {
+function ExamTab({ questions, examGroups, lang, router }: { questions: any[], examGroups: any[], lang: string, router: any }) {
+  const [selectedGroup, setSelectedGroup] = useState<number | null>(null);
+
+  // إذا كانت مجموعة واحدة فقط، ابدأ مباشرة
+  const activeQuestions = selectedGroup !== null
+    ? (examGroups.find(g => g.group === selectedGroup)?.questions || [])
+    : questions;
+
+  // إذا لا توجد مجموعات متعددة، اعرض الامتحان مباشرة
+  const hasMultipleGroups = examGroups.length > 1;
+
+  if (hasMultipleGroups && selectedGroup === null) {
+    return (
+      <div className="py-4">
+        <div className="text-center mb-6">
+          <div className="text-4xl mb-2">🎯</div>
+          <h2 className="text-lg font-black text-gray-800">
+            {lang === "ar" ? "اختر الامتحان" : lang === "nl" ? "Kies een examen" : lang === "fr" ? "Choisissez un examen" : "Choose an exam"}
+          </h2>
+          <p className="text-sm text-gray-500 mt-1">
+            {lang === "ar" ? "كل امتحان يحتوي على مجموعة من الأسئلة" : lang === "nl" ? "Elk examen bevat een reeks vragen" : lang === "fr" ? "Chaque examen contient une série de questions" : "Each exam contains a set of questions"}
+          </p>
+        </div>
+        <div className="space-y-3">
+          {examGroups.map((g, i) => (
+            <button key={g.group} onClick={() => setSelectedGroup(g.group)}
+              className="w-full flex items-center justify-between px-5 py-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-95"
+              style={{ background: "white", border: "2px solid #e5e7eb", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-white text-sm"
+                  style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
+                  {i + 1}
+                </div>
+                <div className="text-left">
+                  <p className="font-black text-gray-800 text-sm">
+                    {g.label || (lang === "ar" ? "امتحان مجاني" : lang === "nl" ? "Gratis Examen" : "Examen Gratuit")}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    {g.questions.length} {lang === "ar" ? "سؤال" : lang === "nl" ? "vragen" : "questions"}
+                    {" · "}{g.questions.reduce((s: number, q: any) => s + (q.points || 1), 0)} {lang === "ar" ? "نقطة" : lang === "nl" ? "punten" : "pts"}
+                  </p>
+                </div>
+              </div>
+              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <ExamRunner
+      questions={activeQuestions}
+      lang={lang}
+      router={router}
+      groupLabel={selectedGroup !== null ? (examGroups.find(g => g.group === selectedGroup)?.label || null) : null}
+      onBack={hasMultipleGroups ? () => setSelectedGroup(null) : undefined}
+    />
+  );
+}
+
+// ─── منفذ الامتحان ────────────────────────────────────────────────────────────
+function ExamRunner({ questions, lang, router, groupLabel, onBack }: { questions: any[], lang: string, router: any, groupLabel: string | null, onBack?: () => void }) {
   const [started, setStarted] = useState(false);
   const [finished, setFinished] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -373,12 +438,19 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
     <div className="text-center py-10">
       <div className="border-4 border-[#003399] rounded-2xl p-8 max-w-md mx-auto">
         <div className="text-5xl mb-3">🎯</div>
-        <h2 className="text-xl font-black text-[#003399] mb-2">Gratis Examen</h2>
+        <h2 className="text-xl font-black text-[#003399] mb-2">{groupLabel || "Gratis Examen"}</h2>
         <p className="text-gray-500 mb-2">{shuffledQuestions.length} {lang === "ar" ? "سؤال" : lang === "nl" ? "vragen" : lang === "fr" ? "questions" : "questions"}</p>
         <p className="text-sm text-orange-600 font-bold mb-6">⏱ {lang === "ar" ? "15 ثانية لكل سؤال" : lang === "nl" ? "15 seconden per vraag" : lang === "fr" ? "15 secondes par question" : "15 seconds per question"}</p>
-        <button onClick={() => { unlockAudio(); setStarted(true); }} className="px-8 py-3 font-black text-white rounded-xl" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-          {lang === "ar" ? "ابدأ" : lang === "nl" ? "Start" : lang === "fr" ? "Démarrer" : "Start"} →
-        </button>
+        <div className="flex gap-3 justify-center">
+          {onBack && (
+            <button onClick={onBack} className="px-6 py-3 font-black rounded-xl border-2 border-gray-300 text-gray-600 hover:bg-gray-50">
+              ← {lang === "ar" ? "العودة" : lang === "nl" ? "Terug" : "Retour"}
+            </button>
+          )}
+          <button onClick={() => { unlockAudio(); setStarted(true); }} className="px-8 py-3 font-black text-white rounded-xl" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
+            {lang === "ar" ? "ابدأ" : lang === "nl" ? "Start" : lang === "fr" ? "Démarrer" : "Start"} →
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -606,6 +678,7 @@ function GratisContent() {
   const [tab, setTab] = useState<"lessons" | "exam">("lessons");
   const [questions, setQuestions] = useState<any[]>([]);
   const [examQuestions, setExamQuestions] = useState<any[]>([]);
+  const [examGroups, setExamGroups] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
   const categories = [
@@ -618,7 +691,7 @@ function GratisContent() {
     setLoading(true);
     fetch(`/api/free-content?category=${category}`)
       .then(r => r.json())
-      .then(d => { if (d.success) { setQuestions(d.questions || []); setExamQuestions((d.examQuestions || []).sort(() => Math.random() - 0.5)); } })
+      .then(d => { if (d.success) { setQuestions(d.questions || []); setExamQuestions((d.examQuestions || []).sort(() => Math.random() - 0.5)); setExamGroups(d.examGroups || []); } })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [category]);
@@ -670,7 +743,7 @@ function GratisContent() {
         ) : tab === "lessons" ? (
           <LessonsTab questions={questions} lang={lang} router={router} />
         ) : (
-          <ExamTab questions={examQuestions} lang={lang} router={router} />
+          <ExamTab questions={examQuestions} examGroups={examGroups} lang={lang} router={router} />
         )}
       </div>
       <Footer />
