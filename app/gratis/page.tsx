@@ -640,7 +640,12 @@ export default function GratisPage() {
           <div className="flex gap-2">
             <button onClick={() => setTab("lessons")} className="flex-1 py-2 rounded-xl text-xs font-black transition-all"
               style={tab === "lessons" ? { background: "rgba(255,255,255,0.2)", color: "white" } : { background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.4)" }}>
-              📚 {lang === "ar" ? "شروح" : lang === "nl" ? "Lessen" : lang === "fr" ? "Leçons" : "Lessons"} ({questions.length})
+              📚 {lang === "ar" ? "شروح" : lang === "nl" ? "Lessen" : lang === "fr" ? "Leçons" : "Lessons"}
+              {questions.length > 0 && (
+                <span className="ml-1 px-1.5 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(34,197,94,0.3)", color: "#86efac" }}>
+                  🎁 {questions.length}
+                </span>
+              )}
             </button>
             <button onClick={() => setTab("exam")} className="flex-1 py-2 rounded-xl text-xs font-black transition-all"
               style={tab === "exam" ? { background: "rgba(255,255,255,0.2)", color: "white" } : { background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.4)" }}>
