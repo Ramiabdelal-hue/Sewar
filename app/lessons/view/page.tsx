@@ -144,50 +144,22 @@ function LessonViewContent() {
   const stopTtsRef = useRef(false);
   const ttsSessionRef = useRef(0);
   const [isReading, setIsReading] = useState(false);
-  const [readingDone, setReadingDone] = useState(false);
-  const [audioEnabled, setAudioEnabled] = useState(false);
-  const [showAudioPrompt, setShowAudioPrompt] = useState(false);
+  const translatedRef = useRef<string[]>(["", "", ""]);
 
-  // Check if device is mobile
-  const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-  // Enable audio function for mobile
-  const enableAudio = async () => {
+  // فتح قناة الصوت عند أول تفاعل (مطلوب على iOS/Android)
+  const unlockAudio = () => {
     if (!window.speechSynthesis) return;
-    
-    try {
-      // Create a silent utterance to initialize speech synthesis
-      const utterance = new SpeechSynthesisUtterance(' ');
-      utterance.volume = 0;
-      window.speechSynthesis.speak(utterance);
-      
-      setAudioEnabled(true);
-      setShowAudioPrompt(false);
-      
-      // Start reading current question after enabling
-      if (filteredQuestions[currentIndex]) {
-        setTimeout(() => speakContent(filteredQuestions[currentIndex]), 500);
-      }
-    } catch (error) {
-      console.error('Error enabling audio:', error);
-    }
+    const u = new SpeechSynthesisUtterance('');
+    u.volume = 0;
+    u.rate = 1;
+    window.speechSynthesis.speak(u);
   };
 
-  // Check if audio prompt should be shown
-  useEffect(() => {
-    if (isMobile && !audioEnabled && filteredQuestions.length > 0) {
-      setShowAudioPrompt(true);
-    }
-  }, [isMobile, audioEnabled, filteredQuestions.length]);
-
-  // Stop TTS function
+  // إيقاف فوري
   const killTts = () => {
     stopTtsRef.current = true;
     ttsSessionRef.current += 1;
-    if (ttsRef.current) { 
-      clearTimeout(ttsRef.current); 
-      ttsRef.current = null; 
-    }
+    if (ttsRef.current) { clearTimeout(ttsRef.current); ttsRef.current = null; }
     if (window.speechSynthesis) {
       window.speechSynthesis.pause();
       window.speechSynthesis.cancel();
@@ -195,38 +167,24 @@ function LessonViewContent() {
     setIsReading(false);
   };
 
-  // Language mapping for TTS
-  const langMap: Record<string, string> = {
-    nl: "nl-NL",
-    fr: "fr-FR", 
-    ar: "ar-SA",
-    en: "en-US"
-  };
-
-  // Read question and explanation
+  // قراءة السؤال والشرح
   const speakContent = (question: Question) => {
     if (!window.speechSynthesis || !question) return;
-    if (isMobile && !audioEnabled) {
-      setShowAudioPrompt(true);
-      return;
-    }
-    
+
     stopTtsRef.current = false;
     const session = ttsSessionRef.current;
     window.speechSynthesis.cancel();
     setIsReading(true);
-    setReadingDone(false);
 
+    const langMap: Record<string, string> = { nl: "nl-NL", fr: "fr-FR", ar: "ar-SA", en: "en-US" };
     const speechLang = langMap[lang] || "nl-NL";
 
     const getVoice = (): SpeechSynthesisVoice | null => {
       const voices = window.speechSynthesis.getVoices();
       if (!voices.length) return null;
-      
-      // البحث عن صوت أنثى أولاً
-      const femaleVoice = voices.find(v => 
-        v.lang === speechLang && 
-        (v.name.toLowerCase().includes('female') || 
+      const femaleVoice = voices.find(v =>
+        v.lang === speechLang &&
+        (v.name.toLowerCase().includes('female') ||
          v.name.toLowerCase().includes('woman') ||
          v.name.toLowerCase().includes('zira') ||
          v.name.toLowerCase().includes('hazel') ||
@@ -238,85 +196,62 @@ function LessonViewContent() {
          v.name.toLowerCase().includes('amelie') ||
          v.name.toLowerCase().includes('thomas') === false)
       );
-      
       if (femaleVoice) return femaleVoice;
-      
-      // إذا لم نجد صوت أنثى محدد، نبحث عن أي صوت باللغة المطلوبة
       return voices.find(v => v.lang === speechLang)
         || voices.find(v => v.lang.startsWith(speechLang.split("-")[0]))
         || voices.find(v => v.lang === "nl-NL")
-        || voices[0]
-        || null;
+        || voices[0] || null;
     };
 
     const isValid = () => ttsSessionRef.current === session && !stopTtsRef.current;
 
     const speak = (text: string, onEnd?: () => void) => {
-      if (!isValid()) return;
-      if (!text) { if (onEnd) onEnd(); return; }
-      
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = speechLang;
-      utterance.rate = 0.3; // سرعة أبطأ للوضوح
-      utterance.pitch = 1;
-      
-      const voice = getVoice();
-      if (voice) utterance.voice = voice;
-
-      if (onEnd) utterance.onend = () => { if (isValid()) onEnd(); };
-      utterance.onerror = () => { if (isValid() && onEnd) onEnd(); };
-      
-      window.speechSynthesis.speak(utterance);
+      if (!isValid()) { setIsReading(false); return; }
+      if (!text) { if (onEnd) onEnd(); else setIsReading(false); return; }
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = speechLang;
+      u.rate = 0.3;
+      u.pitch = 1;
+      const v = getVoice();
+      if (v) u.voice = v;
+      if (onEnd) {
+        u.onend = () => { if (isValid()) onEnd(); else setIsReading(false); };
+      } else {
+        u.onend = () => setIsReading(false);
+      }
+      u.onerror = () => { if (isValid() && onEnd) onEnd(); else setIsReading(false); };
+      window.speechSynthesis.speak(u);
     };
 
-    // Get question text
     const questionText = question.textNL || question.textFR || question.textAR || question.text || "";
-    
-    // Get explanation text
     const explanationText = question.explanationNL || question.explanationFR || question.explanationAR || "";
 
-    // Read question first, then explanation
     if (questionText) {
       speak(questionText, () => {
+        if (!isValid()) { setIsReading(false); return; }
         if (explanationText) {
           ttsRef.current = setTimeout(() => {
-            if (isValid()) {
-              speak(explanationText, () => {
-                setIsReading(false);
-                setReadingDone(true);
-              });
-            }
+            if (isValid()) speak(explanationText, () => setIsReading(false));
+            else setIsReading(false);
           }, 600);
         } else {
           setIsReading(false);
-          setReadingDone(true);
         }
       });
     } else if (explanationText) {
-      speak(explanationText, () => {
-        setIsReading(false);
-        setReadingDone(true);
-      });
+      speak(explanationText, () => setIsReading(false));
     } else {
       setIsReading(false);
-      setReadingDone(true);
     }
   };
 
-  // Auto-read when question changes
+  // قراءة تلقائية عند تغيير السؤال - نفس منطق الامتحانات
   useEffect(() => {
     if (!filteredQuestions[currentIndex]) return;
-    
     killTts();
-    setReadingDone(false);
-
-    // Don't auto-read on mobile unless audio is enabled
-    if (isMobile && !audioEnabled) {
-      setShowAudioPrompt(true);
-      return;
-    }
 
     ttsRef.current = setTimeout(() => {
+      stopTtsRef.current = false;
       const question = filteredQuestions[currentIndex];
       if (!question) return;
 
@@ -324,14 +259,20 @@ function LessonViewContent() {
       if (voices.length > 0) {
         speakContent(question);
       } else {
-        window.speechSynthesis.onvoiceschanged = () => {
+        let voiceStarted = false;
+        const startOnce = () => {
+          if (voiceStarted || stopTtsRef.current) return;
+          voiceStarted = true;
+          window.speechSynthesis.onvoiceschanged = null;
           speakContent(question);
         };
+        window.speechSynthesis.onvoiceschanged = startOnce;
+        setTimeout(startOnce, 1000);
       }
-    }, 500);
+    }, 1000);
 
     return () => killTts();
-  }, [currentIndex, filteredQuestions, lang, audioEnabled]);
+  }, [currentIndex, filteredQuestions, lang]);
 
   // Debounce search term
   useEffect(() => {
@@ -577,40 +518,6 @@ function LessonViewContent() {
       
       <div className="py-8 px-4">
         <div className="max-w-4xl mx-auto">
-          {/* Audio Enable Prompt for Mobile */}
-          {showAudioPrompt && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.7)" }}>
-              <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
-                <div className="text-4xl mb-4">🔊</div>
-                <h3 className="text-lg font-bold text-gray-800 mb-2">
-                  {lang === "ar" ? "تفعيل القراءة الصوتية" : 
-                   lang === "nl" ? "Audio inschakelen" : 
-                   lang === "fr" ? "Activer l'audio" : 
-                   "Enable Audio"}
-                </h3>
-                <p className="text-sm text-gray-600 mb-6">
-                  {lang === "ar" ? "اضغط لتفعيل القراءة الصوتية للأسئلة والشروحات" : 
-                   lang === "nl" ? "Tik om audio voor vragen en uitleg in te schakelen" : 
-                   lang === "fr" ? "Appuyez pour activer l'audio des questions et explications" : 
-                   "Tap to enable audio for questions and explanations"}
-                </p>
-                <div className="flex gap-3">
-                  <button
-                    onClick={enableAudio}
-                    className="flex-1 py-3 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition-colors"
-                  >
-                    {lang === "ar" ? "تفعيل" : lang === "nl" ? "Inschakelen" : lang === "fr" ? "Activer" : "Enable"}
-                  </button>
-                  <button
-                    onClick={() => setShowAudioPrompt(false)}
-                    className="flex-1 py-3 bg-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-400 transition-colors"
-                  >
-                    {lang === "ar" ? "تخطي" : lang === "nl" ? "Overslaan" : lang === "fr" ? "Ignorer" : "Skip"}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
           {/* Header */}
           <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
             <div className="flex items-center justify-between mb-4">
@@ -656,7 +563,7 @@ function LessonViewContent() {
           {filteredQuestions.length > 1 && (
             <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
               <button
-                onClick={() => { setCurrentIndex(Math.max(0, currentIndex - 1)); window.scrollTo(0, 0); }}
+                onClick={() => { unlockAudio(); setCurrentIndex(Math.max(0, currentIndex - 1)); window.scrollTo(0, 0); }}
                 disabled={currentIndex === 0}
                 className={`px-6 py-3 font-black text-sm border-2 transition-all ${currentIndex === 0 ? "text-gray-300 border-gray-200 cursor-not-allowed" : "text-[#003399] border-[#003399] hover:bg-[#003399] hover:text-white"}`}
               >
@@ -666,7 +573,7 @@ function LessonViewContent() {
               {/* أزرار التحكم في القراءة */}
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => speakContent(filteredQuestions[currentIndex])}
+                  onClick={() => { unlockAudio(); speakContent(filteredQuestions[currentIndex]); }}
                   disabled={isReading}
                   className={`px-4 py-2 rounded-lg font-bold text-sm transition-all ${
                     isReading 
@@ -694,7 +601,7 @@ function LessonViewContent() {
                 {currentIndex + 1} / {filteredQuestions.length}
               </span>
               <button
-                onClick={() => { setCurrentIndex(Math.min(filteredQuestions.length - 1, currentIndex + 1)); window.scrollTo(0, 0); }}
+                onClick={() => { unlockAudio(); setCurrentIndex(Math.min(filteredQuestions.length - 1, currentIndex + 1)); window.scrollTo(0, 0); }}
                 disabled={currentIndex + 1 >= filteredQuestions.length}
                 className={`px-6 py-3 font-black text-sm border-2 transition-all ${currentIndex + 1 >= filteredQuestions.length ? "text-gray-300 border-gray-200 cursor-not-allowed" : "text-white border-[#003399] hover:opacity-90"}`}
                 style={currentIndex + 1 <= filteredQuestions.length - 1 ? { background: "linear-gradient(135deg, #003399, #0055cc)" } : {}}
