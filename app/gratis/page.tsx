@@ -678,5 +678,4 @@ export default function GratisPage() {
       <GratisContent />
     </Suspense>
   );
-}  );
 }
