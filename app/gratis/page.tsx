@@ -37,27 +37,32 @@ function LessonsTab({ questions, lang, router }: { questions: any[], lang: strin
         </div>
       )}
       <QuestionCard question={questions[currentIndex]} index={currentIndex} total={questions.length} lang={lang} onNext={() => {}} onPrev={() => {}} />
-      <div className="flex flex-col gap-2 mt-4">
-        {/* زر الاشتراك */}
+      
+      {/* أزرار التنقل */}
+      <div className="grid grid-cols-2 gap-2 mt-4">
+        <button onClick={() => { setCurrentIndex(Math.max(0, currentIndex - 1)); window.scrollTo(0, 0); }}
+          disabled={currentIndex === 0}
+          className={`py-3 rounded-xl font-black text-sm border-2 transition-all ${currentIndex === 0 ? "text-gray-300 border-gray-200 cursor-not-allowed bg-gray-50" : "text-[#003399] border-[#003399] hover:bg-[#003399] hover:text-white"}`}>
+          {isRtl ? "→" : "←"} {lang === "ar" ? "السابق" : lang === "nl" ? "Vorige" : lang === "fr" ? "Précédent" : "Previous"}
+        </button>
+        <button onClick={() => { setCurrentIndex(Math.min(questions.length - 1, currentIndex + 1)); window.scrollTo(0, 0); }}
+          disabled={currentIndex + 1 >= questions.length}
+          className={`py-3 rounded-xl font-black text-sm border-2 transition-all ${currentIndex + 1 >= questions.length ? "text-gray-300 border-gray-200 cursor-not-allowed bg-gray-50" : "text-white border-[#003399] bg-[#003399] hover:bg-[#0055cc]"}`}>
+          {lang === "ar" ? "التالي" : lang === "nl" ? "Volgende" : lang === "fr" ? "Suivant" : "Next"} {isRtl ? "←" : "→"}
+        </button>
+      </div>
+
+      {/* زر الاشتراك - ثابت في الأسفل على الموبايل، عادي على الكمبيوتر */}
+      <div className="fixed bottom-0 left-0 right-0 p-3 z-50 md:static md:p-0 md:mt-3"
+        style={{ background: "linear-gradient(to top, rgba(249,250,251,1) 70%, rgba(249,250,251,0))" }}>
         <button onClick={() => router.push("/theorie")}
-          className="w-full py-3 rounded-xl font-black text-sm"
-          style={{ background: "linear-gradient(135deg, #ffcc00, #ff9900)", color: "#003399" }}>
+          className="w-full py-3 rounded-xl font-black text-sm shadow-lg md:shadow-none"
+          style={{ background: "linear-gradient(135deg, #ffcc00, #ff9900)", color: "#003399", boxShadow: "0 4px 16px rgba(255,153,0,0.4)" }}>
           🔓 {lang === "ar" ? "اشترك للمزيد" : lang === "nl" ? "Meer? Inschrijven" : lang === "fr" ? "Plus? S'inscrire" : "More? Subscribe"}
         </button>
-        {/* أزرار التنقل */}
-        <div className="grid grid-cols-2 gap-2">
-          <button onClick={() => { setCurrentIndex(Math.max(0, currentIndex - 1)); window.scrollTo(0, 0); }}
-            disabled={currentIndex === 0}
-            className={`py-3 rounded-xl font-black text-sm border-2 transition-all ${currentIndex === 0 ? "text-gray-300 border-gray-200 cursor-not-allowed bg-gray-50" : "text-[#003399] border-[#003399] hover:bg-[#003399] hover:text-white"}`}>
-            {isRtl ? "→" : "←"} {lang === "ar" ? "السابق" : lang === "nl" ? "Vorige" : lang === "fr" ? "Précédent" : "Previous"}
-          </button>
-          <button onClick={() => { setCurrentIndex(Math.min(questions.length - 1, currentIndex + 1)); window.scrollTo(0, 0); }}
-            disabled={currentIndex + 1 >= questions.length}
-            className={`py-3 rounded-xl font-black text-sm border-2 transition-all ${currentIndex + 1 >= questions.length ? "text-gray-300 border-gray-200 cursor-not-allowed bg-gray-50" : "text-white border-[#003399] bg-[#003399] hover:bg-[#0055cc]"}`}>
-            {lang === "ar" ? "التالي" : lang === "nl" ? "Volgende" : lang === "fr" ? "Suivant" : "Next"} {isRtl ? "←" : "→"}
-          </button>
-        </div>
       </div>
+      {/* مسافة لمنع تغطية المحتوى بالزر الثابت على الموبايل */}
+      <div className="h-16 md:hidden" />
     </>
   );
 }
