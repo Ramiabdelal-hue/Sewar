@@ -37,20 +37,26 @@ function LessonsTab({ questions, lang, router }: { questions: any[], lang: strin
         </div>
       )}
       <QuestionCard question={questions[currentIndex]} index={currentIndex} total={questions.length} lang={lang} onNext={() => {}} onPrev={() => {}} />
-      <div className="flex items-center justify-between mt-4">
-        <button onClick={() => { setCurrentIndex(Math.max(0, currentIndex - 1)); window.scrollTo(0, 0); }}
-          disabled={currentIndex === 0}
-          className={`px-6 py-3 font-black text-sm border-2 transition-all ${currentIndex === 0 ? "text-gray-300 border-gray-200 cursor-not-allowed" : "text-[#003399] border-[#003399] hover:bg-[#003399] hover:text-white"}`}>
-          ← {lang === "ar" ? "السابق" : lang === "nl" ? "Vorige" : lang === "fr" ? "Précédent" : "Previous"}
-        </button>
-        <button onClick={() => router.push("/theorie")} className="px-4 py-2 rounded-xl font-black text-xs" style={{ background: "linear-gradient(135deg, #ffcc00, #ff9900)", color: "#003399" }}>
+      <div className="flex flex-col gap-2 mt-4">
+        {/* زر الاشتراك */}
+        <button onClick={() => router.push("/theorie")}
+          className="w-full py-3 rounded-xl font-black text-sm"
+          style={{ background: "linear-gradient(135deg, #ffcc00, #ff9900)", color: "#003399" }}>
           🔓 {lang === "ar" ? "اشترك للمزيد" : lang === "nl" ? "Meer? Inschrijven" : lang === "fr" ? "Plus? S'inscrire" : "More? Subscribe"}
         </button>
-        <button onClick={() => { setCurrentIndex(Math.min(questions.length - 1, currentIndex + 1)); window.scrollTo(0, 0); }}
-          disabled={currentIndex + 1 >= questions.length}
-          className={`px-6 py-3 font-black text-sm border-2 transition-all ${currentIndex + 1 >= questions.length ? "text-gray-300 border-gray-200 cursor-not-allowed" : "text-white border-[#003399] bg-[#003399] hover:bg-[#0055cc]"}`}>
-          {lang === "ar" ? "التالي" : lang === "nl" ? "Volgende" : lang === "fr" ? "Suivant" : "Next"} →
-        </button>
+        {/* أزرار التنقل */}
+        <div className="grid grid-cols-2 gap-2">
+          <button onClick={() => { setCurrentIndex(Math.max(0, currentIndex - 1)); window.scrollTo(0, 0); }}
+            disabled={currentIndex === 0}
+            className={`py-3 rounded-xl font-black text-sm border-2 transition-all ${currentIndex === 0 ? "text-gray-300 border-gray-200 cursor-not-allowed bg-gray-50" : "text-[#003399] border-[#003399] hover:bg-[#003399] hover:text-white"}`}>
+            {isRtl ? "→" : "←"} {lang === "ar" ? "السابق" : lang === "nl" ? "Vorige" : lang === "fr" ? "Précédent" : "Previous"}
+          </button>
+          <button onClick={() => { setCurrentIndex(Math.min(questions.length - 1, currentIndex + 1)); window.scrollTo(0, 0); }}
+            disabled={currentIndex + 1 >= questions.length}
+            className={`py-3 rounded-xl font-black text-sm border-2 transition-all ${currentIndex + 1 >= questions.length ? "text-gray-300 border-gray-200 cursor-not-allowed bg-gray-50" : "text-white border-[#003399] bg-[#003399] hover:bg-[#0055cc]"}`}>
+            {lang === "ar" ? "التالي" : lang === "nl" ? "Volgende" : lang === "fr" ? "Suivant" : "Next"} {isRtl ? "←" : "→"}
+          </button>
+        </div>
       </div>
     </>
   );
