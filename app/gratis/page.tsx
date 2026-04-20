@@ -507,30 +507,23 @@ function ExamRunner({ questions, lang, router, groupLabel, onBack }: { questions
 
   return (
     <div>
-      {/* تأثير الورود عند الإجابة الصحيحة */}
+      {/* تأثير الإجابة الصحيحة - إشارة صح خضراء */}
       {showRoses && (
-        <div className="fixed inset-0 z-[9999] pointer-events-none overflow-hidden">
-          {Array.from({ length: 18 }).map((_, i) => (
-            <div
-              key={i}
-              style={{
-                position: 'absolute',
-                left: `${Math.random() * 100}%`,
-                top: '-60px',
-                fontSize: `${1.5 + Math.random() * 1.5}rem`,
-                animation: `roseFall ${1.2 + Math.random() * 1.2}s ease-in forwards`,
-                animationDelay: `${Math.random() * 0.6}s`,
-                transform: `rotate(${Math.random() * 360}deg)`,
-              }}
-            >
-              {['🌹','🌸','🌺','💐','🌷'][Math.floor(Math.random() * 5)]}
+        <div className="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center">
+          <div className="absolute inset-0 bg-green-500 opacity-10" />
+          <div style={{ animation: "checkPop 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards" }}>
+            <div className="w-32 h-32 rounded-full flex items-center justify-center"
+              style={{ background: "rgba(34,197,94,0.95)", boxShadow: "0 0 60px rgba(34,197,94,0.7)" }}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-16 h-16">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
             </div>
-          ))}
+          </div>
           <style>{`
-            @keyframes roseFall {
-              0%   { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
-              80%  { opacity: 1; }
-              100% { transform: translateY(110vh) rotate(720deg) scale(0.5); opacity: 0; }
+            @keyframes checkPop {
+              0%   { transform: scale(0) rotate(-10deg); opacity: 0; }
+              60%  { transform: scale(1.15) rotate(3deg); opacity: 1; }
+              100% { transform: scale(1) rotate(0deg); opacity: 1; }
             }
           `}</style>
         </div>
