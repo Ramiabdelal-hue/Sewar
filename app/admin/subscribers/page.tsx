@@ -73,7 +73,9 @@ export default function AdminSubscribersPage() {
   };
 
   const handleLogin = () => {
-    if (user === "sewar" && password === "70709090") {
+    const adminUser = process.env.NEXT_PUBLIC_ADMIN_USER || "sewar";
+    const adminPass = process.env.NEXT_PUBLIC_ADMIN_PASS || "70709090";
+    if (user === adminUser && password === adminPass) {
       setIsLogged(true);
       fetchSubscribers();
     } else {
