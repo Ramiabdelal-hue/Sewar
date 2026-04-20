@@ -1,7 +1,6 @@
 import './globals.css';
 import { LangProvider } from '@/context/LangContext';
 import ScreenProtection from '@/components/ScreenProtection';
-import SecurityBanner from '@/components/SecurityBanner';
 
 export const metadata = {
   title: 'S & A',
@@ -81,10 +80,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <LangProvider>
           <ScreenProtection />
-          <div style={{ paddingBottom: "36px" }}>
+          <div>
             {children}
           </div>
-          <SecurityBanner />
         </LangProvider>
       </body>
     </html>
