@@ -114,7 +114,7 @@ const PWA_TEXT: Record<string, {
 function PWAModal({ lang, onClose }: { lang: string; onClose: () => void }) {
   const tx = PWA_TEXT[lang] || PWA_TEXT.nl;
   const dir = lang === "ar" ? "rtl" : "ltr";
-  const steps = tx.steps;
+  const [selected, setSelected] = useState<"android" | "iphone" | null>(null);
 
   return (
     <div
@@ -141,83 +141,108 @@ function PWAModal({ lang, onClose }: { lang: string; onClose: () => void }) {
               <FaMobileAlt size={32} className="text-white" />
             </div>
           </div>
-          <h2 className="text-white font-black text-xl">
-            {tx.title}
-          </h2>
-          <p className="text-white/70 text-sm mt-1">
-            {tx.subtitle}
-          </p>
+          <h2 className="text-white font-black text-xl">{tx.title}</h2>
+          <p className="text-white/70 text-sm mt-1">{tx.subtitle}</p>
         </div>
 
-        {/* Tabs */}
-        <div className="px-6 pt-5 pb-6 space-y-5 overflow-y-auto max-h-[70vh]">
+        <div className="px-6 pt-5 pb-6 overflow-y-auto max-h-[70vh]">
 
-          {/* Android */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-2xl">🤖</span>
-              <span className="text-white font-black text-base">
-                {tx.android}
-              </span>
-            </div>
-            <div className="space-y-2">
-              {steps.android.map((s, i) => (
-                <div key={i} className="flex items-start gap-3 p-3 rounded-xl"
-                  style={{ background: "rgba(255,255,255,0.07)" }}>
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-black text-sm"
-                    style={{ background: "linear-gradient(135deg, #0066cc, #004499)", color: "white" }}>
-                    {i + 1}
-                  </div>
-                  <div>
-                    <p className="text-white font-bold text-sm">{s.icon} {s.title}</p>
-                    <p className="text-white/60 text-xs mt-0.5">{s.desc}</p>
-                  </div>
+          {/* اختيار الجهاز */}
+          {!selected ? (
+            <div className="space-y-4">
+              <p className="text-white/60 text-sm text-center mb-5">
+                {lang === "ar" ? "اختر نوع جهازك" : lang === "nl" ? "Kies je apparaat" : lang === "fr" ? "Choisissez votre appareil" : "Choose your device"}
+              </p>
+
+              {/* زر Android */}
+              <button
+                onClick={() => setSelected("android")}
+                className="w-full flex items-center gap-4 p-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-95"
+                style={{ background: "linear-gradient(135deg, #22c55e22, #16a34a22)", border: "1.5px solid rgba(34,197,94,0.4)" }}
+              >
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-3xl"
+                  style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
+                  🤖
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div className="flex items-center gap-3">
-            <div className="flex-1 h-px bg-white/20" />
-            <span className="text-white/40 text-xs font-bold">
-              {tx.or}
-            </span>
-            <div className="flex-1 h-px bg-white/20" />
-          </div>
-
-          {/* iPhone */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-2xl">🍎</span>
-              <span className="text-white font-black text-base">
-                {tx.iphone}
-              </span>
-            </div>
-            <div className="space-y-2">
-              {steps.iphone.map((s, i) => (
-                <div key={i} className="flex items-start gap-3 p-3 rounded-xl"
-                  style={{ background: "rgba(255,255,255,0.07)" }}>
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-black text-sm"
-                    style={{ background: "linear-gradient(135deg, #555, #333)", color: "white" }}>
-                    {i + 1}
-                  </div>
-                  <div>
-                    <p className="text-white font-bold text-sm">{s.icon} {s.title}</p>
-                    <p className="text-white/60 text-xs mt-0.5">{s.desc}</p>
-                  </div>
+                <div className="text-left">
+                  <p className="text-white font-black text-lg">Android</p>
+                  <p className="text-white/50 text-xs mt-0.5">Chrome Browser</p>
                 </div>
-              ))}
-            </div>
-          </div>
+                <span className="ml-auto text-white/40 text-xl">›</span>
+              </button>
 
-          {/* Tip */}
-          <div className="p-3 rounded-xl text-center"
-            style={{ background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.3)" }}>
-            <p className="text-green-400 text-xs font-bold">
-              {tx.tip}
-            </p>
-          </div>
+              {/* زر iPhone */}
+              <button
+                onClick={() => setSelected("iphone")}
+                className="w-full flex items-center gap-4 p-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-95"
+                style={{ background: "linear-gradient(135deg, #6366f122, #4f46e522)", border: "1.5px solid rgba(99,102,241,0.4)" }}
+              >
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-3xl"
+                  style={{ background: "linear-gradient(135deg, #6366f1, #4f46e5)" }}>
+                  🍎
+                </div>
+                <div className="text-left">
+                  <p className="text-white font-black text-lg">iPhone</p>
+                  <p className="text-white/50 text-xs mt-0.5">Safari Browser</p>
+                </div>
+                <span className="ml-auto text-white/40 text-xl">›</span>
+              </button>
+
+              {/* Tip */}
+              <div className="p-3 rounded-xl text-center mt-4"
+                style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)" }}>
+                <p className="text-green-400 text-xs font-bold">{tx.tip}</p>
+              </div>
+            </div>
+
+          ) : (
+            /* خطوات التثبيت */
+            <div>
+              {/* زر الرجوع */}
+              <button
+                onClick={() => setSelected(null)}
+                className="flex items-center gap-2 text-white/60 hover:text-white text-sm font-bold mb-4 transition-colors"
+              >
+                ← {lang === "ar" ? "رجوع" : lang === "nl" ? "Terug" : lang === "fr" ? "Retour" : "Back"}
+              </button>
+
+              {/* عنوان الجهاز */}
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-3xl">{selected === "android" ? "🤖" : "🍎"}</span>
+                <span className="text-white font-black text-lg">
+                  {selected === "android" ? tx.android : tx.iphone}
+                </span>
+              </div>
+
+              {/* الخطوات */}
+              <div className="space-y-2">
+                {tx.steps[selected].map((s, i) => (
+                  <div key={i} className="flex items-start gap-3 p-3 rounded-xl"
+                    style={{ background: "rgba(255,255,255,0.07)" }}>
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-black text-sm"
+                      style={{
+                        background: selected === "android"
+                          ? "linear-gradient(135deg, #22c55e, #16a34a)"
+                          : "linear-gradient(135deg, #6366f1, #4f46e5)",
+                        color: "white"
+                      }}>
+                      {i + 1}
+                    </div>
+                    <div>
+                      <p className="text-white font-bold text-sm">{s.icon} {s.title}</p>
+                      <p className="text-white/60 text-xs mt-0.5">{s.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Tip */}
+              <div className="p-3 rounded-xl text-center mt-4"
+                style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)" }}>
+                <p className="text-green-400 text-xs font-bold">{tx.tip}</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
