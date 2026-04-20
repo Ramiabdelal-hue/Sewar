@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import QuestionCard from "@/components/QuestionCard";
@@ -590,10 +590,13 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
 // ─── الصفحة الرئيسية ──────────────────────────────────────────────────────────
 export default function GratisPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { lang } = useLang();
   const isRtl = lang === "ar";
 
-  const [category, setCategory] = useState("B");
+  const initialCat = searchParams.get("cat")?.toUpperCase();
+  const validCats = ["A", "B", "C"];
+  const [category, setCategory] = useState(validCats.includes(initialCat || "") ? initialCat! : "B");
   const [tab, setTab] = useState<"lessons" | "exam">("lessons");
   const [questions, setQuestions] = useState<any[]>([]);
   const [examQuestions, setExamQuestions] = useState<any[]>([]);
