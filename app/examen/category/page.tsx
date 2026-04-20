@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useLang } from "@/context/LangContext";
 import Navbar from "@/components/Navbar";
+import WatermarkedImage from "@/components/WatermarkedImage";
 import Footer from "@/components/Footer";
 import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
 
@@ -492,11 +493,8 @@ function ExamenCategoryContent() {
                       {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
                         <div className={`grid gap-0.5 bg-gray-900 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
                           {q.videoUrls.filter(Boolean).map((url: string, idx: number) => (
-                            <div key={idx} className="relative rounded overflow-hidden">
-                              <img src={url} alt="" className="w-full h-auto" />
-                              <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-                                <img src="/logo.png" alt="" style={{ width: '45%', height: '45%', objectFit: 'contain', opacity: 0.75, mixBlendMode: 'screen', transform: 'rotate(-15deg)' }} />
-                              </div>
+                            <div key={idx} className="rounded overflow-hidden">
+                              <WatermarkedImage src={url} className="w-full h-auto" />
                             </div>
                           ))}
                         </div>
@@ -672,12 +670,8 @@ function ExamenCategoryContent() {
             {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
               <div className={`grid gap-1 bg-gray-900 p-2 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
                 {q.videoUrls.filter(Boolean).map((url: string, i: number) => (
-                  <div key={i} className="relative rounded-xl overflow-hidden">
-                    <img src={url} alt="" className="w-full h-auto" draggable={false} onContextMenu={e => e.preventDefault()} />
-                    {/* watermark */}
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-                      <img src="/logo.png" alt="" style={{ width: '45%', height: '45%', objectFit: 'contain', opacity: 0.75, mixBlendMode: 'screen', transform: 'rotate(-15deg)' }} draggable={false} />
-                    </div>
+                  <div key={i} className="rounded-xl overflow-hidden">
+                    <WatermarkedImage src={url} className="w-full h-auto" />
                   </div>
                 ))}
               </div>

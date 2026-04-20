@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import WatermarkedImage from "./WatermarkedImage";
 
 const cache: Record<string, string> = {};
 
@@ -89,17 +90,7 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
         <div className={`grid gap-1 bg-gray-900 p-2 ${question.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
           {question.videoUrls.filter(Boolean).map((url, i) => (
             <div key={i} className="relative rounded-xl overflow-hidden select-none">
-              <img src={url} alt={`img ${i + 1}`}
-                className="w-full h-auto"
-                draggable={false}
-                onContextMenu={(e) => e.preventDefault()}
-              />
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-                <img src="/logo.png" alt="Sewar"
-                  style={{ width: '50%', height: '50%', objectFit: 'contain', opacity: 0.75, mixBlendMode: 'screen', transform: 'rotate(-15deg)' }}
-                  draggable={false} onContextMenu={(e) => e.preventDefault()}
-                />
-              </div>
+              <WatermarkedImage src={url} className="w-full h-auto" />
               {question.videoUrls!.filter(Boolean).length > 1 && (
                 <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
                   {i + 1}/{question.videoUrls!.filter(Boolean).length}

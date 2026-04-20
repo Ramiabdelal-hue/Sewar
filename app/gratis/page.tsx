@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import QuestionCard from "@/components/QuestionCard";
+import WatermarkedImage from "@/components/WatermarkedImage";
 import { useLang } from "@/context/LangContext";
 import { MotorcycleIcon, CarIcon, TruckIcon } from "@/components/VehicleIcons";
 import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
@@ -487,11 +488,8 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
           {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
             <div className={`grid gap-1 bg-gray-900 p-2 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
               {q.videoUrls.filter(Boolean).map((url: string, i: number) => (
-                <div key={i} className="relative overflow-hidden rounded-xl" style={{ aspectRatio: "4/3" }}>
-                  <img src={url} alt="" className="w-full h-full object-cover" draggable={false} />
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <img src="/logo.png" alt="" style={{ width: '50%', height: '50%', objectFit: 'contain', opacity: 0.75, mixBlendMode: 'screen', transform: 'rotate(-15deg)' }} draggable={false} />
-                  </div>
+                <div key={i} className="rounded-xl overflow-hidden">
+                  <WatermarkedImage src={url} className="w-full h-auto" />
                 </div>
               ))}
             </div>
