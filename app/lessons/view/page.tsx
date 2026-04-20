@@ -383,33 +383,20 @@ function LessonViewContent() {
     <div className="min-h-screen bg-gray-50" dir={lang === "ar" ? "rtl" : "ltr"}>
       <Navbar />
       
-      <div className="py-8 px-4">
+      <div className="py-4 px-4">
         <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <button
-                onClick={() => router.back()}
-                className="flex items-center gap-2 text-gray-600 hover:text-orange-500 font-medium transition"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                {lang === "ar" ? "العودة" : lang === "nl" ? "Terug" : "Retour"}
-              </button>
-            </div>
-
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">{translatedLessonTitle || `${lang === "ar" ? "الدرس" : lang === "nl" ? "Les" : "Leçon"} ${lessonId}`}</h1>
-            <div className="flex items-center gap-4">
-              {questions.length !== filteredQuestions.length && (
-                <span className="text-sm bg-orange-100 text-orange-600 px-3 py-1 rounded-full font-medium">
-                  {lang === "ar" ? `${filteredQuestions.length} من ${questions.length}` : lang === "nl" ? `${filteredQuestions.length} van ${questions.length}` : `${filteredQuestions.length} sur ${questions.length}`}
-                </span>
-              )}
-            </div>
+          {/* زر العودة فقط */}
+          <div className="mb-4">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center gap-2 text-gray-600 hover:text-orange-500 font-medium transition"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              {lang === "ar" ? "العودة" : lang === "nl" ? "Terug" : "Retour"}
+            </button>
           </div>
-
-          {/* Search Bar - محذوف */}
 
           {/* الشروح في نفس الصفحة */}
           <div className="space-y-4">
