@@ -70,6 +70,17 @@ export default function InfoPage() {
       ],
     },
     // { id: "C", ... }, // temp: hidden - Rijbewijs C / Vrachtwagens
+    {
+      id: "C", color: "#22c55e", bg: "from-green-50 to-emerald-50", border: "border-green-200",
+      titleColor: "text-green-800", dot: "text-green-500",
+      icon: <TruckIcon className="w-16 h-10" />,
+      title: lang === "ar" ? "الفئة C - الشاحنات" : lang === "nl" ? "Categorie C - Vrachtwagens" : "Catégorie C - Camions",
+      facts: [
+        lang === "ar" ? "الحد الأدنى للعمر: 21 سنة" : lang === "nl" ? "Minimumleeftijd: 21 jaar" : "Âge minimum: 21 ans",
+        lang === "ar" ? "للمركبات فوق 3500 كجم" : lang === "nl" ? "Voor voertuigen boven 3500 kg" : "Pour véhicules de plus de 3500 kg",
+        lang === "ar" ? "يتطلب امتحان نظري وعملي" : lang === "nl" ? "Vereist theoretisch en praktisch examen" : "Nécessite examen théorique et pratique",
+      ],
+    },
   ];
 
   if (showCheckout && selectedData) {

@@ -73,7 +73,7 @@ export default function ExamenPage() {
   const categories = [
     { id: "cat-a", catLetter: "A", name: "Rijbewijs A", description: t.motorcycles || "Motorfietsen", icon: <MotorcycleIcon className="w-16 h-10" /> },
     { id: "cat-b", catLetter: "B", name: "Rijbewijs B", description: t.cars || "Auto's", icon: <CarIcon className="w-16 h-10" /> },
-    // { id: "cat-c", catLetter: "C", name: "Rijbewijs C", description: t.trucks || "Vrachtwagens", icon: <TruckIcon className="w-16 h-10" /> }, // temp: hidden
+    { id: "cat-c", catLetter: "C", name: "Rijbewijs C", description: t.trucks || "Vrachtwagens", icon: <TruckIcon className="w-16 h-10" /> },
   ];
 
   const [allExamPrices, setAllExamPrices] = useState<Record<string, string>>({});
