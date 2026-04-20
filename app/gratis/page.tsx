@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -588,7 +588,7 @@ function ExamTab({ questions, lang, router }: { questions: any[], lang: string, 
 }
 
 // ─── الصفحة الرئيسية ──────────────────────────────────────────────────────────
-export default function GratisPage() {
+function GratisContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { lang } = useLang();
@@ -670,4 +670,13 @@ export default function GratisPage() {
       <Footer />
     </div>
   );
+}
+
+export default function GratisPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="w-10 h-10 border-4 border-[#003399] border-t-transparent rounded-full animate-spin"></div></div>}>
+      <GratisContent />
+    </Suspense>
+  );
+}  );
 }
