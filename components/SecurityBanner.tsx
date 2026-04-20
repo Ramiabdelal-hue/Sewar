@@ -1,16 +1,42 @@
 "use client";
 
-const messages = [
-  "🔒 هذا الموقع محمي ومراقب بالكامل — أي محاولة انتهاك ستعرض صاحبها للمساءلة القانونية الفورية",
-  "⚖️ جميع المحتويات محمية بموجب قوانين حقوق الملكية الفكرية البلجيكية والأوروبية",
-  "🛡️ Deze website is volledig beveiligd en bewaakt — elke inbreuk wordt onmiddellijk juridisch vervolgd",
-  "⚠️ Ce site est protégé et surveillé — toute violation sera immédiatement poursuivie en justice",
-  "🔐 This website is protected and monitored — any violation will result in immediate legal action",
-  "📵 النسخ أو التصوير أو إعادة النشر محظور تماماً ويُعدّ جريمة يعاقب عليها القانون",
-];
+import { useLang } from "@/context/LangContext";
+
+const messages: Record<string, string[]> = {
+  nl: [
+    "🔒 Deze website is volledig beveiligd en bewaakt",
+    "⚖️ Elke poging tot inbreuk wordt onmiddellijk juridisch vervolgd",
+    "🛡️ Alle inhoud is beschermd door Belgische en Europese auteursrechten",
+    "📵 Kopiëren, fotograferen of herpubliceren is strikt verboden en strafbaar",
+    "🔐 Overtreders worden zonder waarschuwing aansprakelijk gesteld",
+  ],
+  fr: [
+    "🔒 Ce site est entièrement protégé et surveillé",
+    "⚖️ Toute tentative de violation sera immédiatement poursuivie en justice",
+    "🛡️ Tout le contenu est protégé par les droits d'auteur belges et européens",
+    "📵 La copie, la photographie ou la republication est strictement interdite et punissable",
+    "🔐 Les contrevenants seront tenus responsables sans avertissement",
+  ],
+  ar: [
+    "🔒 هذا الموقع محمي ومراقب بالكامل",
+    "⚖️ أي محاولة انتهاك ستعرض صاحبها للمساءلة القانونية الفورية",
+    "🛡️ جميع المحتويات محمية بموجب قوانين حقوق الملكية الفكرية البلجيكية والأوروبية",
+    "📵 النسخ أو التصوير أو إعادة النشر محظور تماماً ويُعدّ جريمة يعاقب عليها القانون",
+    "🔐 المخالفون سيُحاسَبون قانونياً دون أي إنذار مسبق",
+  ],
+  en: [
+    "🔒 This website is fully protected and monitored",
+    "⚖️ Any attempt to violate will result in immediate legal action",
+    "🛡️ All content is protected under Belgian and European intellectual property laws",
+    "📵 Copying, photographing or republishing is strictly prohibited and punishable by law",
+    "🔐 Violators will be held legally accountable without prior warning",
+  ],
+};
 
 export default function SecurityBanner() {
-  const text = messages.join("   •   ");
+  const { lang } = useLang();
+  const msgs = messages[lang] || messages.nl;
+  const text = msgs.join("   •   ");
 
   return (
     <div
@@ -34,36 +60,32 @@ export default function SecurityBanner() {
       {/* النص المتحرك */}
       <div className="flex items-center h-full">
         <div
+          key={lang}
           className="whitespace-nowrap text-xs font-bold"
           style={{
-            animation: "marquee 40s linear infinite",
+            animation: "marquee 45s linear infinite",
             color: "#ffd700",
             textShadow: "0 0 10px rgba(255,215,0,0.5)",
             letterSpacing: "0.03em",
+            direction: lang === "ar" ? "rtl" : "ltr",
           }}
         >
           {text}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{text}
         </div>
       </div>
 
-      {/* أيقونة قفل ثابتة على اليمين */}
+      {/* أيقونة ثابتة على اليمين */}
       <div
         className="absolute right-0 top-0 bottom-0 flex items-center px-3"
-        style={{
-          background: "linear-gradient(90deg, transparent, #0a0a1a)",
-          zIndex: 1,
-        }}
+        style={{ background: "linear-gradient(90deg, transparent, #0a0a1a)", zIndex: 1 }}
       >
         <span style={{ fontSize: "16px" }}>🔒</span>
       </div>
 
-      {/* أيقونة قفل ثابتة على اليسار */}
+      {/* أيقونة ثابتة على اليسار */}
       <div
         className="absolute left-0 top-0 bottom-0 flex items-center px-3"
-        style={{
-          background: "linear-gradient(270deg, transparent, #0a0a1a)",
-          zIndex: 1,
-        }}
+        style={{ background: "linear-gradient(270deg, transparent, #0a0a1a)", zIndex: 1 }}
       >
         <span style={{ fontSize: "16px" }}>⚖️</span>
       </div>
