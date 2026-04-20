@@ -245,34 +245,10 @@ function LessonViewContent() {
     }
   };
 
-  // قراءة تلقائية عند تغيير السؤال - نفس منطق الامتحانات
+  // لا قراءة تلقائية - الصوت اختياري فقط عند ضغط زر القراءة
   useEffect(() => {
-    if (!filteredQuestions[currentIndex]) return;
     killTts();
-
-    ttsRef.current = setTimeout(() => {
-      stopTtsRef.current = false;
-      const question = filteredQuestions[currentIndex];
-      if (!question) return;
-
-      const voices = window.speechSynthesis.getVoices();
-      if (voices.length > 0) {
-        speakContent(question);
-      } else {
-        let voiceStarted = false;
-        const startOnce = () => {
-          if (voiceStarted || stopTtsRef.current) return;
-          voiceStarted = true;
-          window.speechSynthesis.onvoiceschanged = null;
-          speakContent(question);
-        };
-        window.speechSynthesis.onvoiceschanged = startOnce;
-        setTimeout(startOnce, 1000);
-      }
-    }, 1000);
-
-    return () => killTts();
-  }, [currentIndex, filteredQuestions, lang]);
+  }, [currentIndex, filteredQuestions]);
 
   // Debounce search term
   useEffect(() => {
