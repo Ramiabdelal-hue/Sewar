@@ -91,11 +91,6 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
           {question.videoUrls.filter(Boolean).map((url, i) => (
             <div key={i} className="relative rounded-xl overflow-hidden select-none">
               <WatermarkedImage src={url} className="w-full h-auto" />
-              {question.videoUrls!.filter(Boolean).length > 1 && (
-                <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
-                  {i + 1}/{question.videoUrls!.filter(Boolean).length}
-                </div>
-              )}
             </div>
           ))}
         </div>
