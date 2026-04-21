@@ -1,587 +1,407 @@
-"use client";
+﻿"use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useLang } from "@/context/LangContext";
-import nl from "@/locales/nl.json";
-import fr from "@/locales/fr.json";
-import ar from "@/locales/ar.json";
-import en from "@/locales/en.json";
 import Navbar from "@/components/Navbar";
+import WatermarkedImage from "@/components/WatermarkedImage";
 import Footer from "@/components/Footer";
-
-interface Question {
-  id: number;
-  text: string;
-  textNL?: string;
-  videoUrls?: string[];
-  audioUrl?: string;
-  answer1?: string;
-  answer2?: string;
-  answer3?: string;
-  correctAnswer?: number;
-  points?: number;
-}
+import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
 
 function ExamenTestContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { lang, setLang } = useLang();
-  const translations: any = { nl, fr, ar, en };
-  const t = translations[lang];
+  const { lang } = useLang();
 
-  const category = searchParams.get("category"); // A, B, C
-  const lesson = searchParams.get("lesson");
-  const email = searchParams.get("email");
+  const category = searchParams.get("category") || "B";
   const lessonId = searchParams.get("lessonId");
+  const email = searchParams.get("email") || "";
+  const lessonName = searchParams.get("lesson") || "";
   const offsetParam = parseInt(searchParams.get("offset") || "0");
-  const limitParam = parseInt(searchParams.get("limit") || "0"); // 0 = كل الأسئلة
+  const limitParam = parseInt(searchParams.get("limit") || "0");
 
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [userAnswers, setUserAnswers] = useState<Record<number, number>>({});
-  const [showResults, setShowResults] = useState(false);
-  const [score, setScore] = useState(0);
-  const [maxScore, setMaxScore] = useState(0);
-  const [isExpired, setIsExpired] = useState(false);
-  const [checking, setChecking] = useState(true);
+  const [started, setStarted] = useState(false);
+  const [finished, setFinished] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<number, number | null>>({});
+  const [timeLeft, setTimeLeft] = useState(15);
+  const [locked, setLocked] = useState(false);
+  const [readingDone, setReadingDone] = useState(false);
+  const [showCorrect, setShowCorrect] = useState(false);
+  const [showWrong, setShowWrong] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const ttsRef = useRef<NodeJS.Timeout | null>(null);
+  const stopTtsRef = useRef(false);
+  const ttsSessionRef = useRef(0);
+  const translatedRef = useRef<string[]>(["", "", "", ""]);
+  const isRtl = lang === "ar";
 
-  // التحقق من صلاحية الاشتراك
-  useEffect(() => {
-    // حفظ بيانات المستخدم في localStorage إذا كانت موجودة في URL
-    if (email) {
-      localStorage.setItem("userEmail", email);
+  const killTts = () => {
+    stopTtsRef.current = true;
+    ttsSessionRef.current += 1;
+    if (ttsRef.current) { clearTimeout(ttsRef.current); ttsRef.current = null; }
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.pause();
+      window.speechSynthesis.cancel();
     }
-    if (category) {
-      localStorage.setItem("userCategory", category);
-    }
+  };
 
-    const checkSubscription = async () => {
-      const emailToCheck = localStorage.getItem("userEmail") || email;
-      if (!emailToCheck) {
-        setIsExpired(true);
-        setChecking(false);
-        setLoading(false);
-        return;
-      }
-      try {
-        const response = await fetch("/api/check-subscription", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: emailToCheck, sessionToken: localStorage.getItem("sessionToken") || undefined })
-        });
-        if (!response.ok) {
-          console.warn("check-subscription failed:", response.status);
-          setChecking(false);
-          return;
-        }
-        const data = await response.json();
-        if (data.sessionInvalid) {
-          localStorage.removeItem("userEmail"); localStorage.removeItem("userCategory"); localStorage.removeItem("sessionToken");
-          window.location.href = "/"; return;
-        }
-        if (data.expired) {
-          setIsExpired(true);
-          setLoading(false);
-        }
-      } catch (error) {
-        console.error("Error checking subscription:", error);
-      } finally {
-        setChecking(false);
-      }
+  const unlockAudio = () => {
+    if (!window.speechSynthesis) return;
+    const u = new SpeechSynthesisUtterance("");
+    u.volume = 0; u.rate = 1;
+    window.speechSynthesis.speak(u);
+  };
+
+  const speakQuestion = (q: any, translated: string[]) => {
+    if (!window.speechSynthesis || !q) { setReadingDone(true); return; }
+    stopTtsRef.current = false;
+    const session = ttsSessionRef.current;
+    window.speechSynthesis.cancel();
+    setReadingDone(false);
+    const langMap: Record<string, string> = { nl: "nl-NL", fr: "fr-FR", ar: "ar-SA", en: "en-US" };
+    const speechLang = langMap[lang] || "nl-NL";
+    const getVoice = () => {
+      const voices = window.speechSynthesis.getVoices();
+      if (!voices.length) return null;
+      return voices.find(v => v.lang === speechLang) || voices.find(v => v.lang.startsWith(speechLang.split("-")[0])) || null;
     };
-
-    checkSubscription();
-  }, [email, category]);
+    const isValid = () => ttsSessionRef.current === session && !stopTtsRef.current;
+    const speak = (text: string, onEnd?: () => void) => {
+      if (!isValid()) { setReadingDone(true); return; }
+      if (!text) { if (onEnd) onEnd(); else setReadingDone(true); return; }
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = speechLang; u.rate = 0.3; u.pitch = 1;
+      const v = getVoice(); if (v) u.voice = v;
+      if (onEnd) { u.onend = () => { if (isValid()) onEnd(); else setReadingDone(true); }; }
+      else { u.onend = () => setReadingDone(true); }
+      u.onerror = () => { if (isValid() && onEnd) onEnd(); else setReadingDone(true); };
+      window.speechSynthesis.speak(u);
+    };
+    const questionText = translated[0] || q.textNL || q.text || "";
+    const answers = [translated[1] || q.answer1, translated[2] || q.answer2, translated[3] || q.answer3].filter(Boolean);
+    const labels = lang === "ar" ? ["الجواب A:", "الجواب B:", "الجواب C:"] : lang === "fr" ? ["Réponse A:", "Réponse B:", "Réponse C:"] : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
+    if (!questionText) { setReadingDone(true); return; }
+    speak(questionText, () => {
+      if (!isValid()) { setReadingDone(true); return; }
+      let i = 0;
+      const readNext = () => {
+        if (!isValid()) { setReadingDone(true); return; }
+        if (i >= answers.length) { setReadingDone(true); return; }
+        speak(`${labels[i]} ${answers[i]}`, () => {
+          i++;
+          if (i >= answers.length) { setReadingDone(true); }
+          else { ttsRef.current = setTimeout(() => { if (isValid()) readNext(); else setReadingDone(true); }, 400); }
+        });
+      };
+      if (answers.length === 0) { setReadingDone(true); }
+      else { ttsRef.current = setTimeout(() => { if (isValid()) readNext(); else setReadingDone(true); }, 600); }
+    });
+  };
 
   useEffect(() => {
-    if (category && !isExpired && !checking) {
-      fetchQuestions();
-    }
-  }, [category, lessonId, isExpired, checking]);
-
-  const fetchQuestions = async () => {
-    try {
-      const lessonIdParam = searchParams.get("lessonId");
-
-      if (lessonIdParam) {
-        const res = await fetch(`/api/exam-questions?lessonId=${lessonIdParam}&category=${category || "B"}`);
-        const data = await res.json();
-        if (data.success) {
-          let qs = data.questions || [];
-          // تطبيق offset و limit إذا كانا محددين
-          if (limitParam > 0) {
-            qs = qs.slice(offsetParam, offsetParam + limitParam);
-          }
-          setQuestions(qs);
-        }
-      } else if (category) {
-        const lessonsRes = await fetch(`/api/lessons?category=${category}`);
-        const lessonsData = await lessonsRes.json();
-        if (lessonsData.success && lessonsData.lessons.length > 0) {
-          const allQ: any[] = [];
-          for (const l of lessonsData.lessons) {
-            const qRes = await fetch(`/api/exam-questions?lessonId=${l.id}&category=${category}`);
-            const qData = await qRes.json();
-            if (qData.success && qData.questions?.length > 0) allQ.push(...qData.questions);
-          }
-          setQuestions(allQ.sort(() => Math.random() - 0.5));
-        }
+    if (!started || finished) return;
+    killTts();
+    setReadingDone(false);
+    ttsRef.current = setTimeout(() => {
+      stopTtsRef.current = false;
+      const q = questions[currentIndex];
+      if (!q) { setReadingDone(true); return; }
+      const texts = lang === "nl"
+        ? [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]
+        : translatedRef.current;
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) { speakQuestion(q, texts); }
+      else {
+        let done = false;
+        const start = () => { if (done || stopTtsRef.current) return; done = true; window.speechSynthesis.onvoiceschanged = null; speakQuestion(q, texts); };
+        window.speechSynthesis.onvoiceschanged = start;
+        setTimeout(start, 1000);
       }
-    } catch (error) {
-      console.error("❌ Error fetching questions:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    }, 1000);
+    return () => { killTts(); };
+  }, [currentIndex, started, finished]);
 
-  const handleAnswerSelect = (questionId: number, answerNumber: number) => {
-    if (!showResults) {
-      setUserAnswers({ ...userAnswers, [questionId]: answerNumber });
-    }
-  };
+  useEffect(() => {
+    if (!started || finished || locked || !readingDone) return;
+    setTimeLeft(15);
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) { clearInterval(timerRef.current!); setLocked(true); setAnswers(a => ({ ...a, [currentIndex]: a[currentIndex] ?? null })); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timerRef.current!);
+  }, [currentIndex, started, finished, readingDone]);
 
-  const handleSubmit = async () => {
-    let totalScore = 0;
-    let total = 0;
-    questions.forEach((q) => {
-      const pts = q.points || 1;
-      total += pts;
-      if (userAnswers[q.id] === q.correctAnswer) {
-        totalScore += pts;
-      }
-    });
-    setScore(totalScore);
-    setMaxScore(total);
-    setShowResults(true);
-
-    const answersData = questions.map((q) => ({
-      questionId: q.id,
-      questionText: q.text,
-      videoUrls: q.videoUrls || [],
-      audioUrl: q.audioUrl || null,
-      answer1: q.answer1,
-      answer2: q.answer2,
-      answer3: q.answer3,
-      correctAnswer: q.correctAnswer,
-      userAnswer: userAnswers[q.id] || null,
-      isCorrect: userAnswers[q.id] === q.correctAnswer
-    }));
-
-    if (email && lesson && category) {
+  useEffect(() => {
+    const fetch_ = async () => {
       try {
-        await fetch("/api/exam-results", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userEmail: email,
-            lessonTitle: lesson,
-            category,
-            score: totalScore,
-            totalQuestions: questions.length,
-            maxScore: total,
-            answers: answersData
-          })
-        });
-      } catch (error) {
-        console.error("❌ Error saving result:", error);
-      }
-    }
+        if (lessonId) {
+          const res = await fetch(`/api/exam-questions?lessonId=${lessonId}&category=${category.toUpperCase()}`);
+          const data = await res.json();
+          if (data.success) {
+            let qs = data.questions || [];
+            if (limitParam > 0) qs = qs.slice(offsetParam, offsetParam + limitParam);
+            setQuestions(qs);
+          }
+        }
+      } catch (e) { console.error(e); }
+      finally { setLoading(false); }
+    };
+    fetch_();
+  }, [lessonId, category]);
+
+  const q = questions[currentIndex];
+  const textsToTranslate = q ? [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""] : ["", "", "", ""];
+  const translatedTexts = useAutoTranslateList(textsToTranslate, lang);
+  useEffect(() => { translatedRef.current = translatedTexts; }, [translatedTexts]);
+
+  const score = Object.entries(answers).reduce((total, [i, ans]) => {
+    if (ans === null || ans === undefined) return total;
+    const question = questions[parseInt(i)];
+    if (!question) return total;
+    return total + (question.correctAnswer === ans ? (question.points || 1) : 0);
+  }, 0);
+  const maxScore = questions.reduce((t, q) => t + (q.points || 1), 0);
+
+  const handleAnswer = (num: number) => {
+    if (locked || answers[currentIndex] !== undefined) return;
+    killTts();
+    clearInterval(timerRef.current!);
+    if (questions[currentIndex]?.correctAnswer === num) { setShowCorrect(true); setTimeout(() => setShowCorrect(false), 1500); }
+    else { setShowWrong(true); setTimeout(() => setShowWrong(false), 800); }
+    setAnswers(a => ({ ...a, [currentIndex]: num }));
+    setLocked(true);
   };
 
-  const handleRetry = () => {
-    setUserAnswers({});
-    setShowResults(false);
-    setScore(0);
-    setMaxScore(0);
+  const handleNext = () => {
+    killTts();
+    setReadingDone(false);
+    if (currentIndex + 1 >= questions.length) setFinished(true);
+    else { setCurrentIndex(i => i + 1); setLocked(false); }
   };
 
-  if (loading || checking) {
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-12 h-12 border-4 border-[#003399] border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+
+  if (!started) return (
+    <div className="min-h-screen bg-white" dir={isRtl ? "rtl" : "ltr"}>
+      <Navbar />
+      <div className="max-w-2xl mx-auto px-4 py-12 text-center">
+        <div className="border-4 border-[#003399] rounded-2xl p-10">
+          <div className="text-6xl mb-4">🎯</div>
+          <h1 className="text-2xl font-black text-[#003399] mb-2">{lessonName || `Examen ${category}`}</h1>
+          <p className="text-gray-500 mb-2">{questions.length} {lang === "ar" ? "سؤال" : lang === "nl" ? "vragen" : "questions"}</p>
+          <p className="text-sm text-orange-600 font-bold mb-8">⏱ {lang === "ar" ? "15 ثانية لكل سؤال" : lang === "nl" ? "15 seconden per vraag" : "15 seconds per question"}</p>
+          {questions.length === 0
+            ? <p className="text-red-500 font-bold">{lang === "ar" ? "لا توجد أسئلة" : "Geen vragen"}</p>
+            : <button onClick={() => { unlockAudio(); setStarted(true); }}
+                className="px-10 py-4 font-black text-white text-lg rounded-xl hover:scale-105 active:scale-95 transition-all"
+                style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
+                {lang === "ar" ? "ابدأ الامتحان" : lang === "nl" ? "Start Examen" : "Start Exam"} →
+              </button>
+          }
+        </div>
+      </div>
+    </div>
+  );
+
+  if (finished) {
+    const pct = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
+    const passed = pct >= 60;
+    const correctCount = questions.filter((q, i) => answers[i] === q.correctAnswer).length;
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">
-            {checking ? "Abonnement controleren..." : "Vragen laden..."}
-          </p>
+      <div className="min-h-screen bg-gray-50" dir={isRtl ? "rtl" : "ltr"}>
+        <Navbar />
+        <div className="max-w-3xl mx-auto px-4 py-8">
+          <div className={`rounded-2xl p-8 mb-6 text-center border-4 ${passed ? "border-green-400 bg-green-50" : "border-red-400 bg-red-50"}`}>
+            <div className="text-6xl mb-3">{passed ? "🏆" : "😔"}</div>
+            <h1 className="text-2xl font-black mb-1" style={{ color: passed ? "#16a34a" : "#dc2626" }}>
+              {passed ? (lang === "ar" ? "مبروك! نجحت" : lang === "nl" ? "Geslaagd!" : "Passed!") : (lang === "ar" ? "لم تنجح هذه المرة" : lang === "nl" ? "Helaas niet geslaagd" : "Not passed")}
+            </h1>
+            <div className="flex items-center justify-center gap-4 mt-4 flex-wrap">
+              {[
+                { label: lang === "ar" ? "النقاط" : "Behaald", value: score, sub: `/ ${maxScore}`, color: "text-green-600" },
+                { label: lang === "ar" ? "صح" : "Correct", value: correctCount, sub: `/ ${questions.length}`, color: "text-blue-600" },
+                { label: lang === "ar" ? "خطأ" : "Fout", value: questions.length - correctCount, sub: "", color: "text-red-500" },
+                { label: "Score", value: `${pct}%`, sub: "", color: passed ? "text-green-600" : "text-red-600" },
+              ].map((s, i) => (
+                <div key={i} className="bg-white rounded-xl px-5 py-3 shadow text-center">
+                  <p className="text-xs text-gray-400 font-bold uppercase mb-1">{s.label}</p>
+                  <p className={`text-3xl font-black ${s.color}`}>{s.value}</p>
+                  {s.sub && <p className="text-xs text-gray-400">{s.sub}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* الأسئلة الخاطئة */}
+          {questions.some((q, i) => answers[i] !== q.correctAnswer) && (
+            <div className="mb-6">
+              <h2 className="text-lg font-black text-gray-800 mb-3 flex items-center gap-2">
+                <span className="w-7 h-7 rounded-lg bg-red-500 flex items-center justify-center text-white text-sm">✗</span>
+                {lang === "ar" ? "الأسئلة الخاطئة" : lang === "nl" ? "Foute antwoorden" : "Wrong answers"}
+              </h2>
+              <div className="space-y-4">
+                {questions.map((q, i) => {
+                  const userAns = answers[i];
+                  if (userAns === q.correctAnswer) return null;
+                  return (
+                    <div key={i} className="bg-white rounded-2xl overflow-hidden shadow border border-red-100">
+                      <div className="px-4 py-2 flex items-center gap-2" style={{ background: "#fef2f2" }}>
+                        <span className="w-6 h-6 rounded-full bg-red-500 text-white text-xs font-black flex items-center justify-center">{i + 1}</span>
+                        {q.points === 5 && <span className="text-xs font-black px-1.5 py-0.5 rounded-full" style={{ background: "rgba(239,68,68,0.15)", color: "#dc2626" }}>⭐ 5 pts</span>}
+                        {(userAns === null || userAns === undefined) && <span className="text-xs font-black text-orange-500">⏱ {lang === "ar" ? "انتهى الوقت" : "Tijd verlopen"}</span>}
+                      </div>
+                      {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
+                        <div className={`grid gap-0.5 bg-gray-900 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+                          {q.videoUrls.filter(Boolean).map((url: string, idx: number) => (
+                            <WatermarkedImage key={idx} src={url} className="w-full h-auto" />
+                          ))}
+                        </div>
+                      )}
+                      <div className="p-4">
+                        <p className="font-bold text-gray-800 mb-3 text-sm">{q.textNL || q.text}</p>
+                        <div className="space-y-2">
+                          {[1, 2, 3].map(num => {
+                            const ansText = q[`answer${num}`];
+                            if (!ansText) return null;
+                            const isCorrectAns = q.correctAnswer === num;
+                            const isUserAns = userAns === num;
+                            return (
+                              <div key={num} className={`flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium border-2 ${isCorrectAns ? "bg-green-50 border-green-400 text-green-800" : isUserAns ? "bg-red-50 border-red-400 text-red-800" : "bg-gray-50 border-gray-200 text-gray-500"}`}>
+                                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0 ${isCorrectAns ? "bg-green-500 text-white" : isUserAns ? "bg-red-500 text-white" : "bg-gray-300 text-gray-600"}`}>
+                                  {isCorrectAns ? "✓" : isUserAns ? "✗" : num}
+                                </span>
+                                <span className="flex-1">{ansText}</span>
+                                {isCorrectAns && <span className="text-xs font-black text-green-600">{lang === "ar" ? "الصحيحة" : "Correct"}</span>}
+                                {isUserAns && !isCorrectAns && <span className="text-xs font-black text-red-500">{lang === "ar" ? "إجابتك" : "Jouw antwoord"}</span>}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <div className="flex gap-3">
+            <button onClick={() => { unlockAudio(); setStarted(false); setFinished(false); setCurrentIndex(0); setAnswers({}); setLocked(false); }}
+              className="flex-1 py-3 font-black text-white rounded-xl hover:opacity-90 active:scale-95"
+              style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
+              🔄 {lang === "ar" ? "إعادة" : lang === "nl" ? "Opnieuw" : "Retry"}
+            </button>
+            <button onClick={() => router.back()}
+              className="flex-1 py-3 font-black border-2 border-gray-300 text-gray-600 rounded-xl hover:bg-gray-50 active:scale-95">
+              ← {lang === "ar" ? "رجوع" : lang === "nl" ? "Terug" : "Back"}
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
-  if (isExpired) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
-        <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md">
-          <div className="w-20 h-20 bg-red-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-            <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            Abonnement verlopen
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Sorry, je abonnement is verlopen. Vernieuw je abonnement om toegang te krijgen tot examens.
-          </p>
-          <button
-            onClick={() => router.push("/")}
-            className="bg-orange-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-600 transition"
-          >
-            Abonnement vernieuwen
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (questions.length === 0 && !loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
-        <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md">
-          <div className="w-20 h-20 bg-red-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-            <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            Geen vragen
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Er zijn nog geen vragen toegevoegd voor deze les
-          </p>
-          <button
-            onClick={() => router.push("/")}
-            className="bg-orange-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-600 transition"
-          >
-            Terug naar home
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const userAnswer = answers[currentIndex];
+  const isAnswered = userAnswer !== undefined;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white" dir={isRtl ? "rtl" : "ltr"}>
       <Navbar />
-      
-      <div className="py-8 px-4">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <button
-                onClick={() => router.push("/")}
-                className="flex items-center gap-2 text-gray-600 hover:text-orange-500 font-medium transition"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Terug
-            </button>
-          </div>
 
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            Examen Test
-          </h1>
-          <p className="text-gray-600">
-            Categorie {category} - {lesson}
-          </p>
-          <div className="mt-4 flex items-center gap-4">
-            <div className="bg-blue-50 px-4 py-2 rounded-lg">
-              <span className="text-sm text-gray-600">Aantal vragen:</span>
-              <span className="font-bold text-blue-600 ml-2">{questions.length}</span>
+      {showCorrect && (
+        <div className="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center">
+          <div className="absolute inset-0 bg-green-500 opacity-10" />
+          <div style={{ animation: "checkPop 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards" }}>
+            <div className="w-32 h-32 rounded-full flex items-center justify-center" style={{ background: "rgba(34,197,94,0.95)", boxShadow: "0 0 60px rgba(34,197,94,0.7)" }}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-16 h-16"><path d="M20 6L9 17l-5-5" /></svg>
             </div>
-            {showResults && (
-              <div className={`px-4 py-2 rounded-lg ${score >= maxScore * 0.7 ? "bg-green-50" : "bg-red-50"}`}>
-                <span className="text-sm text-gray-600">Score:</span>
-                <span className={`font-bold ml-2 ${score >= maxScore * 0.7 ? "text-green-600" : "text-red-600"}`}>
-                  {score} / {maxScore} pts
-                </span>
+          </div>
+          <style>{`@keyframes checkPop { 0% { transform: scale(0) rotate(-10deg); opacity: 0; } 60% { transform: scale(1.15) rotate(3deg); opacity: 1; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }`}</style>
+        </div>
+      )}
+
+      {showWrong && (
+        <div className="fixed inset-0 z-[9999] pointer-events-none">
+          <div className="absolute inset-0 bg-red-500 opacity-20 animate-pulse"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-8xl" style={{ animation: "wrongBounce 0.3s ease-in-out 3" }}>❌</div>
+          </div>
+          <style>{`@keyframes wrongBounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }`}</style>
+        </div>
+      )}
+
+      <div className="max-w-2xl mx-auto px-4 py-6">
+        {q && (
+          <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-100">
+            <div className="px-5 py-3 flex items-center justify-between" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
+              <div className="flex items-center gap-2">
+                <span className="text-white font-black text-sm">{currentIndex + 1} / {questions.length}</span>
+                {q.points === 5 && (
+                  <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(239,68,68,0.85)", color: "white", border: "1.5px solid rgba(255,255,255,0.4)" }}>⭐ 5 pts</span>
+                )}
+              </div>
+              <div className={`flex items-center gap-2 px-3 py-1 rounded-full font-black text-sm border-2 transition-all ${locked ? "bg-white/20 border-white/40 text-white" : !readingDone ? "bg-blue-500 border-blue-300 text-white animate-pulse" : timeLeft <= 5 ? "bg-red-500 border-red-300 text-white animate-pulse" : timeLeft <= 10 ? "bg-orange-500 border-orange-300 text-white" : "bg-green-500 border-green-300 text-white"}`}>
+                <span>{!readingDone && !locked ? "🎧" : "⏱"}</span>
+                <span>{locked ? (isAnswered && userAnswer !== null ? (userAnswer === q.correctAnswer ? "✅" : "❌") : "⏱") : !readingDone ? (lang === "ar" ? "قراءة..." : "Lezen...") : timeLeft}</span>
+                {!locked && readingDone && <span className="text-xs opacity-80">s</span>}
+              </div>
+            </div>
+
+            {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
+              <div className={`grid gap-1 bg-gray-900 p-2 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+                {q.videoUrls.filter(Boolean).map((url: string, i: number) => (
+                  <div key={i} className="rounded-xl overflow-hidden"><WatermarkedImage src={url} className="w-full h-auto" /></div>
+                ))}
               </div>
             )}
-          </div>
-        </div>
 
-        {/* Questions */}
-        <div className="space-y-8">
-          {questions.map((question, index) => {
-            const userAnswer = userAnswers[question.id];
-            const isCorrect = showResults && userAnswer === question.correctAnswer;
-            const isWrong = showResults && userAnswer && userAnswer !== question.correctAnswer;
-
-            return (
-              <div
-                key={question.id}
-                className={`bg-white rounded-3xl shadow-xl overflow-hidden transition-all duration-300 ${
-                  showResults
-                    ? isCorrect
-                      ? "ring-4 ring-green-400 shadow-green-200"
-                      : isWrong
-                      ? "ring-4 ring-red-400 shadow-red-200"
-                      : "ring-2 ring-gray-200"
-                    : "hover:shadow-2xl"
-                }`}
-              >
-                {/* Question Header */}
-                <div className={`px-6 py-4 ${
-                  showResults
-                    ? isCorrect
-                      ? "bg-gradient-to-r from-green-50 to-emerald-50"
-                      : isWrong
-                      ? "bg-gradient-to-r from-red-50 to-pink-50"
-                      : "bg-gradient-to-r from-gray-50 to-slate-50"
-                    : "bg-gradient-to-r from-orange-50 to-amber-50"
-                }`}>
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black text-lg shadow-lg ${
-                      showResults
-                        ? isCorrect
-                          ? "bg-gradient-to-br from-green-500 to-emerald-600"
-                          : isWrong
-                          ? "bg-gradient-to-br from-red-500 to-pink-600"
-                          : "bg-gradient-to-br from-gray-400 to-slate-500"
-                        : "bg-gradient-to-br from-orange-500 to-amber-600"
-                    }`}>
-                      {index + 1}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                        Vraag {index + 1}
-                        {question.points === 5 && (                          <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(239,68,68,0.1)", color: "#dc2626", border: "1px solid rgba(239,68,68,0.3)" }}>
-                            ⭐ 5 pts
-                          </span>
-                        )}
-                      </p>
-                      {showResults && (
-                        <p className={`text-sm font-bold ${
-                          isCorrect ? "text-green-600" : isWrong ? "text-red-600" : "text-gray-600"
-                        }`}>
-                          {isCorrect 
-                            ? "✓ Correct"
-                            : isWrong 
-                            ? "✗ Fout"
-                            : "Niet beantwoord"
-                          }
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Question Content */}
-                <div className="p-6">
-                  <p className="text-xl text-gray-800 leading-relaxed mb-6 font-medium">
-                    {question.textNL || question.text}
-                  </p>
-
-                  {/* Images */}
-                  {question.videoUrls && question.videoUrls.length > 0 && (
-                    <div className="mb-6 grid grid-cols-2 md:grid-cols-3 gap-4">
-                      {question.videoUrls.map((url, idx) => (
-                        <div key={idx} className="relative group">
-                          <img
-                            src={url}
-                            alt={`Question ${index + 1} image ${idx + 1}`}
-                            className="w-full h-48 object-cover rounded-2xl border-4 border-gray-100 shadow-md group-hover:shadow-xl transition-all duration-300 group-hover:scale-105"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Audio */}
-                  {question.audioUrl && (
-                    <div className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 p-4 rounded-2xl border-2 border-purple-200">
-                      <audio controls className="w-full">
-                        <source src={question.audioUrl} type="audio/mpeg" />
-                      </audio>
-                    </div>
-                  )}
-
-                  {/* Answers */}
-                  <div className="space-y-4 mt-6">
-                    {[1, 2, 3].map((num) => {
-                      const answerKey = `answer${num}` as keyof Question;
-                      const answerText = question[answerKey] as string;
-                      
-                      if (!answerText) return null;
-
-                      const isSelected = userAnswer === num;
-                      const isCorrectAnswer = question.correctAnswer === num;
-
-                      return (
-                        <button
-                          key={num}
-                          onClick={() => handleAnswerSelect(question.id, num)}
-                          disabled={showResults}
-                          className={`w-full text-left p-5 rounded-2xl border-3 transition-all duration-300 transform ${
-                            showResults
-                              ? isCorrectAnswer
-                                ? "bg-gradient-to-r from-green-50 to-emerald-50 border-green-400 shadow-lg shadow-green-200"
-                                : isSelected && !isCorrectAnswer
-                                ? "bg-gradient-to-r from-red-50 to-pink-50 border-red-400 shadow-lg shadow-red-200"
-                                : "bg-gray-50 border-gray-200"
-                              : isSelected
-                              ? "bg-gradient-to-r from-orange-50 to-amber-50 border-orange-400 shadow-xl shadow-orange-200 scale-[1.02]"
-                              : "bg-white border-gray-200 hover:border-orange-300 hover:shadow-lg hover:scale-[1.01]"
-                          } ${!showResults && "cursor-pointer active:scale-95"}`}
-                          style={{ borderWidth: '3px' }}
-                        >
-                          <div className="flex items-center gap-4">
-                            <div
-                              className={`w-8 h-8 rounded-xl border-3 flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
-                                showResults
-                                  ? isCorrectAnswer
-                                    ? "bg-gradient-to-br from-green-500 to-emerald-600 border-green-600 shadow-lg"
-                                    : isSelected && !isCorrectAnswer
-                                    ? "bg-gradient-to-br from-red-500 to-pink-600 border-red-600 shadow-lg"
-                                    : "border-gray-300 bg-white"
-                                  : isSelected
-                                  ? "bg-gradient-to-br from-orange-500 to-amber-600 border-orange-600 shadow-lg"
-                                  : "border-gray-300 bg-white"
-                              }`}
-                            >
-                              {((showResults && isCorrectAnswer) || (!showResults && isSelected)) && (
-                                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                </svg>
-                              )}
-                              {showResults && isSelected && !isCorrectAnswer && (
-                                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                                </svg>
-                              )}
-                            </div>
-                            <span className={`flex-1 font-semibold text-lg ${
-                              showResults
-                                ? isCorrectAnswer
-                                  ? "text-green-800"
-                                  : isSelected && !isCorrectAnswer
-                                  ? "text-red-800"
-                                  : "text-gray-700"
-                                : isSelected
-                                ? "text-orange-800"
-                                : "text-gray-700"
-                            }`}>{answerText}</span>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+            <div className="px-5 py-4 bg-white">
+              <p className={`text-lg font-bold text-gray-900 leading-relaxed mb-4 ${isRtl ? "text-right" : "text-left"}`}>
+                {translatedTexts[0] || q.textNL || q.text}
+              </p>
+              <div className="space-y-3">
+                {[1, 2, 3].map(num => {
+                  const label = ["A", "B", "C"][num - 1];
+                  const ansText = translatedTexts[num] || q[`answer${num}`];
+                  if (!q[`answer${num}`]) return null;
+                  const isCorrect = q.correctAnswer === num;
+                  const isSelected = userAnswer === num;
+                  let style = "bg-white border-2 border-gray-300 text-gray-800 hover:border-[#003399]";
+                  if (isAnswered || locked) {
+                    if (isAnswered && userAnswer !== null) {
+                      if (isCorrect) style = "bg-green-50 border-2 border-green-500 text-green-800";
+                      else if (isSelected) style = "bg-red-50 border-2 border-red-500 text-red-800";
+                      else style = "bg-gray-50 border-2 border-gray-200 text-gray-500";
+                    } else { style = "bg-gray-50 border-2 border-gray-200 text-gray-400 opacity-60"; }
+                  }
+                  return (
+                    <button key={num} onClick={() => handleAnswer(num)} disabled={isAnswered || locked}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${style} ${!isAnswered && !locked ? "cursor-pointer active:scale-95" : "cursor-default"}`}>
+                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0 ${isAnswered && userAnswer !== null ? isCorrect ? "bg-green-500 text-white" : isSelected ? "bg-red-500 text-white" : "bg-gray-200 text-gray-500" : locked ? "bg-gray-200 text-gray-400" : "bg-[#003399] text-white"}`}>
+                        {isAnswered && userAnswer !== null ? (isCorrect ? "✓" : isSelected ? "✗" : label) : label}
+                      </span>
+                      <span className={isRtl ? "text-right flex-1" : "text-left flex-1"}>{ansText}</span>
+                    </button>
+                  );
+                })}
               </div>
-            );
-          })}
-        </div>
-
-        {/* Submit Button */}
-        {!showResults && (
-          <div className="mt-8 bg-gradient-to-r from-orange-50 to-amber-50 rounded-3xl shadow-xl p-8 border-2 border-orange-200">
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center gap-3 bg-white px-6 py-3 rounded-full shadow-md">
-                <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-600 rounded-full flex items-center justify-center text-white font-bold">
-                  {Object.keys(userAnswers).length}
-                </div>
-                <span className="text-gray-700 font-semibold">
-                  {Object.keys(userAnswers).length} / {questions.length}
-                </span>
-              </div>
-            </div>
-            
-            <button
-              onClick={handleSubmit}
-              disabled={Object.keys(userAnswers).length !== questions.length}
-              className={`w-full py-5 rounded-2xl font-black text-2xl transition-all duration-300 transform ${
-                Object.keys(userAnswers).length === questions.length
-                  ? "bg-gradient-to-r from-orange-500 to-amber-600 text-white hover:from-orange-600 hover:to-amber-700 shadow-2xl shadow-orange-300 hover:scale-[1.02] active:scale-95"
-                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
-              }`}
-            >
-              {Object.keys(userAnswers).length === questions.length ? (
-                <span className="flex items-center justify-center gap-3">
-                  <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  Antwoorden indienen
-                </span>
-              ) : (
-                <span className="flex items-center justify-center gap-3">
-                  <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  Beantwoord alle vragen
-                </span>
+              {(isAnswered || locked) && (
+                <button onClick={handleNext} className="w-full mt-5 py-3 font-black text-white rounded-xl hover:opacity-90 active:scale-95" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
+                  {currentIndex + 1 >= questions.length ? (lang === "ar" ? "عرض النتيجة 🏆" : lang === "nl" ? "Resultaat 🏆" : "Result 🏆") : (lang === "ar" ? "التالي ←" : lang === "nl" ? "Volgende →" : "Next →")}
+                </button>
               )}
-            </button>
-          </div>
-        )}
-
-        {/* Results */}
-        {showResults && (
-          <div className="mt-8 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-3xl shadow-2xl p-8 border-4 border-indigo-200">
-            <div className="text-center">
-              {/* نجاح أو رسوب */}
-              <div className={`inline-flex items-center gap-2 px-6 py-2 rounded-full font-black text-lg mb-4 ${
-                score >= maxScore * 0.7
-                  ? "bg-green-100 text-green-700 border-2 border-green-300"
-                  : "bg-red-100 text-red-700 border-2 border-red-300"
-              }`}>
-                {score >= maxScore * 0.7 ? "🎉 Geslaagd!" : "❌ Helaas niet geslaagd"}
-              </div>
-
-              <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full shadow-2xl mb-6">
-                <span className="text-3xl font-black text-white">
-                  {maxScore > 0 ? Math.round((score / maxScore) * 100) : 0}%
-                </span>
-              </div>
-
-              <h3 className="text-3xl font-black text-gray-800 mb-4">Eindresultaat</h3>
-
-              {/* النتيجة الرئيسية: score / maxScore */}
-              <div className="flex items-center justify-center gap-4 mb-6">
-                <div className="bg-white rounded-2xl px-8 py-5 shadow-lg text-center">
-                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Behaald</p>
-                  <p className="text-5xl font-black text-green-600">{score}</p>
-                </div>
-                <div className="text-4xl font-black text-gray-300">/</div>
-                <div className="bg-white rounded-2xl px-8 py-5 shadow-lg text-center">
-                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Totaal</p>
-                  <p className="text-5xl font-black text-indigo-600">{maxScore}</p>
-                </div>
-              </div>
-
-              {/* تفاصيل إضافية */}
-              <div className="flex items-center justify-center gap-4 mb-6 text-sm">
-                <span className="px-3 py-1 rounded-full bg-green-50 text-green-700 font-bold border border-green-200">
-                  ✓ Correct: {questions.filter(q => userAnswers[q.id] === q.correctAnswer).length}
-                </span>
-                <span className="px-3 py-1 rounded-full bg-red-50 text-red-700 font-bold border border-red-200">
-                  ✗ Fout: {questions.filter(q => userAnswers[q.id] && userAnswers[q.id] !== q.correctAnswer).length}
-                </span>
-                <span className="px-3 py-1 rounded-full bg-gray-50 text-gray-600 font-bold border border-gray-200">
-                  Vragen: {questions.length}
-                </span>
-              </div>
-
-              <div className="flex gap-4 justify-center">
-                <button
-                  onClick={() => { handleRetry(); window.scrollTo(0,0); }}
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-10 py-4 rounded-2xl font-black text-lg hover:from-indigo-600 hover:to-purple-700 transition-all shadow-xl hover:scale-105 active:scale-95"
-                >
-                  Opnieuw proberen
-                </button>
-                <button
-                  onClick={() => router.push("/")}
-                  className="bg-white text-gray-700 px-10 py-4 rounded-2xl font-black text-lg hover:bg-gray-50 transition-all shadow-xl border-2 border-gray-200 hover:scale-105 active:scale-95"
-                >
-                  Terug naar home
-                </button>
-              </div>
             </div>
           </div>
         )}
-        </div>
       </div>
       <Footer />
     </div>
@@ -590,7 +410,7 @@ function ExamenTestContent() {
 
 export default function ExamenTestPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="text-xl font-bold">Loading...</div></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-12 h-12 border-4 border-[#003399] border-t-transparent rounded-full animate-spin"></div></div>}>
       <ExamenTestContent />
     </Suspense>
   );
