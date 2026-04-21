@@ -26,9 +26,6 @@ function LessonsTab({ questions, lang, router }: { questions: any[], lang: strin
     <>
       <div className="flex items-center justify-between mb-4">
         <span className="text-sm font-bold text-gray-500">{currentIndex + 1} / {questions.length}</span>
-        <div className="flex-1 mx-4 bg-gray-200 rounded-full h-2">
-          <div className="bg-[#003399] h-2 rounded-full transition-all" style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}></div>
-        </div>
         <span className="text-xs font-bold px-2 py-1 rounded-full" style={{ background: "rgba(34,197,94,0.1)", color: "#16a34a" }}>🎁 Gratis</span>
       </div>
       {questions[currentIndex]?.lesson && (
@@ -551,9 +548,6 @@ function ExamRunner({ questions, lang, router, groupLabel, onBack }: { questions
       {/* شريط التقدم */}
       <div className="flex items-center justify-between mb-3">
         <span className="text-sm font-bold text-gray-500">{currentIndex + 1} / {shuffledQuestions.length}</span>
-        <div className="flex-1 mx-3 bg-gray-200 rounded-full h-2">
-          <div className="bg-[#003399] h-2 rounded-full transition-all" style={{ width: `${((currentIndex + 1) / shuffledQuestions.length) * 100}%` }}></div>
-        </div>
         <span className="text-sm font-bold text-gray-500">Score: {score}</span>
       </div>
 
