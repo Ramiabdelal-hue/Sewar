@@ -703,25 +703,6 @@ function ExamenCategoryContent() {
               </p>
 
               {/* مؤشر حالة القراءة والمؤقت */}
-              {!locked && (
-                <div className={`text-center mb-4 p-2 rounded-lg text-sm font-bold ${
-                  !readingDone 
-                    ? "bg-blue-50 text-blue-700 border border-blue-200" 
-                    : "bg-green-50 text-green-700 border border-green-200"
-                }`}>
-                  {!readingDone 
-                    ? (lang === "ar" ? "🎧 جاري قراءة السؤال والإجابات A, B, C..." : 
-                       lang === "nl" ? "🎧 Vraag en antwoorden A, B, C worden voorgelezen..." : 
-                       lang === "fr" ? "🎧 Lecture de la question et réponses A, B, C..." : 
-                       "🎧 Reading question and answers A, B, C...")
-                    : (lang === "ar" ? `⏱ انتهت القراءة - لديك ${timeLeft} ثانية للإجابة` : 
-                       lang === "nl" ? `⏱ Voorlezen klaar - Je hebt ${timeLeft} seconden om te antwoorden` : 
-                       lang === "fr" ? `⏱ Lecture terminée - Vous avez ${timeLeft} secondes pour répondre` : 
-                       `⏱ Reading finished - You have ${timeLeft} seconds to answer`)
-                  }
-                </div>
-              )}
-
               {/* الإجابات */}
               <div className="space-y-3">
                 {[1, 2, 3].map(num => {
