@@ -401,15 +401,28 @@ function LessonViewContent() {
           {/* الشروح في نفس الصفحة */}
           <div className="space-y-4">
             {filteredQuestions.slice(currentIndex, currentIndex + 1).map((q, i) => (
-              <QuestionCard
-                key={q.id}
-                question={q}
-                index={currentIndex + i}
-                total={filteredQuestions.length}
-                lang={lang}
-                onNext={() => {}}
-                onPrev={() => {}}
-              />
+              <div key={q.id}>
+                {/* عنوان الدرس فوق البطاقة */}
+                {translatedLessonTitle && (
+                  <div className="flex items-center gap-3 mb-2 px-4 py-2.5 rounded-2xl"
+                    style={{ background: "linear-gradient(135deg, #eff6ff, #dbeafe)", border: "1px solid #bfdbfe" }}>
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
+                      <span className="text-white text-xs">📚</span>
+                    </div>
+                    <p className="text-sm font-black text-[#003399] flex-1">{translatedLessonTitle}</p>
+                    <span className="text-xs font-bold text-[#003399]/50">{currentIndex + 1} / {filteredQuestions.length}</span>
+                  </div>
+                )}
+                <QuestionCard
+                  question={q}
+                  index={currentIndex + i}
+                  total={filteredQuestions.length}
+                  lang={lang}
+                  onNext={() => {}}
+                  onPrev={() => {}}
+                />
+              </div>
             ))}
           </div>
 
