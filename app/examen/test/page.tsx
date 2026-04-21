@@ -34,6 +34,8 @@ function ExamenTestContent() {
   const lesson = searchParams.get("lesson");
   const email = searchParams.get("email");
   const lessonId = searchParams.get("lessonId");
+  const offsetParam = parseInt(searchParams.get("offset") || "0");
+  const limitParam = parseInt(searchParams.get("limit") || "0"); // 0 = كل الأسئلة
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
@@ -105,7 +107,14 @@ function ExamenTestContent() {
       if (lessonIdParam) {
         const res = await fetch(`/api/exam-questions?lessonId=${lessonIdParam}&category=${category || "B"}`);
         const data = await res.json();
-        if (data.success) setQuestions(data.questions);
+        if (data.success) {
+          let qs = data.questions || [];
+          // تطبيق offset و limit إذا كانا محددين
+          if (limitParam > 0) {
+            qs = qs.slice(offsetParam, offsetParam + limitParam);
+          }
+          setQuestions(qs);
+        }
       } else if (category) {
         const lessonsRes = await fetch(`/api/lessons?category=${category}`);
         const lessonsData = await lessonsRes.json();
