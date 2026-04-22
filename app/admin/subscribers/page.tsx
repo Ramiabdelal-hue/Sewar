@@ -69,6 +69,26 @@ export default function AdminSubscribersPage() {
   const [activityStats, setActivityStats] = useState<ActivityStats | null>(null);
   const [activeTab, setActiveTab] = useState<"subscribers" | "activity" | "screenshots">("subscribers");
   const [selectedUserScreenshots, setSelectedUserScreenshots] = useState<any>(null);
+  const [smsSending, setSmsSending] = useState(false);
+  const [smsResult, setSmsResult] = useState<{ success: boolean; message: string } | null>(null);
+
+  const sendWarningSMS = async (email: string) => {
+    setSmsSending(true);
+    setSmsResult(null);
+    try {
+      const res = await fetch("/api/admin/send-warning", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userEmail: email }),
+      });
+      const data = await res.json();
+      setSmsResult({ success: data.success, message: data.message });
+    } catch {
+      setSmsResult({ success: false, message: "خطأ في الاتصال بالخادم" });
+    } finally {
+      setSmsSending(false);
+    }
+  };
   
   // فلاتر البحث
   const [searchName, setSearchName] = useState("");
@@ -291,9 +311,21 @@ export default function AdminSubscribersPage() {
                           {user.phone && <p className="text-xs text-white/70">📱 {user.phone}</p>}
                         </div>
                       </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-black">{user.attempts}</div>
-                        <div className="text-xs text-white/70">محاولة</div>
+                      <div className="flex items-center gap-3">
+                        <div className="text-center">
+                          <div className="text-2xl font-black">{user.attempts}</div>
+                          <div className="text-xs text-white/70">محاولة</div>
+                        </div>
+                        {user.phone && (
+                          <button
+                            onClick={() => sendWarningSMS(user.email)}
+                            disabled={smsSending}
+                            className="flex items-center gap-1 px-3 py-2 bg-white text-red-600 rounded-lg text-xs font-black hover:bg-red-50 transition disabled:opacity-60"
+                          >
+                            <span>📱</span>
+                            <span>SMS</span>
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -844,12 +876,52 @@ export default function AdminSubscribersPage() {
 
             {/* Footer */}
             <div className="p-6 bg-gray-50 border-t">
-              <button
-                onClick={() => setSelectedUserScreenshots(null)}
-                className="w-full px-6 py-3 bg-gray-800 text-white rounded-xl font-bold hover:bg-gray-900 transition"
-              >
-                إغلاق
-              </button>
+              <div className="flex flex-col gap-3">
+                {/* نتيجة إرسال SMS */}
+                {smsResult && (
+                  <div className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold ${
+                    smsResult.success
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                  }`}>
+                    <span>{smsResult.success ? "✅" : "❌"}</span>
+                    <span>{smsResult.message}</span>
+                  </div>
+                )}
+                <div className="flex gap-3">
+                  {/* زر إرسال SMS تحذيري */}
+                  {selectedUserScreenshots.phone ? (
+                    <button
+                      onClick={() => sendWarningSMS(selectedUserScreenshots.email)}
+                      disabled={smsSending}
+                      className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold hover:from-orange-600 hover:to-red-600 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {smsSending ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <span>جاري الإرسال...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-lg">📱</span>
+                          <span>إرسال SMS تحذيري</span>
+                        </>
+                      )}
+                    </button>
+                  ) : (
+                    <div className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gray-200 text-gray-500 rounded-xl font-bold cursor-not-allowed">
+                      <span className="text-lg">📵</span>
+                      <span>لا يوجد رقم هاتف</span>
+                    </div>
+                  )}
+                  <button
+                    onClick={() => { setSelectedUserScreenshots(null); setSmsResult(null); }}
+                    className="px-6 py-3 bg-gray-800 text-white rounded-xl font-bold hover:bg-gray-900 transition"
+                  >
+                    إغلاق
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
