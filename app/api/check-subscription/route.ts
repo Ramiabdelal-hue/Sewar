@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, sessionToken } = body;
+    const { email } = body;
 
     if (!email) {
       return NextResponse.json({ success: false, message: "البريد الإلكتروني مطلوب" }, { status: 400 });
@@ -16,16 +16,6 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ success: false, expired: true, message: "المستخدم غير موجود" });
-    }
-
-    // التحقق من session token - إذا تم تسجيل الدخول من مكان آخر
-    if (sessionToken && user.sessionToken && user.sessionToken !== sessionToken) {
-      return NextResponse.json({
-        success: false,
-        expired: false,
-        sessionInvalid: true,
-        message: "تم تسجيل الدخول من جهاز آخر. يرجى تسجيل الدخول مجدداً."
-      });
     }
 
     const now = new Date();

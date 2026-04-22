@@ -72,7 +72,7 @@ function TheorieLessonContent() {
         const response = await fetch("/api/check-subscription", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: emailToCheck, sessionToken: localStorage.getItem("sessionToken") || undefined })
+          body: JSON.stringify({ email: emailToCheck })
         });
         // إذا فشل الـ API - لا نعتبره منتهياً
         if (!response.ok) {
@@ -81,10 +81,6 @@ function TheorieLessonContent() {
           return;
         }
         const data = await response.json();
-        if (data.sessionInvalid) {
-          localStorage.removeItem("userEmail"); localStorage.removeItem("userCategory"); localStorage.removeItem("sessionToken");
-          window.location.href = "/"; return;
-        }
         if (data.expired) {
           setIsExpired(true);
           setLoading(false);

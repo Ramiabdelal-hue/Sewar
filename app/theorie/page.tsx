@@ -56,11 +56,10 @@ export default function TheoriePage() {
 
   const checkAndFetch = async (email: string, category: string) => {
     try {
-      const sessionToken = localStorage.getItem("sessionToken") || undefined;
       const res = await fetch("/api/check-subscription", { 
         method: "POST", 
         headers: { "Content-Type": "application/json" }, 
-        body: JSON.stringify({ email, sessionToken }) 
+        body: JSON.stringify({ email }) 
       });
       
       if (!res.ok) {
@@ -71,17 +70,6 @@ export default function TheoriePage() {
       }
       
       const data = await res.json();
-
-      // تسجيل دخول من جهاز آخر
-      if (data.sessionInvalid) {
-        localStorage.removeItem("userEmail");
-        localStorage.removeItem("userCategory");
-        localStorage.removeItem("sessionToken");
-        setIsLoggedIn(false);
-        setLoading(false);
-        alert(data.message || "تم تسجيل الدخول من جهاز آخر");
-        return;
-      }
 
       if (data.expired) { setIsExpired(true); setLoading(false); return; }
 
