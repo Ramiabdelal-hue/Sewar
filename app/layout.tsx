@@ -6,6 +6,11 @@ export const metadata = {
   title: 'S & A',
   description: 'Next.js + Tailwind example',
   manifest: '/manifest.json',
+  icons: {
+    icon: '/her.jpeg',
+    apple: '/her.jpeg',
+    shortcut: '/her.jpeg',
+  },
 };
 
 export const viewport = {
@@ -19,6 +24,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="nl">
       <head>
+        <link rel="apple-touch-icon" href="/her.jpeg" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/her.jpeg" />
+        <link rel="icon" type="image/jpeg" href="/her.jpeg" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Sewar" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
