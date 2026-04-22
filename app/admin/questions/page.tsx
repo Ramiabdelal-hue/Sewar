@@ -1012,7 +1012,7 @@ export default function AdminQuestionsPage() {
     const matchesFivePoints = !filterFivePoints || q.points === 5;
     const matchesGratis = !filterGratis || q.isFree === true;
     return matchesSearch && matchesLesson && matchesFivePoints && matchesGratis;
-  });
+  }).sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
 
   if (!isLogged) {
     return (
