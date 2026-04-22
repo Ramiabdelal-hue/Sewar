@@ -280,8 +280,9 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
   const [isSuspended, setIsSuspended] = useState(false);
   const [screenshotWarning, setScreenshotWarning] = useState(false);
   const [screenshotCount, setScreenshotCount] = useState(0);
-  // منع تشغيل check مرتين في نفس الوقت
   const checkingRef = useRef(false);
+  // نحفظ عدد المحاولات المعروض لتجنب إعادة الرسم عند كل check
+  const shownCountRef = useRef(0);
 
   // PWA install prompt listener
   useEffect(() => {
@@ -358,11 +359,13 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
             setUserName(data.user.name);
           }
 
-          // تحذير Screenshot
-          if (data.screenshotAttempts > 3) {
+          // تحذير Screenshot - فقط إذا تغيّر العدد لتجنب إعادة الرسم
+          const attempts = data.screenshotAttempts || 0;
+          if (attempts > 3 && attempts !== shownCountRef.current) {
+            shownCountRef.current = attempts;
             setScreenshotWarning(true);
-            setScreenshotCount(data.screenshotAttempts);
-          } else {
+            setScreenshotCount(attempts);
+          } else if (attempts <= 3) {
             setScreenshotWarning(false);
           }
 
@@ -395,11 +398,15 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
     check();
     const interval = setInterval(check, 60 * 60 * 1000);
     window.addEventListener("userLoggedIn", check);
-    window.addEventListener("storage", check);
+    // storage event: فقط عند تغيير userEmail (login/logout) وليس كل تغيير
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "userEmail") check();
+    };
+    window.addEventListener("storage", onStorage);
     return () => {
       clearInterval(interval);
       window.removeEventListener("userLoggedIn", check);
-      window.removeEventListener("storage", check);
+      window.removeEventListener("storage", onStorage);
     };
   }, []);
 
