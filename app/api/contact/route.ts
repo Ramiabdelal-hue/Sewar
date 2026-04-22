@@ -13,63 +13,65 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
+
+    // تحقق من وجود بيانات SMTP
+    if (!smtpUser || !smtpPass) {
+      console.error("SMTP credentials missing:", { smtpUser: !!smtpUser, smtpPass: !!smtpPass });
+      return NextResponse.json({
+        success: false,
+        message: "Email service not configured",
+        debug: { smtp_user: smtpUser ? "set" : "MISSING", smtp_pass: smtpPass ? "set" : "MISSING" }
+      }, { status: 500 });
+    }
+
     // Setup Nodemailer transporter
-    const transporter = nodemailer.createTransporter({
-      host: process.env.SMTP_HOST || "smtp.gmail.com",
-      port: parseInt(process.env.SMTP_PORT || "587"),
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
       secure: false,
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user: smtpUser,
+        pass: smtpPass,
+      },
+      tls: {
+        rejectUnauthorized: false,
       },
     });
 
+    // تحقق من الاتصال
+    await transporter.verify();
+
     // Email content
     const mailOptions = {
-      from: `"B-Road Contact Form" <${process.env.SMTP_USER}>`,
+      from: `"Sewar RijbewijsOnline" <${smtpUser}>`,
       to: process.env.CONTACT_EMAIL || "sewarrijbewijs@gmail.com",
       replyTo: email,
-      subject: `New message from ${name}${subject ? ` - ${subject}` : ''}`,
+      subject: `📩 رسالة جديدة من ${name}${subject ? ` - ${subject}` : ''}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
-          <h2 style="color: #3b82f6; border-bottom: 2px solid #3b82f6; padding-bottom: 10px;">New Contact Form Message</h2>
+          <h2 style="color: #3b82f6; border-bottom: 2px solid #3b82f6; padding-bottom: 10px;">📩 رسالة جديدة من نموذج التواصل</h2>
           
           <div style="margin: 20px 0;">
-            <p style="margin: 10px 0;"><strong>Name:</strong> ${name}</p>
-            <p style="margin: 10px 0;"><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
-            ${phone ? `<p style="margin: 10px 0;"><strong>Phone:</strong> ${phone}</p>` : ''}
-            ${subject ? `<p style="margin: 10px 0;"><strong>Subject:</strong> ${subject}</p>` : ''}
+            <p style="margin: 10px 0;"><strong>الاسم:</strong> ${name}</p>
+            <p style="margin: 10px 0;"><strong>البريد:</strong> <a href="mailto:${email}">${email}</a></p>
+            ${phone ? `<p style="margin: 10px 0;"><strong>الهاتف:</strong> ${phone}</p>` : ''}
+            ${subject ? `<p style="margin: 10px 0;"><strong>الموضوع:</strong> ${subject}</p>` : ''}
           </div>
           
           <div style="background-color: #f3f4f6; padding: 15px; border-radius: 5px; margin: 20px 0;">
-            <h3 style="color: #374151; margin-top: 0;">Message:</h3>
+            <h3 style="color: #374151; margin-top: 0;">الرسالة:</h3>
             <p style="color: #4b5563; line-height: 1.6; white-space: pre-wrap;">${message}</p>
           </div>
           
           <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0; color: #6b7280; font-size: 12px;">
-            <p>This message was sent from the B-Road contact form</p>
-            <p>Date: ${new Date().toLocaleString('en-US', { timeZone: 'Europe/Amsterdam' })}</p>
+            <p>تاريخ الإرسال: ${new Date().toLocaleString('ar-EG', { timeZone: 'Europe/Amsterdam' })}</p>
           </div>
         </div>
       `,
-      text: `
-New Contact Form Message
-
-Name: ${name}
-Email: ${email}
-${phone ? `Phone: ${phone}` : ''}
-${subject ? `Subject: ${subject}` : ''}
-
-Message:
-${message}
-
----
-This message was sent from the B-Road contact form
-Date: ${new Date().toLocaleString('en-US', { timeZone: 'Europe/Amsterdam' })}
-      `
     };
 
-    // Send email
     await transporter.sendMail(mailOptions);
 
     return NextResponse.json({
@@ -78,11 +80,14 @@ Date: ${new Date().toLocaleString('en-US', { timeZone: 'Europe/Amsterdam' })}
     });
 
   } catch (error: any) {
-    console.error("Error sending email:", error);
+    console.error("Contact email error:", error);
     return NextResponse.json({
       success: false,
       message: "Failed to send email",
       error: error?.message || String(error),
+      code: error?.code,
+      smtp_user: process.env.SMTP_USER ? "set" : "MISSING",
+      smtp_pass: process.env.SMTP_PASS ? "set" : "MISSING",
     }, { status: 500 });
   }
 }
