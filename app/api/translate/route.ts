@@ -25,7 +25,33 @@ export async function POST(req: NextRequest) {
 
     const target = gtLang[targetLang] || targetLang;
 
-    // استخدام Google Translate غير الرسمي (أدق من MyMemory)
+    // إذا كان النص متعدد الأسطر، نترجم كل سطر على حدة للحفاظ على الترتيب
+    const lines = text.split('\n');
+    const hasMultipleLines = lines.length > 1;
+
+    if (hasMultipleLines) {
+      // ترجمة كل سطر غير فارغ
+      const translatedLines = await Promise.all(
+        lines.map(async (line) => {
+          const trimmed = line.trim();
+          if (!trimmed) return line; // أبقِ الأسطر الفارغة
+          const lineUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=nl&tl=${target}&dt=t&q=${encodeURIComponent(trimmed)}`;
+          try {
+            const lineRes = await fetch(lineUrl, { headers: { "User-Agent": "Mozilla/5.0" } });
+            const lineData = await lineRes.json();
+            if (Array.isArray(lineData) && Array.isArray(lineData[0])) {
+              return lineData[0].filter((i: any) => i && i[0]).map((i: any) => i[0]).join("").replace(/<[^>]*>/g, "").trim();
+            }
+          } catch {}
+          return trimmed;
+        })
+      );
+      const result = translatedLines.join('\n');
+      memCache[cacheKey] = result;
+      return NextResponse.json({ success: true, translated: result });
+    }
+
+    // نص سطر واحد
     const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=nl&tl=${target}&dt=t&q=${encodeURIComponent(text)}`;
 
     const res = await fetch(url, {
@@ -51,10 +77,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, translated: text });
     }
 
-    // تنظيف
+    // تنظيف مع الحفاظ على السطور الجديدة
     translated = translated
-      .replace(/<[^>]*>/g, "")
-      .replace(/\s+/g, " ")
+      .replace(/<[^>]*>/g, "")   // إزالة HTML tags
+      .replace(/[ \t]+/g, " ")   // تنظيف المسافات الأفقية فقط (لا \n)
       .trim();
 
     memCache[cacheKey] = translated;
