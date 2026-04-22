@@ -11,19 +11,19 @@ interface Props {
 
 const footerText: Record<string, { left: string; right: string }> = {
   nl: {
-    left: "© Alle rechten voorbehouden · SewAr Verkeersschool",
+    left: "© Alle rechten voorbehouden · SewarRijbewijsOnline",
     right: "🛡 Origineel educatief materiaal · Wettelijk beschermd",
   },
   fr: {
-    left: "© Tous droits réservés · SewAr Verkeersschool",
+    left: "© Tous droits réservés · SewarRijbewijsOnline",
     right: "🛡 Contenu éducatif original · Protégé légalement",
   },
   ar: {
-    left: "© جميع الحقوق محفوظة · SewAr Verkeersschool",
+    left: "© جميع الحقوق محفوظة · SewarRijbewijsOnline",
     right: "🛡 محتوى تعليمي أصلي محمي قانونياً",
   },
   en: {
-    left: "© All rights reserved · SewAr Verkeersschool",
+    left: "© All rights reserved · SewarRijbewijsOnline",
     right: "🛡 Original educational content · Legally protected",
   },
 };
