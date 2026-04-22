@@ -1566,15 +1566,16 @@ export default function AdminQuestionsPage() {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      🖼️ رفع صورة
+                      🖼️ رفع صور (يمكن اختيار أكثر من صورة)
                     </label>
                     <FileUploader
                       type="image"
+                      multiple={true}
                       onUploadComplete={(url, publicId) => {
-                        setNewQuestion({
-                          ...newQuestion,
-                          videoUrls: [...newQuestion.videoUrls, url],
-                        });
+                        setNewQuestion(prev => ({
+                          ...prev,
+                          videoUrls: [...prev.videoUrls, url],
+                        }));
                       }}
                       maxSizeMB={5}
                     />
@@ -1909,10 +1910,11 @@ export default function AdminQuestionsPage() {
                         {/* رفع صورة/فيديو جديد */}
                         <div>
                           <p className="text-xs font-bold text-gray-600 mb-2">
-                            ➕ {questionType === "Praktijk" ? "إضافة فيديو جديد" : "إضافة صورة جديدة"}
+                            ➕ {questionType === "Praktijk" ? "إضافة فيديو جديد" : "إضافة صور جديدة (يمكن اختيار أكثر من صورة)"}
                           </p>
                           <FileUploader
                             type={questionType === "Praktijk" ? "video" : "image"}
+                            multiple={questionType !== "Praktijk"}
                             onUploadComplete={(url) => setEditForm(prev => ({ ...prev, videoUrls: [...prev.videoUrls, url] }))}
                             maxSizeMB={questionType === "Praktijk" ? 100 : 5}
                           />
