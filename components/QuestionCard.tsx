@@ -86,15 +86,25 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
       </div>
 
       {/* الصور */}
-      {question.videoUrls && question.videoUrls.filter(Boolean).length > 0 && (
-        <div className={`grid gap-1 bg-gray-900 p-2 ${question.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
-          {question.videoUrls.filter(Boolean).map((url, i) => (
-            <div key={i} className="relative rounded-xl overflow-hidden select-none">
-              <WatermarkedImage src={url} className="w-full h-auto" />
-            </div>
-          ))}
-        </div>
-      )}
+      {question.videoUrls && question.videoUrls.filter(Boolean).length > 0 && (() => {
+        const urls = question.videoUrls!.filter(Boolean);
+        const count = urls.length;
+        const isOdd = count % 2 !== 0;
+        return (
+          <div className={`grid gap-1 bg-gray-900 p-2 ${count === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+            {urls.map((url, i) => {
+              const isLastOdd = isOdd && i === count - 1;
+              return (
+                <div key={i}
+                  className="relative rounded-xl overflow-hidden select-none"
+                  style={isLastOdd ? { gridColumn: "1 / -1" } : {}}>
+                  <WatermarkedImage src={url} className="w-full h-auto" />
+                </div>
+              );
+            })}
+          </div>
+        );
+      })()}
 
       {/* Audio */}
       {question.audioUrl && (
