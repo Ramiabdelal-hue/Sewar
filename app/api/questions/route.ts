@@ -63,9 +63,9 @@ export async function GET(request: NextRequest) {
     if (allLessons || !lessonIdNum) {
       console.log(`🔍 Fetching ALL questions for category ${category}`);
       let questions;
-      if (category === "A") questions = await prisma.questionA.findMany({ orderBy: { createdAt: 'asc' } });
-      else if (category === "B") questions = await prisma.questionB.findMany({ orderBy: { createdAt: 'asc' } });
-      else if (category === "C") questions = await prisma.questionC.findMany({ orderBy: { createdAt: 'asc' } });
+      if (category === "A") questions = await prisma.questionA.findMany({ orderBy: { createdAt: 'desc' } });
+      else if (category === "B") questions = await prisma.questionB.findMany({ orderBy: { createdAt: 'desc' } });
+      else if (category === "C") questions = await prisma.questionC.findMany({ orderBy: { createdAt: 'desc' } });
       return NextResponse.json({ success: true, questions: questions || [] });
     }
 
@@ -75,17 +75,17 @@ export async function GET(request: NextRequest) {
     if (category === "A") {
       lessonRecord = await prisma.lessonA.findUnique({
         where: { id: lessonIdNum },
-        include: { questions: { orderBy: { createdAt: 'asc' } } }
+        include: { questions: { orderBy: { createdAt: 'desc' } } }
       });
     } else if (category === "B") {
       lessonRecord = await prisma.lessonB.findUnique({
         where: { id: lessonIdNum },
-        include: { questions: { orderBy: { createdAt: 'asc' } } }
+        include: { questions: { orderBy: { createdAt: 'desc' } } }
       });
     } else if (category === "C") {
       lessonRecord = await prisma.lessonC.findUnique({
         where: { id: lessonIdNum },
-        include: { questions: { orderBy: { createdAt: 'asc' } } }
+        include: { questions: { orderBy: { createdAt: 'desc' } } }
       });
     }
 
