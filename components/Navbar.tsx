@@ -5,7 +5,7 @@ import nl from "@/locales/nl.json";
 import fr from "@/locales/fr.json";
 import ar from "@/locales/ar.json";
 import en from "@/locales/en.json";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { usePathname } from "next/navigation";
 import LoginModal from "./LoginModal";
 import { FaHome, FaBook, FaCar, FaCheckCircle, FaEnvelope, FaSignInAlt, FaMobileAlt, FaTimes } from "react-icons/fa";
@@ -280,6 +280,8 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
   const [isSuspended, setIsSuspended] = useState(false);
   const [screenshotWarning, setScreenshotWarning] = useState(false);
   const [screenshotCount, setScreenshotCount] = useState(0);
+  // منع تشغيل check مرتين في نفس الوقت
+  const checkingRef = useRef(false);
 
   // PWA install prompt listener
   useEffect(() => {
@@ -305,6 +307,9 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
 
   useEffect(() => {
     const check = async () => {
+      if (checkingRef.current) return; // منع التشغيل المتزامن
+      checkingRef.current = true;
+      try {
       const userEmail = localStorage.getItem("userEmail");
       if (!userEmail) {
         setIsLoggedIn(false);
@@ -383,6 +388,8 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
         }
       } catch (e) {
         console.error(e);
+      } finally {
+        checkingRef.current = false;
       }
     };
 

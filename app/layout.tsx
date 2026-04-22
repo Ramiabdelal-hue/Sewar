@@ -96,31 +96,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             };
             window.addEventListener('popstate', function() { track('pageview'); });
 
-            // كشف محاولات Screenshot
-            // 1. مفاتيح لوحة المفاتيح
-            document.addEventListener('keyup', function(e) {
-              if (e.key === 'PrintScreen' ||
-                  (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === '3' || e.key === '4' || e.key === '5')) ||
-                  (e.metaKey && e.shiftKey && (e.key === '3' || e.key === '4' || e.key === '5'))) {
-                track('screenshot_attempt', 'keyboard: ' + e.key);
-              }
-            });
-
-            // 2. تغيير visibility (قد يدل على screenshot على موبايل)
-            document.addEventListener('visibilitychange', function() {
-              if (document.visibilityState === 'hidden') {
-                track('screenshot_attempt', 'visibility_hidden');
-              }
-            });
-
-            // 3. كشف screenshot API على Android
-            if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
-              var origGetDisplayMedia = navigator.mediaDevices.getDisplayMedia.bind(navigator.mediaDevices);
-              navigator.mediaDevices.getDisplayMedia = function(opts) {
-                track('screenshot_attempt', 'getDisplayMedia');
-                return origGetDisplayMedia(opts);
-              };
-            }
           })();
         `}} />
 
