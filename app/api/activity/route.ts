@@ -40,7 +40,16 @@ export async function POST(request: NextRequest) {
           select: { name: true, email: true },
         });
         if (user) {
-          sendScreenshotWarningEmail(user.email, user.name, totalAttempts).catch(console.error);
+          // إرسال في الخلفية مع logging واضح
+          sendScreenshotWarningEmail(user.email, user.name, totalAttempts)
+            .then(result => {
+              if (result.success) {
+                console.log(`📧 Auto warning email sent to ${user.email} (${totalAttempts} attempts)`);
+              } else {
+                console.error(`❌ Auto warning email FAILED for ${user.email}: ${result.error}`);
+              }
+            })
+            .catch(err => console.error(`❌ Auto warning email exception for ${user.email}:`, err));
         }
       }
     }
