@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendScreenshotWarningEmail } from "@/lib/email";
 
-// الحد الأقصى لمحاولات Screenshot قبل إرسال تحذير بالإيميل
+// الحد: إرسال إيميل عند المحاولة رقم 3 بالضبط، ثم كل 3 محاولات (6، 9، ...)
 const EMAIL_WARNING_THRESHOLD = 3;
 
 // POST - تسجيل نشاط
@@ -27,24 +27,19 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // ── إرسال إيميل تحذيري عند تجاوز الحد ──────────────────────────────────
+    // ── إرسال إيميل تحذيري تلقائياً ─────────────────────────────────────────
     if (eventType === "screenshot_attempt" && userEmail) {
       const totalAttempts = await prisma.activityLog.count({
         where: { userEmail, eventType: "screenshot_attempt" },
       });
 
-      // أرسل إيميل عند المحاولة رقم 4، ثم كل 3 محاولات إضافية (7، 10، ...)
-      if (
-        totalAttempts > EMAIL_WARNING_THRESHOLD &&
-        (totalAttempts - EMAIL_WARNING_THRESHOLD) % 3 === 1
-      ) {
+      // أرسل عند المحاولة رقم 3، ثم 6، 9، 12 ...
+      if (totalAttempts >= EMAIL_WARNING_THRESHOLD && totalAttempts % EMAIL_WARNING_THRESHOLD === 0) {
         const user = await prisma.user.findUnique({
           where: { email: userEmail },
           select: { name: true, email: true },
         });
-
         if (user) {
-          // إرسال في الخلفية لتسريع الاستجابة
           sendScreenshotWarningEmail(user.email, user.name, totalAttempts).catch(console.error);
         }
       }
