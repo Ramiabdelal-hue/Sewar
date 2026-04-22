@@ -90,18 +90,38 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
         const urls = question.videoUrls!.filter(Boolean);
         const count = urls.length;
         const isOdd = count % 2 !== 0;
+        const ft: Record<string, { left: string; right: string }> = {
+          nl: { left: "© Alle rechten voorbehouden · SewarRijbewijsOnline", right: "🛡 Origineel educatief materiaal · Wettelijk beschermd" },
+          fr: { left: "© Tous droits réservés · SewarRijbewijsOnline", right: "🛡 Contenu éducatif original · Protégé légalement" },
+          ar: { left: "© جميع الحقوق محفوظة · SewarRijbewijsOnline", right: "🛡 محتوى تعليمي أصلي محمي قانونياً" },
+          en: { left: "© All rights reserved · SewarRijbewijsOnline", right: "🛡 Original educational content · Legally protected" },
+        };
+        const text = ft[lang] || ft.nl;
         return (
-          <div className={`grid gap-1 bg-gray-900 p-2 ${count === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
-            {urls.map((url, i) => {
-              const isLastOdd = isOdd && i === count - 1;
-              return (
-                <div key={i}
-                  className="relative rounded-xl overflow-hidden select-none"
-                  style={isLastOdd ? { gridColumn: "1 / -1" } : {}}>
-                  <WatermarkedImage src={url} className="w-full h-auto" />
-                </div>
-              );
-            })}
+          <div className="bg-gray-900">
+            <div className={`grid gap-1 p-2 ${count === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+              {urls.map((url, i) => {
+                const isLastOdd = isOdd && i === count - 1;
+                return (
+                  <div key={i}
+                    className="relative rounded-xl overflow-hidden select-none"
+                    style={isLastOdd ? { gridColumn: "1 / -1" } : {}}>
+                    <WatermarkedImage src={url} className="w-full h-auto" />
+                  </div>
+                );
+              })}
+            </div>
+            {/* شريط الحقوق — مرة واحدة أسفل كل الصور */}
+            <div
+              className="flex items-center justify-between px-3 py-1.5"
+              style={{
+                background: "linear-gradient(135deg, rgba(0,20,60,0.97), rgba(0,40,120,0.97))",
+                fontSize: "9px", fontWeight: 700, letterSpacing: "0.02em",
+                direction: lang === "ar" ? "rtl" : "ltr",
+              }}>
+              <span className="text-white/80">{text.left}</span>
+              <span className="text-white/80">{text.right}</span>
+            </div>
           </div>
         );
       })()}
