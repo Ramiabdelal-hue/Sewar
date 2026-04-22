@@ -57,11 +57,16 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
 
   useEffect(() => {
     if (lang === "nl") { setQText(originalText); setExpText(originalExplanation); return; }
-    setTranslating(true);
+    // نحافظ على النص الأصلي حتى تكتمل الترجمة
     Promise.all([
       translateOne(originalText, lang),
       translateOne(originalExplanation, lang),
-    ]).then(([q, e]) => { setQText(q); setExpText(e); }).finally(() => setTranslating(false));
+    ]).then(([q, e]) => {
+      setQText(q);
+      setExpText(e);
+      setTranslating(false);
+    });
+    setTranslating(true);
   }, [originalText, originalExplanation, lang]);
 
   const isRtl = lang === "ar";

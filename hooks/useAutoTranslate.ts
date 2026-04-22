@@ -46,14 +46,24 @@ export function useAutoTranslateList(texts: string[], targetLang: string) {
 
   useEffect(() => {
     if (!texts.length) { setTranslated([]); return; }
-    if (targetLang === "nl") { setTranslated(texts); return; }
+    if (targetLang === "nl") { setTranslated([...texts]); return; }
 
-    // أولاً أعرض النصوص الأصلية فوراً
-    setTranslated(texts);
+    // أعرض النصوص الأصلية فوراً للحفاظ على الترتيب
+    setTranslated([...texts]);
 
-    // ثم نترجم
-    Promise.all(texts.map(t => translateOne(t, targetLang)))
-      .then(results => setTranslated(results));
+    // ترجمة كل نص بشكل مستقل مع الحفاظ على الترتيب
+    const results = [...texts];
+    let pending = texts.length;
+
+    texts.forEach((text, index) => {
+      translateOne(text, targetLang).then(result => {
+        results[index] = result; // حفظ في نفس الموضع
+        pending--;
+        if (pending === 0) {
+          setTranslated([...results]); // تحديث واحد بعد اكتمال الكل
+        }
+      });
+    });
   }, [textsKey, targetLang]);
 
   return translated;
