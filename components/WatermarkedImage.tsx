@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useLang } from "@/context/LangContext";
 
 interface Props {
   src: string;
@@ -8,13 +9,30 @@ interface Props {
   style?: React.CSSProperties;
 }
 
-/**
- * يدمج الـ logo مع الصورة مباشرة عبر Canvas
- * بحيث لا يمكن إزالة الـ watermark من الـ DOM
- */
+const footerText: Record<string, { left: string; right: string }> = {
+  nl: {
+    left: "© Alle rechten voorbehouden · SewAr Verkeersschool",
+    right: "🛡 Origineel educatief materiaal · Wettelijk beschermd",
+  },
+  fr: {
+    left: "© Tous droits réservés · SewAr Verkeersschool",
+    right: "🛡 Contenu éducatif original · Protégé légalement",
+  },
+  ar: {
+    left: "© جميع الحقوق محفوظة · SewAr Verkeersschool",
+    right: "🛡 محتوى تعليمي أصلي محمي قانونياً",
+  },
+  en: {
+    left: "© All rights reserved · SewAr Verkeersschool",
+    right: "🛡 Original educational content · Legally protected",
+  },
+};
+
 export default function WatermarkedImage({ src, className, style }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [loaded, setLoaded] = useState(false);
+  const { lang } = useLang();
+  const ft = footerText[lang] || footerText.nl;
 
   useEffect(() => {
     if (!src) return;
@@ -39,20 +57,16 @@ export default function WatermarkedImage({ src, className, style }: Props) {
     const tryDraw = () => {
       if (!imgLoaded || !logoLoaded) return;
 
-      // ضبط حجم الـ canvas
       canvas.width = img.naturalWidth;
       canvas.height = img.naturalHeight;
 
-      // ارسم الصورة الأصلية
       ctx.drawImage(img, 0, 0);
 
-      // احسب حجم الـ logo (50% من عرض الصورة)
       const logoW = canvas.width * 0.5;
       const logoH = (logo.naturalHeight / logo.naturalWidth) * logoW;
       const logoX = (canvas.width - logoW) / 2;
       const logoY = (canvas.height - logoH) / 2;
 
-      // ارسم الـ logo مع rotation و opacity
       ctx.save();
       ctx.globalAlpha = 0.75;
       ctx.globalCompositeOperation = "screen";
@@ -67,7 +81,6 @@ export default function WatermarkedImage({ src, className, style }: Props) {
     img.onload = () => { imgLoaded = true; tryDraw(); };
     logo.onload = () => { logoLoaded = true; tryDraw(); };
 
-    // fallback إذا فشل تحميل الـ logo
     img.onerror = () => {
       canvas.width = 400;
       canvas.height = 300;
@@ -77,12 +90,29 @@ export default function WatermarkedImage({ src, className, style }: Props) {
   }, [src]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className={className}
-      style={{ display: loaded ? "block" : "none", ...style }}
-      onContextMenu={(e) => e.preventDefault()}
-      draggable={false}
-    />
+    <div className="relative select-none" onContextMenu={(e) => e.preventDefault()}>
+      <canvas
+        ref={canvasRef}
+        className={className}
+        style={{ display: loaded ? "block" : "none", width: "100%", ...style }}
+        draggable={false}
+      />
+      {/* شريط الحقوق أسفل الصورة */}
+      {loaded && (
+        <div
+          className="flex items-center justify-between px-2 py-1 text-white"
+          style={{
+            background: "linear-gradient(135deg, rgba(0,30,80,0.92), rgba(0,51,153,0.92))",
+            fontSize: "9px",
+            fontWeight: 700,
+            letterSpacing: "0.02em",
+            direction: lang === "ar" ? "rtl" : "ltr",
+          }}
+        >
+          <span className="flex items-center gap-1 opacity-90">{ft.left}</span>
+          <span className="flex items-center gap-1 opacity-90">{ft.right}</span>
+        </div>
+      )}
+    </div>
   );
 }
