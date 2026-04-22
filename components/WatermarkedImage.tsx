@@ -97,22 +97,6 @@ export default function WatermarkedImage({ src, className, style }: Props) {
         style={{ display: loaded ? "block" : "none", width: "100%", ...style }}
         draggable={false}
       />
-      {/* شريط الحقوق أسفل الصورة */}
-      {loaded && (
-        <div
-          className="flex items-center justify-between px-2 py-1 text-white"
-          style={{
-            background: "linear-gradient(135deg, rgba(0,30,80,0.92), rgba(0,51,153,0.92))",
-            fontSize: "9px",
-            fontWeight: 700,
-            letterSpacing: "0.02em",
-            direction: lang === "ar" ? "rtl" : "ltr",
-          }}
-        >
-          <span className="flex items-center gap-1 opacity-90">{ft.left}</span>
-          <span className="flex items-center gap-1 opacity-90">{ft.right}</span>
-        </div>
-      )}
     </div>
   );
 }

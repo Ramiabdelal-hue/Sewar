@@ -770,13 +770,11 @@ export default function AdminQuestionsPage() {
       let url = '';
       
       if (questionType === "Examen") {
-        // جلب كل أسئلة الامتحانات للـ category بدون فلتر lessonId
-        url = `/api/exam-questions?category=${category}&all=1`;
+        url = `/api/exam-questions?category=${category}&all=1&admin=1`;
       } else if (questionType === "Praktijk") {
-        url = `/api/praktijk/questions?lessonId=${lessonId}`;
+        url = `/api/praktijk/questions?lessonId=${lessonId}&admin=1`;
       } else {
-        // Theorie: جلب كل شروح الـ category بدون فلتر lessonId
-        url = `/api/questions?category=${category}&all=1`;
+        url = `/api/questions?category=${category}&all=1&admin=1`;
       }
       
       const res = await fetch(url);

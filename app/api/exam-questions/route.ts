@@ -40,14 +40,16 @@ export async function GET(request: NextRequest) {
     console.log(`🔍 Fetching exam questions for category ${category}${lessonIdNum ? ` lessonId ${lessonIdNum}` : " (all lessons)"}`);
 
     const where = lessonIdNum && !allLessons ? { lessonId: lessonIdNum } : {};
+    const isAdmin = searchParams.get("admin") === "1";
+    const order: "asc" | "desc" = isAdmin ? "desc" : "asc";
 
     let questions;
     if (category === "A") {
-      questions = await prisma.examQuestionA.findMany({ where, orderBy: { createdAt: 'desc' } });
+      questions = await prisma.examQuestionA.findMany({ where, orderBy: { createdAt: order } });
     } else if (category === "B") {
-      questions = await prisma.examQuestionB.findMany({ where, orderBy: { createdAt: 'desc' } });
+      questions = await prisma.examQuestionB.findMany({ where, orderBy: { createdAt: order } });
     } else if (category === "C") {
-      questions = await prisma.examQuestionC.findMany({ where, orderBy: { createdAt: 'desc' } });
+      questions = await prisma.examQuestionC.findMany({ where, orderBy: { createdAt: order } });
     }
 
     return NextResponse.json({ success: true, questions: questions || [] });

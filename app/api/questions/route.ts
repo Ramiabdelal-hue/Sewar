@@ -49,6 +49,8 @@ export async function GET(request: NextRequest) {
     }
 
     const lessonIdNum = lessonId ? parseInt(lessonId) : null;
+    const isAdmin = searchParams.get("admin") === "1";
+    const order = isAdmin ? "desc" : "asc";
 
     let category = categoryParam?.toUpperCase() || null;
     if (!category && lessonIdNum) {
@@ -63,9 +65,9 @@ export async function GET(request: NextRequest) {
     if (allLessons || !lessonIdNum) {
       console.log(`🔍 Fetching ALL questions for category ${category}`);
       let questions;
-      if (category === "A") questions = await prisma.questionA.findMany({ orderBy: { createdAt: 'desc' } });
-      else if (category === "B") questions = await prisma.questionB.findMany({ orderBy: { createdAt: 'desc' } });
-      else if (category === "C") questions = await prisma.questionC.findMany({ orderBy: { createdAt: 'desc' } });
+      if (category === "A") questions = await prisma.questionA.findMany({ orderBy: { createdAt: order } });
+      else if (category === "B") questions = await prisma.questionB.findMany({ orderBy: { createdAt: order } });
+      else if (category === "C") questions = await prisma.questionC.findMany({ orderBy: { createdAt: order } });
       return NextResponse.json({ success: true, questions: questions || [] });
     }
 
@@ -75,17 +77,17 @@ export async function GET(request: NextRequest) {
     if (category === "A") {
       lessonRecord = await prisma.lessonA.findUnique({
         where: { id: lessonIdNum },
-        include: { questions: { orderBy: { createdAt: 'desc' } } }
+        include: { questions: { orderBy: { createdAt: order } } }
       });
     } else if (category === "B") {
       lessonRecord = await prisma.lessonB.findUnique({
         where: { id: lessonIdNum },
-        include: { questions: { orderBy: { createdAt: 'desc' } } }
+        include: { questions: { orderBy: { createdAt: order } } }
       });
     } else if (category === "C") {
       lessonRecord = await prisma.lessonC.findUnique({
         where: { id: lessonIdNum },
-        include: { questions: { orderBy: { createdAt: 'desc' } } }
+        include: { questions: { orderBy: { createdAt: order } } }
       });
     }
 
