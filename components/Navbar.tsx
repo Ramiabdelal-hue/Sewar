@@ -307,22 +307,21 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
 
   useEffect(() => {
     const check = async () => {
-      if (checkingRef.current) return; // منع التشغيل المتزامن
+      if (checkingRef.current) return;
       checkingRef.current = true;
       try {
-      const userEmail = localStorage.getItem("userEmail");
-      if (!userEmail) {
-        setIsLoggedIn(false);
-        setDaysLeft(null);
-        setUserCategory(null);
-        setUserName(null);
-        return;
-      }
-      setIsLoggedIn(true);
-      setUserCategory(localStorage.getItem("userCategory"));
-      setUserName(localStorage.getItem("userName"));
+        const userEmail = localStorage.getItem("userEmail");
+        if (!userEmail) {
+          setIsLoggedIn(false);
+          setDaysLeft(null);
+          setUserCategory(null);
+          setUserName(null);
+          return;
+        }
+        setIsLoggedIn(true);
+        setUserCategory(localStorage.getItem("userCategory"));
+        setUserName(localStorage.getItem("userName"));
 
-      try {
         const sessionToken = localStorage.getItem("sessionToken") || undefined;
         const res = await fetch("/api/check-subscription", {
           method: "POST",
