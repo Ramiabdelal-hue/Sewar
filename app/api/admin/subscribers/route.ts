@@ -128,11 +128,41 @@ export async function GET(request: NextRequest) {
 
     // تحويل البيانات لعرض كل اشتراك على حدة
     const subscriptionRows: any[] = [];
+    
+    // جلب محاولات Screenshot لجميع المستخدمين
+    const allScreenshots = await prisma.activityLog.findMany({
+      where: {
+        eventType: 'screenshot_attempt',
+        userEmail: {
+          in: users.map((u: any) => u.email)
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    // تجميع محاولات Screenshot حسب البريد الإلكتروني
+    const screenshotsByEmail: Record<string, any[]> = {};
+    allScreenshots.forEach((log: any) => {
+      if (!screenshotsByEmail[log.userEmail]) {
+        screenshotsByEmail[log.userEmail] = [];
+      }
+      screenshotsByEmail[log.userEmail].push({
+        date: log.createdAt,
+        page: log.page || 'غير محدد',
+        ip: log.ip || 'unknown'
+      });
+    });
+
     users.forEach((user: any) => {
       if (user.subscriptions && user.subscriptions.length > 0) {
         user.subscriptions.forEach((sub: any) => {
           // حساب المبلغ بناءً على نوع الاشتراك
           const amount = packagePrices[sub.subscriptionType] || 25;
+          
+          // الحصول على محاولات Screenshot للمستخدم
+          const userScreenshots = screenshotsByEmail[user.email] || [];
           
           subscriptionRows.push({
             id: `${user.id}-${sub.id}`,
@@ -146,7 +176,11 @@ export async function GET(request: NextRequest) {
             category: sub.category,
             expiryDate: sub.expiryDate,
             createdAt: sub.createdAt,
-            isActive: sub.isActive
+            isActive: sub.isActive,
+            screenshotDetails: {
+              count: userScreenshots.length,
+              attempts: userScreenshots
+            }
           });
         });
       }
@@ -169,6 +203,11 @@ export async function GET(request: NextRequest) {
       categoryStats[row.category] = (categoryStats[row.category] || 0) + 1;
     });
 
+    // حساب المشتركين الذين لديهم أكثر من 3 محاولات screenshot
+    const suspiciousUsers = subscriptionRows.filter((row: any) => 
+      row.screenshotDetails && row.screenshotDetails.count > 3
+    );
+
     return NextResponse.json({
       success: true,
       data: {
@@ -178,6 +217,15 @@ export async function GET(request: NextRequest) {
           totalRevenue,
           categoryStats,
           totalSubscriptions: subscriptionRows.length
+        },
+        warnings: {
+          suspiciousScreenshots: suspiciousUsers.length,
+          suspiciousUsers: suspiciousUsers.map((u: any) => ({
+            name: u.name,
+            email: u.email,
+            phone: u.phone,
+            attempts: u.screenshotDetails.count
+          }))
         }
       }
     });

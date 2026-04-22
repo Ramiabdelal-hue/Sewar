@@ -17,6 +17,15 @@ interface SubscriptionRow {
   expiryDate: string;
   createdAt: string;
   isActive: boolean;
+  screenshotAttempts?: number;
+  screenshotDetails?: {
+    count: number;
+    attempts: Array<{
+      date: string;
+      page: string;
+      ip: string;
+    }>;
+  };
 }
 
 interface Stats {
@@ -24,6 +33,16 @@ interface Stats {
   totalRevenue: number;
   categoryStats: Record<string, number>;
   totalSubscriptions: number;
+}
+
+interface Warnings {
+  suspiciousScreenshots: number;
+  suspiciousUsers: Array<{
+    name: string;
+    email: string;
+    phone: string | null;
+    attempts: number;
+  }>;
 }
 
 interface ActivityStats {
@@ -44,10 +63,12 @@ export default function AdminSubscribersPage() {
   const [password, setPassword] = useState("");
   const [subscriptions, setSubscriptions] = useState<SubscriptionRow[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
+  const [warnings, setWarnings] = useState<Warnings | null>(null);
   const [loading, setLoading] = useState(false);
   const [availableNames, setAvailableNames] = useState<{name: string, email: string}[]>([]);
   const [activityStats, setActivityStats] = useState<ActivityStats | null>(null);
   const [activeTab, setActiveTab] = useState<"subscribers" | "activity" | "screenshots">("subscribers");
+  const [selectedUserScreenshots, setSelectedUserScreenshots] = useState<any>(null);
   
   // فلاتر البحث
   const [searchName, setSearchName] = useState("");
@@ -129,6 +150,7 @@ export default function AdminSubscribersPage() {
       if (data.success) {
         setSubscriptions(data.data.subscriptions);
         setStats(data.data.stats);
+        setWarnings(data.data.warnings);
       }
     } catch (error) {
       console.error("Error fetching subscribers:", error);
@@ -241,6 +263,46 @@ export default function AdminSubscribersPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* تحذير المحاولات المشبوهة */}
+        {warnings && warnings.suspiciousScreenshots > 0 && (
+          <div className="mb-6 bg-gradient-to-r from-red-500 to-red-600 rounded-2xl shadow-xl p-6 text-white animate-pulse">
+            <div className="flex items-start gap-4">
+              <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 text-3xl">
+                ⚠️
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-black mb-2 flex items-center gap-2">
+                  تحذير أمني: محاولات Screenshot مشبوهة
+                </h3>
+                <p className="text-white/90 mb-4">
+                  يوجد <span className="font-black text-2xl mx-1">{warnings.suspiciousScreenshots}</span> 
+                  مشترك حاولوا أخذ أكثر من 3 لقطات شاشة
+                </p>
+                <div className="bg-white/10 rounded-xl p-4 space-y-2">
+                  {warnings.suspiciousUsers.map((user, idx) => (
+                    <div key={idx} className="flex items-center justify-between bg-white/10 rounded-lg p-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-sm font-black">
+                          {user.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="font-bold">{user.name}</p>
+                          <p className="text-xs text-white/70">{user.email}</p>
+                          {user.phone && <p className="text-xs text-white/70">📱 {user.phone}</p>}
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-black">{user.attempts}</div>
+                        <div className="text-xs text-white/70">محاولة</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* تبويبات */}
         <div className="flex gap-2 mb-6">
           {[
@@ -569,6 +631,7 @@ export default function AdminSubscribersPage() {
                       <th className="px-4 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">تاريخ الانتهاء</th>
                       <th className="px-4 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">تاريخ الاشتراك</th>
                       <th className="px-4 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">الحالة</th>
+                      <th className="px-4 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">📸 Screenshots</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -627,6 +690,24 @@ export default function AdminSubscribersPage() {
                             {new Date(sub.expiryDate) > new Date() ? 'نشط' : 'منتهي'}
                           </span>
                         </td>
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          {sub.screenshotDetails && sub.screenshotDetails.count > 0 ? (
+                            <button
+                              onClick={() => setSelectedUserScreenshots(sub)}
+                              className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+                                sub.screenshotDetails.count > 3
+                                  ? 'bg-red-100 text-red-800 hover:bg-red-200 animate-pulse'
+                                  : 'bg-orange-100 text-orange-800 hover:bg-orange-200'
+                              }`}
+                            >
+                              <span className="text-base">📸</span>
+                              <span>{sub.screenshotDetails.count}</span>
+                              {sub.screenshotDetails.count > 3 && <span className="text-base">⚠️</span>}
+                            </button>
+                          ) : (
+                            <span className="text-gray-400 text-xs">-</span>
+                          )}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -638,6 +719,141 @@ export default function AdminSubscribersPage() {
         </div>
         )}
       </div>
+
+      {/* Modal لعرض تفاصيل محاولات Screenshot */}
+      {selectedUserScreenshots && (
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          onClick={() => setSelectedUserScreenshots(null)}
+        >
+          <div 
+            className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className={`p-6 border-b ${selectedUserScreenshots.screenshotDetails.count > 3 ? 'bg-red-50 border-red-200' : 'bg-orange-50 border-orange-200'}`}>
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-4">
+                  <div className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl ${selectedUserScreenshots.screenshotDetails.count > 3 ? 'bg-red-100' : 'bg-orange-100'}`}>
+                    📸
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-gray-800 flex items-center gap-2">
+                      محاولات Screenshot
+                      {selectedUserScreenshots.screenshotDetails.count > 3 && (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-500 text-white rounded-lg text-xs animate-pulse">
+                          ⚠️ تحذير
+                        </span>
+                      )}
+                    </h3>
+                    <p className="text-sm text-gray-600 mt-1">
+                      <span className="font-bold">{selectedUserScreenshots.screenshotDetails.count}</span> محاولة مسجلة
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedUserScreenshots(null)}
+                  className="text-gray-400 hover:text-gray-600 transition"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* معلومات المشترك */}
+            <div className="p-6 bg-gray-50 border-b">
+              <h4 className="text-sm font-bold text-gray-600 mb-3">معلومات المشترك</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white rounded-lg p-3">
+                  <p className="text-xs text-gray-500 mb-1">الاسم</p>
+                  <p className="font-bold text-gray-800">{selectedUserScreenshots.name}</p>
+                </div>
+                <div className="bg-white rounded-lg p-3">
+                  <p className="text-xs text-gray-500 mb-1">البريد الإلكتروني</p>
+                  <p className="font-bold text-gray-800 text-sm">{selectedUserScreenshots.email}</p>
+                </div>
+                <div className="bg-white rounded-lg p-3">
+                  <p className="text-xs text-gray-500 mb-1">رقم الهاتف</p>
+                  <p className="font-bold text-gray-800">{selectedUserScreenshots.phone || 'غير متوفر'}</p>
+                </div>
+                <div className="bg-white rounded-lg p-3">
+                  <p className="text-xs text-gray-500 mb-1">نوع الاشتراك</p>
+                  <p className="font-bold text-gray-800">{getPackageLabel(selectedUserScreenshots.subscriptionType)}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* قائمة المحاولات */}
+            <div className="p-6 max-h-96 overflow-y-auto">
+              <h4 className="text-sm font-bold text-gray-600 mb-4">تفاصيل المحاولات</h4>
+              <div className="space-y-3">
+                {selectedUserScreenshots.screenshotDetails.attempts.map((attempt: any, idx: number) => (
+                  <div 
+                    key={idx} 
+                    className={`p-4 rounded-xl border-2 ${
+                      idx < 3 ? 'bg-orange-50 border-orange-200' : 'bg-red-50 border-red-200'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0 ${
+                        idx < 3 ? 'bg-orange-200 text-orange-800' : 'bg-red-200 text-red-800'
+                      }`}>
+                        {idx + 1}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-xs font-bold text-gray-800">
+                            {new Date(attempt.date).toLocaleString('ar-EG', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              second: '2-digit'
+                            })}
+                          </span>
+                          {idx >= 3 && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-500 text-white rounded text-xs font-bold">
+                              ⚠️ مشبوه
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-gray-600">
+                          <span className="flex items-center gap-1">
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M4.083 9h1.946c.089-1.546.383-2.97.837-4.118A6.004 6.004 0 004.083 9zM10 2a8 8 0 100 16 8 8 0 000-16zm0 2c-.076 0-.232.032-.465.262-.238.234-.497.623-.737 1.182-.389.907-.673 2.142-.766 3.556h3.936c-.093-1.414-.377-2.649-.766-3.556-.24-.56-.5-.948-.737-1.182C10.232 4.032 10.076 4 10 4zm3.971 5c-.089-1.546-.383-2.97-.837-4.118A6.004 6.004 0 0115.917 9h-1.946zm-2.003 2H8.032c.093 1.414.377 2.649.766 3.556.24.56.5.948.737 1.182.233.23.389.262.465.262.076 0 .232-.032.465-.262.238-.234.498-.623.737-1.182.389-.907.673-2.142.766-3.556zm1.166 4.118c.454-1.147.748-2.572.837-4.118h1.946a6.004 6.004 0 01-2.783 4.118zm-6.268 0C6.412 13.97 6.118 12.546 6.03 11H4.083a6.004 6.004 0 002.783 4.118z" clipRule="evenodd" />
+                            </svg>
+                            {attempt.page}
+                          </span>
+                          <span className="text-gray-400">•</span>
+                          <span className="flex items-center gap-1">
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                            </svg>
+                            IP: {attempt.ip}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-6 bg-gray-50 border-t">
+              <button
+                onClick={() => setSelectedUserScreenshots(null)}
+                className="w-full px-6 py-3 bg-gray-800 text-white rounded-xl font-bold hover:bg-gray-900 transition"
+              >
+                إغلاق
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

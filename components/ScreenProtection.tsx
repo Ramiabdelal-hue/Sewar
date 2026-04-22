@@ -12,6 +12,26 @@ export default function ScreenProtection() {
     if (overlayRef.current) overlayRef.current.style.display = "none";
   };
 
+  // دالة لتسجيل محاولة Screenshot
+  const logScreenshotAttempt = async () => {
+    try {
+      const userEmail = localStorage.getItem("userEmail");
+      const currentPage = window.location.pathname;
+      
+      await fetch("/api/activity", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userEmail: userEmail || null,
+          eventType: "screenshot_attempt",
+          page: currentPage
+        })
+      });
+    } catch (error) {
+      console.error("Failed to log screenshot attempt:", error);
+    }
+  };
+
   useEffect(() => {
     // ── 1. منع Right-click ─────────────────────────────────────────────────
     const noContext = (e: MouseEvent) => e.preventDefault();
@@ -33,6 +53,7 @@ export default function ScreenProtection() {
       if (e.key === "PrintScreen" || e.keyCode === 44) {
         e.preventDefault();
         showOverlay();
+        logScreenshotAttempt(); // تسجيل المحاولة
         navigator.clipboard?.writeText("").catch(() => {});
         setTimeout(hideOverlay, 2000);
         return false;
@@ -54,6 +75,7 @@ export default function ScreenProtection() {
     const onKeyUp = (e: KeyboardEvent) => {
       if (e.key === "PrintScreen" || e.keyCode === 44) {
         showOverlay();
+        logScreenshotAttempt(); // تسجيل المحاولة
         navigator.clipboard?.writeText("").catch(() => {});
         setTimeout(hideOverlay, 2000);
       }
@@ -66,6 +88,7 @@ export default function ScreenProtection() {
     const onVisibility = () => {
       if (document.hidden) {
         showOverlay();
+        logScreenshotAttempt(); // تسجيل المحاولة
       } else {
         setTimeout(hideOverlay, 400);
       }
