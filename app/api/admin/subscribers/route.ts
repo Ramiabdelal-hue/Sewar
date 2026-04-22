@@ -113,7 +113,8 @@ export async function GET(request: NextRequest) {
       } as any,
       orderBy: {
         createdAt: 'desc'
-      }
+      },
+      // نجلب status أيضاً
     });
 
     console.log("📊 Found users:", users.length);
@@ -177,6 +178,7 @@ export async function GET(request: NextRequest) {
             expiryDate: sub.expiryDate,
             createdAt: sub.createdAt,
             isActive: sub.isActive,
+            userStatus: user.status,
             screenshotDetails: {
               count: userScreenshots.length,
               attempts: userScreenshots

@@ -277,6 +277,9 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
   const [showPWAModal, setShowPWAModal] = useState(false);
   const [userCategory, setUserCategory] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
+  const [isSuspended, setIsSuspended] = useState(false);
+  const [screenshotWarning, setScreenshotWarning] = useState(false);
+  const [screenshotCount, setScreenshotCount] = useState(0);
 
   // PWA install prompt listener
   useEffect(() => {
@@ -337,11 +340,26 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
           return;
         }
 
+        // ── حساب معلق ──────────────────────────────────────────────────────
+        if (data.suspended) {
+          setIsSuspended(true);
+          return;
+        }
+        setIsSuspended(false);
+
         if (data.success && data.user?.expiryDate) {
           // حفظ اسم المستخدم
           if (data.user.name) {
             localStorage.setItem("userName", data.user.name);
             setUserName(data.user.name);
+          }
+
+          // تحذير Screenshot
+          if (data.screenshotAttempts > 3) {
+            setScreenshotWarning(true);
+            setScreenshotCount(data.screenshotAttempts);
+          } else {
+            setScreenshotWarning(false);
           }
 
           // أخذ أقرب تاريخ انتهاء من بين كل الاشتراكات النشطة
@@ -576,6 +594,70 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
       {/* Modals */}
       {showLoginModal && <LoginModal lang={lang} onClose={() => setShowLoginModal(false)} />}
       {showPWAModal && <PWAModal lang={lang} onClose={() => setShowPWAModal(false)} />}
+
+      {/* ── بانر: حساب معلق ─────────────────────────────────────────────── */}
+      {isSuspended && (
+        <div
+          dir={lang === "ar" ? "rtl" : "ltr"}
+          style={{
+            background: "linear-gradient(135deg,#7c3aed,#5b21b6)",
+            color: "#fff",
+            padding: "14px 20px",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            fontSize: "14px",
+            fontWeight: "700",
+            flexWrap: "wrap",
+          }}
+        >
+          <span style={{ fontSize: "22px" }}>🔒</span>
+          <span style={{ flex: 1 }}>
+            {lang === "ar"
+              ? "تم تعليق اشتراكك مؤقتاً من قِبل المشرف. للاستفسار تواصل معنا على sewarrijbewijs@gmail.com"
+              : lang === "nl"
+              ? "Uw abonnement is tijdelijk opgeschort door de beheerder. Neem contact op via sewarrijbewijs@gmail.com"
+              : lang === "fr"
+              ? "Votre abonnement a été temporairement suspendu. Contactez-nous à sewarrijbewijs@gmail.com"
+              : "Your subscription has been temporarily suspended. Contact us at sewarrijbewijs@gmail.com"}
+          </span>
+        </div>
+      )}
+
+      {/* ── بانر: تحذير Screenshot ──────────────────────────────────────── */}
+      {screenshotWarning && !isSuspended && (
+        <div
+          dir={lang === "ar" ? "rtl" : "ltr"}
+          style={{
+            background: "linear-gradient(135deg,#dc2626,#b91c1c)",
+            color: "#fff",
+            padding: "12px 20px",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            fontSize: "13px",
+            fontWeight: "700",
+            flexWrap: "wrap",
+          }}
+        >
+          <span style={{ fontSize: "20px" }}>⚠️</span>
+          <span style={{ flex: 1 }}>
+            {lang === "ar"
+              ? `تحذير: تم رصد ${screenshotCount} محاولة لأخذ لقطات شاشة على حسابك. تكرار ذلك قد يؤدي إلى تعليق اشتراكك.`
+              : lang === "nl"
+              ? `Waarschuwing: Er zijn ${screenshotCount} schermafbeeldingspogingen gedetecteerd op uw account. Herhaling kan leiden tot opschorting.`
+              : lang === "fr"
+              ? `Avertissement: ${screenshotCount} tentatives de capture d'écran détectées. La répétition peut entraîner la suspension.`
+              : `Warning: ${screenshotCount} screenshot attempts detected on your account. Repeated attempts may lead to suspension.`}
+          </span>
+          <button
+            onClick={() => setScreenshotWarning(false)}
+            style={{ background: "rgba(255,255,255,0.2)", border: "none", color: "#fff", borderRadius: "6px", padding: "4px 10px", cursor: "pointer", fontWeight: "900", fontSize: "14px" }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </>
   );
 }

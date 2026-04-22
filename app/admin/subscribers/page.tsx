@@ -17,6 +17,7 @@ interface SubscriptionRow {
   expiryDate: string;
   createdAt: string;
   isActive: boolean;
+  userStatus?: string;
   screenshotAttempts?: number;
   screenshotDetails?: {
     count: number;
@@ -69,12 +70,16 @@ export default function AdminSubscribersPage() {
   const [activityStats, setActivityStats] = useState<ActivityStats | null>(null);
   const [activeTab, setActiveTab] = useState<"subscribers" | "activity" | "screenshots">("subscribers");
   const [selectedUserScreenshots, setSelectedUserScreenshots] = useState<any>(null);
-  const [smsSending, setSmsSending] = useState(false);
-  const [smsResult, setSmsResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [emailSending, setEmailSending] = useState(false);
+  const [emailResult, setEmailResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [suspendLoading, setSuspendLoading] = useState<string | null>(null); // email of user being suspended
+  const [suspendResult, setSuspendResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [showSuspendModal, setShowSuspendModal] = useState<any>(null); // user object
+  const [suspendReason, setSuspendReason] = useState("");
 
-  const sendWarningSMS = async (email: string) => {
-    setSmsSending(true);
-    setSmsResult(null);
+  const sendWarningEmail = async (email: string) => {
+    setEmailSending(true);
+    setEmailResult(null);
     try {
       const res = await fetch("/api/admin/send-warning", {
         method: "POST",
@@ -82,11 +87,43 @@ export default function AdminSubscribersPage() {
         body: JSON.stringify({ userEmail: email }),
       });
       const data = await res.json();
-      setSmsResult({ success: data.success, message: data.message });
+      setEmailResult({ success: data.success, message: data.message });
     } catch {
-      setSmsResult({ success: false, message: "خطأ في الاتصال بالخادم" });
+      setEmailResult({ success: false, message: "خطأ في الاتصال بالخادم" });
     } finally {
-      setSmsSending(false);
+      setEmailSending(false);
+    }
+  };
+
+  const suspendUser = async (email: string, action: "suspend" | "unsuspend") => {
+    setSuspendLoading(email);
+    setSuspendResult(null);
+    try {
+      const res = await fetch("/api/admin/suspend-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userEmail: email, action, reason: suspendReason }),
+      });
+      const data = await res.json();
+      setSuspendResult({ success: data.success, message: data.message });
+      if (data.success) {
+        // تحديث حالة المشترك في القائمة محلياً
+        setSubscriptions(prev =>
+          prev.map(s =>
+            s.email === email
+              ? { ...s, isActive: action === "unsuspend" }
+              : s
+          )
+        );
+        setShowSuspendModal(null);
+        setSuspendReason("");
+        // إعادة تحميل البيانات
+        setTimeout(fetchSubscribers, 500);
+      }
+    } catch {
+      setSuspendResult({ success: false, message: "خطأ في الاتصال بالخادم" });
+    } finally {
+      setSuspendLoading(null);
     }
   };
   
@@ -318,12 +355,12 @@ export default function AdminSubscribersPage() {
                         </div>
                         {user.phone && (
                           <button
-                            onClick={() => sendWarningSMS(user.email)}
-                            disabled={smsSending}
+                            onClick={() => sendWarningEmail(user.email)}
+                            disabled={emailSending}
                             className="flex items-center gap-1 px-3 py-2 bg-white text-red-600 rounded-lg text-xs font-black hover:bg-red-50 transition disabled:opacity-60"
                           >
-                            <span>📱</span>
-                            <span>SMS</span>
+                            <span>📧</span>
+                            <span>إيميل</span>
                           </button>
                         )}
                       </div>
@@ -664,6 +701,7 @@ export default function AdminSubscribersPage() {
                       <th className="px-4 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">تاريخ الاشتراك</th>
                       <th className="px-4 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">الحالة</th>
                       <th className="px-4 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">📸 Screenshots</th>
+                      <th className="px-4 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">⚙️ إجراءات</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -739,6 +777,30 @@ export default function AdminSubscribersPage() {
                           ) : (
                             <span className="text-gray-400 text-xs">-</span>
                           )}
+                        </td>
+                        {/* عمود الإجراءات */}
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            {sub.userStatus === "suspended" ? (
+                              <button
+                                onClick={() => setShowSuspendModal({ ...sub, action: "unsuspend" })}
+                                disabled={suspendLoading === sub.email}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-green-100 text-green-800 hover:bg-green-200 transition disabled:opacity-60"
+                              >
+                                <span>✅</span>
+                                <span>رفع التعليق</span>
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => setShowSuspendModal({ ...sub, action: "suspend" })}
+                                disabled={suspendLoading === sub.email}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-100 text-purple-800 hover:bg-purple-200 transition disabled:opacity-60"
+                              >
+                                <span>🔒</span>
+                                <span>تعليق</span>
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -877,51 +939,149 @@ export default function AdminSubscribersPage() {
             {/* Footer */}
             <div className="p-6 bg-gray-50 border-t">
               <div className="flex flex-col gap-3">
-                {/* نتيجة إرسال SMS */}
-                {smsResult && (
+                {/* نتيجة إرسال الإيميل */}
+                {emailResult && (
                   <div className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold ${
-                    smsResult.success
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
+                    emailResult.success ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
                   }`}>
-                    <span>{smsResult.success ? "✅" : "❌"}</span>
-                    <span>{smsResult.message}</span>
+                    <span>{emailResult.success ? "✅" : "❌"}</span>
+                    <span>{emailResult.message}</span>
                   </div>
                 )}
                 <div className="flex gap-3">
-                  {/* زر إرسال SMS تحذيري */}
-                  {selectedUserScreenshots.phone ? (
-                    <button
-                      onClick={() => sendWarningSMS(selectedUserScreenshots.email)}
-                      disabled={smsSending}
-                      className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold hover:from-orange-600 hover:to-red-600 transition disabled:opacity-60 disabled:cursor-not-allowed"
-                    >
-                      {smsSending ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          <span>جاري الإرسال...</span>
-                        </>
-                      ) : (
-                        <>
-                          <span className="text-lg">📱</span>
-                          <span>إرسال SMS تحذيري</span>
-                        </>
-                      )}
-                    </button>
-                  ) : (
-                    <div className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gray-200 text-gray-500 rounded-xl font-bold cursor-not-allowed">
-                      <span className="text-lg">📵</span>
-                      <span>لا يوجد رقم هاتف</span>
-                    </div>
-                  )}
+                  {/* زر إرسال إيميل تحذيري */}
                   <button
-                    onClick={() => { setSelectedUserScreenshots(null); setSmsResult(null); }}
+                    onClick={() => sendWarningEmail(selectedUserScreenshots.email)}
+                    disabled={emailSending}
+                    className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold hover:from-orange-600 hover:to-red-600 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {emailSending ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>جاري الإرسال...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-lg">📧</span>
+                        <span>إرسال إيميل تحذيري</span>
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => { setSelectedUserScreenshots(null); setEmailResult(null); }}
                     className="px-6 py-3 bg-gray-800 text-white rounded-xl font-bold hover:bg-gray-900 transition"
                   >
                     إغلاق
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Modal تأكيد التعليق / رفع التعليق */}
+      {showSuspendModal && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          onClick={() => { setShowSuspendModal(null); setSuspendReason(""); setSuspendResult(null); }}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className={`p-6 ${showSuspendModal.action === "suspend" ? "bg-purple-600" : "bg-green-600"}`}>
+              <div className="flex items-center gap-3">
+                <span className="text-4xl">{showSuspendModal.action === "suspend" ? "🔒" : "✅"}</span>
+                <div>
+                  <h3 className="text-xl font-black text-white">
+                    {showSuspendModal.action === "suspend" ? "تعليق الاشتراك مؤقتاً" : "رفع التعليق"}
+                  </h3>
+                  <p className="text-white/80 text-sm mt-1">{showSuspendModal.name}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="p-6">
+              <div className="bg-gray-50 rounded-xl p-4 mb-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">الاسم</span>
+                  <span className="font-bold">{showSuspendModal.name}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">البريد</span>
+                  <span className="font-bold text-blue-600">{showSuspendModal.email}</span>
+                </div>
+                {showSuspendModal.phone && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">الهاتف</span>
+                    <span className="font-bold">{showSuspendModal.phone}</span>
+                  </div>
+                )}
+              </div>
+
+              {showSuspendModal.action === "suspend" && (
+                <>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    سبب التعليق (اختياري - سيُرسل في الإيميل)
+                  </label>
+                  <textarea
+                    value={suspendReason}
+                    onChange={(e) => setSuspendReason(e.target.value)}
+                    placeholder="مثال: محاولات متكررة لأخذ لقطات شاشة..."
+                    rows={3}
+                    className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none text-sm resize-none"
+                  />
+                  <p className="text-xs text-gray-500 mt-2">
+                    ⚠️ سيتم إرسال إيميل إشعار للمشترك وإجباره على تسجيل الخروج فوراً
+                  </p>
+                </>
+              )}
+
+              {showSuspendModal.action === "unsuspend" && (
+                <p className="text-sm text-gray-600 bg-green-50 rounded-xl p-3">
+                  ✅ سيتم رفع التعليق وإعادة تفعيل الاشتراك فوراً
+                </p>
+              )}
+
+              {/* نتيجة العملية */}
+              {suspendResult && (
+                <div className={`mt-3 flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold ${
+                  suspendResult.success ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                }`}>
+                  <span>{suspendResult.success ? "✅" : "❌"}</span>
+                  <span>{suspendResult.message}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="p-6 bg-gray-50 border-t flex gap-3">
+              <button
+                onClick={() => suspendUser(showSuspendModal.email, showSuspendModal.action)}
+                disabled={suspendLoading === showSuspendModal.email}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-black text-white transition disabled:opacity-60 ${
+                  showSuspendModal.action === "suspend"
+                    ? "bg-purple-600 hover:bg-purple-700"
+                    : "bg-green-600 hover:bg-green-700"
+                }`}
+              >
+                {suspendLoading === showSuspendModal.email ? (
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <span>{showSuspendModal.action === "suspend" ? "🔒" : "✅"}</span>
+                    <span>{showSuspendModal.action === "suspend" ? "تأكيد التعليق" : "تأكيد رفع التعليق"}</span>
+                  </>
+                )}
+              </button>
+              <button
+                onClick={() => { setShowSuspendModal(null); setSuspendReason(""); setSuspendResult(null); }}
+                className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300 transition"
+              >
+                إلغاء
+              </button>
             </div>
           </div>
         </div>

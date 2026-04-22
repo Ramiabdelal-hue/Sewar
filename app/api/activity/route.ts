@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { sendScreenshotWarningSMS } from "@/lib/sms";
+import { sendScreenshotWarningEmail } from "@/lib/email";
 
-// الحد الأقصى لمحاولات Screenshot قبل إرسال تحذير SMS
-const SMS_WARNING_THRESHOLD = 3;
+// الحد الأقصى لمحاولات Screenshot قبل إرسال تحذير بالإيميل
+const EMAIL_WARNING_THRESHOLD = 3;
 
 // POST - تسجيل نشاط
 export async function POST(request: NextRequest) {
@@ -27,39 +27,25 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // ── إرسال SMS تحذيري عند تجاوز الحد ──────────────────────────────────
+    // ── إرسال إيميل تحذيري عند تجاوز الحد ──────────────────────────────────
     if (eventType === "screenshot_attempt" && userEmail) {
-      // عد إجمالي محاولات هذا المستخدم
       const totalAttempts = await prisma.activityLog.count({
-        where: {
-          userEmail,
-          eventType: "screenshot_attempt",
-        },
+        where: { userEmail, eventType: "screenshot_attempt" },
       });
 
-      // أرسل SMS فقط عند الوصول للحد بالضبط (لتجنب إرسال رسائل متكررة)
-      // مثلاً: عند المحاولة رقم 4، 7، 10 ... (كل 3 محاولات إضافية)
-      if (totalAttempts > SMS_WARNING_THRESHOLD &&
-          (totalAttempts - SMS_WARNING_THRESHOLD) % 3 === 1) {
-        // جلب بيانات المستخدم
+      // أرسل إيميل عند المحاولة رقم 4، ثم كل 3 محاولات إضافية (7، 10، ...)
+      if (
+        totalAttempts > EMAIL_WARNING_THRESHOLD &&
+        (totalAttempts - EMAIL_WARNING_THRESHOLD) % 3 === 1
+      ) {
         const user = await prisma.user.findUnique({
           where: { email: userEmail },
-          select: { name: true, phone: true },
+          select: { name: true, email: true },
         });
 
-        if (user?.phone) {
-          // إرسال SMS في الخلفية (لا ننتظر النتيجة لتسريع الاستجابة)
-          sendScreenshotWarningSMS(user.phone, user.name, totalAttempts)
-            .then((result) => {
-              if (result.success) {
-                console.log(`📱 Warning SMS sent to ${user.name} (${userEmail}) - ${totalAttempts} attempts`);
-              } else {
-                console.error(`❌ SMS failed for ${userEmail}:`, result.error);
-              }
-            })
-            .catch(console.error);
-        } else {
-          console.warn(`⚠️ No phone number for user ${userEmail} - SMS skipped`);
+        if (user) {
+          // إرسال في الخلفية لتسريع الاستجابة
+          sendScreenshotWarningEmail(user.email, user.name, totalAttempts).catch(console.error);
         }
       }
     }
