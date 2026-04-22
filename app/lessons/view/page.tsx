@@ -396,7 +396,7 @@ function LessonViewContent() {
               <span className="text-white text-xs">📚</span>
             </div>
             <p className="text-sm font-black text-[#003399] flex-1 truncate">{translatedLessonTitle}</p>
-            <span className="text-xs font-bold text-[#003399]/50 flex-shrink-0">{filteredQuestions.length} {lang === "ar" ? "شرح" : lang === "nl" ? "lessen" : lang === "fr" ? "leçons" : "lessons"}</span>
+            <span className="text-xs font-bold text-[#003399]/50 flex-shrink-0">{filteredQuestions.length} {lang === "ar" ? "شرح" : lang === "nl" ? "uitleggen" : lang === "fr" ? "leçons" : "lessons"}</span>
           </div>
 
           {/* كل أسئلة الدرس معاً */}
