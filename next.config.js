@@ -39,7 +39,7 @@ const nextConfig = {
   },
   
   poweredByHeader: false,
-  reactStrictMode: true,
+  reactStrictMode: false,
 };
 
 module.exports = nextConfig;

@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 
 export default function ScreenProtection() {
   const overlayRef = useRef<HTMLDivElement>(null);
+  const registeredRef = useRef(false); // منع تسجيل الـ listeners مرتين
 
   const showOverlay = () => {
     if (overlayRef.current) overlayRef.current.style.display = "flex";
@@ -12,7 +13,6 @@ export default function ScreenProtection() {
     if (overlayRef.current) overlayRef.current.style.display = "none";
   };
 
-  // تسجيل محاولة Screenshot الحقيقية فقط
   const logScreenshotAttempt = async () => {
     try {
       const userEmail = localStorage.getItem("userEmail");
@@ -29,40 +29,32 @@ export default function ScreenProtection() {
   };
 
   useEffect(() => {
-    // ── 1. منع Right-click ────────────────────────────────────────────────
+    if (registeredRef.current) return;
+    registeredRef.current = true;
+
     const noContext = (e: MouseEvent) => e.preventDefault();
     document.addEventListener("contextmenu", noContext);
 
-    // ── 2. منع تحديد النص ────────────────────────────────────────────────
     const noSelect = (e: Event) => e.preventDefault();
     document.addEventListener("selectstart", noSelect);
 
-    // ── 3. منع Drag ──────────────────────────────────────────────────────
     const noDrag = (e: DragEvent) => e.preventDefault();
     document.addEventListener("dragstart", noDrag);
 
-    // ── 4. مفاتيح الحماية ────────────────────────────────────────────────
-    // نستخدم keydown فقط (ليس keyup) لتجنب التسجيل مرتين
     const onKeyDown = (e: KeyboardEvent) => {
       const ctrl = e.ctrlKey || e.metaKey;
 
-      // Print Screen - التسجيل هنا فقط (keydown)
       if (e.key === "PrintScreen" || e.keyCode === 44) {
         e.preventDefault();
         showOverlay();
-        logScreenshotAttempt(); // ← مرة واحدة فقط
+        logScreenshotAttempt();
         navigator.clipboard?.writeText("").catch(() => {});
         setTimeout(hideOverlay, 2000);
         return;
       }
-
-      // Ctrl+P طباعة
       if (ctrl && e.key === "p") { e.preventDefault(); return; }
-      // Ctrl+S حفظ
       if (ctrl && e.key === "s") { e.preventDefault(); return; }
-      // Ctrl+U مصدر الصفحة
       if (ctrl && e.key === "u") { e.preventDefault(); return; }
-      // F12 / DevTools
       if (e.key === "F12") { e.preventDefault(); return; }
       if (ctrl && e.shiftKey && ["i","I","j","J","c","C"].includes(e.key)) {
         e.preventDefault(); return;
@@ -71,30 +63,13 @@ export default function ScreenProtection() {
 
     document.addEventListener("keydown", onKeyDown);
 
-    // ── 5. منع الطباعة عبر CSS ───────────────────────────────────────────
     const printStyle = document.createElement("style");
     printStyle.id = "__no-print__";
-    printStyle.textContent = `
-      @media print {
-        body * { visibility: hidden !important; }
-        body::after {
-          content: "🔒 هذا المحتوى محمي ولا يمكن طباعته";
-          visibility: visible !important;
-          position: fixed; top: 50%; left: 50%;
-          transform: translate(-50%, -50%);
-          font-size: 24px; font-weight: 900; color: #003399;
-        }
-      }
-    `;
+    printStyle.textContent = `@media print { body * { visibility: hidden !important; } }`;
     document.head.appendChild(printStyle);
 
-    return () => {
-      document.removeEventListener("contextmenu", noContext);
-      document.removeEventListener("selectstart", noSelect);
-      document.removeEventListener("dragstart", noDrag);
-      document.removeEventListener("keydown", onKeyDown);
-      document.getElementById("__no-print__")?.remove();
-    };
+    // لا نُزيل الـ listeners عند unmount لأن StrictMode يُزيل ويُعيد mount
+    // الـ registeredRef يمنع التسجيل مرتين
   }, []);
 
   return (

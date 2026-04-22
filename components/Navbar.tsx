@@ -281,8 +281,7 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
   const [screenshotWarning, setScreenshotWarning] = useState(false);
   const [screenshotCount, setScreenshotCount] = useState(0);
   const checkingRef = useRef(false);
-  // نحفظ عدد المحاولات المعروض لتجنب إعادة الرسم عند كل check
-  const shownCountRef = useRef(0);
+  const hasCheckedRef = useRef(false); // منع التشغيل عند mount مرتين (StrictMode)
 
   // PWA install prompt listener
   useEffect(() => {
@@ -307,6 +306,10 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
   };
 
   useEffect(() => {
+    // منع التشغيل مرتين في React StrictMode
+    if (hasCheckedRef.current) return;
+    hasCheckedRef.current = true;
+
     const check = async () => {
       if (checkingRef.current) return;
       checkingRef.current = true;
@@ -345,7 +348,6 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
           return;
         }
 
-        // ── حساب معلق ──────────────────────────────────────────────────────
         if (data.suspended) {
           setIsSuspended(true);
           return;
@@ -353,25 +355,18 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
         setIsSuspended(false);
 
         if (data.success && data.user?.expiryDate) {
-          // حفظ اسم المستخدم
           if (data.user.name) {
             localStorage.setItem("userName", data.user.name);
             setUserName(data.user.name);
           }
 
-          // تحذير Screenshot - فقط إذا تغيّر العدد لتجنب إعادة الرسم
           const attempts = data.screenshotAttempts || 0;
-          if (attempts > 3 && attempts !== shownCountRef.current) {
-            shownCountRef.current = attempts;
+          if (attempts > 3) {
             setScreenshotWarning(true);
             setScreenshotCount(attempts);
-          } else if (attempts <= 3) {
-            setScreenshotWarning(false);
           }
 
-          // أخذ أقرب تاريخ انتهاء من بين كل الاشتراكات النشطة
           let earliestExpiry = new Date(data.user.expiryDate).getTime();
-
           if (data.subscriptions && data.subscriptions.length > 0) {
             for (const sub of data.subscriptions) {
               const subExpiry = new Date(sub.expiryDate).getTime();
@@ -397,16 +392,16 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
 
     check();
     const interval = setInterval(check, 60 * 60 * 1000);
-    window.addEventListener("userLoggedIn", check);
-    // storage event: فقط عند تغيير userEmail (login/logout) وليس كل تغيير
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === "userEmail") check();
+
+    const onLogin = () => {
+      hasCheckedRef.current = false;
+      check();
     };
-    window.addEventListener("storage", onStorage);
+    window.addEventListener("userLoggedIn", onLogin);
+
     return () => {
       clearInterval(interval);
-      window.removeEventListener("userLoggedIn", check);
-      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("userLoggedIn", onLogin);
     };
   }, []);
 
