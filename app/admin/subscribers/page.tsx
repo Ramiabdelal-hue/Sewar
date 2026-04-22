@@ -341,6 +341,7 @@ export default function AdminSubscribersPage() {
           <div>
           {/* Statistics Cards */}
           {stats && (
+            <div className="grid md:grid-cols-3 gap-6 mb-8">
             <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-xl p-6 text-white">
               <div className="flex items-center justify-between mb-4">
                 <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
@@ -634,6 +635,8 @@ export default function AdminSubscribersPage() {
             </div>
           )}
         </div>
+        </div>
+        )}
       </div>
     </div>
   );
