@@ -26,6 +26,17 @@ interface Stats {
   totalSubscriptions: number;
 }
 
+interface ActivityStats {
+  todayVisitors: number;
+  todayLoggedIn: number;
+  weekVisitors: number;
+  totalUniqueVisitors: number;
+  screenshotAttempts: number;
+  topPages: { page: string; count: number }[];
+  recentActivity: any[];
+  recentScreenshots: any[];
+}
+
 export default function AdminSubscribersPage() {
   const router = useRouter();
   const [isLogged, setIsLogged] = useState(false);
@@ -35,6 +46,8 @@ export default function AdminSubscribersPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(false);
   const [availableNames, setAvailableNames] = useState<{name: string, email: string}[]>([]);
+  const [activityStats, setActivityStats] = useState<ActivityStats | null>(null);
+  const [activeTab, setActiveTab] = useState<"subscribers" | "activity" | "screenshots">("subscribers");
   
   // فلاتر البحث
   const [searchName, setSearchName] = useState("");
@@ -57,8 +70,17 @@ export default function AdminSubscribersPage() {
   useEffect(() => {
     if (isLogged) {
       fetchAvailableNames();
+      fetchActivityStats();
     }
   }, [isLogged]);
+
+  const fetchActivityStats = async () => {
+    try {
+      const res = await fetch("/api/activity");
+      const data = await res.json();
+      if (data.success) setActivityStats(data.stats);
+    } catch {}
+  };
 
   const fetchAvailableNames = async () => {
     try {
@@ -219,9 +241,106 @@ export default function AdminSubscribersPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Statistics Cards */}
-        {stats && (
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
+        {/* تبويبات */}
+        <div className="flex gap-2 mb-6">
+          {[
+            { key: "subscribers", label: "👥 المشتركون" },
+            { key: "activity", label: "📊 الزوار والنشاط" },
+            { key: "screenshots", label: "📸 محاولات Screenshot" },
+          ].map(tab => (
+            <button key={tab.key}
+              onClick={() => { setActiveTab(tab.key as any); if (tab.key !== "subscribers") fetchActivityStats(); }}
+              className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all ${activeTab === tab.key ? "bg-blue-600 text-white shadow-lg" : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"}`}>
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* تبويب الزوار */}
+        {activeTab === "activity" && activityStats && (
+          <div className="space-y-6">
+            {/* بطاقات الإحصائيات */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { label: "زوار اليوم", value: activityStats.todayVisitors, icon: "👁", color: "from-blue-500 to-blue-600" },
+                { label: "مسجلون اليوم", value: activityStats.todayLoggedIn, icon: "🔐", color: "from-green-500 to-green-600" },
+                { label: "زوار آخر 7 أيام", value: activityStats.weekVisitors, icon: "📅", color: "from-purple-500 to-purple-600" },
+                { label: "إجمالي الزوار", value: activityStats.totalUniqueVisitors, icon: "🌍", color: "from-orange-500 to-orange-600" },
+              ].map((s, i) => (
+                <div key={i} className={`bg-gradient-to-br ${s.color} rounded-2xl p-5 text-white shadow-lg`}>
+                  <div className="text-3xl mb-1">{s.icon}</div>
+                  <div className="text-3xl font-black">{s.value}</div>
+                  <div className="text-white/80 text-sm mt-1">{s.label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* أكثر الصفحات زيارة */}
+            <div className="bg-white rounded-2xl shadow-lg p-6">
+              <h3 className="text-lg font-black text-gray-800 mb-4">📄 أكثر الصفحات زيارة (آخر 7 أيام)</h3>
+              <div className="space-y-2">
+                {activityStats.topPages.map((p, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-black flex items-center justify-center flex-shrink-0">{i + 1}</span>
+                    <span className="flex-1 text-sm font-medium text-gray-700 truncate">{p.page}</span>
+                    <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-black">{p.count}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* آخر النشاطات */}
+            <div className="bg-white rounded-2xl shadow-lg p-6">
+              <h3 className="text-lg font-black text-gray-800 mb-4">🕐 آخر النشاطات</h3>
+              <div className="space-y-2 max-h-80 overflow-y-auto">
+                {activityStats.recentActivity.map((a, i) => (
+                  <div key={i} className="flex items-center gap-3 py-2 border-b border-gray-100 last:border-0">
+                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${a.eventType === "screenshot_attempt" ? "bg-red-500" : "bg-green-500"}`} />
+                    <span className="text-xs text-gray-500 flex-shrink-0">{new Date(a.createdAt).toLocaleString("ar-EG")}</span>
+                    <span className="text-xs font-bold text-gray-700 flex-shrink-0">{a.eventType === "screenshot_attempt" ? "📸 Screenshot" : "👁 زيارة"}</span>
+                    <span className="text-xs text-gray-500 truncate">{a.page || "-"}</span>
+                    {a.userEmail && <span className="text-xs text-blue-600 truncate">{a.userEmail}</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* تبويب Screenshots */}
+        {activeTab === "screenshots" && activityStats && (
+          <div className="bg-white rounded-2xl shadow-lg p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center text-2xl">📸</div>
+              <div>
+                <h3 className="text-lg font-black text-gray-800">محاولات Screenshot</h3>
+                <p className="text-sm text-red-600 font-bold">{activityStats.screenshotAttempts} محاولة في آخر 30 يوم</p>
+              </div>
+            </div>
+            {activityStats.recentScreenshots.length === 0 ? (
+              <p className="text-center text-gray-400 py-8">✅ لا توجد محاولات مسجلة</p>
+            ) : (
+              <div className="space-y-3">
+                {activityStats.recentScreenshots.map((s, i) => (
+                  <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-red-50 border border-red-100">
+                    <span className="text-red-500 text-xl">⚠️</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-gray-800">{s.userEmail || "زائر غير مسجل"}</p>
+                      <p className="text-xs text-gray-500">{s.page} · IP: {s.ip}</p>
+                    </div>
+                    <span className="text-xs text-gray-400 flex-shrink-0">{new Date(s.createdAt).toLocaleString("ar-EG")}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* تبويب المشتركين */}
+        {activeTab === "subscribers" && (
+          <div>
+          {/* Statistics Cards */}
+          {stats && (
             <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-xl p-6 text-white">
               <div className="flex items-center justify-between mb-4">
                 <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">

@@ -241,6 +241,20 @@ model ExamQuestionC {
   lesson        LessonC  @relation("ExamQuestionsC", fields: [lessonId], references: [id], onDelete: Cascade)
 }
 
+model ActivityLog {
+  id          Int      @id @default(autoincrement())
+  userEmail   String?
+  eventType   String   // "pageview" | "screenshot_attempt" | "visit"
+  page        String?
+  userAgent   String?
+  ip          String?
+  createdAt   DateTime @default(now())
+
+  @@index([userEmail])
+  @@index([eventType])
+  @@index([createdAt])
+}
+
 model Setting {
   id        Int      @id @default(autoincrement())
   key       String   @unique
