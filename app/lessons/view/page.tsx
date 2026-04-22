@@ -382,63 +382,45 @@ function LessonViewContent() {
       <div className="py-3 px-4">
         <div className="max-w-4xl mx-auto">
 
-          {/* الشروح في نفس الصفحة */}
+          {/* شريط العنوان + زر العودة */}
+          <div className="flex items-center gap-3 mb-3 px-4 py-2.5 rounded-2xl"
+            style={{ background: "linear-gradient(135deg, #eff6ff, #dbeafe)", border: "1px solid #bfdbfe" }}>
+            <button onClick={() => router.back()}
+              className="flex items-center gap-1 text-[#003399]/60 hover:text-[#003399] transition flex-shrink-0">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={lang === "ar" ? "M14 5l7 7m0 0l-7 7m7-7H3" : "M10 19l-7-7m0 0l7-7m-7 7h18"} />
+              </svg>
+            </button>
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+              style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
+              <span className="text-white text-xs">📚</span>
+            </div>
+            <p className="text-sm font-black text-[#003399] flex-1 truncate">{translatedLessonTitle}</p>
+            <span className="text-xs font-bold text-[#003399]/50 flex-shrink-0">{filteredQuestions.length} {lang === "ar" ? "شرح" : lang === "nl" ? "lessen" : lang === "fr" ? "leçons" : "lessons"}</span>
+          </div>
+
+          {/* كل أسئلة الدرس معاً */}
           <div className="space-y-4">
-            {filteredQuestions.slice(currentIndex, currentIndex + 1).map((q, i) => (
-              <div key={q.id}>
-                {/* عنوان الدرس + زر العودة في نفس الشريط */}
-                <div className="flex items-center gap-3 mb-1.5 px-4 py-2.5 rounded-2xl"
-                  style={{ background: "linear-gradient(135deg, #eff6ff, #dbeafe)", border: "1px solid #bfdbfe" }}>
-                  <button onClick={() => router.back()}
-                    className="flex items-center gap-1 text-[#003399]/60 hover:text-[#003399] transition flex-shrink-0">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={lang === "ar" ? "M14 5l7 7m0 0l-7 7m7-7H3" : "M10 19l-7-7m0 0l7-7m-7 7h18"} />
-                    </svg>
-                  </button>
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-                    <span className="text-white text-xs">📚</span>
-                  </div>
-                  <p className="text-sm font-black text-[#003399] flex-1 truncate">{translatedLessonTitle}</p>
-                  <span className="text-xs font-bold text-[#003399]/50 flex-shrink-0">{currentIndex + 1} / {filteredQuestions.length}</span>
-                </div>
-                <QuestionCard
-                  question={q}
-                  index={currentIndex + i}
-                  total={filteredQuestions.length}
-                  lang={lang}
-                  onNext={() => {}}
-                  onPrev={() => {}}
-                />
-              </div>
+            {filteredQuestions.map((q, i) => (
+              <QuestionCard
+                key={q.id}
+                question={q}
+                index={i}
+                total={filteredQuestions.length}
+                lang={lang}
+                onNext={() => {}}
+                onPrev={() => {}}
+              />
             ))}
           </div>
 
-          {/* أزرار التنقل بين الصفحات */}
-          {filteredQuestions.length > 1 && (
-            <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
-              <button
-                onClick={() => { setCurrentIndex(Math.max(0, currentIndex - 1)); window.scrollTo(0, 0); }}
-                disabled={currentIndex === 0}
-                className={`px-6 py-3 font-black text-sm border-2 transition-all ${currentIndex === 0 ? "text-gray-300 border-gray-200 cursor-not-allowed" : "text-[#003399] border-[#003399] hover:bg-[#003399] hover:text-white"}`}
-              >
-                ← {lang === "ar" ? "السابق" : lang === "nl" ? "Vorige" : lang === "fr" ? "Précédent" : "Previous"}
-              </button>
-              
-              <span className="text-sm text-gray-500 font-bold">
-                {currentIndex + 1} / {filteredQuestions.length}
-              </span>
-
-              <button
-                onClick={() => { setCurrentIndex(Math.min(filteredQuestions.length - 1, currentIndex + 1)); window.scrollTo(0, 0); }}
-                disabled={currentIndex + 1 >= filteredQuestions.length}
-                className={`px-6 py-3 font-black text-sm border-2 transition-all ${currentIndex + 1 >= filteredQuestions.length ? "text-gray-300 border-gray-200 cursor-not-allowed" : "text-white border-[#003399] hover:opacity-90"}`}
-                style={currentIndex + 1 <= filteredQuestions.length - 1 ? { background: "linear-gradient(135deg, #003399, #0055cc)" } : {}}
-              >
-                {lang === "ar" ? "التالي" : lang === "nl" ? "Volgende" : lang === "fr" ? "Suivant" : "Next"} →
-              </button>
-            </div>
-          )}
+          {/* زر العودة في الأسفل */}
+          <div className="mt-6 pb-4">
+            <button onClick={() => { router.back(); window.scrollTo(0, 0); }}
+              className="w-full py-3 font-black text-sm border-2 border-[#003399] text-[#003399] rounded-xl hover:bg-[#003399] hover:text-white transition-all">
+              ← {lang === "ar" ? "العودة للدروس" : lang === "nl" ? "Terug naar lessen" : lang === "fr" ? "Retour aux leçons" : "Back to lessons"}
+            </button>
+          </div>
         </div>
       </div>
       <Footer />
