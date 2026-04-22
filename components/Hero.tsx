@@ -74,18 +74,14 @@ export default function Hero({ onSelect }: HeroProps) {
 
             {/* اللوغو */}
             <div className="mb-3">
-              <div className="rounded-full p-1 border-4 inline-block"
-                style={{ background: "white", borderColor: "#d4af37", boxShadow: "0 0 20px rgba(212,175,55,0.6)" }}
-              >
-                <Image
-                  src="/her.jpeg"
-                  alt="S & A Rijacademie"
-                  width={90}
-                  height={90}
-                  className="rounded-full object-cover"
-                  style={{ width: '90px', height: '90px' }}
-                />
-              </div>
+              <Image
+                src="/her.jpeg"
+                alt="S & A Rijacademie"
+                width={140}
+                height={140}
+                className="rounded-full object-cover"
+                style={{ width: '140px', height: '140px' }}
+              />
             </div>
 
             <p className="text-xs md:text-sm leading-relaxed mb-4 max-w-xl" style={{ color: "#a0a0a0" }}>
