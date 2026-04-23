@@ -30,6 +30,8 @@ export default function TheoriePage() {
   const [globalSelection, setGlobalSelection] = useState<{ catId: string; duration: string; catName: string } | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [allPrices, setAllPrices] = useState<Record<string, string>>({});
+  const [examModal, setExamModal] = useState<{lessonId: number; lessonTitle: string; batches: {from:number;count:number}[]} | null>(null);
+  const [loadingExam, setLoadingExam] = useState(false);
 
   const translatedTitles = useAutoTranslateList(lessons.map(l => l.title), lang);
 
@@ -53,6 +55,28 @@ export default function TheoriePage() {
       checkAndFetch(email, category);
     } else { setLoading(false); }
   }, []);
+
+  const openExamModal = async (lessonId: number, lessonTitle: string) => {
+    setLoadingExam(true);
+    try {
+      const res = await fetch(`/api/exam-questions?lessonId=${lessonId}&category=${userCategory}`);
+      const data = await res.json();
+      const total = data.success ? (data.questions?.length || 0) : 0;
+      if (total === 0) {
+        router.push(`/examen/category?cat=${userCategory}&email=${userEmail}&lessonId=${lessonId}`);
+        return;
+      }
+      const batches: {from:number;count:number}[] = [];
+      for (let i = 0; i < total; i += 50) {
+        batches.push({ from: i, count: Math.min(50, total - i) });
+      }
+      setExamModal({ lessonId, lessonTitle, batches });
+    } catch {
+      router.push(`/examen/category?cat=${userCategory}&email=${userEmail}&lessonId=${lessonId}`);
+    } finally {
+      setLoadingExam(false);
+    }
+  };
 
   const checkAndFetch = async (email: string, category: string) => {
     try {
@@ -333,8 +357,9 @@ export default function TheoriePage() {
                   </td>
                   <td className="px-4 py-3 border border-gray-200 text-center">
                     <button
-                      onClick={() => router.push(`/examen/category?cat=${userCategory}&email=${userEmail}&lessonId=${lesson.id}`)}
-                      className="bg-white border-2 border-orange-400 px-4 py-1 text-sm font-bold text-orange-600 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-colors"
+                      onClick={() => openExamModal(lesson.id, lesson.title)}
+                      disabled={loadingExam}
+                      className="bg-white border-2 border-orange-400 px-4 py-1 text-sm font-bold text-orange-600 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-colors disabled:opacity-60"
                     >
                       EXAM
                     </button>
@@ -346,6 +371,40 @@ export default function TheoriePage() {
         )}
       </div>
       <Footer />
+
+      {/* Modal اختيار الامتحان */}
+      {examModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4"
+          onClick={() => setExamModal(null)}>
+          <div className="bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl w-full sm:max-w-md overflow-hidden"
+            onClick={e => e.stopPropagation()}>
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between"
+              style={{ background: "#eff6ff" }}>
+              <div>
+                <h3 className="font-black text-[#003399] text-base">🎯 {lang === "ar" ? "اختر الامتحان" : lang === "nl" ? "Kies examen" : lang === "fr" ? "Choisir examen" : "Choose exam"}</h3>
+                <p className="text-xs text-blue-500 mt-0.5 truncate">{examModal.lessonTitle}</p>
+              </div>
+              <button onClick={() => setExamModal(null)} className="text-gray-400 hover:text-gray-600 text-2xl w-8 h-8 flex items-center justify-center">✕</button>
+            </div>
+            <div className="p-4 grid grid-cols-2 gap-3">
+              {examModal.batches.map((b, i) => (
+                <button key={i}
+                  onClick={() => {
+                    setExamModal(null);
+                    router.push(`/examen/test?category=${userCategory}&lesson=${encodeURIComponent(examModal.lessonTitle)}&email=${encodeURIComponent(userEmail)}&lessonId=${examModal.lessonId}&offset=${b.from}&limit=${b.count}`);
+                  }}
+                  className="flex flex-col items-center justify-center gap-1 py-4 rounded-xl font-black text-white transition-all active:scale-95"
+                  style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}
+                >
+                  <span className="text-2xl">🎯</span>
+                  <span className="text-sm">{lang === "ar" ? `امتحان ${i + 1}` : `Examen ${i + 1}`}</span>
+                  <span className="text-xs opacity-70">{b.count} {lang === "ar" ? "سؤال" : "vr."}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
