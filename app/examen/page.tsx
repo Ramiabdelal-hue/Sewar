@@ -189,7 +189,6 @@ export default function ExamenPage() {
                       );
                     })}
                   </div>
-                  </div>
                 </div>
               ))}
             </div>
