@@ -234,7 +234,11 @@ function ExamenCategoryContent() {
         if (lessonId) {
           const qRes = await fetch(`/api/exam-questions?lessonId=${lessonId}&category=${cat.toUpperCase()}`);
           const qData = await qRes.json();
-          if (qData.success) setQuestions(qData.questions.sort(() => Math.random() - 0.5));
+          if (qData.success) {
+            // حد 50 سؤال لكل امتحان
+            const shuffled = qData.questions.sort(() => Math.random() - 0.5);
+            setQuestions(shuffled.slice(0, 50));
+          }
         } else {
           const lessonsRes = await fetch(`/api/lessons?category=${cat.toUpperCase()}`);
           const lessonsData = await lessonsRes.json();
@@ -245,7 +249,9 @@ function ExamenCategoryContent() {
             const qData = await qRes.json();
             if (qData.success && qData.questions?.length > 0) allQ.push(...qData.questions);
           }
-          setQuestions(allQ.sort(() => Math.random() - 0.5));
+          // خلط عشوائي ثم أخذ 50 سؤال فقط
+          const shuffled = allQ.sort(() => Math.random() - 0.5);
+          setQuestions(shuffled.slice(0, 50));
         }
       } catch (e) { console.error(e); }
       finally { setLoading(false); }
@@ -583,7 +589,7 @@ function ExamenCategoryContent() {
 
           {/* أزرار */}
           <div className="flex gap-3">
-            <button onClick={() => { unlockAudio(); setStarted(false); setFinished(false); setCurrentIndex(0); setAnswers({}); setLocked(false); setQuestions(q => [...q].sort(() => Math.random() - 0.5)); }}
+            <button onClick={() => { unlockAudio(); setStarted(false); setFinished(false); setCurrentIndex(0); setAnswers({}); setLocked(false); setQuestions(q => [...q].sort(() => Math.random() - 0.5).slice(0, 50)); }}
               className="flex-1 py-3 font-black text-white rounded-xl transition-all hover:opacity-90 active:scale-95"
               style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
               🔄 {lang === "ar" ? "إعادة" : lang === "nl" ? "Opnieuw" : lang === "fr" ? "Recommencer" : "Retry"}

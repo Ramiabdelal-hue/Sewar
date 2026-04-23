@@ -144,7 +144,13 @@ function ExamenTestContent() {
           const data = await res.json();
           if (data.success) {
             let qs = data.questions || [];
-            if (limitParam > 0) qs = qs.slice(offsetParam, offsetParam + limitParam);
+            // دائماً 50 سؤال كحد أقصى، مع offset إذا وُجد
+            qs = qs.sort(() => Math.random() - 0.5);
+            if (limitParam > 0) {
+              qs = qs.slice(offsetParam, offsetParam + Math.min(limitParam, 50));
+            } else {
+              qs = qs.slice(0, 50);
+            }
             setQuestions(qs);
           }
         }
