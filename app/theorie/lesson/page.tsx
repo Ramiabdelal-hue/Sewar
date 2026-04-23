@@ -9,7 +9,7 @@ import ar from "@/locales/ar.json";
 import en from "@/locales/en.json";
 import Navbar from "@/components/Navbar";
 import QuestionCard from "@/components/QuestionCard";
-import { useAutoTranslate, useAutoTranslateList } from "@/hooks/useAutoTranslate";
+import { useAutoTranslate } from "@/hooks/useAutoTranslate";
 import Footer from "@/components/Footer";
 
 interface Question {
@@ -43,8 +43,6 @@ function TheorieLessonContent() {
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [showAnswer, setShowAnswer] = useState(false);
   const [isExpired, setIsExpired] = useState(false);
   const [checking, setChecking] = useState(true);
   const [lessonDescription, setLessonDescription] = useState("");
@@ -247,13 +245,13 @@ function TheorieLessonContent() {
             )}
           </div>
 
-          {/* 10 أسئلة في نفس الصفحة */}
+          {/* كل أسئلة الدرس في نفس الصفحة */}
           <div className="space-y-4">
-            {questions.slice(currentIndex, currentIndex + 1).map((q, i) => (
+            {questions.map((q, i) => (
               <QuestionCard
                 key={q.id}
                 question={q}
-                index={currentIndex + i}
+                index={i}
                 total={questions.length}
                 lang={lang}
                 onNext={() => {}}
@@ -262,29 +260,15 @@ function TheorieLessonContent() {
             ))}
           </div>
 
-          {/* أزرار التنقل بين الصفحات */}
-          {questions.length > 1 && (
-            <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
-              <button
-                onClick={() => { setCurrentIndex(Math.max(0, currentIndex - 1)); window.scrollTo(0, 0); }}
-                disabled={currentIndex === 0}
-                className={`px-6 py-3 font-black text-sm border-2 transition-all ${currentIndex === 0 ? "text-gray-300 border-gray-200 cursor-not-allowed" : "text-[#003399] border-[#003399] hover:bg-[#003399] hover:text-white"}`}
-              >
-                ← {lang === "ar" ? "السابق" : lang === "nl" ? "Vorige" : lang === "fr" ? "Précédent" : "Previous"}
-              </button>
-              <span className="text-sm text-gray-500 font-bold">
-                {currentIndex + 1} / {questions.length}
-              </span>
-              <button
-                onClick={() => { setCurrentIndex(Math.min(questions.length - 1, currentIndex + 1)); window.scrollTo(0, 0); }}
-                disabled={currentIndex + 1 >= questions.length}
-                className={`px-6 py-3 font-black text-sm border-2 transition-all ${currentIndex + 1 >= questions.length ? "text-gray-300 border-gray-200 cursor-not-allowed" : "text-white border-[#003399] bg-[#003399] hover:bg-[#0055cc]"}`}
-                style={currentIndex + 1 <= questions.length - 1 ? { background: "linear-gradient(135deg, #003399, #0055cc)" } : {}}
-              >
-                {lang === "ar" ? "التالي" : lang === "nl" ? "Volgende" : lang === "fr" ? "Suivant" : "Next"} →
-              </button>
-            </div>
-          )}
+          {/* زر العودة في الأسفل */}
+          <div className="mt-6 pb-4">
+            <button
+              onClick={() => { router.push("/theorie"); window.scrollTo(0, 0); }}
+              className="w-full py-3 font-black text-sm border-2 border-[#003399] text-[#003399] rounded-xl hover:bg-[#003399] hover:text-white transition-all"
+            >
+              ← {lang === "ar" ? "العودة للدروس" : lang === "nl" ? "Terug naar lessen" : lang === "fr" ? "Retour aux leçons" : "Back to lessons"}
+            </button>
+          </div>
         </div>
       </div>
       <Footer />
