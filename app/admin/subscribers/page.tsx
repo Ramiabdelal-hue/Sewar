@@ -97,7 +97,11 @@ export default function AdminSubscribersPage() {
     try {
       const r = await fetch("/api/admin/suspend-user", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({userEmail:email, action, reason:suspendReason}) });
       const d = await r.json();
-      setSuspendResult({success:d.success, message:d.message});
+      // عرض نتيجة الإيميل أيضاً
+      const msg = d.emailStatus
+        ? `${d.message} | إيميل: ${d.emailStatus === "sent" ? "✅ أُرسل" : "❌ " + d.emailStatus}`
+        : d.message;
+      setSuspendResult({success:d.success, message:msg});
       if (d.success) { setShowSuspendModal(null); setSuspendReason(""); setTimeout(fetchSubscribers, 400); }
     } catch { setSuspendResult({success:false, message:"خطأ في الاتصال"}); }
     finally { setSuspendLoading(null); }
