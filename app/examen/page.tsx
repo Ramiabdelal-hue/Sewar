@@ -26,7 +26,7 @@ export default function ExamenPage() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [availableLessons, setAvailableLessons] = useState<any[]>([]);
   const [showLessons, setShowLessons] = useState(false);
-  const [examBatches, setExamBatches] = useState<{lessonId: number; lessonTitle: string; batches: number}[]>([]);
+  const [examBatches, setExamBatches] = useState<{lessonId: number; lessonTitle: string; batches: number; totalQuestions: number}[]>([]);
   const [loadingBatches, setLoadingBatches] = useState(false);
 
   useEffect(() => {
@@ -116,6 +116,7 @@ export default function ExamenPage() {
             lessonId: lesson.id,
             lessonTitle: lesson.title,
             batches: Math.ceil(count / 50),
+            totalQuestions: count,
           });
         }
       }
@@ -164,24 +165,30 @@ export default function ExamenPage() {
                   <div className="px-4 py-3 font-black text-[#003399] text-sm flex items-center gap-2" style={{ background: "#eff6ff", borderBottom: "1px solid #bfdbfe" }}>
                     <span>📚</span>
                     <span className="flex-1">{item.lessonTitle}</span>
-                    <span className="text-xs text-blue-400 font-bold">{item.batches * 50} {lang === "ar" ? "سؤال" : "vr."}</span>
+                    <span className="text-xs text-blue-400 font-bold">{item.totalQuestions} {lang === "ar" ? "سؤال" : "vr."}</span>
                   </div>
                   {/* أزرار الامتحانات - grid على الموبايل، flex على الديسكتوب */}
                   <div className="p-3 grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
-                    {Array.from({ length: item.batches }, (_, i) => (
-                      <button
-                        key={i}
-                        onClick={() => router.push(
-                          `/examen/test?category=${selectedCategory}&lesson=${encodeURIComponent(item.lessonTitle)}&email=${encodeURIComponent(userEmail)}&lessonId=${item.lessonId}&offset=${i * 50}&limit=50`
-                        )}
-                        className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-3 px-3 sm:px-5 font-black text-sm rounded-xl transition-all active:scale-95 text-white"
-                        style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}
-                      >
-                        <span className="text-lg sm:text-base">🎯</span>
-                        <span className="text-xs sm:text-sm">{lang === "ar" ? `امتحان ${i + 1}` : `Examen ${i + 1}`}</span>
-                        <span className="text-xs opacity-70">50</span>
-                      </button>
-                    ))}
+                    {Array.from({ length: item.batches }, (_, i) => {
+                      const from = i * 50;
+                      const to = Math.min(from + 50, item.totalQuestions);
+                      const count = to - from;
+                      return (
+                        <button
+                          key={i}
+                          onClick={() => router.push(
+                            `/examen/test?category=${selectedCategory}&lesson=${encodeURIComponent(item.lessonTitle)}&email=${encodeURIComponent(userEmail)}&lessonId=${item.lessonId}&offset=${from}&limit=${count}`
+                          )}
+                          className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-3 px-3 sm:px-5 font-black text-sm rounded-xl transition-all active:scale-95 text-white"
+                          style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}
+                        >
+                          <span className="text-lg sm:text-base">🎯</span>
+                          <span className="text-xs sm:text-sm">{lang === "ar" ? `امتحان ${i + 1}` : `Examen ${i + 1}`}</span>
+                          <span className="text-xs opacity-70">{count}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                   </div>
                 </div>
               ))}

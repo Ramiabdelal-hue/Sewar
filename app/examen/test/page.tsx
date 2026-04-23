@@ -144,12 +144,12 @@ function ExamenTestContent() {
           const data = await res.json();
           if (data.success) {
             let qs = data.questions || [];
-            // دائماً 50 سؤال كحد أقصى، مع offset إذا وُجد
-            qs = qs.sort(() => Math.random() - 0.5);
             if (limitParam > 0) {
-              qs = qs.slice(offsetParam, offsetParam + Math.min(limitParam, 50));
+              // offset محدد = امتحان محدد بأسئلة ثابتة (بدون خلط)
+              qs = qs.slice(offsetParam, offsetParam + limitParam);
             } else {
-              qs = qs.slice(0, 50);
+              // بدون offset = خلط عشوائي وأخذ 50
+              qs = qs.sort(() => Math.random() - 0.5).slice(0, 50);
             }
             setQuestions(qs);
           }
