@@ -20,6 +20,15 @@ function ExamenTestContent() {
   const offsetParam = parseInt(searchParams.get("offset") || "0");
   const limitParam = parseInt(searchParams.get("limit") || "0");
 
+  // دالة الرجوع - ترجع لقائمة الامتحانات إذا كان email موجوداً
+  const goBackToExamList = () => {
+    if (email && email !== "guest") {
+      router.push(`/examen?email=${encodeURIComponent(email)}&cat=${category}`);
+    } else {
+      router.back();
+    }
+  };
+
   const [questions, setQuestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [started, setStarted] = useState(false);
@@ -214,7 +223,7 @@ function ExamenTestContent() {
                   style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
                   {lang === "ar" ? "ابدأ الامتحان" : lang === "nl" ? "Start Examen" : "Start Exam"} →
                 </button>
-                <button onClick={() => router.back()}
+                <button onClick={goBackToExamList}
                   className="px-8 py-4 font-black border-2 border-gray-300 text-gray-600 text-lg rounded-xl hover:bg-gray-50 active:scale-95 transition-all">
                   ← {lang === "ar" ? "رجوع" : lang === "nl" ? "Terug" : "Back"}
                 </button>
@@ -313,7 +322,7 @@ function ExamenTestContent() {
               style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
               🔄 {lang === "ar" ? "إعادة" : lang === "nl" ? "Opnieuw" : "Retry"}
             </button>
-            <button onClick={() => router.back()}
+            <button onClick={goBackToExamList}
               className="flex-1 py-3 font-black border-2 border-gray-300 text-gray-600 rounded-xl hover:bg-gray-50 active:scale-95">
               ← {lang === "ar" ? "رجوع" : lang === "nl" ? "Terug" : "Back"}
             </button>
