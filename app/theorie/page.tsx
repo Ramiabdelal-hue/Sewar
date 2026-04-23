@@ -393,12 +393,11 @@ export default function TheoriePage() {
                     setExamModal(null);
                     router.push(`/examen/test?category=${userCategory}&lesson=${encodeURIComponent(examModal.lessonTitle)}&email=${encodeURIComponent(userEmail)}&lessonId=${examModal.lessonId}&offset=${b.from}&limit=${b.count}`);
                   }}
-                  className="flex flex-col items-center justify-center gap-1 py-4 rounded-xl font-black text-white transition-all active:scale-95"
-                  style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}
+                  className="flex flex-col items-center justify-center gap-2 py-4 rounded-xl font-black transition-all active:scale-95 hover:opacity-90"
+                  style={{background:"linear-gradient(135deg,#eff6ff,#dbeafe)", border:"2px solid #93c5fd", color:"#1d4ed8"}}
                 >
                   <span className="text-2xl">🎯</span>
                   <span className="text-sm">{lang === "ar" ? `امتحان ${i + 1}` : `Examen ${i + 1}`}</span>
-                  <span className="text-xs opacity-70">{b.count} {lang === "ar" ? "سؤال" : "vr."}</span>
                 </button>
               ))}
             </div>

@@ -141,50 +141,66 @@ export default function ExamenPage() {
 
   if (showLessons && userEmail && selectedCategory) {
     return (
-      <div className="min-h-screen bg-white" dir={lang === "ar" ? "rtl" : "ltr"}>
+      <div className="min-h-screen" dir={lang === "ar" ? "rtl" : "ltr"} style={{background:"#f0f4f8"}}>
         <Navbar />
-        <div className="w-full px-4 py-6">
-          <button onClick={() => { setShowLessons(false); setExamBatches([]); }} className="mb-4 text-[#003399] font-bold hover:underline">
-            ← {lang === "ar" ? "رجوع" : lang === "nl" ? "Terug" : lang === "fr" ? "Retour" : "Back"}
-          </button>
-          <h1 className="text-xl sm:text-2xl font-black text-[#003399] uppercase border-b-4 border-[#003399] pb-3 mb-5">
-            {lang === "ar" ? "اختر الامتحان" : lang === "nl" ? "KIES EEN EXAMEN" : lang === "fr" ? "CHOISISSEZ UN EXAMEN" : "CHOOSE AN EXAM"}
-          </h1>
+        <div className="max-w-2xl mx-auto px-4 py-6">
+
+          {/* Header */}
+          <div className="flex items-center gap-3 mb-6">
+            <button
+              onClick={() => { setShowLessons(false); setExamBatches([]); }}
+              className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-[#003399] hover:bg-blue-100 transition flex-shrink-0"
+              style={{background:"#eff6ff", border:"2px solid #bfdbfe"}}
+            >
+              ←
+            </button>
+            <div>
+              <h1 className="text-xl font-black text-[#003399]">
+                {lang === "ar" ? "اختر الامتحان" : lang === "nl" ? "Kies een examen" : lang === "fr" ? "Choisir un examen" : "Choose an exam"}
+              </h1>
+              <p className="text-gray-500 text-xs mt-0.5">
+                {lang === "ar" ? `فئة ${selectedCategory}` : `Categorie ${selectedCategory}`}
+              </p>
+            </div>
+          </div>
 
           {loadingBatches ? (
-            <div className="flex items-center justify-center py-12">
+            <div className="flex items-center justify-center py-16">
               <div className="w-10 h-10 border-4 border-[#003399] border-t-transparent rounded-full animate-spin"/>
             </div>
           ) : examBatches.length === 0 ? (
-            <p className="text-gray-500 p-4">{lang === "ar" ? "لا توجد أسئلة" : lang === "nl" ? "Geen vragen beschikbaar" : "No questions available"}</p>
+            <div className="text-center py-16 text-gray-400">
+              <div className="text-5xl mb-3">📭</div>
+              <p className="font-bold">{lang === "ar" ? "لا توجد أسئلة" : "Geen vragen beschikbaar"}</p>
+            </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {examBatches.map((item) => (
-                <div key={item.lessonId} className="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                <div key={item.lessonId} className="bg-white rounded-2xl shadow-sm overflow-hidden" style={{border:"1px solid #e5e7eb"}}>
                   {/* عنوان الدرس */}
-                  <div className="px-4 py-3 font-black text-[#003399] text-sm flex items-center gap-2" style={{ background: "#eff6ff", borderBottom: "1px solid #bfdbfe" }}>
-                    <span>📚</span>
-                    <span className="flex-1">{item.lessonTitle}</span>
-                    <span className="text-xs text-blue-400 font-bold">{item.totalQuestions} {lang === "ar" ? "سؤال" : "vr."}</span>
+                  <div className="px-5 py-4 flex items-center gap-3" style={{background:"linear-gradient(135deg,#003399,#0055cc)"}}>
+                    <span className="text-2xl">📚</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-black text-white text-sm truncate">{item.lessonTitle}</p>
+                      <p className="text-white/60 text-xs mt-0.5">{item.totalQuestions} {lang === "ar" ? "سؤال" : lang === "nl" ? "vragen" : "questions"}</p>
+                    </div>
                   </div>
-                  {/* أزرار الامتحانات - grid على الموبايل، flex على الديسكتوب */}
-                  <div className="p-3 grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
+                  {/* أزرار الامتحانات */}
+                  <div className="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {Array.from({ length: item.batches }, (_, i) => {
                       const from = i * 50;
-                      const to = Math.min(from + 50, item.totalQuestions);
-                      const count = to - from;
+                      const count = Math.min(50, item.totalQuestions - from);
                       return (
                         <button
                           key={i}
                           onClick={() => router.push(
                             `/examen/test?category=${selectedCategory}&lesson=${encodeURIComponent(item.lessonTitle)}&email=${encodeURIComponent(userEmail)}&lessonId=${item.lessonId}&offset=${from}&limit=${count}`
                           )}
-                          className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-3 px-3 sm:px-5 font-black text-sm rounded-xl transition-all active:scale-95 text-white"
-                          style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}
+                          className="flex flex-col items-center justify-center gap-2 py-4 rounded-xl font-black transition-all active:scale-95 hover:opacity-90"
+                          style={{background:"linear-gradient(135deg,#eff6ff,#dbeafe)", border:"2px solid #93c5fd", color:"#1d4ed8"}}
                         >
-                          <span className="text-lg sm:text-base">🎯</span>
-                          <span className="text-xs sm:text-sm">{lang === "ar" ? `امتحان ${i + 1}` : `Examen ${i + 1}`}</span>
-                          <span className="text-xs opacity-70">{count}</span>
+                          <span className="text-2xl">🎯</span>
+                          <span className="text-sm">{lang === "ar" ? `امتحان ${i + 1}` : lang === "nl" ? `Examen ${i + 1}` : lang === "fr" ? `Examen ${i + 1}` : `Exam ${i + 1}`}</span>
                         </button>
                       );
                     })}
