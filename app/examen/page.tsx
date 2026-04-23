@@ -26,6 +26,8 @@ export default function ExamenPage() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [availableLessons, setAvailableLessons] = useState<any[]>([]);
   const [showLessons, setShowLessons] = useState(false);
+  const [examBatches, setExamBatches] = useState<{lessonId: number; lessonTitle: string; batches: number}[]>([]);
+  const [loadingBatches, setLoadingBatches] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("renewPrefillData");
@@ -39,7 +41,7 @@ export default function ExamenPage() {
       if (emailParam && catParam) {
         setUserEmail(emailParam);
         setSelectedCategory(catParam);
-        fetchLessons(catParam);
+        fetchExamBatches(catParam);
         setShowLessons(true);
         return;
       }
@@ -61,7 +63,7 @@ export default function ExamenPage() {
               const cat = examenSub.category || "B";
               setUserEmail(email);
               setSelectedCategory(cat);
-              fetchLessons(cat);
+              fetchExamBatches(cat);
               setShowLessons(true);
             }
           }
@@ -91,11 +93,35 @@ export default function ExamenPage() {
 
   const fetchLessons = async (catLetter: string) => {
     try {
-      // جلب كل دروس الفئة بدون فلتر questionType
       const res = await fetch(`/api/lessons?category=${catLetter}`);
       const data = await res.json();
       if (data.success) setAvailableLessons(data.lessons);
     } catch (e) { console.error(e); }
+  };
+
+  // جلب عدد الأسئلة لكل درس وحساب عدد الامتحانات
+  const fetchExamBatches = async (catLetter: string) => {
+    setLoadingBatches(true);
+    try {
+      const res = await fetch(`/api/lessons?category=${catLetter}`);
+      const data = await res.json();
+      if (!data.success) return;
+      const results: {lessonId: number; lessonTitle: string; batches: number}[] = [];
+      for (const lesson of data.lessons) {
+        const qRes = await fetch(`/api/exam-questions?lessonId=${lesson.id}&category=${catLetter}`);
+        const qData = await qRes.json();
+        const count = qData.success ? (qData.questions?.length || 0) : 0;
+        if (count > 0) {
+          results.push({
+            lessonId: lesson.id,
+            lessonTitle: lesson.title,
+            batches: Math.ceil(count / 50),
+          });
+        }
+      }
+      setExamBatches(results);
+    } catch (e) { console.error(e); }
+    finally { setLoadingBatches(false); }
   };
 
   const handleSelect = (catId: string, durKey: string, catName: string) => {
@@ -117,47 +143,49 @@ export default function ExamenPage() {
       <div className="min-h-screen bg-white" dir={lang === "ar" ? "rtl" : "ltr"}>
         <Navbar />
         <div className="w-full px-4 py-6">
-          <button onClick={() => setShowLessons(false)} className="mb-4 text-[#003399] font-bold hover:underline">
+          <button onClick={() => { setShowLessons(false); setExamBatches([]); }} className="mb-4 text-[#003399] font-bold hover:underline">
             ← {lang === "ar" ? "رجوع" : lang === "nl" ? "Terug" : lang === "fr" ? "Retour" : "Back"}
           </button>
           <h1 className="text-xl sm:text-2xl font-black text-[#003399] uppercase border-b-4 border-[#003399] pb-3 mb-5">
-            {lang === "ar" ? "اختر الدرس" : lang === "nl" ? "KIES EEN LES" : lang === "fr" ? "CHOISISSEZ UNE LEÇON" : "CHOOSE A LESSON"}
+            {lang === "ar" ? "اختر الامتحان" : lang === "nl" ? "KIES EEN EXAMEN" : lang === "fr" ? "CHOISISSEZ UN EXAMEN" : "CHOOSE AN EXAM"}
           </h1>
-          {availableLessons.length === 0 ? (
-            <p className="text-gray-500 p-4">{lang === "ar" ? "لا توجد دروس" : lang === "nl" ? "Geen lessen beschikbaar" : lang === "fr" ? "Aucune leçon disponible" : "No lessons available"}</p>
+
+          {loadingBatches ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="w-10 h-10 border-4 border-[#003399] border-t-transparent rounded-full animate-spin"/>
+            </div>
+          ) : examBatches.length === 0 ? (
+            <p className="text-gray-500 p-4">{lang === "ar" ? "لا توجد أسئلة" : lang === "nl" ? "Geen vragen beschikbaar" : "No questions available"}</p>
           ) : (
-            <table className="w-full border-collapse" style={{ tableLayout: "fixed" }}>
-              <colgroup><col style={{ width: "75%" }} /><col style={{ width: "25%" }} /></colgroup>
-              <thead>
-                <tr style={{ backgroundColor: "#3399ff" }}>
-                  <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc]">
-                    {lang === "ar" ? "الدرس" : lang === "nl" ? "LES" : lang === "fr" ? "LEÇON" : "LESSON"}
-                  </th>
-                  <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
-                    {lang === "ar" ? "ابدأ" : lang === "nl" ? "START" : lang === "fr" ? "DÉMARRER" : "START"}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {availableLessons.map((lesson, i) => (
-                  <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#f5f5f5" }}>
-                    <td className="px-4 py-3 border border-gray-200 font-bold text-[#003399] text-base">
-                      {i + 1}. {lesson.title}
-                    </td>
-                    <td className="px-4 py-3 border border-gray-200 text-center">
+            <div className="space-y-4">
+              {examBatches.map((item) => (
+                <div key={item.lessonId} className="border border-gray-200 rounded-xl overflow-hidden">
+                  {/* عنوان الدرس */}
+                  <div className="px-4 py-3 font-black text-[#003399] text-sm" style={{ background: "#eff6ff", borderBottom: "1px solid #bfdbfe" }}>
+                    📚 {item.lessonTitle}
+                  </div>
+                  {/* أزرار الامتحانات */}
+                  <div className="p-3 flex flex-wrap gap-2">
+                    {Array.from({ length: item.batches }, (_, i) => (
                       <button
-                        onClick={() => router.push(`/examen/test?category=${selectedCategory}&lesson=${encodeURIComponent(lesson.title)}&email=${encodeURIComponent(userEmail)}&lessonId=${lesson.id}`)}
-                        className="bg-white border-2 border-gray-400 px-6 py-1.5 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors"
+                        key={i}
+                        onClick={() => router.push(
+                          `/examen/test?category=${selectedCategory}&lesson=${encodeURIComponent(item.lessonTitle)}&email=${encodeURIComponent(userEmail)}&lessonId=${item.lessonId}&offset=${i * 50}&limit=50`
+                        )}
+                        className="flex items-center gap-2 px-5 py-2.5 font-black text-sm rounded-xl transition-all hover:scale-105 active:scale-95 text-white"
+                        style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}
                       >
-                        {lang === "ar" ? "ابدأ" : lang === "nl" ? "Start" : lang === "fr" ? "Démarrer" : "Start"}
+                        🎯 {lang === "ar" ? `امتحان ${i + 1}` : lang === "nl" ? `Examen ${i + 1}` : lang === "fr" ? `Examen ${i + 1}` : `Exam ${i + 1}`}
+                        <span className="text-xs opacity-75 font-bold">50 {lang === "ar" ? "سؤال" : "vr."}</span>
                       </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
+        <Footer />
       </div>
     );
   }
@@ -211,7 +239,7 @@ export default function ExamenPage() {
                         const email = localStorage.getItem("userEmail") || "";
                         setUserEmail(email || "guest");
                         setSelectedCategory(cat.catLetter);
-                        fetchLessons(cat.catLetter);
+                        fetchExamBatches(cat.catLetter);
                         setShowLessons(true);
                       }}
                       className="px-4 py-1.5 text-sm font-bold border-2 w-full bg-green-500 text-white border-green-500 hover:bg-green-600 transition-colors"
@@ -261,7 +289,7 @@ export default function ExamenPage() {
                     const email = localStorage.getItem("userEmail") || "";
                     setUserEmail(email || "guest");
                     setSelectedCategory(cat.catLetter);
-                    fetchLessons(cat.catLetter);
+                    fetchExamBatches(cat.catLetter);
                     setShowLessons(true);
                   }}
                   className="flex-1 py-2.5 text-sm font-bold border-2 bg-green-500 text-white border-green-500"
