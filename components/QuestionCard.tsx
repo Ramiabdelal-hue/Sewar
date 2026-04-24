@@ -57,7 +57,7 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
 
   useEffect(() => {
     if (lang === "nl") { setQText(originalText); setExpText(originalExplanation); return; }
-    // نحافظ على النص الأصلي حتى تكتمل الترجمة
+    setTranslating(true);
     Promise.all([
       translateOne(originalText, lang),
       translateOne(originalExplanation, lang),
@@ -66,7 +66,6 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
       setExpText(e);
       setTranslating(false);
     });
-    setTranslating(true);
   }, [originalText, originalExplanation, lang]);
 
   const isRtl = lang === "ar";
@@ -84,7 +83,7 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
         {/* العنوان بجانب الرقم */}
         {(question.textNL || question.text) && (
           <p className={`text-sm font-black text-white leading-snug flex-1 ${isRtl ? "text-right" : "text-left"}`}>
-            {translating ? (question.textNL || question.text) : qText}
+            {qText || question.textNL || question.text}
           </p>
         )}
         <span className="text-white/50 text-xs font-bold flex-shrink-0">{index + 1} / {total}</span>
