@@ -67,7 +67,7 @@ export default function Hero({ onSelect }: HeroProps) {
         </div>
 
         {/* البطاقة البيضاء - منفصلة */}
-        <div className="flex flex-col items-center text-center px-4 py-4 rounded-none md:rounded-2xl flex-1 md:flex-none overflow-y-auto"
+        <div className="flex flex-col items-center text-center px-4 py-4 rounded-none md:rounded-2xl flex-1 md:flex-none justify-center"
           style={{ background: "#ffffff", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
 
           {/* اللوغو */}
