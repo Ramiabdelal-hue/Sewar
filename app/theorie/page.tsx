@@ -80,11 +80,16 @@ export default function TheoriePage() {
 
   const checkAndFetch = async (email: string, category: string) => {
     try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000); // 8 ثواني كحد أقصى
+      
       const res = await fetch("/api/check-subscription", { 
         method: "POST", 
         headers: { "Content-Type": "application/json" }, 
-        body: JSON.stringify({ email }) 
+        body: JSON.stringify({ email }),
+        signal: controller.signal,
       });
+      clearTimeout(timeout);
       
       if (!res.ok) {
         const lr = await fetch(`/api/lessons?category=${category}`);
@@ -102,7 +107,7 @@ export default function TheoriePage() {
       if (ld.success) setLessons(ld.lessons);
     } catch (e) { 
       console.error("checkAndFetch error:", e);
-      // عند خطأ في الشبكة - جلب الدروس بدون التحقق
+      // عند خطأ أو timeout - جلب الدروس بدون التحقق
       try {
         const lr = await fetch(`/api/lessons?category=${category}`);
         const ld = await lr.json();

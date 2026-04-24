@@ -58,7 +58,7 @@ function LessonsContent() {
           body: JSON.stringify({ email: userEmail }),
         });
         const data = await res.json();
-        if (data.expired || !data.success) { setIsExpired(true); setPrefillData({ email: userEmail }); return; }
+        if (data.expired || !data.success) { setIsExpired(true); setPrefillData({ email: userEmail }); setChecking(false); return; }
 
         const subs = data.subscriptions || [];
         const hasTheorie = subs.some((s: any) => s.subscriptionType === "theorie") ||
@@ -68,14 +68,17 @@ function LessonsContent() {
           const praktijkLessons = subs.find((s: any) => s.subscriptionType === "praktijk-lessons");
           const praktijkExam = subs.find((s: any) => s.subscriptionType === "praktijk-exam");
           if (praktijkLessons) {
-            window.location.assign(`/praktical/lessons?email=${encodeURIComponent(userEmail!)}&exp=${new Date(praktijkLessons.expiryDate).getTime()}`);
+            router.push(`/praktical/lessons?email=${encodeURIComponent(userEmail!)}&exp=${new Date(praktijkLessons.expiryDate).getTime()}`);
           } else if (praktijkExam) {
-            window.location.assign(`/praktical/exam?email=${encodeURIComponent(userEmail!)}&exp=${new Date(praktijkExam.expiryDate).getTime()}`);
+            router.push(`/praktical/exam?email=${encodeURIComponent(userEmail!)}&exp=${new Date(praktijkExam.expiryDate).getTime()}`);
           } else {
             setIsExpired(true);
           }
         }
-      } catch (e) { console.error(e); }
+      } catch (e) { 
+        console.error(e);
+        // عند خطأ في الشبكة نعرض الدروس بدل إخفائها
+      }
       finally { setChecking(false); }
     };
     checkSubscription();
