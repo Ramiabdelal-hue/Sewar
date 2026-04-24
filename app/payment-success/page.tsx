@@ -8,6 +8,7 @@ function PaymentSuccessContent() {
   const router = useRouter();
   const [checking, setChecking] = useState(true);
   const [message, setMessage] = useState("جاري التحقق من الدفع...");
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     const email = searchParams.get("email");
@@ -17,8 +18,11 @@ function PaymentSuccessContent() {
       return;
     }
 
-    // التحقق من حالة الدفع
+    let attempts = 0;
+    const MAX_ATTEMPTS = 15; // 30 ثانية كحد أقصى
+
     const checkPayment = async () => {
+      attempts++;
       try {
         const res = await fetch("/api/check-payment-status", {
           method: "POST",
@@ -29,24 +33,32 @@ function PaymentSuccessContent() {
         const data = await res.json();
 
         if (data.paid) {
-          setMessage("تم تفعيل اشتراكك بنجاح!");
-          
-          // حفظ البيانات في localStorage
-          localStorage.setItem("userEmail", email);
-          localStorage.setItem("userCategory", data.subscription.category);
-          localStorage.setItem("userExpiry", data.subscription.expiryDate);
+          setMessage("تم تفعيل اشتراكك بنجاح! ✅");
+          setChecking(false);
 
-          // إعادة التوجيه للمحتوى
-          setTimeout(() => {
-            router.push("/theorie");
-          }, 2000);
+          localStorage.setItem("userEmail", email);
+          if (data.subscription?.category) localStorage.setItem("userCategory", data.subscription.category);
+          if (data.subscription?.expiryDate) localStorage.setItem("userExpiry", data.subscription.expiryDate);
+
+          setTimeout(() => { router.push("/theorie"); }, 2000);
+
+        } else if (attempts >= MAX_ATTEMPTS) {
+          // تجاوز الحد الأقصى - أعطِ المستخدم خياراً
+          setChecking(false);
+          setFailed(true);
+          setMessage("استغرق التحقق وقتاً طويلاً. إذا تم الدفع، سيتم تفعيل اشتراكك خلال دقائق.");
         } else {
-          // لم يتم تأكيد الدفع بعد، انتظر قليلاً
           setTimeout(checkPayment, 2000);
         }
       } catch (error) {
         console.error("Error checking payment:", error);
-        setMessage("حدث خطأ في التحقق من الدفع");
+        if (attempts >= MAX_ATTEMPTS) {
+          setChecking(false);
+          setFailed(true);
+          setMessage("حدث خطأ في التحقق. تواصل معنا إذا تم الخصم من حسابك.");
+        } else {
+          setTimeout(checkPayment, 3000);
+        }
       }
     };
 
@@ -70,11 +82,25 @@ function PaymentSuccessContent() {
           {message}
         </p>
         
-        <div className="flex items-center justify-center gap-2">
-          <div className="w-3 h-3 bg-green-500 rounded-full animate-bounce"></div>
-          <div className="w-3 h-3 bg-green-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-          <div className="w-3 h-3 bg-green-500 rounded-full animate-bounce" style={{animationDelay: '0.4s'}}></div>
-        </div>
+        {failed ? (
+          <div className="flex flex-col gap-3">
+            <button onClick={() => router.push("/theorie")}
+              className="px-6 py-3 rounded-xl font-black text-white text-sm"
+              style={{ background: "linear-gradient(135deg,#7c3aed,#5b21b6)" }}>
+              الذهاب للدروس
+            </button>
+            <button onClick={() => router.push("/")}
+              className="px-6 py-3 rounded-xl font-black text-sm border-2 border-gray-200 text-gray-600">
+              العودة للرئيسية
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center gap-2">
+            <div className="w-3 h-3 bg-green-500 rounded-full animate-bounce"></div>
+            <div className="w-3 h-3 bg-green-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+            <div className="w-3 h-3 bg-green-500 rounded-full animate-bounce" style={{animationDelay: '0.4s'}}></div>
+          </div>
+        )}
       </div>
     </div>
   );
