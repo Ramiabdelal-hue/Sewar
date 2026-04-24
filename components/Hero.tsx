@@ -48,8 +48,8 @@ export default function Hero({ onSelect }: HeroProps) {
       style={{ height: "100%", background: "#f0f0f0" }}
     >
       {/* الصورة */}
-      <div className="relative w-full md:w-2xl rounded-2xl overflow-hidden flex-shrink-0"
-        style={{ height: "36%", minHeight: "180px", maxHeight: "320px", boxShadow: "0 4px 16px rgba(0,0,0,0.12)" }}>
+      <div className="relative w-full rounded-2xl overflow-hidden flex-shrink-0"
+        style={{ height: "36%", minHeight: "180px", maxHeight: "320px", maxWidth: "672px", boxShadow: "0 4px 16px rgba(0,0,0,0.12)" }}>
         <Image src="/hero.jpg" alt="Driving lesson" fill
           className="object-cover" sizes="100vw" priority />
         <div className="absolute inset-0"
