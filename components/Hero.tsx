@@ -68,9 +68,9 @@ export default function Hero({ onSelect }: HeroProps) {
         style={{ background: "#ffffff", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
 
         <div className="mb-2">
-          <Image src="/her.jpeg" alt="S & A Rijacademie" width={100} height={100}
+          <Image src="/logo.png" alt="Sewar Rijbewijsonline" width={120} height={120}
             className="rounded-full object-cover"
-            style={{ width: '100px', height: '100px', border: "3px solid #f3f4f6" }} />
+            style={{ width: '120px', height: '120px', border: "3px solid #f3f4f6" }} />
         </div>
 
         <p className="text-xs leading-relaxed mb-3 max-w-xl font-medium" style={{ color: "#7c3aed" }}>
