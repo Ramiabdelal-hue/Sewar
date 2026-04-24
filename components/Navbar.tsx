@@ -490,9 +490,9 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
               })}
               <li>
                 <button onClick={() => setShowPWAModal(true)}
-                  className="flex flex-col items-center gap-0.5 px-5 py-2.5 font-bold text-[11px] uppercase tracking-wide border-b-2 border-transparent transition-all"
-                  style={{ color: "#9ca3af" }}>
-                  <FaMobileAlt style={{ fontSize: "16px", color: "#9ca3af" }} />
+                  className="flex flex-col items-center gap-0.5 px-4 py-2 font-bold text-[11px] uppercase tracking-wide transition-all ml-2 rounded-xl"
+                  style={{ background: "linear-gradient(135deg,#f5a623,#e8920a)", color: "white" }}>
+                  <FaMobileAlt style={{ fontSize: "16px" }} />
                   App
                 </button>
               </li>
@@ -512,9 +512,9 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                 );
               })}
               <button onClick={() => setShowPWAModal(true)}
-                className="flex flex-col items-center justify-center gap-0.5 px-3 py-2 font-bold text-[10px] uppercase whitespace-nowrap flex-shrink-0 border-b-2 border-transparent"
-                style={{ color: "#9ca3af" }}>
-                <FaMobileAlt style={{ fontSize: "15px", color: "#9ca3af" }} />
+                className="flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 font-bold text-[10px] uppercase whitespace-nowrap flex-shrink-0 rounded-xl ml-1"
+                style={{ background: "linear-gradient(135deg,#f5a623,#e8920a)", color: "white" }}>
+                <FaMobileAlt style={{ fontSize: "15px" }} />
                 <span>App</span>
               </button>
             </div>
