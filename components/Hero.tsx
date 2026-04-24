@@ -43,13 +43,13 @@ export default function Hero({ onSelect }: HeroProps) {
   return (
     <>
     <section
-      className="flex flex-col px-3 py-3 overflow-y-auto gap-3"
+      className="flex flex-col md:flex-row px-3 md:px-8 py-3 md:py-6 overflow-y-auto gap-3 md:gap-6 md:items-center md:justify-center"
       dir={lang === "ar" ? "rtl" : "ltr"}
       style={{ height: "100%", background: "#f0f0f0" }}
     >
       {/* الصورة */}
-      <div className="relative w-full rounded-2xl overflow-hidden flex-shrink-0"
-        style={{ height: "36%", boxShadow: "0 4px 16px rgba(0,0,0,0.12)" }}>
+      <div className="relative w-full md:w-1/2 md:flex-shrink-0 rounded-2xl overflow-hidden"
+        style={{ height: "36%", minHeight: "200px", boxShadow: "0 4px 16px rgba(0,0,0,0.12)" }}>
         <Image src="/hero.jpg" alt="Driving lesson" fill
           className="object-cover" sizes="100vw" priority />
         <div className="absolute inset-0"
@@ -64,7 +64,7 @@ export default function Hero({ onSelect }: HeroProps) {
       </div>
 
       {/* البطاقة البيضاء */}
-      <div className="flex flex-col items-center text-center px-4 py-4 rounded-2xl flex-1"
+      <div className="flex flex-col items-center text-center px-4 py-4 rounded-2xl flex-1 md:h-full md:justify-center"
         style={{ background: "#ffffff", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
 
         <div className="mb-2">
@@ -73,12 +73,12 @@ export default function Hero({ onSelect }: HeroProps) {
             style={{ width: '150px', height: '150px', border: "3px solid #f3f4f6" }} />
         </div>
 
-        <p className="text-xs leading-relaxed mb-3 max-w-xl font-medium" style={{ color: "#7c3aed" }}>
+        <p className="text-xs md:text-sm leading-relaxed mb-3 max-w-xl font-medium" style={{ color: "#7c3aed" }}>
           {t.heroText}
         </p>
 
         <button onClick={() => router.push("/theorie")}
-          className="group flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm transition-all hover:scale-105 active:scale-95 mb-3 w-full justify-center"
+          className="group flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm md:text-base transition-all hover:scale-105 active:scale-95 mb-3 w-full justify-center"
           style={{ background: "linear-gradient(135deg, #d4af37, #f0d060, #d4af37)", color: "#0a0a0a", boxShadow: "0 4px 16px rgba(212,175,55,0.4)" }}>
           <span>{t.heroButton}</span>
           <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -86,17 +86,17 @@ export default function Hero({ onSelect }: HeroProps) {
           </svg>
         </button>
 
-        <div className="w-full grid grid-cols-3 gap-2 pt-3 border-t mt-auto" style={{ borderColor: "#f3f4f6" }}>
+        <div className="w-full grid grid-cols-3 gap-2 md:gap-4 pt-3 border-t mt-auto" style={{ borderColor: "#f3f4f6" }}>
           {[
             { icon: "👥", value: "10,000+", label: lang === "ar" ? "طالب" : lang === "nl" ? "Studenten" : lang === "fr" ? "Étudiants" : "Students" },
             { icon: "✅", value: "100%", label: lang === "ar" ? "نجاح" : lang === "nl" ? "Geslaagd" : lang === "fr" ? "Réussite" : "Pass rate" },
             { icon: "🏅", value: "A·B·C", label: lang === "ar" ? "فئات" : lang === "nl" ? "Categorieën" : lang === "fr" ? "Catégories" : "Categories" },
           ].map((stat, i) => (
-            <div key={i} className="flex flex-col items-center justify-center gap-1 py-2 rounded-2xl"
+            <div key={i} className="flex flex-col items-center justify-center gap-1 py-2 md:py-4 rounded-2xl"
               style={{ background: "#f9fafb", border: "1px solid #f3f4f6" }}>
-              <span className="text-lg">{stat.icon}</span>
-              <div className="text-base font-black" style={{ color: "#7c3aed" }}>{stat.value}</div>
-              <div className="text-[10px] font-medium" style={{ color: "#9ca3af" }}>{stat.label}</div>
+              <span className="text-lg md:text-2xl">{stat.icon}</span>
+              <div className="text-base md:text-xl font-black" style={{ color: "#7c3aed" }}>{stat.value}</div>
+              <div className="text-[10px] md:text-xs font-medium" style={{ color: "#9ca3af" }}>{stat.label}</div>
             </div>
           ))}
         </div>
