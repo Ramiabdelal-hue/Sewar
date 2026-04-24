@@ -153,22 +153,13 @@ export default function ExamenPage() {
         <div className="max-w-2xl mx-auto px-4 py-6">
 
           {/* Header */}
-          <div className="flex items-center gap-3 mb-6">
-            <button
-              onClick={() => { setShowLessons(false); setExamBatches([]); }}
-              className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-[#003399] hover:bg-blue-100 transition flex-shrink-0"
-              style={{background:"#eff6ff", border:"2px solid #bfdbfe"}}
-            >
-              ←
-            </button>
-            <div>
-              <h1 className="text-xl font-black text-[#003399]">
-                {lang === "ar" ? "اختر الامتحان" : lang === "nl" ? "Kies een examen" : lang === "fr" ? "Choisir un examen" : "Choose an exam"}
-              </h1>
-              <p className="text-gray-500 text-xs mt-0.5">
-                {lang === "ar" ? `فئة ${selectedCategory}` : `Categorie ${selectedCategory}`}
-              </p>
-            </div>
+          <div className="mb-6">
+            <h1 className="text-xl font-black text-[#003399]">
+              {lang === "ar" ? "اختر الامتحان" : lang === "nl" ? "Kies een examen" : lang === "fr" ? "Choisir un examen" : "Choose an exam"}
+            </h1>
+            <p className="text-gray-500 text-xs mt-0.5">
+              {lang === "ar" ? `فئة ${selectedCategory}` : `Categorie ${selectedCategory}`}
+            </p>
           </div>
 
           {loadingBatches ? (
