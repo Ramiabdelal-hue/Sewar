@@ -43,108 +43,70 @@ export default function Hero({ onSelect }: HeroProps) {
   return (
     <>
     <section
-      className="flex justify-center items-center px-3 py-2"
+      className="flex justify-center items-start px-3 py-3 overflow-y-auto"
       dir={lang === "ar" ? "rtl" : "ltr"}
-      style={{
-        height: "100%",
-        overflow: "hidden",
-      background: "#f5f5f5"
-      }}
+      style={{ height: "100%", background: "#f5f5f5" }}
     >
-      <div className="relative w-full max-w-4xl h-full flex items-center">
+      <div className="w-full max-w-2xl flex flex-col gap-3">
 
-        {/* توهج ذهبي خلفي */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl opacity-20 pointer-events-none"
-          style={{ background: "radial-gradient(circle, #d4af37, transparent)" }}
-        ></div>
-
-        <div className="relative rounded-2xl flex flex-col border w-full"
-          style={{ borderColor: "#e5e7eb", boxShadow: "0 4px 24px rgba(0,0,0,0.08)", background: "#ffffff" }}
-        >
-          {/* صورة الخلفية */}
-          <div className="relative h-36 md:h-52 group overflow-hidden rounded-t-2xl flex-shrink-0">
-            <Image
-              src="/hero.jpg"
-              alt="Driving lesson"
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-700"
-              sizes="100vw"
-              priority
-            />
-            <div className="absolute inset-0"
-              style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(10,10,10,0.7))" }}
-            ></div>
-
-            {/* شارة */}
-            <div className="absolute top-3 left-3 z-20 flex items-center gap-2 px-3 py-1 rounded-full border"
-              style={{ background: "rgba(124,58,237,0.9)", borderColor: "rgba(124,58,237,0.5)" }}
-            >
-              <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#fbbf24" }}></div>
-              <span className="text-xs font-bold text-white">
-                {lang === "ar" ? "متاح الآن" : lang === "nl" ? "Nu beschikbaar" : lang === "fr" ? "Disponible" : "Available now"}
-              </span>
-            </div>
-          </div>
-
-          {/* قسم المحتوى */}
-          <div className="flex flex-col items-center text-center pt-4 pb-4 px-4 md:px-12 relative"
-            style={{ background: "#ffffff" }}
-          >
-            {/* خط رمادي فاتح */}
-            <div className="absolute top-0 left-0 w-full h-0.5"
-              style={{ background: "linear-gradient(to right, transparent, #e5e7eb, transparent)" }}
-            ></div>
-
-            {/* اللوغو */}
-            <div className="mb-3">
-              <Image
-                src="/her.jpeg"
-                alt="S & A Rijacademie"
-                width={140}
-                height={140}
-                className="rounded-full object-cover"
-                style={{ width: '140px', height: '140px' }}
-              />
-            </div>
-
-            <p className="text-xs md:text-sm leading-relaxed mb-4 max-w-xl" style={{ color: "#7c3aed" }}>
-              {t.heroText}
-            </p>
-
-            <button
-              onClick={() => router.push("/theorie")}
-              className="group flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-sm transition-all hover:scale-105 active:scale-95 mb-3"
-              style={{
-                background: "linear-gradient(135deg, #d4af37, #f0d060, #d4af37)",
-                color: "#0a0a0a",
-                boxShadow: "0 4px 20px rgba(212,175,55,0.4)"
-              }}
-            >
-              <span>{t.heroButton}</span>
-              <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={lang === "ar" ? "M15 19l-7-7 7-7" : "M9 5l7 7-7 7"} />
-              </svg>
-            </button>
-
-            
-            <div className="w-full grid grid-cols-3 gap-3 pt-4 border-t"
-              style={{ borderColor: "#f3f4f6" }}
-            >
-              {[
-                { icon: "👥", value: "10,000+", label: lang === "ar" ? "طالب" : lang === "nl" ? "Studenten" : lang === "fr" ? "Étudiants" : "Students" },
-                { icon: "✅", value: "100%", label: lang === "ar" ? "نجاح" : lang === "nl" ? "Geslaagd" : lang === "fr" ? "Réussite" : "Pass rate" },
-                { icon: "🏅", value: "A·B·C", label: lang === "ar" ? "فئات" : lang === "nl" ? "Categorieën" : lang === "fr" ? "Catégories" : "Categories" },
-              ].map((stat, i) => (
-                <div key={i} className="flex flex-col items-center justify-center gap-1 py-3 rounded-2xl"
-                  style={{ background: "#ffffff", border: "1px solid #f3f4f6", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
-                  <span className="text-xl" style={{ color: "#9ca3af" }}>{stat.icon}</span>
-                  <div className="text-lg md:text-xl font-black" style={{ color: "#7c3aed" }}>{stat.value}</div>
-                  <div className="text-[10px] font-medium" style={{ color: "#9ca3af" }}>{stat.label}</div>
-                </div>
-              ))}
-            </div>
+        {/* الصورة - منفصلة */}
+        <div className="relative h-44 md:h-56 rounded-2xl overflow-hidden flex-shrink-0"
+          style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.12)" }}>
+          <Image src="/hero.jpg" alt="Driving lesson" fill
+            className="object-cover" sizes="100vw" priority />
+          <div className="absolute inset-0"
+            style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.05), rgba(0,0,0,0.3))" }} />
+          {/* شارة Nu beschikbaar */}
+          <div className="absolute top-3 left-3 z-20 flex items-center gap-2 px-3 py-1 rounded-full"
+            style={{ background: "rgba(124,58,237,0.92)" }}>
+            <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#fbbf24" }} />
+            <span className="text-xs font-bold text-white">
+              {lang === "ar" ? "متاح الآن" : lang === "nl" ? "Nu beschikbaar" : lang === "fr" ? "Disponible" : "Available now"}
+            </span>
           </div>
         </div>
+
+        {/* البطاقة البيضاء - منفصلة */}
+        <div className="flex flex-col items-center text-center px-4 py-4 rounded-2xl"
+          style={{ background: "#ffffff", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+
+          {/* اللوغو */}
+          <div className="mb-3">
+            <Image src="/her.jpeg" alt="S & A Rijacademie" width={120} height={120}
+              className="rounded-full object-cover"
+              style={{ width: '120px', height: '120px', border: "3px solid #f3f4f6" }} />
+          </div>
+
+          <p className="text-xs md:text-sm leading-relaxed mb-4 max-w-xl font-medium" style={{ color: "#7c3aed" }}>
+            {t.heroText}
+          </p>
+
+          <button onClick={() => router.push("/theorie")}
+            className="group flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm transition-all hover:scale-105 active:scale-95 mb-4 w-full justify-center"
+            style={{ background: "linear-gradient(135deg, #d4af37, #f0d060, #d4af37)", color: "#0a0a0a", boxShadow: "0 4px 16px rgba(212,175,55,0.4)" }}>
+            <span>{t.heroButton}</span>
+            <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={lang === "ar" ? "M15 19l-7-7 7-7" : "M9 5l7 7-7 7"} />
+            </svg>
+          </button>
+
+          {/* الكروت */}
+          <div className="w-full grid grid-cols-3 gap-3 pt-3 border-t" style={{ borderColor: "#f3f4f6" }}>
+            {[
+              { icon: "👥", value: "10,000+", label: lang === "ar" ? "طالب" : lang === "nl" ? "Studenten" : lang === "fr" ? "Étudiants" : "Students" },
+              { icon: "✅", value: "100%", label: lang === "ar" ? "نجاح" : lang === "nl" ? "Geslaagd" : lang === "fr" ? "Réussite" : "Pass rate" },
+              { icon: "🏅", value: "A·B·C", label: lang === "ar" ? "فئات" : lang === "nl" ? "Categorieën" : lang === "fr" ? "Catégories" : "Categories" },
+            ].map((stat, i) => (
+              <div key={i} className="flex flex-col items-center justify-center gap-1 py-3 rounded-2xl"
+                style={{ background: "#f9fafb", border: "1px solid #f3f4f6" }}>
+                <span className="text-xl">{stat.icon}</span>
+                <div className="text-base md:text-lg font-black" style={{ color: "#7c3aed" }}>{stat.value}</div>
+                <div className="text-[10px] font-medium" style={{ color: "#9ca3af" }}>{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
       </div>
     </section>
 
