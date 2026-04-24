@@ -415,26 +415,21 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
   return (
     <>
       <header dir={lang === "ar" ? "rtl" : "ltr"}>
-        {/* الشريط العلوي - أزرق */}
-        <div className="bg-[#0066cc] text-white">
+        {/* الشريط العلوي - أبيض */}
+        <div className="bg-white border-b border-gray-100 shadow-sm">
           <div className="max-w-5xl mx-auto px-3 py-2 flex items-center justify-between">
-            {/* اللوغو + اسم الموقع */}
+            {/* اللوغو + اسم الموقع - ألوان العلم البلجيكي */}
             <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.href = "/"}>
-              <span className="text-base md:text-2xl font-black tracking-wide uppercase hidden sm:inline">
-                <span style={{ color: '#000000' }}>SEWAR</span>{' '}
-                <span style={{ color: '#FFD700' }}>RIJBEWIJS</span>
-                <span style={{ color: '#FF0000' }}>ONLINE</span>
-              </span>
-              <span className="text-base font-black tracking-wide uppercase sm:hidden">
-                <span style={{ color: '#000000' }}>SEWAR</span>{' '}
-                <span style={{ color: '#FFD700' }}>RIJBEWIJS</span>
-                <span style={{ color: '#FF0000' }}>ONLINE</span>
+              <span className="text-base md:text-2xl font-black tracking-wide uppercase">
+                <span style={{ color: '#1a1a1a' }}>SEWAR </span>
+                <span style={{ color: '#f5a623' }}>RIJBEWIJS</span>
+                <span style={{ color: '#e63946' }}>ONLINE</span>
               </span>
             </div>
 
-            {/* أزرار اللغة + PWA + Inloggen */}
-            <div className="flex flex-col items-end gap-1">
-              {/* صف: أزرار اللغة + زر التلفون */}
+            {/* أزرار اللغة + Inloggen */}
+            <div className="flex flex-col items-end gap-1.5">
+              {/* أزرار اللغة */}
               <div className="flex gap-1 items-center">
                 {[
                   { code: "nl", label: "NL" },
@@ -445,30 +440,30 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                   <button
                     key={code}
                     onClick={() => changeLang(code)}
-                    className={`px-2 py-1 md:px-3 md:py-1 font-bold text-xs md:text-sm border-2 transition-all ${
+                    className={`px-2.5 py-1 font-bold text-xs rounded-md border transition-all ${
                       lang === code
-                        ? "bg-white text-[#0066cc] border-white"
-                        : "bg-transparent text-white border-white/60 hover:border-white hover:bg-white/10"
+                        ? "text-white border-transparent"
+                        : "bg-transparent text-gray-500 border-gray-200 hover:border-[#7c3aed] hover:text-[#7c3aed]"
                     }`}
+                    style={lang === code ? { background: "linear-gradient(135deg,#7c3aed,#5b21b6)", borderColor: "transparent" } : {}}
                   >
                     {label}
                   </button>
                 ))}
               </div>
 
-              {/* زر Inloggen */}
+              {/* زر Inloggen / Logout */}
               {!isLoggedIn ? (
                 <button
                   onClick={() => onOpenLogin ? onOpenLogin() : setShowLoginModal(true)}
-                  className="w-full flex items-center justify-center gap-1.5 py-1 font-black text-xs uppercase tracking-wide transition-all active:scale-95 hover:opacity-90"
-                  style={{ background: "linear-gradient(135deg, #ffcc00, #ff9900)", color: "#003399" }}
+                  className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg font-black text-xs uppercase tracking-wide transition-all active:scale-95 hover:opacity-90 text-white"
+                  style={{ background: "linear-gradient(135deg,#7c3aed,#5b21b6)" }}
                 >
                   <FaSignInAlt className="text-xs" />
                   {lang === "ar" ? "دخول" : lang === "nl" ? "Inloggen" : lang === "fr" ? "Connexion" : "Login"}
                 </button>
               ) : (
-                <div className="flex flex-col gap-1 w-full">
-                  {/* زر Logout في المكان الأول */}
+                <div className="flex flex-col gap-0.5 items-end">
                   <button
                     onClick={() => {
                       localStorage.removeItem("userEmail");
@@ -477,33 +472,16 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                       localStorage.removeItem("userName");
                       window.location.href = "/";
                     }}
-                    className="w-full py-1 text-xs font-black uppercase bg-red-500 hover:bg-red-600 transition-colors text-white text-center"
+                    className="px-4 py-1.5 rounded-lg text-xs font-black uppercase bg-red-500 hover:bg-red-600 transition-colors text-white"
                   >
                     {lang === "ar" ? "خروج" : lang === "nl" ? "Logout" : lang === "fr" ? "Déconnexion" : "Logout"}
                   </button>
-                  {/* رسالة الترحيب تحت زر Logout */}
-                  <div className="text-center text-white text-xs">
-                    {lang === "ar" ? "أهلاً وسهلاً" : 
-                     lang === "nl" ? "Welkom" : 
-                     lang === "fr" ? "Bienvenue" : 
-                     "Welcome"} {userName && `, ${userName}`}
+                  <div className="text-right text-gray-600 text-xs">
+                    {lang === "ar" ? "أهلاً" : lang === "nl" ? "Welkom" : lang === "fr" ? "Bienvenue" : "Welcome"}{userName && `, ${userName}`}
                     {daysLeft !== null && (
-                      <div className={`mt-0.5 ${
-                        isExpired ? "text-red-300" :
-                        daysLeft <= 3 ? "text-orange-300" :
-                        "text-green-300"
-                      }`}>
-                        {isExpired ? 
-                          (lang === "ar" ? "انتهت الصلاحية" : 
-                           lang === "nl" ? "Verlopen" : 
-                           lang === "fr" ? "Expiré" : 
-                           "Expired") : 
-                          (lang === "ar" ? `${daysLeft} يوم متبقي` :
-                           lang === "fr" ? `${daysLeft}j restants` :
-                           lang === "en" ? `${daysLeft}d left` :
-                           `${daysLeft}d over`)
-                        }
-                      </div>
+                      <span className={`ml-1 font-bold ${isExpired ? "text-red-500" : daysLeft <= 3 ? "text-orange-500" : "text-green-600"}`}>
+                        {isExpired ? (lang === "ar" ? "منتهي" : "Verlopen") : `${daysLeft}d`}
+                      </span>
                     )}
                   </div>
                 </div>
@@ -512,9 +490,9 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
           </div>
         </div>
 
-        {/* الشريط الثاني - روابط التنقل */}
-        <div className="bg-[#004499] text-white">
-          <div className="max-w-5xl mx-auto px-4">
+        {/* الشريط الثاني - أبيض مع أيقونات بنفسجية */}
+        <div className="bg-white border-b border-gray-100 shadow-sm">
+          <div className="max-w-5xl mx-auto px-2">
             {/* Desktop */}
             <ul className="hidden md:flex items-center">
               {navLinks.map((link, i) => {
@@ -523,35 +501,53 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                   <li key={i}>
                     <button
                       onClick={() => link.onClick ? link.onClick() : window.location.href = link.href}
-                      className={`flex items-center gap-1.5 px-4 py-2.5 font-bold text-sm uppercase tracking-wide border-r border-white/20 transition-colors ${
-                        isActive ? "bg-white text-[#0066cc]" : "hover:bg-[#0066cc] text-white"
+                      className={`flex flex-col items-center gap-0.5 px-5 py-2.5 font-bold text-xs uppercase tracking-wide transition-all border-b-2 ${
+                        isActive ? "border-[#7c3aed] text-[#7c3aed]" : "border-transparent text-gray-500 hover:text-[#7c3aed]"
                       }`}
                     >
-                      {link.icon}
+                      <span className={`text-base ${isActive ? "text-[#7c3aed]" : "text-gray-400"}`}>{link.icon}</span>
                       {link.label}
                     </button>
                   </li>
                 );
               })}
+              {/* زر App */}
+              <li>
+                <button
+                  onClick={() => setShowPWAModal(true)}
+                  className="flex flex-col items-center gap-0.5 px-5 py-2.5 font-bold text-xs uppercase tracking-wide transition-all border-b-2 border-transparent text-gray-500 hover:text-[#7c3aed]"
+                >
+                  <FaMobileAlt className="text-base text-gray-400" />
+                  App
+                </button>
+              </li>
             </ul>
 
             {/* Mobile - أزرار أفقية */}
-            <div className="md:hidden flex items-center gap-1 py-1.5 overflow-x-auto scrollbar-hide">
+            <div className="md:hidden flex items-center overflow-x-auto scrollbar-hide">
               {navLinks.map((link, i) => {
                 const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
                 return (
                   <button
                     key={i}
                     onClick={() => { link.onClick ? link.onClick() : window.location.href = link.href; }}
-                    className={`flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase whitespace-nowrap flex-shrink-0 transition-all ${
-                      isActive ? "bg-white text-[#0066cc]" : "text-white hover:bg-[#0066cc]"
+                    className={`flex flex-col items-center justify-center gap-0.5 px-3 py-2 font-bold text-[10px] uppercase whitespace-nowrap flex-shrink-0 transition-all border-b-2 ${
+                      isActive ? "border-[#7c3aed] text-[#7c3aed]" : "border-transparent text-gray-500"
                     }`}
                   >
-                    <span className="text-sm">{link.icon}</span>
+                    <span className={`text-sm ${isActive ? "text-[#7c3aed]" : "text-gray-400"}`}>{link.icon}</span>
                     <span>{link.label}</span>
                   </button>
                 );
               })}
+              {/* زر App */}
+              <button
+                onClick={() => setShowPWAModal(true)}
+                className="flex flex-col items-center justify-center gap-0.5 px-3 py-2 font-bold text-[10px] uppercase whitespace-nowrap flex-shrink-0 border-b-2 border-transparent text-gray-500"
+              >
+                <FaMobileAlt className="text-sm text-gray-400" />
+                <span>App</span>
+              </button>
             </div>
           </div>
         </div>
