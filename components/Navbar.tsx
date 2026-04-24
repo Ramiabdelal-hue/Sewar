@@ -533,22 +533,6 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                   </li>
                 );
               })}
-              {/* زر تحميل التطبيق - بجانب Contact */}
-              <li>
-                <button
-                  onClick={() => setShowPWAModal(true)}
-                  className="relative flex items-center gap-1.5 px-4 py-2.5 font-bold text-sm uppercase tracking-wide transition-all hover:scale-105 active:scale-95"
-                  style={{
-                    background: "linear-gradient(135deg, #22c55e, #16a34a)",
-                    color: "white",
-                  }}
-                >
-                  <FaMobileAlt size={14} />
-                  {lang === "ar" ? "تطبيق" : lang === "nl" ? "App" : lang === "fr" ? "App" : "App"}
-                  <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-yellow-400 animate-ping" />
-                  <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-yellow-400" />
-                </button>
-              </li>
             </ul>
 
             {/* Mobile - أزرار أفقية */}
@@ -568,15 +552,6 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                   </button>
                 );
               })}
-              {/* زر App */}
-              <button
-                onClick={() => setShowPWAModal(true)}
-                className="flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase whitespace-nowrap flex-shrink-0 transition-all"
-                style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white" }}
-              >
-                <FaMobileAlt size={13} />
-                <span>App</span>
-              </button>
             </div>
           </div>
         </div>
