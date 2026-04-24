@@ -73,7 +73,6 @@ export default function Hero({ onSelect }: HeroProps) {
             className="rounded-full object-cover"
             style={{ width: '150px', height: '150px', border: "3px solid #f3f4f6" }} />
         </div>
-        </div>
 
         <p className="text-xs md:text-sm leading-relaxed mb-3 max-w-xl font-medium" style={{ color: "#7c3aed" }}>
           {t.heroText}
