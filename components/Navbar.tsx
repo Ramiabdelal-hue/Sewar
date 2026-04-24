@@ -420,7 +420,7 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
           <div className="max-w-5xl mx-auto px-3 py-2.5 flex items-center justify-between gap-4">
             {/* اسم الموقع - ألوان العلم البلجيكي */}
             <div className="cursor-pointer" onClick={() => window.location.href = "/"}>
-              <span className="text-lg md:text-2xl font-black tracking-wide uppercase whitespace-nowrap">
+              <span className="text-sm md:text-2xl font-black tracking-wide uppercase whitespace-nowrap">
                 <span style={{ color: '#1a1a1a' }}>SEWAR </span>
                 <span style={{ color: '#f5a623' }}>RIJBEWIJS</span>
                 <span style={{ color: '#e63946' }}>ONLINE</span>
