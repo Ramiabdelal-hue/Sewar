@@ -43,11 +43,11 @@ export default function Hero({ onSelect }: HeroProps) {
   return (
     <>
     <section
-      className="flex justify-center items-start px-3 py-3 overflow-y-auto"
+      className="flex justify-center items-start px-3 pt-4 pb-3 overflow-y-auto"
       dir={lang === "ar" ? "rtl" : "ltr"}
       style={{ height: "100%", background: "#f5f5f5" }}
     >
-      <div className="w-full max-w-2xl flex flex-col gap-3">
+      <div className="w-full max-w-2xl flex flex-col gap-3 mx-auto">
 
         {/* الصورة - منفصلة */}
         <div className="relative h-44 md:h-56 rounded-2xl overflow-hidden flex-shrink-0"
