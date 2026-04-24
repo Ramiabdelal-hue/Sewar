@@ -20,9 +20,9 @@ function ExamenTestContent() {
   const offsetParam = parseInt(searchParams.get("offset") || "0");
   const limitParam = parseInt(searchParams.get("limit") || "0");
 
-  // دالة الرجوع - ترجع لصفحة الامتحانات الرئيسية (جدول A, B, C)
+  // دالة الرجوع - ترجع للصفحة السابقة
   const goBackToExamList = () => {
-    router.replace("/examen");
+    router.back();
   };
 
   const [questions, setQuestions] = useState<any[]>([]);
