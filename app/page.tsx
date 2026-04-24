@@ -20,29 +20,26 @@ export default function HomePage() {
         <Hero onSelect={() => setShowCheckout(true)} />
       </div>
       {/* Footer ثابت في الأسفل */}
-      <footer style={{ background: "linear-gradient(135deg, #0a0a2e 0%, #003399 100%)", flexShrink: 0 }}>
+      <footer style={{ background: "#ffffff", borderTop: "1px solid #e5e7eb", flexShrink: 0 }}>
         <div className="max-w-5xl mx-auto px-4 py-3">
-          <div className="h-px mb-3" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)" }} />
-          <div className="flex flex-col md:flex-row items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-3">
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-                style={{ background: "rgba(255,204,0,0.15)", border: "1px solid rgba(255,204,0,0.3)" }}>
-                <span className="text-xs">©</span>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                style={{ background: "#f3f4f6", border: "1px solid #e5e7eb" }}>
+                <span className="text-sm">©</span>
               </div>
               <div>
-                <p className="text-white font-black text-xs tracking-wide">Sewar Achour</p>
-                <p className="text-white/40 text-xs">BTW nr: 0766.704.232</p>
+                <p className="font-black text-xs tracking-wide" style={{ color: "#1a1a1a" }}>Sewar Achour</p>
+                <p className="text-xs" style={{ color: "#9ca3af" }}>BTW nr: 0766.704.232</p>
               </div>
             </div>
-            <div className="text-center">
-              <p className="text-white/50 text-xs">
-                © {new Date().getFullYear()} Sewar Rijbewijsonline.{" "}
-                {lang === "nl" ? "Alle rechten voorbehouden" :
-                 lang === "fr" ? "Tous droits réservés" :
-                 lang === "ar" ? "جميع الحقوق محفوظة" :
-                 "All rights reserved"}
-              </p>
-            </div>
+            <p className="text-xs text-center" style={{ color: "#9ca3af" }}>
+              © {new Date().getFullYear()} Sewar Rijbewijsonline.{" "}
+              {lang === "nl" ? "Alle rechten voorbehouden" :
+               lang === "fr" ? "Tous droits réservés" :
+               lang === "ar" ? "جميع الحقوق محفوظة" :
+               "All rights reserved"}
+            </p>
           </div>
         </div>
       </footer>
