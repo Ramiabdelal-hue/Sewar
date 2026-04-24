@@ -148,23 +148,24 @@ export default function ExamenPage() {
 
   if (showLessons && userEmail && selectedCategory) {
     return (
-      <div className="min-h-screen" dir={lang === "ar" ? "rtl" : "ltr"} style={{background:"#f0f4f8"}}>
+      <div className="min-h-screen bg-white" dir={lang === "ar" ? "rtl" : "ltr"}>
         <Navbar />
-        <div className="max-w-2xl mx-auto px-4 py-6">
+        <div className="max-w-2xl mx-auto px-4 py-12">
 
           {/* Header */}
-          <div className="mb-6">
-            <h1 className="text-xl font-black text-[#003399]">
-              {lang === "ar" ? "اختر الامتحان" : lang === "nl" ? "Kies een examen" : lang === "fr" ? "Choisir un examen" : "Choose an exam"}
+          <div className="text-center mb-8">
+            <div className="text-5xl mb-4">🎯</div>
+            <h1 className="text-2xl font-black text-[#003399] uppercase mb-2">
+              {lang === "ar" ? `امتحان الفئة ${selectedCategory}` : lang === "nl" ? `Examen Categorie ${selectedCategory}` : lang === "fr" ? `Examen Catégorie ${selectedCategory}` : `Exam Category ${selectedCategory}`}
             </h1>
-            <p className="text-gray-500 text-xs mt-0.5">
-              {lang === "ar" ? `فئة ${selectedCategory}` : `Categorie ${selectedCategory}`}
+            <p className="text-gray-500 text-sm">
+              {lang === "ar" ? "اختر الامتحان" : lang === "nl" ? "Kies een examen" : lang === "fr" ? "Choisir un examen" : "Choose an exam"}
             </p>
           </div>
 
           {loadingBatches ? (
             <div className="flex items-center justify-center py-16">
-              <div className="w-10 h-10 border-4 border-[#003399] border-t-transparent rounded-full animate-spin"/>
+              <div className="w-12 h-12 border-4 border-[#003399] border-t-transparent rounded-full animate-spin"/>
             </div>
           ) : examBatches.length === 0 ? (
             <div className="text-center py-16 text-gray-400">
@@ -174,7 +175,7 @@ export default function ExamenPage() {
           ) : (
             <div className="space-y-4">
               {examBatches.map((item) => (
-                <div key={item.lessonId} className="bg-white rounded-2xl shadow-sm overflow-hidden" style={{border:"1px solid #e5e7eb"}}>
+                <div key={item.lessonId} className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
                   {/* عنوان الدرس */}
                   <div className="px-5 py-4 flex items-center gap-3" style={{background:"linear-gradient(135deg,#003399,#0055cc)"}}>
                     <span className="text-2xl">📚</span>

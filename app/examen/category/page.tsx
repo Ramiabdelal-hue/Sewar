@@ -415,17 +415,11 @@ function ExamenCategoryContent() {
           {questions.length === 0 ? (
             <p className="text-red-500 font-bold">{lang === "ar" ? "لا توجد أسئلة بعد" : lang === "nl" ? "Geen vragen beschikbaar" : lang === "fr" ? "Pas encore de questions" : "No questions yet"}</p>
           ) : (
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <button onClick={() => { unlockAudio(); setStarted(true); }}
-                className="px-10 py-4 font-black text-white text-lg rounded-xl transition-all hover:scale-105 active:scale-95"
-                style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-                {lang === "ar" ? "ابدأ الامتحان" : lang === "nl" ? "Start Examen" : lang === "fr" ? "Démarrer l'examen" : "Start Exam"} →
-              </button>
-              <button onClick={() => router.back()}
-                className="px-8 py-4 font-black border-2 border-gray-300 text-gray-600 text-lg rounded-xl hover:bg-gray-50 active:scale-95 transition-all">
-                ← {lang === "ar" ? "رجوع" : lang === "nl" ? "Terug" : lang === "fr" ? "Retour" : "Back"}
-              </button>
-            </div>
+            <button onClick={() => { unlockAudio(); setStarted(true); }}
+              className="px-10 py-4 font-black text-white text-lg rounded-xl transition-all hover:scale-105 active:scale-95"
+              style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
+              {lang === "ar" ? "ابدأ الامتحان" : lang === "nl" ? "Start Examen" : lang === "fr" ? "Démarrer l'examen" : "Start Exam"} →
+            </button>
           )}
         </div>
       </div>
