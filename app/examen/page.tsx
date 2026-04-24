@@ -33,31 +33,7 @@ export default function ExamenPage() {
     const stored = localStorage.getItem("renewPrefillData");
     if (stored) setPrefillData(JSON.parse(stored));
 
-    // قراءة URL params (بعد الاشتراك أو الرجوع من الامتحان)
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const emailParam = params.get("email");
-      const catParam = params.get("cat");
-      if (emailParam && catParam) {
-        setUserEmail(emailParam);
-        setSelectedCategory(catParam);
-        // استخدام cache إذا موجود، وإلا جلب البيانات
-        const cacheKey = `examBatches_${catParam}`;
-        const cached = sessionStorage.getItem(cacheKey);
-        if (cached) {
-          try {
-            setExamBatches(JSON.parse(cached));
-            setShowLessons(true);
-            return;
-          } catch {}
-        }
-        fetchExamBatches(catParam);
-        setShowLessons(true);
-        return;
-      }
-    }
-
-    // التحقق من اشتراك examen موجود في localStorage
+    // التحقق من اشتراك examen موجود في localStorage فقط
     const email = localStorage.getItem("userEmail");
     if (email) {
       fetch("/api/check-subscription", {
@@ -70,11 +46,7 @@ export default function ExamenPage() {
           if (data.success && data.subscriptions) {
             const examenSub = data.subscriptions.find((s: any) => s.subscriptionType === "examen");
             if (examenSub) {
-              const cat = examenSub.category || "B";
               setUserEmail(email);
-              setSelectedCategory(cat);
-              fetchExamBatches(cat);
-              setShowLessons(true);
             }
           }
         })

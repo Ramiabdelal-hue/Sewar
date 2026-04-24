@@ -20,10 +20,9 @@ function ExamenTestContent() {
   const offsetParam = parseInt(searchParams.get("offset") || "0");
   const limitParam = parseInt(searchParams.get("limit") || "0");
 
-  // دالة الرجوع - ترجع لقائمة الامتحانات مع الحفاظ على الـ cache
+  // دالة الرجوع - ترجع لصفحة الامتحانات الرئيسية (جدول A, B, C)
   const goBackToExamList = () => {
-    // استخدام replace بدل push لتجنب تراكم التاريخ
-    router.replace(`/examen?email=${encodeURIComponent(email || "guest")}&cat=${category}`);
+    router.replace("/examen");
   };
 
   const [questions, setQuestions] = useState<any[]>([]);
