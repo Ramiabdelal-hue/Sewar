@@ -43,14 +43,14 @@ export default function Hero({ onSelect }: HeroProps) {
   return (
     <>
     <section
-      className="flex justify-center items-center px-3 py-4 overflow-y-auto"
+      className="flex justify-center items-center px-0 md:px-3 py-0 md:py-4 overflow-y-auto"
       dir={lang === "ar" ? "rtl" : "ltr"}
       style={{ height: "100%", background: "#f5f5f5" }}
     >
-      <div className="w-full max-w-md md:max-w-2xl flex flex-col gap-3 mx-auto">
+      <div className="w-full md:max-w-2xl flex flex-col gap-0 md:gap-3 mx-auto h-full md:h-auto">
 
         {/* الصورة - منفصلة */}
-        <div className="relative h-44 md:h-56 rounded-2xl overflow-hidden flex-shrink-0"
+        <div className="relative h-44 md:h-56 rounded-none md:rounded-2xl overflow-hidden flex-shrink-0"
           style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.12)" }}>
           <Image src="/hero.jpg" alt="Driving lesson" fill
             className="object-cover" sizes="100vw" priority />
@@ -67,7 +67,7 @@ export default function Hero({ onSelect }: HeroProps) {
         </div>
 
         {/* البطاقة البيضاء - منفصلة */}
-        <div className="flex flex-col items-center text-center px-4 py-4 rounded-2xl"
+        <div className="flex flex-col items-center text-center px-4 py-4 rounded-none md:rounded-2xl flex-1 md:flex-none overflow-y-auto"
           style={{ background: "#ffffff", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
 
           {/* اللوغو */}
