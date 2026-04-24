@@ -417,7 +417,7 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
       <header dir={lang === "ar" ? "rtl" : "ltr"}>
         {/* الشريط العلوي - أبيض */}
         <div style={{ background: "#ffffff", borderBottom: "1px solid #e5e7eb" }}>
-          <div className="max-w-5xl mx-auto px-3 py-2.5 flex items-center justify-between">
+          <div className="max-w-5xl mx-auto px-3 py-2.5 flex items-center justify-between gap-4">
             {/* اسم الموقع - ألوان العلم البلجيكي */}
             <div className="cursor-pointer" onClick={() => window.location.href = "/"}>
               <span className="text-lg md:text-2xl font-black tracking-wide uppercase">
