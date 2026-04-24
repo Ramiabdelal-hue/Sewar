@@ -131,13 +131,15 @@ export default function Hero({ onSelect }: HeroProps) {
               style={{ borderColor: "#f3f4f6" }}
             >
               {[
-                { value: "10,000+", label: lang === "ar" ? "طالب" : lang === "nl" ? "Studenten" : lang === "fr" ? "Étudiants" : "Students" },
-                { value: "100%", label: lang === "ar" ? "نجاح" : lang === "nl" ? "Geslaagd" : lang === "fr" ? "Réussite" : "Pass rate" },
-                { value: "A·B·C", label: lang === "ar" ? "فئات" : lang === "nl" ? "Categorieën" : lang === "fr" ? "Catégories" : "Categories" },
+                { icon: "👥", value: "10,000+", label: lang === "ar" ? "طالب" : lang === "nl" ? "Studenten" : lang === "fr" ? "Étudiants" : "Students" },
+                { icon: "✅", value: "100%", label: lang === "ar" ? "نجاح" : lang === "nl" ? "Geslaagd" : lang === "fr" ? "Réussite" : "Pass rate" },
+                { icon: "🏅", value: "A·B·C", label: lang === "ar" ? "فئات" : lang === "nl" ? "Categorieën" : lang === "fr" ? "Catégories" : "Categories" },
               ].map((stat, i) => (
-                <div key={i} className="text-center">
-                  <div className="text-lg md:text-2xl font-black mb-0.5" style={{ color: "#7c3aed" }}>{stat.value}</div>
-                  <div className="text-xs" style={{ color: "#9ca3af" }}>{stat.label}</div>
+                <div key={i} className="flex flex-col items-center justify-center gap-1 py-3 rounded-2xl"
+                  style={{ background: "#ffffff", border: "1px solid #f3f4f6", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+                  <span className="text-xl" style={{ color: "#9ca3af" }}>{stat.icon}</span>
+                  <div className="text-lg md:text-xl font-black" style={{ color: "#7c3aed" }}>{stat.value}</div>
+                  <div className="text-[10px] font-medium" style={{ color: "#9ca3af" }}>{stat.label}</div>
                 </div>
               ))}
             </div>
