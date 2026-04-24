@@ -43,13 +43,13 @@ export default function Hero({ onSelect }: HeroProps) {
   return (
     <>
     <section
-      className="flex flex-col md:flex-row px-3 md:px-8 py-3 md:py-6 overflow-y-auto gap-3 md:gap-6 md:items-center md:justify-center"
+      className="flex flex-col items-center px-3 md:px-0 py-3 md:py-6 overflow-y-auto gap-3"
       dir={lang === "ar" ? "rtl" : "ltr"}
       style={{ height: "100%", background: "#f0f0f0" }}
     >
       {/* الصورة */}
-      <div className="relative w-full md:w-1/2 md:flex-shrink-0 rounded-2xl overflow-hidden"
-        style={{ height: "36%", minHeight: "200px", boxShadow: "0 4px 16px rgba(0,0,0,0.12)" }}>
+      <div className="relative w-full md:w-2xl rounded-2xl overflow-hidden flex-shrink-0"
+        style={{ height: "36%", minHeight: "180px", maxHeight: "320px", boxShadow: "0 4px 16px rgba(0,0,0,0.12)" }}>
         <Image src="/hero.jpg" alt="Driving lesson" fill
           className="object-cover" sizes="100vw" priority />
         <div className="absolute inset-0"
@@ -64,13 +64,15 @@ export default function Hero({ onSelect }: HeroProps) {
       </div>
 
       {/* البطاقة البيضاء */}
-      <div className="flex flex-col items-center text-center px-4 py-4 rounded-2xl flex-1 md:h-full md:justify-center"
-        style={{ background: "#ffffff", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+      <div className="flex flex-col items-center text-center px-4 md:px-8 py-4 md:py-6 rounded-2xl flex-1 w-full md:w-2xl"
+        style={{ background: "#ffffff", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", maxWidth: "672px" }}>
 
         <div className="mb-2">
-          <Image src="/Logo.jpeg" alt="Sewar Rijbewijsonline" width={150} height={150}
+          <Image src="/Logo.jpeg" alt="Sewar Rijbewijsonline"
+            width={150} height={150}
             className="rounded-full object-cover"
             style={{ width: '150px', height: '150px', border: "3px solid #f3f4f6" }} />
+        </div>
         </div>
 
         <p className="text-xs md:text-sm leading-relaxed mb-3 max-w-xl font-medium" style={{ color: "#7c3aed" }}>
