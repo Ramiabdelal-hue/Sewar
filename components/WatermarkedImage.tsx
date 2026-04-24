@@ -49,7 +49,7 @@ export default function WatermarkedImage({ src, className, style }: Props) {
 
     const logo = new Image();
     logo.crossOrigin = "anonymous";
-    logo.src = "/logo.png";
+    logo.src = "/Logo.jpeg";
 
     let imgLoaded = false;
     let logoLoaded = false;
