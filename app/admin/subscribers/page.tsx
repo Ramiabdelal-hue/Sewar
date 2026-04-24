@@ -80,7 +80,11 @@ export default function AdminSubscribersPage() {
   };
 
   useEffect(() => { if (isLogged) { fetchSubscribers(); fetch("/api/admin/subscribers?getNames=true").then(r=>r.json()).then(d=>{ if(d.success) setAvailableNames(d.names); }); } }, [isLogged]);
-  useEffect(() => { if (isLogged) fetchSubscribers(); }, [searchName, searchMonth, searchCategory, searchType]);
+  useEffect(() => {
+    if (!isLogged) return;
+    const timer = setTimeout(() => { fetchSubscribers(); }, 600);
+    return () => clearTimeout(timer);
+  }, [searchName, searchMonth, searchCategory, searchType]);
 
   const sendWarningEmail = async (email: string) => {
     setEmailSending(true); setEmailResult(null);
