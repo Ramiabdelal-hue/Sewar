@@ -43,70 +43,63 @@ export default function Hero({ onSelect }: HeroProps) {
   return (
     <>
     <section
-      className="flex justify-center items-center px-0 md:px-3 py-0 md:py-4 overflow-y-auto"
+      className="flex flex-col px-3 py-3 overflow-y-auto gap-3"
       dir={lang === "ar" ? "rtl" : "ltr"}
-      style={{ height: "100%", background: "#f5f5f5" }}
+      style={{ height: "100%", background: "#f0f0f0" }}
     >
-      <div className="w-full md:max-w-2xl flex flex-col gap-0 md:gap-3 mx-auto h-full md:h-auto">
+      {/* الصورة */}
+      <div className="relative w-full rounded-2xl overflow-hidden flex-shrink-0"
+        style={{ height: "42%", boxShadow: "0 4px 16px rgba(0,0,0,0.12)" }}>
+        <Image src="/hero.jpg" alt="Driving lesson" fill
+          className="object-cover" sizes="100vw" priority />
+        <div className="absolute inset-0"
+          style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.05), rgba(0,0,0,0.25))" }} />
+        <div className="absolute top-3 left-3 z-20 flex items-center gap-2 px-3 py-1 rounded-full"
+          style={{ background: "rgba(124,58,237,0.92)" }}>
+          <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#fbbf24" }} />
+          <span className="text-xs font-bold text-white">
+            {lang === "ar" ? "متاح الآن" : lang === "nl" ? "Nu beschikbaar" : lang === "fr" ? "Disponible" : "Available now"}
+          </span>
+        </div>
+      </div>
 
-        {/* الصورة - منفصلة */}
-        <div className="relative h-44 md:h-56 rounded-none md:rounded-2xl overflow-hidden flex-shrink-0"
-          style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.12)" }}>
-          <Image src="/hero.jpg" alt="Driving lesson" fill
-            className="object-cover" sizes="100vw" priority />
-          <div className="absolute inset-0"
-            style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.05), rgba(0,0,0,0.3))" }} />
-          {/* شارة Nu beschikbaar */}
-          <div className="absolute top-3 left-3 z-20 flex items-center gap-2 px-3 py-1 rounded-full"
-            style={{ background: "rgba(124,58,237,0.92)" }}>
-            <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#fbbf24" }} />
-            <span className="text-xs font-bold text-white">
-              {lang === "ar" ? "متاح الآن" : lang === "nl" ? "Nu beschikbaar" : lang === "fr" ? "Disponible" : "Available now"}
-            </span>
-          </div>
+      {/* البطاقة البيضاء */}
+      <div className="flex flex-col items-center text-center px-4 py-4 rounded-2xl flex-1"
+        style={{ background: "#ffffff", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+
+        <div className="mb-2">
+          <Image src="/her.jpeg" alt="S & A Rijacademie" width={100} height={100}
+            className="rounded-full object-cover"
+            style={{ width: '100px', height: '100px', border: "3px solid #f3f4f6" }} />
         </div>
 
-        {/* البطاقة البيضاء - منفصلة */}
-        <div className="flex flex-col items-center text-center px-4 py-4 rounded-none md:rounded-2xl flex-1 md:flex-none justify-center"
-          style={{ background: "#ffffff", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+        <p className="text-xs leading-relaxed mb-3 max-w-xl font-medium" style={{ color: "#7c3aed" }}>
+          {t.heroText}
+        </p>
 
-          {/* اللوغو */}
-          <div className="mb-3">
-            <Image src="/her.jpeg" alt="S & A Rijacademie" width={120} height={120}
-              className="rounded-full object-cover"
-              style={{ width: '120px', height: '120px', border: "3px solid #f3f4f6" }} />
-          </div>
+        <button onClick={() => router.push("/theorie")}
+          className="group flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm transition-all hover:scale-105 active:scale-95 mb-3 w-full justify-center"
+          style={{ background: "linear-gradient(135deg, #d4af37, #f0d060, #d4af37)", color: "#0a0a0a", boxShadow: "0 4px 16px rgba(212,175,55,0.4)" }}>
+          <span>{t.heroButton}</span>
+          <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={lang === "ar" ? "M15 19l-7-7 7-7" : "M9 5l7 7-7 7"} />
+          </svg>
+        </button>
 
-          <p className="text-xs md:text-sm leading-relaxed mb-4 max-w-xl font-medium" style={{ color: "#7c3aed" }}>
-            {t.heroText}
-          </p>
-
-          <button onClick={() => router.push("/theorie")}
-            className="group flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm transition-all hover:scale-105 active:scale-95 mb-4 w-full justify-center"
-            style={{ background: "linear-gradient(135deg, #d4af37, #f0d060, #d4af37)", color: "#0a0a0a", boxShadow: "0 4px 16px rgba(212,175,55,0.4)" }}>
-            <span>{t.heroButton}</span>
-            <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={lang === "ar" ? "M15 19l-7-7 7-7" : "M9 5l7 7-7 7"} />
-            </svg>
-          </button>
-
-          {/* الكروت */}
-          <div className="w-full grid grid-cols-3 gap-3 pt-3 border-t" style={{ borderColor: "#f3f4f6" }}>
-            {[
-              { icon: "👥", value: "10,000+", label: lang === "ar" ? "طالب" : lang === "nl" ? "Studenten" : lang === "fr" ? "Étudiants" : "Students" },
-              { icon: "✅", value: "100%", label: lang === "ar" ? "نجاح" : lang === "nl" ? "Geslaagd" : lang === "fr" ? "Réussite" : "Pass rate" },
-              { icon: "🏅", value: "A·B·C", label: lang === "ar" ? "فئات" : lang === "nl" ? "Categorieën" : lang === "fr" ? "Catégories" : "Categories" },
-            ].map((stat, i) => (
-              <div key={i} className="flex flex-col items-center justify-center gap-1 py-3 rounded-2xl"
-                style={{ background: "#f9fafb", border: "1px solid #f3f4f6" }}>
-                <span className="text-xl">{stat.icon}</span>
-                <div className="text-base md:text-lg font-black" style={{ color: "#7c3aed" }}>{stat.value}</div>
-                <div className="text-[10px] font-medium" style={{ color: "#9ca3af" }}>{stat.label}</div>
-              </div>
-            ))}
-          </div>
+        <div className="w-full grid grid-cols-3 gap-2 pt-3 border-t mt-auto" style={{ borderColor: "#f3f4f6" }}>
+          {[
+            { icon: "👥", value: "10,000+", label: lang === "ar" ? "طالب" : lang === "nl" ? "Studenten" : lang === "fr" ? "Étudiants" : "Students" },
+            { icon: "✅", value: "100%", label: lang === "ar" ? "نجاح" : lang === "nl" ? "Geslaagd" : lang === "fr" ? "Réussite" : "Pass rate" },
+            { icon: "🏅", value: "A·B·C", label: lang === "ar" ? "فئات" : lang === "nl" ? "Categorieën" : lang === "fr" ? "Catégories" : "Categories" },
+          ].map((stat, i) => (
+            <div key={i} className="flex flex-col items-center justify-center gap-1 py-2 rounded-2xl"
+              style={{ background: "#f9fafb", border: "1px solid #f3f4f6" }}>
+              <span className="text-lg">{stat.icon}</span>
+              <div className="text-base font-black" style={{ color: "#7c3aed" }}>{stat.value}</div>
+              <div className="text-[10px] font-medium" style={{ color: "#9ca3af" }}>{stat.label}</div>
+            </div>
+          ))}
         </div>
-
       </div>
     </section>
 
