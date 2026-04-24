@@ -270,7 +270,6 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [daysLeft, setDaysLeft] = useState<number | null>(null);
   const [isExpired, setIsExpired] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<any>(null);
@@ -552,49 +551,33 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
               </li>
             </ul>
 
-            {/* Mobile - زر القائمة */}
-            <div className="md:hidden flex items-center justify-between py-2">
+            {/* Mobile - أزرار أفقية */}
+            <div className="md:hidden flex items-center gap-1 py-1.5 overflow-x-auto scrollbar-hide">
+              {navLinks.map((link, i) => {
+                const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
+                return (
+                  <button
+                    key={i}
+                    onClick={() => { link.onClick ? link.onClick() : window.location.href = link.href; }}
+                    className={`flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase whitespace-nowrap flex-shrink-0 transition-all ${
+                      isActive ? "bg-white text-[#0066cc]" : "text-white hover:bg-[#0066cc]"
+                    }`}
+                  >
+                    <span className="text-sm">{link.icon}</span>
+                    <span>{link.label}</span>
+                  </button>
+                );
+              })}
+              {/* زر App */}
               <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="flex items-center gap-2 font-bold text-sm uppercase px-2"
+                onClick={() => setShowPWAModal(true)}
+                className="flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase whitespace-nowrap flex-shrink-0 transition-all"
+                style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white" }}
               >
-                <span className="text-xl">{isMobileMenuOpen ? "✕" : "☰"}</span>
-                <span className="text-xs">{lang === "ar" ? "القائمة" : lang === "nl" ? "Menu" : lang === "fr" ? "Menu" : "Menu"}</span>
+                <FaMobileAlt size={13} />
+                <span>App</span>
               </button>
             </div>
-
-            {/* Mobile Menu Dropdown */}
-            {isMobileMenuOpen && (
-              <div className="md:hidden pb-2 flex flex-col">
-                {navLinks.map((link, i) => {
-                  const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
-                  return (
-                    <button
-                      key={i}
-                      onClick={() => {
-                        link.onClick ? link.onClick() : window.location.href = link.href;
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className={`flex items-center gap-2 px-4 py-3 font-bold text-sm uppercase border-t border-white/20 transition-colors text-left ${
-                        isActive ? "bg-white text-[#0066cc]" : "hover:bg-[#0066cc]"
-                      }`}
-                    >
-                      {link.icon}
-                      {link.label}
-                    </button>
-                  );
-                })}
-                {/* زر تحميل التطبيق في Mobile */}
-                <button
-                  onClick={() => { setShowPWAModal(true); setIsMobileMenuOpen(false); }}
-                  className="flex items-center gap-2 px-4 py-3 font-bold text-sm uppercase border-t border-white/20 transition-colors text-left"
-                  style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white" }}
-                >
-                  <FaMobileAlt size={14} />
-                  {lang === "ar" ? "📲 تحميل التطبيق" : lang === "nl" ? "📲 App installeren" : lang === "fr" ? "📲 Installer l'app" : "📲 Install App"}
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </header>
