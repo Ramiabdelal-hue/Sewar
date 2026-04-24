@@ -213,17 +213,11 @@ function ExamenTestContent() {
           <p className="text-sm text-orange-600 font-bold mb-8">⏱ {lang === "ar" ? "15 ثانية لكل سؤال" : lang === "nl" ? "15 seconden per vraag" : "15 seconds per question"}</p>
           {questions.length === 0
             ? <p className="text-red-500 font-bold">{lang === "ar" ? "لا توجد أسئلة" : "Geen vragen"}</p>
-            : <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <button onClick={() => { unlockAudio(); setStarted(true); }}
-                  className="px-10 py-4 font-black text-white text-lg rounded-xl hover:scale-105 active:scale-95 transition-all"
-                  style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-                  {lang === "ar" ? "ابدأ الامتحان" : lang === "nl" ? "Start Examen" : "Start Exam"} →
-                </button>
-                <button onClick={goBackToExamList}
-                  className="px-8 py-4 font-black border-2 border-gray-300 text-gray-600 text-lg rounded-xl hover:bg-gray-50 active:scale-95 transition-all">
-                  ← {lang === "ar" ? "رجوع" : lang === "nl" ? "Terug" : "Back"}
-                </button>
-              </div>
+            : <button onClick={() => { unlockAudio(); setStarted(true); }}
+                className="px-10 py-4 font-black text-white text-lg rounded-xl hover:scale-105 active:scale-95 transition-all"
+                style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
+                {lang === "ar" ? "ابدأ الامتحان" : lang === "nl" ? "Start Examen" : "Start Exam"} →
+              </button>
           }
         </div>
       </div>
