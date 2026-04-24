@@ -47,7 +47,7 @@ export default function Hero({ onSelect }: HeroProps) {
       dir={lang === "ar" ? "rtl" : "ltr"}
       style={{ height: "100%", background: "#f5f5f5" }}
     >
-      <div className="w-full max-w-md flex flex-col gap-3 mx-auto">
+      <div className="w-full max-w-md md:max-w-2xl flex flex-col gap-3 mx-auto">
 
         {/* الصورة - منفصلة */}
         <div className="relative h-44 md:h-56 rounded-2xl overflow-hidden flex-shrink-0"
