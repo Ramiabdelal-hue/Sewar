@@ -48,7 +48,7 @@ export default function Hero({ onSelect }: HeroProps) {
       style={{
         height: "100%",
         overflow: "hidden",
-        background: "linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%)"
+      background: "#f5f5f5"
       }}
     >
       <div className="relative w-full max-w-4xl h-full flex items-center">
@@ -59,7 +59,7 @@ export default function Hero({ onSelect }: HeroProps) {
         ></div>
 
         <div className="relative rounded-2xl flex flex-col border w-full"
-          style={{ borderColor: "#d4af37", boxShadow: "0 0 60px rgba(212,175,55,0.3), 0 25px 50px rgba(0,0,0,0.8)" }}
+          style={{ borderColor: "#e5e7eb", boxShadow: "0 4px 24px rgba(0,0,0,0.08)", background: "#ffffff" }}
         >
           {/* صورة الخلفية */}
           <div className="relative h-36 md:h-52 group overflow-hidden rounded-t-2xl flex-shrink-0">
@@ -77,10 +77,10 @@ export default function Hero({ onSelect }: HeroProps) {
 
             {/* شارة */}
             <div className="absolute top-3 left-3 z-20 flex items-center gap-2 px-3 py-1 rounded-full border"
-              style={{ background: "rgba(0,0,0,0.8)", borderColor: "#d4af37" }}
+              style={{ background: "rgba(124,58,237,0.9)", borderColor: "rgba(124,58,237,0.5)" }}
             >
-              <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#d4af37" }}></div>
-              <span className="text-xs font-bold" style={{ color: "#d4af37" }}>
+              <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#fbbf24" }}></div>
+              <span className="text-xs font-bold text-white">
                 {lang === "ar" ? "متاح الآن" : lang === "nl" ? "Nu beschikbaar" : lang === "fr" ? "Disponible" : "Available now"}
               </span>
             </div>
@@ -88,11 +88,11 @@ export default function Hero({ onSelect }: HeroProps) {
 
           {/* قسم المحتوى */}
           <div className="flex flex-col items-center text-center pt-4 pb-4 px-4 md:px-12 relative"
-            style={{ background: "linear-gradient(135deg, #0f0f0f 0%, #1c1c1c 100%)" }}
+            style={{ background: "#ffffff" }}
           >
-            {/* خط ذهبي */}
+            {/* خط رمادي فاتح */}
             <div className="absolute top-0 left-0 w-full h-0.5"
-              style={{ background: "linear-gradient(to right, transparent, #d4af37, transparent)" }}
+              style={{ background: "linear-gradient(to right, transparent, #e5e7eb, transparent)" }}
             ></div>
 
             {/* اللوغو */}
@@ -107,7 +107,7 @@ export default function Hero({ onSelect }: HeroProps) {
               />
             </div>
 
-            <p className="text-xs md:text-sm leading-relaxed mb-4 max-w-xl" style={{ color: "#a0a0a0" }}>
+            <p className="text-xs md:text-sm leading-relaxed mb-4 max-w-xl" style={{ color: "#7c3aed" }}>
               {t.heroText}
             </p>
 
@@ -138,7 +138,7 @@ export default function Hero({ onSelect }: HeroProps) {
               <span className="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-yellow-400" />
             </button>
             <div className="w-full grid grid-cols-3 gap-3 pt-4 border-t"
-              style={{ borderColor: "rgba(212,175,55,0.2)" }}
+              style={{ borderColor: "#f3f4f6" }}
             >
               {[
                 { value: "10,000+", label: lang === "ar" ? "طالب" : lang === "nl" ? "Studenten" : lang === "fr" ? "Étudiants" : "Students" },
@@ -146,8 +146,8 @@ export default function Hero({ onSelect }: HeroProps) {
                 { value: "A·B·C", label: lang === "ar" ? "فئات" : lang === "nl" ? "Categorieën" : lang === "fr" ? "Catégories" : "Categories" },
               ].map((stat, i) => (
                 <div key={i} className="text-center">
-                  <div className="text-lg md:text-2xl font-black mb-0.5" style={{ color: "#d4af37" }}>{stat.value}</div>
-                  <div className="text-xs" style={{ color: "#666" }}>{stat.label}</div>
+                  <div className="text-lg md:text-2xl font-black mb-0.5" style={{ color: "#7c3aed" }}>{stat.value}</div>
+                  <div className="text-xs" style={{ color: "#9ca3af" }}>{stat.label}</div>
                 </div>
               ))}
             </div>

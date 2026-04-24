@@ -416,37 +416,27 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
     <>
       <header dir={lang === "ar" ? "rtl" : "ltr"}>
         {/* الشريط العلوي - أبيض */}
-        <div className="bg-white border-b border-gray-100 shadow-sm">
-          <div className="max-w-5xl mx-auto px-3 py-2 flex items-center justify-between">
-            {/* اللوغو + اسم الموقع - ألوان العلم البلجيكي */}
-            <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.href = "/"}>
-              <span className="text-base md:text-2xl font-black tracking-wide uppercase">
+        <div style={{ background: "#ffffff", borderBottom: "1px solid #e5e7eb" }}>
+          <div className="max-w-5xl mx-auto px-3 py-2.5 flex items-center justify-between">
+            {/* اسم الموقع - ألوان العلم البلجيكي */}
+            <div className="cursor-pointer" onClick={() => window.location.href = "/"}>
+              <span className="text-lg md:text-2xl font-black tracking-wide uppercase">
                 <span style={{ color: '#1a1a1a' }}>SEWAR </span>
                 <span style={{ color: '#f5a623' }}>RIJBEWIJS</span>
                 <span style={{ color: '#e63946' }}>ONLINE</span>
               </span>
             </div>
 
-            {/* أزرار اللغة + Inloggen */}
+            {/* اليمين: أزرار اللغة + Inloggen */}
             <div className="flex flex-col items-end gap-1.5">
               {/* أزرار اللغة */}
-              <div className="flex gap-1 items-center">
-                {[
-                  { code: "nl", label: "NL" },
-                  { code: "fr", label: "FR" },
-                  { code: "ar", label: "AR" },
-                  { code: "en", label: "EN" },
-                ].map(({ code, label }) => (
-                  <button
-                    key={code}
-                    onClick={() => changeLang(code)}
-                    className={`px-2.5 py-1 font-bold text-xs rounded-md border transition-all ${
-                      lang === code
-                        ? "text-white border-transparent"
-                        : "bg-transparent text-gray-500 border-gray-200 hover:border-[#7c3aed] hover:text-[#7c3aed]"
-                    }`}
-                    style={lang === code ? { background: "linear-gradient(135deg,#7c3aed,#5b21b6)", borderColor: "transparent" } : {}}
-                  >
+              <div className="flex gap-1">
+                {[{ code: "nl", label: "NL" }, { code: "fr", label: "FR" }, { code: "ar", label: "AR" }, { code: "en", label: "EN" }].map(({ code, label }) => (
+                  <button key={code} onClick={() => changeLang(code)}
+                    className="px-2.5 py-1 font-bold text-xs rounded-md transition-all"
+                    style={lang === code
+                      ? { background: "linear-gradient(135deg,#7c3aed,#5b21b6)", color: "white" }
+                      : { background: "#f3f4f6", color: "#6b7280" }}>
                     {label}
                   </button>
                 ))}
@@ -454,26 +444,16 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
 
               {/* زر Inloggen / Logout */}
               {!isLoggedIn ? (
-                <button
-                  onClick={() => onOpenLogin ? onOpenLogin() : setShowLoginModal(true)}
-                  className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg font-black text-xs uppercase tracking-wide transition-all active:scale-95 hover:opacity-90 text-white"
-                  style={{ background: "linear-gradient(135deg,#7c3aed,#5b21b6)" }}
-                >
-                  <FaSignInAlt className="text-xs" />
+                <button onClick={() => onOpenLogin ? onOpenLogin() : setShowLoginModal(true)}
+                  className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg font-black text-xs uppercase tracking-wide transition-all active:scale-95 text-white w-full justify-center"
+                  style={{ background: "linear-gradient(135deg,#f5a623,#e8920a)" }}>
+                  <FaSignInAlt size={10} />
                   {lang === "ar" ? "دخول" : lang === "nl" ? "Inloggen" : lang === "fr" ? "Connexion" : "Login"}
                 </button>
               ) : (
                 <div className="flex flex-col gap-0.5 items-end">
-                  <button
-                    onClick={() => {
-                      localStorage.removeItem("userEmail");
-                      localStorage.removeItem("userCategory");
-                      localStorage.removeItem("userExpiry");
-                      localStorage.removeItem("userName");
-                      window.location.href = "/";
-                    }}
-                    className="px-4 py-1.5 rounded-lg text-xs font-black uppercase bg-red-500 hover:bg-red-600 transition-colors text-white"
-                  >
+                  <button onClick={() => { localStorage.removeItem("userEmail"); localStorage.removeItem("userCategory"); localStorage.removeItem("userExpiry"); localStorage.removeItem("userName"); window.location.href = "/"; }}
+                    className="px-4 py-1.5 rounded-lg text-xs font-black uppercase bg-red-500 hover:bg-red-600 text-white">
                     {lang === "ar" ? "خروج" : lang === "nl" ? "Logout" : lang === "fr" ? "Déconnexion" : "Logout"}
                   </button>
                   <div className="text-right text-gray-600 text-xs">
@@ -490,8 +470,8 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
           </div>
         </div>
 
-        {/* الشريط الثاني - أبيض مع أيقونات بنفسجية */}
-        <div className="bg-white border-b border-gray-100 shadow-sm">
+        {/* الشريط الثاني - أبيض مع أيقونات */}
+        <div style={{ background: "#ffffff", borderBottom: "1px solid #e5e7eb", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
           <div className="max-w-5xl mx-auto px-2">
             {/* Desktop */}
             <ul className="hidden md:flex items-center">
@@ -499,53 +479,42 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
                 const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
                 return (
                   <li key={i}>
-                    <button
-                      onClick={() => link.onClick ? link.onClick() : window.location.href = link.href}
-                      className={`flex flex-col items-center gap-0.5 px-5 py-2.5 font-bold text-xs uppercase tracking-wide transition-all border-b-2 ${
-                        isActive ? "border-[#7c3aed] text-[#7c3aed]" : "border-transparent text-gray-500 hover:text-[#7c3aed]"
-                      }`}
-                    >
-                      <span className={`text-base ${isActive ? "text-[#7c3aed]" : "text-gray-400"}`}>{link.icon}</span>
+                    <button onClick={() => link.onClick ? link.onClick() : window.location.href = link.href}
+                      className="flex flex-col items-center gap-0.5 px-5 py-2.5 font-bold text-[11px] uppercase tracking-wide transition-all border-b-2"
+                      style={isActive ? { borderColor: "#7c3aed", color: "#7c3aed" } : { borderColor: "transparent", color: "#9ca3af" }}>
+                      <span style={{ fontSize: "16px", color: isActive ? "#7c3aed" : "#9ca3af" }}>{link.icon}</span>
                       {link.label}
                     </button>
                   </li>
                 );
               })}
-              {/* زر App */}
               <li>
-                <button
-                  onClick={() => setShowPWAModal(true)}
-                  className="flex flex-col items-center gap-0.5 px-5 py-2.5 font-bold text-xs uppercase tracking-wide transition-all border-b-2 border-transparent text-gray-500 hover:text-[#7c3aed]"
-                >
-                  <FaMobileAlt className="text-base text-gray-400" />
+                <button onClick={() => setShowPWAModal(true)}
+                  className="flex flex-col items-center gap-0.5 px-5 py-2.5 font-bold text-[11px] uppercase tracking-wide border-b-2 border-transparent transition-all"
+                  style={{ color: "#9ca3af" }}>
+                  <FaMobileAlt style={{ fontSize: "16px", color: "#9ca3af" }} />
                   App
                 </button>
               </li>
             </ul>
 
-            {/* Mobile - أزرار أفقية */}
+            {/* Mobile */}
             <div className="md:hidden flex items-center overflow-x-auto scrollbar-hide">
               {navLinks.map((link, i) => {
                 const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
                 return (
-                  <button
-                    key={i}
-                    onClick={() => { link.onClick ? link.onClick() : window.location.href = link.href; }}
-                    className={`flex flex-col items-center justify-center gap-0.5 px-3 py-2 font-bold text-[10px] uppercase whitespace-nowrap flex-shrink-0 transition-all border-b-2 ${
-                      isActive ? "border-[#7c3aed] text-[#7c3aed]" : "border-transparent text-gray-500"
-                    }`}
-                  >
-                    <span className={`text-sm ${isActive ? "text-[#7c3aed]" : "text-gray-400"}`}>{link.icon}</span>
+                  <button key={i} onClick={() => { link.onClick ? link.onClick() : window.location.href = link.href; }}
+                    className="flex flex-col items-center justify-center gap-0.5 px-3 py-2 font-bold text-[10px] uppercase whitespace-nowrap flex-shrink-0 border-b-2 transition-all"
+                    style={isActive ? { borderColor: "#7c3aed", color: "#7c3aed" } : { borderColor: "transparent", color: "#9ca3af" }}>
+                    <span style={{ fontSize: "15px", color: isActive ? "#7c3aed" : "#9ca3af" }}>{link.icon}</span>
                     <span>{link.label}</span>
                   </button>
                 );
               })}
-              {/* زر App */}
-              <button
-                onClick={() => setShowPWAModal(true)}
-                className="flex flex-col items-center justify-center gap-0.5 px-3 py-2 font-bold text-[10px] uppercase whitespace-nowrap flex-shrink-0 border-b-2 border-transparent text-gray-500"
-              >
-                <FaMobileAlt className="text-sm text-gray-400" />
+              <button onClick={() => setShowPWAModal(true)}
+                className="flex flex-col items-center justify-center gap-0.5 px-3 py-2 font-bold text-[10px] uppercase whitespace-nowrap flex-shrink-0 border-b-2 border-transparent"
+                style={{ color: "#9ca3af" }}>
+                <FaMobileAlt style={{ fontSize: "15px", color: "#9ca3af" }} />
                 <span>App</span>
               </button>
             </div>
