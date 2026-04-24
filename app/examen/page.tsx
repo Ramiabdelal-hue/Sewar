@@ -33,7 +33,7 @@ export default function ExamenPage() {
     const stored = localStorage.getItem("renewPrefillData");
     if (stored) setPrefillData(JSON.parse(stored));
 
-    // قراءة URL params (بعد الاشتراك مباشرة)
+    // قراءة URL params (بعد الاشتراك أو الرجوع من الامتحان)
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const emailParam = params.get("email");
@@ -41,6 +41,16 @@ export default function ExamenPage() {
       if (emailParam && catParam) {
         setUserEmail(emailParam);
         setSelectedCategory(catParam);
+        // استخدام cache إذا موجود، وإلا جلب البيانات
+        const cacheKey = `examBatches_${catParam}`;
+        const cached = sessionStorage.getItem(cacheKey);
+        if (cached) {
+          try {
+            setExamBatches(JSON.parse(cached));
+            setShowLessons(true);
+            return;
+          } catch {}
+        }
         fetchExamBatches(catParam);
         setShowLessons(true);
         return;
@@ -99,28 +109,53 @@ export default function ExamenPage() {
     } catch (e) { console.error(e); }
   };
 
-  // جلب عدد الأسئلة لكل درس وحساب عدد الامتحانات
+  // جلب عدد الأسئلة لكل درس وحساب عدد الامتحانات - بشكل متوازٍ للسرعة
   const fetchExamBatches = async (catLetter: string) => {
+    // تحقق من الـ cache أولاً
+    const cacheKey = `examBatches_${catLetter}`;
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        setExamBatches(JSON.parse(cached));
+        return;
+      } catch {}
+    }
+
     setLoadingBatches(true);
     try {
       const res = await fetch(`/api/lessons?category=${catLetter}`);
       const data = await res.json();
       if (!data.success) return;
-      const results: {lessonId: number; lessonTitle: string; batches: number}[] = [];
-      for (const lesson of data.lessons) {
-        const qRes = await fetch(`/api/exam-questions?lessonId=${lesson.id}&category=${catLetter}`);
-        const qData = await qRes.json();
-        const count = qData.success ? (qData.questions?.length || 0) : 0;
-        if (count > 0) {
-          results.push({
-            lessonId: lesson.id,
-            lessonTitle: lesson.title,
-            batches: Math.ceil(count / 50),
-            totalQuestions: count,
-          });
-        }
-      }
+
+      // جلب كل الأسئلة بشكل متوازٍ (Promise.all بدل loop)
+      const counts = await Promise.all(
+        data.lessons.map(async (lesson: any) => {
+          try {
+            const qRes = await fetch(`/api/exam-questions?lessonId=${lesson.id}&category=${catLetter}`);
+            const qData = await qRes.json();
+            return {
+              lessonId: lesson.id,
+              lessonTitle: lesson.title,
+              count: qData.success ? (qData.questions?.length || 0) : 0,
+            };
+          } catch {
+            return { lessonId: lesson.id, lessonTitle: lesson.title, count: 0 };
+          }
+        })
+      );
+
+      const results = counts
+        .filter(item => item.count > 0)
+        .map(item => ({
+          lessonId: item.lessonId,
+          lessonTitle: item.lessonTitle,
+          batches: Math.ceil(item.count / 50),
+          totalQuestions: item.count,
+        }));
+
       setExamBatches(results);
+      // حفظ في cache لـ 5 دقائق
+      sessionStorage.setItem(cacheKey, JSON.stringify(results));
     } catch (e) { console.error(e); }
     finally { setLoadingBatches(false); }
   };
