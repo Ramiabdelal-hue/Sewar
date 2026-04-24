@@ -14,6 +14,10 @@ import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
 function LessonsTab({ questions, lang, router }: { questions: any[], lang: string, router: any }) {
   const isRtl = lang === "ar";
 
+  // ترجمة عناوين الدروس
+  const lessonTitles = questions.map(q => q.lesson?.title || "");
+  const translatedTitles = useAutoTranslateList(lessonTitles, lang);
+
   if (questions.length === 0) return (
     <div className="text-center py-16">
       <div className="text-5xl mb-4">📚</div>
@@ -35,7 +39,7 @@ function LessonsTab({ questions, lang, router }: { questions: any[], lang: strin
           <div key={q.id || i}>
             {q.lesson && (
               <div className="mb-1.5 px-4 py-2 rounded-xl text-xs font-bold text-[#003399]" style={{ background: "#eff6ff", border: "1px solid #bfdbfe" }}>
-                📚 {q.lesson.title}
+                📚 {translatedTitles[i] || q.lesson.title}
               </div>
             )}
             <QuestionCard question={q} index={i} total={questions.length} lang={lang} onNext={() => {}} onPrev={() => {}} />
