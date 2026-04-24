@@ -89,7 +89,7 @@ export default function Hero({ onSelect }: HeroProps) {
             </p>
 
             <button
-              onClick={() => router.push("/info")}
+              onClick={() => router.push("/theorie")}
               className="group flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-sm transition-all hover:scale-105 active:scale-95 mb-4"
               style={{
                 background: "linear-gradient(135deg, #d4af37, #f0d060, #d4af37)",
