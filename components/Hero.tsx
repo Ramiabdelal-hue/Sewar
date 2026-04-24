@@ -49,7 +49,7 @@ export default function Hero({ onSelect }: HeroProps) {
     >
       {/* الصورة */}
       <div className="relative w-full rounded-2xl overflow-hidden flex-shrink-0"
-        style={{ height: "42%", boxShadow: "0 4px 16px rgba(0,0,0,0.12)" }}>
+        style={{ height: "36%", boxShadow: "0 4px 16px rgba(0,0,0,0.12)" }}>
         <Image src="/hero.jpg" alt="Driving lesson" fill
           className="object-cover" sizes="100vw" priority />
         <div className="absolute inset-0"
@@ -68,9 +68,9 @@ export default function Hero({ onSelect }: HeroProps) {
         style={{ background: "#ffffff", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
 
         <div className="mb-2">
-          <Image src="/Logo.jpeg" alt="Sewar Rijbewijsonline" width={120} height={120}
+          <Image src="/Logo.jpeg" alt="Sewar Rijbewijsonline" width={150} height={150}
             className="rounded-full object-cover"
-            style={{ width: '120px', height: '120px', border: "3px solid #f3f4f6" }} />
+            style={{ width: '150px', height: '150px', border: "3px solid #f3f4f6" }} />
         </div>
 
         <p className="text-xs leading-relaxed mb-3 max-w-xl font-medium" style={{ color: "#7c3aed" }}>
