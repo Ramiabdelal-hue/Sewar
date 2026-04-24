@@ -9,7 +9,7 @@ import ar from "@/locales/ar.json";
 import en from "@/locales/en.json";
 import Navbar from "@/components/Navbar";
 import QuestionCard from "@/components/QuestionCard";
-import { useAutoTranslate } from "@/hooks/useAutoTranslate";
+import { useAutoTranslate, useAutoTranslateList } from "@/hooks/useAutoTranslate";
 import Footer from "@/components/Footer";
 
 interface Question {
@@ -46,6 +46,8 @@ function TheorieLessonContent() {
   const [isExpired, setIsExpired] = useState(false);
   const [checking, setChecking] = useState(true);
   const [lessonDescription, setLessonDescription] = useState("");
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [showAnswer, setShowAnswer] = useState(false);
 
   // ترجمة عنوان الدرس تلقائياً
   const translatedLessonTitle = useAutoTranslate(lesson || "", lang);
