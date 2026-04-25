@@ -344,9 +344,13 @@ export default function TheoriePage() {
                   <td className="px-4 py-3 border border-gray-200 text-center">
                     <button
                       onClick={() => router.push(`/theorie/lesson?lessonId=${lesson.id}&category=${userCategory}&email=${userEmail}&lesson=${encodeURIComponent(lesson.title)}`)}
-                      className="bg-white border-2 border-gray-400 px-4 py-1 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors"
+                      className={`border-2 px-4 py-1 text-sm font-bold transition-colors w-full ${
+                        i === 0
+                          ? "bg-[#7c3aed] border-[#7c3aed] text-white hover:bg-[#5b21b6] hover:border-[#5b21b6]"
+                          : "bg-white border-gray-400 hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff]"
+                      }`}
                     >
-                      {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
+                      {i === 0 ? "✔ Start nu" : (lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson")}
                     </button>
                   </td>
                   <td className="px-4 py-3 border border-gray-200 text-center">
