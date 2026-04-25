@@ -279,7 +279,7 @@ function ExamenTestContent() {
                               <img src={url} alt="" style={{ width: "100%", height: "auto", display: "block" }} draggable={false} />
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img src="/watermark.jpeg" alt="" className="absolute pointer-events-none"
-                                style={{ width: "50%", top: "50%", left: "50%", transform: "translate(-50%,-50%) rotate(-15deg)", opacity: 0.2, mixBlendMode: "multiply" }} draggable={false} />
+                                style={{ width: "50%", top: "50%", left: "50%", transform: "translate(-50%,-50%) rotate(-15deg)", opacity: 0.8, mixBlendMode: "multiply" }} draggable={false} />
                             </div>
                           ))}
                         </div>
@@ -382,7 +382,7 @@ function ExamenTestContent() {
                     <img src={url} alt="" style={{ width: "100%", height: "auto", display: "block" }} draggable={false} />
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="/watermark.jpeg" alt="" className="absolute pointer-events-none"
-                      style={{ width: "50%", top: "50%", left: "50%", transform: "translate(-50%,-50%) rotate(-15deg)", opacity: 0.2, mixBlendMode: "multiply" }} draggable={false} />
+                      style={{ width: "50%", top: "50%", left: "50%", transform: "translate(-50%,-50%) rotate(-15deg)", opacity: 0.8, mixBlendMode: "multiply" }} draggable={false} />
                   </div>
                 ))}
               </div>

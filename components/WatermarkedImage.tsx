@@ -31,7 +31,7 @@ export default function WatermarkedImage({ src, className, style }: Props) {
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%) rotate(-15deg)",
-          opacity: 0.25,
+          opacity: 0.8,
           mixBlendMode: "multiply",
         }}
         draggable={false}
