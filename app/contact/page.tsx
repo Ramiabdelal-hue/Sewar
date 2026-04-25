@@ -52,7 +52,7 @@ export default function ContactPage() {
       <Navbar />
 
       {/* Hero Banner */}
-      <div className="w-full py-10 px-4 text-center" style={{ background: "linear-gradient(135deg, #003399 0%, #0055cc 60%, #0077ff 100%)" }}>
+      <div className="w-full py-10 px-4 text-center" style={{ background: "linear-gradient(135deg, #7c3aed 0%, #5b21b6 60%, #4c1d95 100%)" }}>
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 shadow-lg"
           style={{ background: "rgba(255,255,255,0.15)", border: "2px solid rgba(255,255,255,0.3)" }}>
           <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -136,7 +136,7 @@ export default function ContactPage() {
         {/* Form - يمين */}
         <div className="md:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           {/* Form Header */}
-          <div className="px-6 py-5" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
+          <div className="px-6 py-5" style={{ background: "linear-gradient(135deg, #7c3aed, #5b21b6)" }}>
             <h2 className="text-white font-black text-lg">
               {t.sendMessage}
             </h2>
@@ -199,7 +199,7 @@ export default function ContactPage() {
 
               <button type="submit" disabled={loading}
                 className="w-full py-4 rounded-xl font-black text-white text-sm uppercase tracking-wide transition-all hover:opacity-90 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-                style={{ background: loading ? "#9ca3af" : "linear-gradient(135deg, #003399, #0055cc)" }}>
+                style={{ background: loading ? "#9ca3af" : "linear-gradient(135deg, #7c3aed, #5b21b6)" }}>
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
                     <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

@@ -125,27 +125,21 @@ export default function TheoriePage() {
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen flex flex-col" dir={isRtl ? "rtl" : "ltr"}
-        style={{ background: "linear-gradient(160deg, #060818 0%, #0d1b4b 50%, #060818 100%)" }}>
-        {/* خلفية */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full opacity-[0.07] blur-[80px]" style={{ background: "#ffcc00" }}></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full opacity-[0.07] blur-[80px]" style={{ background: "#3b82f6" }}></div>
-          <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: "radial-gradient(circle, #fff 1px, transparent 1px)", backgroundSize: "28px 28px" }}></div>
-        </div>
+        style={{ background: "#f0f0f0" }}>
 
         <Navbar />
 
         <div className="relative z-10 flex-1 px-4 py-8 max-w-lg mx-auto w-full md:max-w-2xl lg:max-w-3xl">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 text-xs font-bold" style={{ background: "rgba(255,204,0,0.1)", border: "1px solid rgba(255,204,0,0.25)", color: "#ffcc00" }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse"></span>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 text-xs font-bold" style={{ background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.25)", color: "#7c3aed" }}>
+              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#7c3aed" }}></span>
               {lang === "ar" ? "اشتراك نظري" : lang === "nl" ? "Theorie Abonnement" : "Abonnement Théorie"}
             </div>
-            <h1 className="text-2xl font-black text-white mb-2">
+            <h1 className="text-2xl font-black mb-2" style={{ color: "#1a1a1a" }}>
               {lang === "ar" ? "اختر فئتك" : lang === "nl" ? "Kies je categorie" : "Choisissez votre catégorie"}
             </h1>
-            <p className="text-white/40 text-sm">
+            <p className="text-gray-500 text-sm">
               {lang === "ar" ? "وصول كامل لجميع الدروس والأسئلة" : lang === "nl" ? "Volledige toegang tot alle lessen en vragen" : "Accès complet à toutes les leçons"}
             </p>
           </div>
@@ -156,39 +150,35 @@ export default function TheoriePage() {
               const durations = getDurations(cat.id);
               const isSelected = globalSelection?.catId === cat.id;
               return (
-                <div key={cat.id} className="rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer group"
+                <div key={cat.id} className="rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer bg-white"
                   style={{
-                    background: isSelected ? `${cat.color}15` : "rgba(255,255,255,0.05)",
-                    border: isSelected ? `2px solid ${cat.color}60` : "1px solid rgba(255,255,255,0.1)",
-                    boxShadow: isSelected ? `0 12px 40px ${cat.glow}` : "none",
-                    transform: "translateY(0)",
+                    border: isSelected ? `2px solid #7c3aed` : "1px solid #e5e7eb",
+                    boxShadow: isSelected ? `0 12px 40px rgba(124,58,237,0.15)` : "0 2px 8px rgba(0,0,0,0.06)",
                   }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(-6px)"; (e.currentTarget as HTMLElement).style.boxShadow = `0 20px 50px ${cat.glow}`; (e.currentTarget as HTMLElement).style.border = `1.5px solid ${cat.color}50`; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; (e.currentTarget as HTMLElement).style.boxShadow = isSelected ? `0 12px 40px ${cat.glow}` : "none"; (e.currentTarget as HTMLElement).style.border = isSelected ? `2px solid ${cat.color}60` : "1px solid rgba(255,255,255,0.1)"; }}
                 >
                   {/* رأس الكرت */}
                   <div className="flex items-center gap-4 px-5 py-5">
                     <div className="flex-shrink-0 opacity-90">{cat.icon}</div>
                     <div className="flex-1">
-                      <p className="text-white font-black text-lg">{cat.name}</p>
-                      <p className="text-white/50 text-sm mt-0.5">{cat.desc}</p>
+                      <p className="font-black text-lg" style={{ color: "#1a1a1a" }}>{cat.name}</p>
+                      <p className="text-gray-500 text-sm mt-0.5">{cat.desc}</p>
                     </div>
                     {isSelected && (
-                      <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: cat.color }}>
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "#7c3aed" }}>
                         <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                       </div>
                     )}
                   </div>
 
                   {/* فاصل */}
-                  <div style={{ height: "1px", background: "rgba(255,255,255,0.06)", margin: "0 20px" }}></div>
+                  <div style={{ height: "1px", background: "#f3f4f6", margin: "0 20px" }}></div>
 
                   {/* زر Gratis */}
                   <div className="px-4 pt-4">
                     <button
                       onClick={() => router.push(`/gratis?cat=${cat.id}`)}
                       className="w-full py-2.5 rounded-xl font-black text-sm transition-all active:scale-95 flex items-center justify-center gap-2"
-                      style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white", boxShadow: "0 4px 14px rgba(34,197,94,0.35)" }}>
+                      style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white" }}>
                       🎁 Gratis proberen
                     </button>
                   </div>
@@ -202,12 +192,11 @@ export default function TheoriePage() {
                           onClick={() => setGlobalSelection({ catId: cat.id, duration: dur.key, catName: cat.name })}
                           className="py-4 rounded-xl transition-all active:scale-95"
                           style={{
-                            background: active ? cat.color : "rgba(255,255,255,0.07)",
-                            border: active ? `1.5px solid ${cat.color}` : "1.5px solid rgba(255,255,255,0.12)",
-                            boxShadow: active ? `0 4px 16px ${cat.color}40` : "none",
+                            background: active ? "linear-gradient(135deg,#7c3aed,#5b21b6)" : "#f9fafb",
+                            border: active ? "1.5px solid #7c3aed" : "1.5px solid #e5e7eb",
                           }}>
-                          <p className="text-xs font-bold mb-1" style={{ color: active ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.45)" }}>{dur.label}</p>
-                          <p className="text-2xl font-black" style={{ color: active ? "white" : "rgba(255,255,255,0.85)" }}>€{dur.price}</p>
+                          <p className="text-xs font-bold mb-1" style={{ color: active ? "rgba(255,255,255,0.8)" : "#9ca3af" }}>{dur.label}</p>
+                          <p className="text-2xl font-black" style={{ color: active ? "white" : "#1a1a1a" }}>€{dur.price}</p>
                         </button>
                       );
                     })}
@@ -223,9 +212,9 @@ export default function TheoriePage() {
             disabled={!globalSelection}
             className="w-full py-4 rounded-2xl font-black text-base transition-all active:scale-95 disabled:opacity-30"
             style={{
-              background: globalSelection ? "linear-gradient(135deg, #ffcc00, #ff9900)" : "rgba(255,255,255,0.1)",
-              color: globalSelection ? "#003399" : "rgba(255,255,255,0.3)",
-              boxShadow: globalSelection ? "0 8px 30px rgba(255,204,0,0.35)" : "none",
+              background: globalSelection ? "linear-gradient(135deg, #d4af37, #f0d060, #d4af37)" : "#e5e7eb",
+              color: globalSelection ? "#0a0a0a" : "#9ca3af",
+              boxShadow: globalSelection ? "0 8px 30px rgba(212,175,55,0.35)" : "none",
             }}>
             {globalSelection
               ? `${lang === "ar" ? "اشترك في" : lang === "nl" ? "Inschrijven voor" : "S'inscrire pour"} ${globalSelection.catName} — €${getDurations(globalSelection.catId).find(d => d.key === globalSelection.duration)?.price}`
@@ -239,9 +228,9 @@ export default function TheoriePage() {
               { icon: "❓", label: lang === "ar" ? "أسئلة تدريبية" : lang === "nl" ? "Oefenvragen" : lang === "fr" ? "Questions d'entraînement" : "Practice questions" },
               { icon: "🎯", label: lang === "ar" ? "امتحانات" : lang === "nl" ? "Examens" : lang === "fr" ? "Examens" : "Exams" },
             ].map((f, i) => (
-              <div key={i} className="text-center py-3 rounded-xl" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
+              <div key={i} className="text-center py-3 rounded-xl bg-white" style={{ border: "1px solid #e5e7eb" }}>
                 <div className="text-xl mb-1">{f.icon}</div>
-                <p className="text-white/50 text-[10px] font-bold">{f.label}</p>
+                <p className="text-gray-500 text-[10px] font-bold">{f.label}</p>
               </div>
             ))}
           </div>
@@ -253,24 +242,24 @@ export default function TheoriePage() {
   // ─── شاشة انتهاء الاشتراك ────────────────────────────────────────────────────
   if (isExpired) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-4"
-        style={{ background: "linear-gradient(160deg, #060818 0%, #0d1b4b 50%, #060818 100%)" }}>
-        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4" style={{ background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)" }}>
-          <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-        </div>
-        <h2 className="text-xl font-black text-white mb-2">{lang === "ar" ? "انتهى الاشتراك" : lang === "nl" ? "Abonnement verlopen" : "Abonnement expiré"}</h2>
-        <p className="text-white/40 text-sm mb-6 text-center">{lang === "ar" ? "يرجى تجديد اشتراكك للوصول للدروس" : lang === "nl" ? "Vernieuw je abonnement om toegang te krijgen" : "Renouvelez votre abonnement"}</p>
-        <div className="flex gap-3 w-full max-w-xs">
-          <button onClick={() => { localStorage.removeItem("userEmail"); localStorage.removeItem("userCategory"); setIsLoggedIn(false); setIsExpired(false); }}
-            className="flex-1 py-3 rounded-xl font-black text-sm text-white transition-all active:scale-95"
-            style={{ background: "linear-gradient(135deg, #ffcc00, #ff9900)", color: "#003399" }}>
-            {lang === "ar" ? "تجديد" : lang === "nl" ? "Vernieuwen" : "Renouveler"}
-          </button>
-          <button onClick={() => router.push("/")}
-            className="flex-1 py-3 rounded-xl font-black text-sm transition-all active:scale-95"
-            style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.1)" }}>
-            {lang === "ar" ? "الرئيسية" : lang === "nl" ? "Home" : lang === "fr" ? "Accueil" : "Home"}
-          </button>
+      <div className="min-h-screen flex flex-col items-center justify-center px-4" style={{ background: "#f0f0f0" }}>
+        <div className="bg-white rounded-2xl p-10 text-center max-w-sm shadow-sm border border-gray-100">
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 mx-auto" style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)" }}>
+            <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+          </div>
+          <h2 className="text-xl font-black text-gray-800 mb-2">{lang === "ar" ? "انتهى الاشتراك" : lang === "nl" ? "Abonnement verlopen" : "Abonnement expiré"}</h2>
+          <p className="text-gray-500 text-sm mb-6">{lang === "ar" ? "يرجى تجديد اشتراكك للوصول للدروس" : lang === "nl" ? "Vernieuw je abonnement om toegang te krijgen" : "Renouvelez votre abonnement"}</p>
+          <div className="flex gap-3">
+            <button onClick={() => { localStorage.removeItem("userEmail"); localStorage.removeItem("userCategory"); setIsLoggedIn(false); setIsExpired(false); }}
+              className="flex-1 py-3 rounded-xl font-black text-sm transition-all active:scale-95"
+              style={{ background: "linear-gradient(135deg, #d4af37, #f0d060)", color: "#0a0a0a" }}>
+              {lang === "ar" ? "تجديد" : lang === "nl" ? "Vernieuwen" : "Renouveler"}
+            </button>
+            <button onClick={() => router.push("/")}
+              className="flex-1 py-3 rounded-xl font-black text-sm transition-all active:scale-95 bg-gray-100 text-gray-600">
+              {lang === "ar" ? "الرئيسية" : lang === "nl" ? "Home" : lang === "fr" ? "Accueil" : "Home"}
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -281,11 +270,11 @@ export default function TheoriePage() {
 
   return (
     <div className="min-h-screen flex flex-col" dir={isRtl ? "rtl" : "ltr"}
-      style={{ background: "#f0f4f8" }}>
+      style={{ background: "#f0f0f0" }}>
       <Navbar />
 
       {/* Header */}
-      <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0a0a2e 0%, #003399 60%, #0055cc 100%)" }}>
+      <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%)" }}>
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-64 h-64 rounded-full blur-3xl" style={{ background: "#ffcc00", transform: "translate(-30%, -30%)" }}></div>
         </div>

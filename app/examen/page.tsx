@@ -148,14 +148,14 @@ export default function ExamenPage() {
 
   if (showLessons && userEmail && selectedCategory) {
     return (
-      <div className="min-h-screen bg-white" dir={lang === "ar" ? "rtl" : "ltr"}>
+      <div className="min-h-screen bg-gray-50" dir={lang === "ar" ? "rtl" : "ltr"}>
         <Navbar />
         <div className="max-w-2xl mx-auto px-4 py-12">
 
           {/* Header */}
           <div className="text-center mb-8">
             <div className="text-5xl mb-4">🎯</div>
-            <h1 className="text-2xl font-black text-[#003399] uppercase mb-2">
+            <h1 className="text-2xl font-black uppercase mb-2" style={{ color: "#7c3aed" }}>
               {lang === "ar" ? `امتحان الفئة ${selectedCategory}` : lang === "nl" ? `Examen Categorie ${selectedCategory}` : lang === "fr" ? `Examen Catégorie ${selectedCategory}` : `Exam Category ${selectedCategory}`}
             </h1>
             <p className="text-gray-500 text-sm">
@@ -215,11 +215,11 @@ export default function ExamenPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white" dir={lang === "ar" ? "rtl" : "ltr"}>
+    <div className="min-h-screen bg-gray-50" dir={lang === "ar" ? "rtl" : "ltr"}>
       <Navbar />
 
       <div className="w-full px-4 py-6">
-        <h1 className="text-xl sm:text-2xl font-black text-[#003399] uppercase border-b-4 border-[#003399] pb-3 mb-5">
+        <h1 className="text-xl sm:text-2xl font-black uppercase border-b-4 pb-3 mb-5" style={{ color: "#7c3aed", borderColor: "#7c3aed" }}>
           {lang === "ar" ? "امتحانات رخصة القيادة" : lang === "nl" ? "THEORIE EXAMEN RIJBEWIJS" : lang === "fr" ? "EXAMEN THÉORIQUE PERMIS" : "THEORY DRIVING LICENSE EXAM"}
         </h1>
 
