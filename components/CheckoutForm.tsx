@@ -106,47 +106,38 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
   return (
     <div className="min-h-screen flex flex-col md:items-center md:justify-center py-0 md:py-8"
       dir={isRtl ? "rtl" : "ltr"}
-      style={{ background: "linear-gradient(160deg, #060818 0%, #0d1b4b 50%, #060818 100%)" }}>
-
-      {/* خلفية ضوئية */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[20%] w-[500px] h-[500px] rounded-full blur-[120px] opacity-[0.08]" style={{ background: "#8b5cf6" }} />
-        <div className="absolute bottom-[-10%] right-[20%] w-[500px] h-[500px] rounded-full blur-[120px] opacity-[0.08]" style={{ background: "#6366f1" }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full blur-[100px] opacity-[0.05]" style={{ background: "#f59e0b" }} />
-        <div className="absolute inset-0 opacity-[0.015]" style={{ backgroundImage: "radial-gradient(circle, #fff 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
-      </div>
+      style={{ background: "#f0f0f0" }}>
 
       <div className="relative z-10 w-full md:max-w-lg flex-1 md:flex-none flex flex-col">
-        <div className="flex-1 flex flex-col md:rounded-3xl md:overflow-hidden"
-          style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.07)", backdropFilter: "blur(20px)" }}>
+        <div className="flex-1 flex flex-col md:rounded-3xl md:overflow-hidden bg-white"
+          style={{ border: "1px solid #e5e7eb", boxShadow: "0 4px 24px rgba(0,0,0,0.08)" }}>
 
           {/* Header */}
           <div className="px-5 md:px-6 pt-5 pb-4 flex items-center gap-3 flex-shrink-0"
-            style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+            style={{ borderBottom: "1px solid #f3f4f6", background: "linear-gradient(135deg, #7c3aed, #5b21b6)" }}>
             <button onClick={onBack}
               className="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-105 active:scale-95 flex-shrink-0"
-              style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}>
-              {isRtl ? <FaChevronRight className="text-white/60 text-sm" /> : <FaChevronLeft className="text-white/60 text-sm" />}
+              style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)" }}>
+              {isRtl ? <FaChevronRight className="text-white text-sm" /> : <FaChevronLeft className="text-white text-sm" />}
             </button>
             <div className="flex-1 min-w-0">
-              <p className="text-white/35 text-[10px] font-black uppercase tracking-widest">
+              <p className="text-white/60 text-[10px] font-black uppercase tracking-widest">
                 {lang === "ar" ? "إتمام الاشتراك" : lang === "nl" ? "Inschrijving voltooien" : lang === "fr" ? "Finaliser l'inscription" : "Complete registration"}
               </p>
               <h1 className="text-white font-black text-sm leading-tight truncate">{selectedData?.catName || "Rijbewijs"}</h1>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
-              {/* أزرار اللغة */}
-              <div className="flex gap-0.5 rounded-lg p-1" style={{ background: "rgba(255,255,255,0.05)" }}>
+              <div className="flex gap-0.5 rounded-lg p-1" style={{ background: "rgba(255,255,255,0.1)" }}>
                 {[["nl","NL"],["fr","FR"],["ar","AR"],["en","EN"]].map(([code, label]) => (
                   <button key={code} type="button" onClick={() => setLang(code as any)}
                     className="px-2 py-1 rounded-md text-[10px] font-black transition-all"
-                    style={lang === code ? { background: "linear-gradient(135deg,#8b5cf6,#6366f1)", color: "white" } : { color: "rgba(255,255,255,0.3)" }}>
+                    style={lang === code ? { background: "rgba(255,255,255,0.25)", color: "white" } : { color: "rgba(255,255,255,0.5)" }}>
                     {label}
                   </button>
                 ))}
               </div>
               <span className="px-2.5 py-1.5 rounded-lg text-[10px] font-black"
-                style={{ background: "rgba(139,92,246,0.15)", color: "#a78bfa", border: "1px solid rgba(139,92,246,0.3)" }}>
+                style={{ background: "rgba(255,255,255,0.15)", color: "white", border: "1px solid rgba(255,255,255,0.2)" }}>
                 {selectedData?.duration === "2w" ? "2W" : "1M"}
               </span>
             </div>
@@ -180,24 +171,24 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
                   return (
                     <div key={key}>
                       <label className="block text-[11px] font-black mb-1.5 px-1 uppercase tracking-wider"
-                        style={{ color: isFocused ? "#a78bfa" : "rgba(255,255,255,0.4)" }}>
+                        style={{ color: isFocused ? "#7c3aed" : "#9ca3af" }}>
                         {label}
                       </label>
                       <div className="relative">
                         <span className="absolute top-1/2 -translate-y-1/2 text-sm transition-colors"
-                          style={{ [isRtl ? "right" : "left"]: "1rem", color: isFocused ? "#8b5cf6" : "rgba(255,255,255,0.2)" }}>
+                          style={{ [isRtl ? "right" : "left"]: "1rem", color: isFocused ? "#7c3aed" : "#9ca3af" }}>
                           {icon}
                         </span>
                         <input
                           required type={type} placeholder={placeholder}
                           value={(formData as any)[key] || ""}
-                          className="w-full py-3.5 text-sm font-medium text-white placeholder-white/15 rounded-xl outline-none transition-all"
+                          className="w-full py-3.5 text-sm font-medium placeholder-gray-300 rounded-xl outline-none transition-all"
                           style={{
                             paddingLeft: isRtl ? "1rem" : "2.75rem",
                             paddingRight: isRtl ? "2.75rem" : "1rem",
-                            background: isFocused ? "rgba(139,92,246,0.1)" : "rgba(255,255,255,0.04)",
-                            border: isFocused ? "1.5px solid rgba(139,92,246,0.55)" : "1.5px solid rgba(255,255,255,0.08)",
-                            boxShadow: isFocused ? "0 0 24px rgba(139,92,246,0.12), inset 0 0 0 1px rgba(139,92,246,0.1)" : "none",
+                            background: isFocused ? "rgba(124,58,237,0.05)" : "#f9fafb",
+                            border: isFocused ? "1.5px solid #7c3aed" : "1.5px solid #e5e7eb",
+                            color: "#1a1a1a",
                           }}
                           onFocus={() => setFocusedField(key)}
                           onBlur={() => setFocusedField(null)}
@@ -211,7 +202,7 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
 
               {/* طريقة الدفع */}
               <div>
-                <p className="text-[11px] font-black uppercase tracking-wider mb-3 px-1" style={{ color: "rgba(255,255,255,0.4)" }}>
+                <p className="text-[11px] font-black uppercase tracking-wider mb-3 px-1" style={{ color: "#9ca3af" }}>
                   {t.paymentQuestion}
                 </p>
                 <div className="grid grid-cols-3 gap-2.5">
@@ -222,16 +213,14 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
                         onClick={() => setFormData({ ...formData, paymentMethod: m.id })}
                         className="relative flex flex-col items-center gap-2 py-4 rounded-2xl transition-all active:scale-95 hover:scale-[1.03]"
                         style={{
-                          background: active ? `${m.color}18` : "rgba(255,255,255,0.03)",
-                          border: active ? `1.5px solid ${m.color}55` : "1.5px solid rgba(255,255,255,0.07)",
-                          boxShadow: active ? `0 4px 20px ${m.glow}` : "none",
+                          background: active ? "rgba(124,58,237,0.08)" : "#f9fafb",
+                          border: active ? "1.5px solid #7c3aed" : "1.5px solid #e5e7eb",
                         }}>
                         {active && (
-                          <div className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full"
-                            style={{ background: m.color, boxShadow: `0 0 6px ${m.color}` }} />
+                          <div className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full" style={{ background: "#7c3aed" }} />
                         )}
-                        <span className="text-xl transition-colors" style={{ color: active ? m.color : "rgba(255,255,255,0.2)" }}>{m.icon}</span>
-                        <span className="text-[10px] font-black transition-colors" style={{ color: active ? m.color : "rgba(255,255,255,0.25)" }}>{m.label}</span>
+                        <span className="text-xl transition-colors" style={{ color: active ? "#7c3aed" : "#9ca3af" }}>{m.icon}</span>
+                        <span className="text-[10px] font-black transition-colors" style={{ color: active ? "#7c3aed" : "#9ca3af" }}>{m.label}</span>
                       </button>
                     );
                   })}
@@ -251,9 +240,9 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
               <button type="submit" disabled={loading || registrationLocked}
                 className="w-full py-4 rounded-2xl font-black text-base transition-all active:scale-95 hover:scale-[1.02] disabled:opacity-40"
                 style={{
-                  background: loading ? "rgba(139,92,246,0.2)" : "linear-gradient(135deg, #8b5cf6, #6366f1)",
-                  color: "white",
-                  boxShadow: loading ? "none" : "0 8px 32px rgba(139,92,246,0.45)",
+                  background: loading ? "#e5e7eb" : "linear-gradient(135deg, #d4af37, #f0d060)",
+                  color: loading ? "#9ca3af" : "#0a0a0a",
+                  boxShadow: loading ? "none" : "0 8px 32px rgba(212,175,55,0.35)",
                 }}>
                 {loading ? (
                   <div className="flex items-center justify-center gap-3">
@@ -276,8 +265,8 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
       {alreadySubscribedModal && subscribedData && (
         <div className="fixed inset-0 flex items-end sm:items-center justify-center z-[99999] p-4"
           style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(12px)" }}>
-          <div className="w-full max-w-sm rounded-3xl overflow-hidden"
-            style={{ background: "linear-gradient(160deg, #0f172a, #1e1b4b)", border: "1px solid rgba(139,92,246,0.2)" }}>
+          <div className="w-full max-w-sm rounded-3xl overflow-hidden bg-white"
+            style={{ border: "1px solid #e5e7eb", boxShadow: "0 20px 60px rgba(0,0,0,0.15)" }}>
             <div className="px-6 pt-8 pb-6 text-center">
               <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center"
                 style={{ background: "rgba(249,115,22,0.12)", border: "1px solid rgba(249,115,22,0.25)" }}>

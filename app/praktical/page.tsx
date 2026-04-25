@@ -84,14 +84,7 @@ export default function VideoLessonsPage() {
 
   return (
     <div className="min-h-screen flex flex-col" dir={isRtl ? "rtl" : "ltr"}
-      style={{ background: "linear-gradient(160deg, #060818 0%, #0d1b4b 50%, #060818 100%)" }}>
-
-      {/* خلفية */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full opacity-[0.07] blur-[80px]" style={{ background: "#3b82f6" }}></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full opacity-[0.07] blur-[80px]" style={{ background: "#f97316" }}></div>
-        <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: "radial-gradient(circle, #fff 1px, transparent 1px)", backgroundSize: "28px 28px" }}></div>
-      </div>
+      style={{ background: "#f0f0f0" }}>
 
       <Navbar />
 
@@ -99,14 +92,14 @@ export default function VideoLessonsPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 text-xs font-bold"
-            style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.25)", color: "#60a5fa" }}>
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
+            style={{ background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.25)", color: "#7c3aed" }}>
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#7c3aed" }}></span>
             {lang === "ar" ? "اشتراك عملي" : lang === "nl" ? "Praktijk Abonnement" : "Abonnement Pratique"}
           </div>
-          <h1 className="text-2xl font-black text-white mb-2">
+          <h1 className="text-2xl font-black mb-2" style={{ color: "#1a1a1a" }}>
             {t.prakticalTitle || (lang === "ar" ? "اختر نوع التدريب" : lang === "nl" ? "Kies je training" : "Choisissez votre formation")}
           </h1>
-          <p className="text-white/40 text-sm">
+          <p className="text-gray-500 text-sm">
             {lang === "ar" ? "فيديوهات تدريبية احترافية" : lang === "nl" ? "Professionele trainingsvideo's" : "Vidéos de formation professionnelles"}
           </p>
         </div>
@@ -117,39 +110,26 @@ export default function VideoLessonsPage() {
             const isSelected = selectedBox === opt.id;
             return (
               <div key={opt.id}
-                className="rounded-2xl overflow-hidden cursor-pointer"
+                className="rounded-2xl overflow-hidden cursor-pointer bg-white"
                 style={{
-                  background: isSelected ? `${opt.color}15` : "rgba(255,255,255,0.05)",
-                  border: isSelected ? `2px solid ${opt.color}60` : "1px solid rgba(255,255,255,0.1)",
-                  boxShadow: isSelected ? `0 12px 40px ${opt.glow}` : "none",
+                  border: isSelected ? "2px solid #7c3aed" : "1px solid #e5e7eb",
+                  boxShadow: isSelected ? "0 12px 40px rgba(124,58,237,0.15)" : "0 2px 8px rgba(0,0,0,0.06)",
                   transition: "all 0.3s ease",
-                }}
-                onMouseEnter={e => {
-                  const el = e.currentTarget as HTMLElement;
-                  el.style.transform = "translateY(-6px)";
-                  el.style.boxShadow = `0 20px 50px ${opt.glow}`;
-                  el.style.border = `1.5px solid ${opt.color}50`;
-                }}
-                onMouseLeave={e => {
-                  const el = e.currentTarget as HTMLElement;
-                  el.style.transform = "translateY(0)";
-                  el.style.boxShadow = isSelected ? `0 12px 40px ${opt.glow}` : "none";
-                  el.style.border = isSelected ? `2px solid ${opt.color}60` : "1px solid rgba(255,255,255,0.1)";
                 }}
                 onClick={() => setSelectedBox(opt.id)}
               >
                 {/* رأس الكرت */}
                 <div className="flex items-center gap-4 px-5 py-5">
                   <div className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: `${opt.color}18`, border: `1px solid ${opt.color}30`, color: opt.color }}>
+                    style={{ background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.2)", color: "#7c3aed" }}>
                     {opt.icon}
                   </div>
                   <div className="flex-1">
-                    <p className="text-white font-black text-lg">{opt.title}</p>
-                    <p className="text-white/50 text-sm mt-0.5 leading-snug">{opt.desc}</p>
+                    <p className="font-black text-lg" style={{ color: "#1a1a1a" }}>{opt.title}</p>
+                    <p className="text-gray-500 text-sm mt-0.5 leading-snug">{opt.desc}</p>
                   </div>
                   {isSelected && (
-                    <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: opt.color }}>
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "#7c3aed" }}>
                       <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
@@ -158,24 +138,20 @@ export default function VideoLessonsPage() {
                 </div>
 
                 {/* فاصل */}
-                <div style={{ height: "1px", background: "rgba(255,255,255,0.06)", margin: "0 20px" }}></div>
+                <div style={{ height: "1px", background: "#f3f4f6", margin: "0 20px" }}></div>
 
                 {/* السعر + زر */}
                 <div className="flex items-center justify-between px-5 py-4">
                   <div>
-                    <p className="text-white/40 text-xs font-bold uppercase tracking-wider mb-0.5">
+                    <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-0.5">
                       {lang === "ar" ? "السعر" : lang === "nl" ? "Prijs" : "Prix"}
                     </p>
-                    <p className="text-3xl font-black" style={{ color: opt.color }}>€{opt.price}</p>
+                    <p className="text-3xl font-black" style={{ color: "#7c3aed" }}>€{opt.price}</p>
                   </div>
                   <button
                     onClick={e => { e.stopPropagation(); setSelectedBox(opt.id); setIsCheckout(true); }}
                     className="px-5 py-3 rounded-xl font-black text-sm transition-all active:scale-95 hover:scale-105"
-                    style={{
-                      background: `linear-gradient(135deg, ${opt.color}, ${opt.color}cc)`,
-                      color: "white",
-                      boxShadow: `0 4px 16px ${opt.color}40`,
-                    }}>
+                    style={{ background: "linear-gradient(135deg, #d4af37, #f0d060)", color: "#0a0a0a" }}>
                     {lang === "ar" ? "اشترك الآن" : lang === "nl" ? "Inschrijven" : lang === "fr" ? "S'inscrire" : "Subscribe"}
                   </button>
                 </div>
@@ -191,10 +167,9 @@ export default function VideoLessonsPage() {
             { icon: "🚗", label: lang === "ar" ? "تدريب عملي" : lang === "nl" ? "Praktijktraining" : lang === "fr" ? "Formation pratique" : "Practical training" },
             { icon: "🏆", label: lang === "ar" ? "نجاح مضمون" : lang === "nl" ? "Slaag gegarandeerd" : lang === "fr" ? "Succès garanti" : "Success guaranteed" },
           ].map((f, i) => (
-            <div key={i} className="text-center py-3 rounded-xl"
-              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
+            <div key={i} className="text-center py-3 rounded-xl bg-white" style={{ border: "1px solid #e5e7eb" }}>
               <div className="text-xl mb-1">{f.icon}</div>
-              <p className="text-white/50 text-[10px] font-bold">{f.label}</p>
+              <p className="text-gray-500 text-[10px] font-bold">{f.label}</p>
             </div>
           ))}
         </div>

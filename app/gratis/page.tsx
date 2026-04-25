@@ -666,9 +666,9 @@ function GratisContent() {
   }, [category]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col" dir={isRtl ? "rtl" : "ltr"}>
+    <div className="min-h-screen flex flex-col" dir={isRtl ? "rtl" : "ltr"} style={{ background: "#f0f0f0" }}>
       <Navbar />
-      <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0a0a2e 0%, #003399 60%, #0055cc 100%)" }}>
+      <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #7c3aed 0%, #5b21b6 60%, #4c1d95 100%)" }}>
         <div className="max-w-3xl mx-auto px-4 py-5">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
@@ -683,7 +683,7 @@ function GratisContent() {
             {categories.map(cat => (
               <button key={cat.id} onClick={() => setCategory(cat.id)}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-black transition-all"
-                style={category === cat.id ? { background: cat.color, color: "white" } : { background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.6)" }}>
+                style={category === cat.id ? { background: "rgba(255,255,255,0.25)", color: "white" } : { background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.6)" }}>
                 {cat.icon}<span className="hidden sm:inline">{cat.label}</span><span className="sm:hidden">{cat.id}</span>
               </button>
             ))}
@@ -708,7 +708,7 @@ function GratisContent() {
 
       <div className="max-w-3xl mx-auto px-4 py-6 flex-1">
         {loading ? (
-          <div className="flex justify-center py-16"><div className="w-10 h-10 border-4 border-[#003399] border-t-transparent rounded-full animate-spin"></div></div>
+          <div className="flex justify-center py-16"><div className="w-10 h-10 border-4 border-[#7c3aed] border-t-transparent rounded-full animate-spin"></div></div>
         ) : tab === "lessons" ? (
           <LessonsTab questions={questions} lang={lang} router={router} />
         ) : (
