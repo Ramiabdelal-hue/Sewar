@@ -153,39 +153,24 @@ function GratisContent() {
                       </div>
                     )}
                   </td>
-                  {/* الدرس الأول: زر واحد "Start nu" */}
-                  {i === 0 ? (
-                    <td colSpan={2} className="px-4 py-3 border border-gray-200 text-center">
-                      <button
-                        onClick={() => router.push(`/gratis/lesson?lessonId=${lesson.id}&category=${selectedCat}&lesson=${encodeURIComponent(lesson.title)}`)}
-                        className="border-2 px-4 py-1 text-sm font-bold transition-colors w-full"
-                        style={{ background: "#7c3aed", borderColor: "#7c3aed", color: "white" }}
-                      >
-                        ✔ Start nu
-                      </button>
-                    </td>
-                  ) : (
-                    /* باقي الدروس: زر Les + زر EXAM */
-                    <>
-                      <td className="px-4 py-3 border border-gray-200 text-center">
-                        <button
-                          onClick={() => router.push(`/gratis/lesson?lessonId=${lesson.id}&category=${selectedCat}&lesson=${encodeURIComponent(lesson.title)}`)}
-                          className="bg-white border-2 border-gray-400 px-4 py-1 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors w-full"
-                        >
-                          {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
-                        </button>
-                      </td>
-                      <td className="px-4 py-3 border border-gray-200 text-center">
-                        <button
-                          onClick={openExamModal}
-                          disabled={examGroups.length === 0}
-                          className="bg-white border-2 border-orange-400 px-4 py-1 text-sm font-bold text-orange-600 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-colors disabled:opacity-60 w-full"
-                        >
-                          EXAM
-                        </button>
-                      </td>
-                    </>
-                  )}
+                  {/* كل الدروس لها زرين منفصلين Les + EXAM */}
+                  <td className="px-4 py-3 border border-gray-200 text-center">
+                    <button
+                      onClick={() => router.push(`/gratis/lesson?lessonId=${lesson.id}&category=${selectedCat}&lesson=${encodeURIComponent(lesson.title)}`)}
+                      className="bg-white border-2 border-gray-400 px-4 py-1 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors w-full"
+                    >
+                      {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
+                    </button>
+                  </td>
+                  <td className="px-4 py-3 border border-gray-200 text-center">
+                    <button
+                      onClick={openExamModal}
+                      disabled={examGroups.length === 0}
+                      className="bg-white border-2 border-orange-400 px-4 py-1 text-sm font-bold text-orange-600 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-colors disabled:opacity-60 w-full"
+                    >
+                      EXAM
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
