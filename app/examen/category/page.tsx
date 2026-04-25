@@ -505,10 +505,15 @@ function ExamenCategoryContent() {
 
                       {/* صورة */}
                       {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
-                        <div className={`grid gap-0.5 bg-gray-900 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+                        <div className={`grid gap-0.5`}
+                          style={{ height: "320px", gridTemplateColumns: q.videoUrls.filter(Boolean).length === 1 ? "1fr" : "1fr 1fr" }}>
                           {q.videoUrls.filter(Boolean).map((url: string, idx: number) => (
-                            <div key={idx} className="rounded overflow-hidden">
-                              <WatermarkedImage src={url} className="w-full h-auto" />
+                            <div key={idx} className="relative overflow-hidden rounded" style={{ height: "100%" }}>
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} draggable={false} />
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src="/watermark.jpeg" alt="" className="absolute pointer-events-none"
+                                style={{ width: "50%", top: "50%", left: "50%", transform: "translate(-50%,-50%) rotate(-15deg)", opacity: 0.2, mixBlendMode: "multiply" }} draggable={false} />
                             </div>
                           ))}
                         </div>
@@ -693,10 +698,15 @@ function ExamenCategoryContent() {
 
             {/* الصور */}
             {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
-              <div className={`grid gap-1 bg-gray-900 p-2 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+              <div className={`grid gap-1 p-2`}
+                style={{ height: "320px", gridTemplateColumns: q.videoUrls.filter(Boolean).length === 1 ? "1fr" : "1fr 1fr" }}>
                 {q.videoUrls.filter(Boolean).map((url: string, i: number) => (
-                  <div key={i} className="rounded-xl overflow-hidden">
-                    <WatermarkedImage src={url} className="w-full h-auto" />
+                  <div key={i} className="relative overflow-hidden rounded-xl" style={{ height: "100%" }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} draggable={false} />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/watermark.jpeg" alt="" className="absolute pointer-events-none"
+                      style={{ width: "50%", top: "50%", left: "50%", transform: "translate(-50%,-50%) rotate(-15deg)", opacity: 0.2, mixBlendMode: "multiply" }} draggable={false} />
                   </div>
                 ))}
               </div>
