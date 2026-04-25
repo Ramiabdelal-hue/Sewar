@@ -331,7 +331,7 @@ export default function TheoriePage() {
               {filtered.map((lesson, i) => (
                 <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#f5f5f5" }}>
                   <td className="px-4 py-3 border border-gray-200">
-                    <div className={`font-bold text-[#003399] text-base ${i === 0 ? "whitespace-normal break-words" : ""}`}>
+                    <div className="font-bold text-[#003399] text-base" style={{ wordBreak: "break-word", whiteSpace: "normal" }}>
                       {i + 1}. {translatedTitles[lessons.indexOf(lesson)] || lesson.title}
                     </div>
                     {lesson.description && (
@@ -341,10 +341,11 @@ export default function TheoriePage() {
                       </div>
                     )}
                   </td>
-                  <td className="px-4 py-3 border border-gray-200 text-center">
+                  <td className="px-4 py-3 border border-gray-200 text-center" style={{ width: "80px" }}>
                     <button
                       onClick={() => router.push(`/theorie/lesson?lessonId=${lesson.id}&category=${userCategory}&email=${userEmail}&lesson=${encodeURIComponent(lesson.title)}`)}
-                      className="bg-white border-2 border-gray-400 px-4 py-1 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors w-full"
+                      className="border-2 px-2 py-1 text-sm font-bold transition-colors w-full"
+                      style={i === 0 ? { background: "#7c3aed", borderColor: "#7c3aed", color: "white" } : { background: "white", borderColor: "#9ca3af" }}
                     >
                       {i === 0 ? <span>✔ Start<br/>nu</span> : (lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson")}
                     </button>
