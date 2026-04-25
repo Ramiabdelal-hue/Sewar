@@ -70,6 +70,21 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
 
   const isRtl = lang === "ar";
 
+  // دالة لتحويل الروابط في النص إلى links قابلة للنقر
+  const renderTextWithLinks = (text: string) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+    return parts.map((part, i) =>
+      urlRegex.test(part) ? (
+        <a key={i} href={part} target="_blank" rel="noopener noreferrer"
+          className="text-blue-600 underline font-bold break-all"
+          onClick={e => e.stopPropagation()}>
+          🔗 {part}
+        </a>
+      ) : part
+    );
+  };
+
   return (
     <div className="rounded-3xl overflow-hidden shadow-2xl border border-gray-100 mb-6" dir={isRtl ? "rtl" : "ltr"}>
 
@@ -147,12 +162,12 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
             <div className="space-y-1.5">
               {expText.split('\n').filter(line => line.trim()).map((line, i) => (
                 <p key={i} className={`text-sm text-gray-800 leading-relaxed ${isRtl ? "text-right" : "text-left"}`}>
-                  {line.trim()}
+                  {renderTextWithLinks(line.trim())}
                 </p>
               ))}
             </div>
           ) : (
-            <p className={`text-sm text-gray-800 leading-relaxed ${isRtl ? "text-right" : "text-left"}`}>{expText}</p>
+            <p className={`text-sm text-gray-800 leading-relaxed ${isRtl ? "text-right" : "text-left"}`}>{renderTextWithLinks(expText)}</p>
           )}
         </div>
       )}
