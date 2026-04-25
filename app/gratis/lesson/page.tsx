@@ -3,116 +3,192 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useLang } from "@/context/LangContext";
+import nl from "@/locales/nl.json";
+import fr from "@/locales/fr.json";
+import ar from "@/locales/ar.json";
+import en from "@/locales/en.json";
 import Navbar from "@/components/Navbar";
 import QuestionCard from "@/components/QuestionCard";
-import { useAutoTranslate, useAutoTranslateList } from "@/hooks/useAutoTranslate";
+import { useAutoTranslate } from "@/hooks/useAutoTranslate";
 import Footer from "@/components/Footer";
+
+interface Question {
+  id: number;
+  text: string;
+  textNL?: string;
+  textFR?: string;
+  textAR?: string;
+  explanationNL?: string;
+  explanationFR?: string;
+  explanationAR?: string;
+  videoUrls?: string[];
+  audioUrl?: string;
+  answer1?: string;
+  answer2?: string;
+  answer3?: string;
+  correctAnswer?: number;
+}
 
 function GratisLessonContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { lang } = useLang();
+  const translations: any = { nl, fr, ar, en };
+  const t = translations[lang];
 
   const category = searchParams.get("category") || "B";
   const lessonId = searchParams.get("lessonId");
   const lessonTitle = searchParams.get("lesson") || "";
 
-  const [questions, setQuestions] = useState<any[]>([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [lessonDescription, setLessonDescription] = useState("");
 
+  // ترجمة عنوان الدرس تلقائياً
   const translatedLessonTitle = useAutoTranslate(lessonTitle, lang);
 
   useEffect(() => {
-    if (!lessonId) { setLoading(false); return; }
-    fetch(`/api/free-content?category=${category}`)
-      .then(r => r.json())
-      .then(d => {
-        if (d.success) {
-          const filtered = d.questions.filter((q: any) => q.lessonId === Number(lessonId));
-          setQuestions(filtered);
+    if (lessonId) {
+      fetchQuestions();
+    }
+  }, [lessonId]);
+
+  const fetchQuestions = async () => {
+    try {
+      if (!lessonId) {
+        console.error("❌ No lessonId provided");
+        setLoading(false);
+        return;
+      }
+      
+      // جلب الأسئلة المجانية فقط
+      const res = await fetch(`/api/free-content?category=${category}`);
+      const data = await res.json();
+
+      if (data.success) {
+        // تصفية الأسئلة للدرس المحدد فقط
+        const filtered = data.questions.filter((q: any) => q.lessonId === Number(lessonId));
+        setQuestions(filtered);
+        
+        // الحصول على وصف الدرس من أول سؤال
+        if (filtered.length > 0 && filtered[0].lesson?.description) {
+          setLessonDescription(filtered[0].lesson.description);
         }
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [lessonId, category]);
+      }
+    } catch (error) {
+      console.error("Error fetching questions:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const currentQuestion = questions[currentIndex] || null;
-  const textsToTranslate = currentQuestion
-    ? [currentQuestion.textNL || currentQuestion.text || "", currentQuestion.answer1 || "", currentQuestion.answer2 || "", currentQuestion.answer3 || ""]
-    : ["", "", "", ""];
-  const translatedTexts = useAutoTranslateList(textsToTranslate, lang);
-
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: "#f0f0f0" }}>
-      <div className="w-10 h-10 border-4 border-[#22c55e] border-t-transparent rounded-full animate-spin"></div>
-    </div>
-  );
-
-  if (questions.length === 0) return (
-    <div className="min-h-screen flex flex-col" style={{ background: "#f0f0f0" }}>
-      <Navbar />
-      <div className="flex-1 flex items-center justify-center p-6">
-        <div className="bg-white rounded-2xl p-8 text-center max-w-sm shadow">
-          <div className="text-4xl mb-3">📚</div>
-          <p className="font-bold text-gray-700 mb-4">
-            {lang === "ar" ? "لا توجد أسئلة مجانية لهذا الدرس" : lang === "nl" ? "Geen gratis vragen voor deze les" : "No free questions for this lesson"}
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 font-medium">
+            {lang === "ar" ? "جاري تحميل الأسئلة المجانية..." : lang === "nl" ? "Gratis vragen laden..." : "Chargement des questions gratuites..."}
           </p>
-          <button onClick={() => router.back()} className="px-6 py-2 rounded-xl font-bold text-white" style={{ background: "#22c55e" }}>
-            {lang === "ar" ? "رجوع" : lang === "nl" ? "Terug" : "Retour"}
+        </div>
+      </div>
+    );
+  }
+
+  if (questions.length === 0 && !loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
+        <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md">
+          <div className="w-20 h-20 bg-red-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+            <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            {lang === "ar" ? "لا توجد أسئلة مجانية" : lang === "nl" ? "Geen gratis vragen" : "Aucune question gratuite"}
+          </h2>
+          <p className="text-gray-600 mb-6">
+            {lang === "ar" ? "لم يتم إضافة أسئلة مجانية لهذا الدرس بعد" : lang === "nl" ? "Er zijn nog geen gratis vragen toegevoegd voor deze les" : "Aucune question gratuite n'a encore été ajoutée pour cette leçon"}
+          </p>
+          <button
+            onClick={() => router.push("/gratis")}
+            className="bg-orange-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-600 transition"
+          >
+            {lang === "ar" ? "العودة للدروس المجانية" : lang === "nl" ? "Terug naar gratis lessen" : "Retour aux leçons gratuites"}
           </button>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: "#f0f0f0" }}>
+    <div className="min-h-screen bg-gray-50" dir={lang === "ar" ? "rtl" : "ltr"}>
       <Navbar />
-
-      {/* Header */}
-      <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)" }}>
-        <div className="relative max-w-2xl md:max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-3">
-            <button onClick={() => router.back()} className="text-white/70 hover:text-white transition-colors">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={lang === "ar" ? "M9 5l7 7-7 7" : "M15 19l-7-7 7-7"} />
-              </svg>
-            </button>
-            <div>
-              <p className="text-white/50 text-xs font-bold uppercase tracking-wider">🎁 Gratis</p>
-              <h1 className="text-base font-black text-white truncate max-w-xs">{translatedLessonTitle || lessonTitle}</h1>
+      
+      <div className="py-8 px-4">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <button
+                onClick={() => router.push("/gratis")}
+                className="flex items-center gap-2 text-gray-600 hover:text-orange-500 font-medium transition"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                {lang === "ar" ? "العودة" : lang === "nl" ? "Terug" : "Retour"}
+              </button>
+              <span className="px-3 py-1.5 rounded-xl text-xs font-black" style={{ background: "rgba(34,197,94,0.15)", color: "#16a34a", border: "1px solid rgba(34,197,94,0.3)" }}>
+                🎁 Gratis
+              </span>
             </div>
-            <span className="ml-auto px-3 py-1 rounded-xl text-xs font-black" style={{ background: "rgba(255,204,0,0.15)", color: "#ffcc00", border: "1px solid rgba(255,204,0,0.3)" }}>
-              {currentIndex + 1} / {questions.length}
-            </span>
+
+            <h1 className="text-2xl font-bold text-gray-800 mb-2">{translatedLessonTitle || lessonTitle}</h1>
+            {lessonDescription && (
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mt-1"
+                style={{ background: "linear-gradient(135deg, #f0fdf4, #dcfce7)", border: "1px solid #86efac" }}>
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0"></span>
+                <span className="text-sm font-semibold text-green-700">{lessonDescription}</span>
+              </div>
+            )}
+          </div>
+
+          {/* كل أسئلة الدرس في نفس الصفحة */}
+          <div className="space-y-4">
+            {questions.map((q, i) => (
+              <QuestionCard
+                key={q.id}
+                question={q}
+                index={i}
+                total={questions.length}
+                lang={lang}
+                onNext={() => {}}
+                onPrev={() => {}}
+              />
+            ))}
+          </div>
+
+          {/* زر العودة في الأسفل */}
+          <div className="mt-6 pb-4">
+            <button
+              onClick={() => { router.push("/gratis"); window.scrollTo(0, 0); }}
+              className="w-full py-3 font-black text-sm border-2 border-[#22c55e] text-[#22c55e] rounded-xl hover:bg-[#22c55e] hover:text-white transition-all"
+            >
+              ← {lang === "ar" ? "العودة للدروس المجانية" : lang === "nl" ? "Terug naar gratis lessen" : lang === "fr" ? "Retour aux leçons gratuites" : "Back to free lessons"}
+            </button>
+          </div>
+
+          {/* زر الاشتراك */}
+          <div className="mt-4">
+            <button onClick={() => router.push("/theorie")}
+              className="w-full py-4 rounded-2xl font-black text-base transition-all active:scale-95"
+              style={{ background: "linear-gradient(135deg, #d4af37, #f0d060, #d4af37)", color: "#0a0a0a", boxShadow: "0 8px 30px rgba(212,175,55,0.35)" }}>
+              🔓 {lang === "ar" ? "اشترك للوصول لكل الدروس" : lang === "nl" ? "Inschrijven voor alle lessen" : lang === "fr" ? "S'inscrire pour toutes les leçons" : "Subscribe for all lessons"}
+            </button>
           </div>
         </div>
       </div>
-
-      {/* المحتوى */}
-      <div className="flex-1 max-w-2xl md:max-w-4xl mx-auto w-full px-4 py-4">
-        {currentQuestion && (
-          <QuestionCard
-            question={{ ...currentQuestion, text: translatedTexts[0] || currentQuestion.textNL || currentQuestion.text, answer1: translatedTexts[1] || currentQuestion.answer1, answer2: translatedTexts[2] || currentQuestion.answer2, answer3: translatedTexts[3] || currentQuestion.answer3 }}
-            index={currentIndex}
-            total={questions.length}
-            lang={lang}
-            onNext={() => { if (currentIndex < questions.length - 1) setCurrentIndex(i => i + 1); }}
-            onPrev={() => { if (currentIndex > 0) setCurrentIndex(i => i - 1); }}
-          />
-        )}
-
-        {/* زر الاشتراك */}
-        <div className="mt-4">
-          <button onClick={() => router.push("/theorie")}
-            className="w-full py-3 rounded-2xl font-black text-sm transition-all active:scale-95"
-            style={{ background: "linear-gradient(135deg, #d4af37, #f0d060, #d4af37)", color: "#0a0a0a", boxShadow: "0 4px 14px rgba(212,175,55,0.35)" }}>
-            🔓 {lang === "ar" ? "اشترك للمزيد" : lang === "nl" ? "Meer? Inschrijven" : lang === "fr" ? "Plus? S'inscrire" : "More? Subscribe"}
-          </button>
-        </div>
-      </div>
-
       <Footer />
     </div>
   );
@@ -120,7 +196,7 @@ function GratisLessonContent() {
 
 export default function GratisLessonPage() {
   return (
-    <Suspense fallback={<div className="flex justify-center py-16"><div className="w-10 h-10 border-4 border-[#22c55e] border-t-transparent rounded-full animate-spin"></div></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="text-xl font-bold">Loading...</div></div>}>
       <GratisLessonContent />
     </Suspense>
   );
