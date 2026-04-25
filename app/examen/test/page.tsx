@@ -1,4 +1,4 @@
-"use client";
+ï»¿"use client";
 
 import { Suspense, useEffect, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -20,7 +20,7 @@ function ExamenTestContent() {
   const offsetParam = parseInt(searchParams.get("offset") || "0");
   const limitParam = parseInt(searchParams.get("limit") || "0");
 
-  // ÏÇáÉ ÇáÑÌæÚ - ÊÑÌÚ ááÕÝÍÉ ÇáÓÇÈÞÉ
+  // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ - ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
   const goBackToExamList = () => {
     router.back();
   };
@@ -87,7 +87,7 @@ function ExamenTestContent() {
     };
     const questionText = translated[0] || q.textNL || q.text || "";
     const answers = [translated[1] || q.answer1, translated[2] || q.answer2, translated[3] || q.answer3].filter(Boolean);
-    const labels = lang === "ar" ? ["ÇáÌæÇÈ A:", "ÇáÌæÇÈ B:", "ÇáÌæÇÈ C:"] : lang === "fr" ? ["Réponse A:", "Réponse B:", "Réponse C:"] : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
+    const labels = lang === "ar" ? ["ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ A:", "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ B:", "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ C:"] : lang === "fr" ? ["Rï¿½ponse A:", "Rï¿½ponse B:", "Rï¿½ponse C:"] : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
     if (!questionText) { setReadingDone(true); return; }
     speak(questionText, () => {
       if (!isValid()) { setReadingDone(true); return; }
@@ -150,11 +150,11 @@ function ExamenTestContent() {
           if (data.success) {
             let qs = data.questions || [];
             if (limitParam > 0) {
-              // ÃÎÐ ÇáÜ batch ÇáãÍÏÏ Ëã ÎáØ ÚÔæÇÆí ÏÇÎáå
+              // ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ batch ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
               qs = qs.slice(offsetParam, offsetParam + limitParam)
                      .sort(() => Math.random() - 0.5);
             } else {
-              // ÈÏæä offset = ÎáØ ÚÔæÇÆí æÃÎÐ 50
+              // ï¿½ï¿½ï¿½ï¿½ offset = ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ 50
               qs = qs.sort(() => Math.random() - 0.5).slice(0, 50);
             }
             setQuestions(qs);
@@ -209,14 +209,14 @@ function ExamenTestContent() {
         <div className="border-4 border-[#003399] rounded-2xl p-10">
           <div className="text-6xl mb-4">??</div>
           <h1 className="text-2xl font-black text-[#003399] mb-2">{lessonName || `Examen ${category}`}</h1>
-          <p className="text-gray-500 mb-2">{questions.length} {lang === "ar" ? "ÓÄÇá" : lang === "nl" ? "vragen" : "questions"}</p>
-          <p className="text-sm text-orange-600 font-bold mb-8">? {lang === "ar" ? "15 ËÇäíÉ áßá ÓÄÇá" : lang === "nl" ? "15 seconden per vraag" : "15 seconds per question"}</p>
+          <p className="text-gray-500 mb-2">{questions.length} {lang === "ar" ? "ï¿½ï¿½ï¿½ï¿½" : lang === "nl" ? "vragen" : "questions"}</p>
+          <p className="text-sm text-orange-600 font-bold mb-8">? {lang === "ar" ? "15 ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½" : lang === "nl" ? "15 seconden per vraag" : "15 seconds per question"}</p>
           {questions.length === 0
-            ? <p className="text-red-500 font-bold">{lang === "ar" ? "áÇ ÊæÌÏ ÃÓÆáÉ" : "Geen vragen"}</p>
+            ? <p className="text-red-500 font-bold">{lang === "ar" ? "ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½" : "Geen vragen"}</p>
             : <button onClick={() => { unlockAudio(); setStarted(true); }}
                 className="px-10 py-4 font-black text-white text-lg rounded-xl hover:scale-105 active:scale-95 transition-all"
                 style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-                {lang === "ar" ? "ÇÈÏÃ ÇáÇãÊÍÇä" : lang === "nl" ? "Start Examen" : "Start Exam"} ?
+                {lang === "ar" ? "ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" : lang === "nl" ? "Start Examen" : "Start Exam"} ?
               </button>
           }
         </div>
@@ -235,13 +235,13 @@ function ExamenTestContent() {
           <div className={`rounded-2xl p-8 mb-6 text-center border-4 ${passed ? "border-green-400 bg-green-50" : "border-red-400 bg-red-50"}`}>
             <div className="text-6xl mb-3">{passed ? "??" : "??"}</div>
             <h1 className="text-2xl font-black mb-1" style={{ color: passed ? "#16a34a" : "#dc2626" }}>
-              {passed ? (lang === "ar" ? "ãÈÑæß! äÌÍÊ" : lang === "nl" ? "Geslaagd!" : "Passed!") : (lang === "ar" ? "áã ÊäÌÍ åÐå ÇáãÑÉ" : lang === "nl" ? "Helaas niet geslaagd" : "Not passed")}
+              {passed ? (lang === "ar" ? "ï¿½ï¿½ï¿½ï¿½ï¿½! ï¿½ï¿½ï¿½ï¿½" : lang === "nl" ? "Geslaagd!" : "Passed!") : (lang === "ar" ? "ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½" : lang === "nl" ? "Helaas niet geslaagd" : "Not passed")}
             </h1>
             <div className="flex items-center justify-center gap-4 mt-4 flex-wrap">
               {[
-                { label: lang === "ar" ? "ÇáäÞÇØ" : "Behaald", value: score, sub: `/ ${maxScore}`, color: "text-green-600" },
-                { label: lang === "ar" ? "ÕÍ" : "Correct", value: correctCount, sub: `/ ${questions.length}`, color: "text-blue-600" },
-                { label: lang === "ar" ? "ÎØÃ" : "Fout", value: questions.length - correctCount, sub: "", color: "text-red-500" },
+                { label: lang === "ar" ? "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" : "Behaald", value: score, sub: `/ ${maxScore}`, color: "text-green-600" },
+                { label: lang === "ar" ? "ï¿½ï¿½" : "Correct", value: correctCount, sub: `/ ${questions.length}`, color: "text-blue-600" },
+                { label: lang === "ar" ? "ï¿½ï¿½ï¿½" : "Fout", value: questions.length - correctCount, sub: "", color: "text-red-500" },
                 { label: "Score", value: `${pct}%`, sub: "", color: passed ? "text-green-600" : "text-red-600" },
               ].map((s, i) => (
                 <div key={i} className="bg-white rounded-xl px-5 py-3 shadow text-center">
@@ -253,12 +253,12 @@ function ExamenTestContent() {
             </div>
           </div>
 
-          {/* ÇáÃÓÆáÉ ÇáÎÇØÆÉ */}
+          {/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */}
           {questions.some((q, i) => answers[i] !== q.correctAnswer) && (
             <div className="mb-6">
               <h2 className="text-lg font-black text-gray-800 mb-3 flex items-center gap-2">
                 <span className="w-7 h-7 rounded-lg bg-red-500 flex items-center justify-center text-white text-sm">?</span>
-                {lang === "ar" ? "ÇáÃÓÆáÉ ÇáÎÇØÆÉ" : lang === "nl" ? "Foute antwoorden" : "Wrong answers"}
+                {lang === "ar" ? "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" : lang === "nl" ? "Foute antwoorden" : "Wrong answers"}
               </h2>
               <div className="space-y-4">
                 {questions.map((q, i) => {
@@ -269,7 +269,7 @@ function ExamenTestContent() {
                       <div className="px-4 py-2 flex items-center gap-2" style={{ background: "#fef2f2" }}>
                         <span className="w-6 h-6 rounded-full bg-red-500 text-white text-xs font-black flex items-center justify-center">{i + 1}</span>
                         {q.points === 5 && <span className="text-xs font-black px-1.5 py-0.5 rounded-full" style={{ background: "rgba(239,68,68,0.15)", color: "#dc2626" }}>? 5 pts</span>}
-                        {(userAns === null || userAns === undefined) && <span className="text-xs font-black text-orange-500">? {lang === "ar" ? "ÇäÊåì ÇáæÞÊ" : "Tijd verlopen"}</span>}
+                        {(userAns === null || userAns === undefined) && <span className="text-xs font-black text-orange-500">? {lang === "ar" ? "ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½" : "Tijd verlopen"}</span>}
                       </div>
                       {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
                         <div className={`grid gap-0.5`}
@@ -299,8 +299,8 @@ function ExamenTestContent() {
                                   {isCorrectAns ? "?" : isUserAns ? "?" : num}
                                 </span>
                                 <span className="flex-1">{ansText}</span>
-                                {isCorrectAns && <span className="text-xs font-black text-green-600">{lang === "ar" ? "ÇáÕÍíÍÉ" : "Correct"}</span>}
-                                {isUserAns && !isCorrectAns && <span className="text-xs font-black text-red-500">{lang === "ar" ? "ÅÌÇÈÊß" : "Jouw antwoord"}</span>}
+                                {isCorrectAns && <span className="text-xs font-black text-green-600">{lang === "ar" ? "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" : "Correct"}</span>}
+                                {isUserAns && !isCorrectAns && <span className="text-xs font-black text-red-500">{lang === "ar" ? "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" : "Jouw antwoord"}</span>}
                               </div>
                             );
                           })}
@@ -317,11 +317,11 @@ function ExamenTestContent() {
             <button onClick={() => { unlockAudio(); setStarted(false); setFinished(false); setCurrentIndex(0); setAnswers({}); setLocked(false); }}
               className="flex-1 py-3 font-black text-white rounded-xl hover:opacity-90 active:scale-95"
               style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-              ?? {lang === "ar" ? "ÅÚÇÏÉ" : lang === "nl" ? "Opnieuw" : "Retry"}
+              ?? {lang === "ar" ? "ï¿½ï¿½ï¿½ï¿½ï¿½" : lang === "nl" ? "Opnieuw" : "Retry"}
             </button>
             <button onClick={goBackToExamList}
               className="flex-1 py-3 font-black border-2 border-gray-300 text-gray-600 rounded-xl hover:bg-gray-50 active:scale-95">
-              ? {lang === "ar" ? "ÑÌæÚ" : lang === "nl" ? "Terug" : "Back"}
+              ? {lang === "ar" ? "ï¿½ï¿½ï¿½ï¿½" : lang === "nl" ? "Terug" : "Back"}
             </button>
           </div>
         </div>
@@ -370,7 +370,7 @@ function ExamenTestContent() {
               </div>
               <div className={`flex items-center gap-2 px-3 py-1 rounded-full font-black text-sm border-2 transition-all ${locked ? "bg-white/20 border-white/40 text-white" : !readingDone ? "bg-blue-500 border-blue-300 text-white animate-pulse" : timeLeft <= 5 ? "bg-red-500 border-red-300 text-white animate-pulse" : timeLeft <= 10 ? "bg-orange-500 border-orange-300 text-white" : "bg-green-500 border-green-300 text-white"}`}>
                 <span>{!readingDone && !locked ? "??" : "?"}</span>
-                <span>{locked ? (isAnswered && userAnswer !== null ? (userAnswer === q.correctAnswer ? "?" : "?") : "?") : !readingDone ? (lang === "ar" ? "ÞÑÇÁÉ..." : "Lezen...") : timeLeft}</span>
+                <span>{locked ? (isAnswered && userAnswer !== null ? (userAnswer === q.correctAnswer ? "?" : "?") : "?") : !readingDone ? (lang === "ar" ? "ï¿½ï¿½ï¿½ï¿½ï¿½..." : "Lezen...") : timeLeft}</span>
                 {!locked && readingDone && <span className="text-xs opacity-80">s</span>}
               </div>
             </div>
@@ -422,7 +422,7 @@ function ExamenTestContent() {
               </div>
               {(isAnswered || locked) && (
                 <button onClick={handleNext} className="w-full mt-5 py-3 font-black text-white rounded-xl hover:opacity-90 active:scale-95" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-                  {currentIndex + 1 >= questions.length ? (lang === "ar" ? "ÚÑÖ ÇáäÊíÌÉ ??" : lang === "nl" ? "Resultaat ??" : "Result ??") : (lang === "ar" ? "ÇáÊÇáí ?" : lang === "nl" ? "Volgende ?" : "Next ?")}
+                  {currentIndex + 1 >= questions.length ? (lang === "ar" ? "ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ??" : lang === "nl" ? "Resultaat ??" : "Result ??") : (lang === "ar" ? "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ?" : lang === "nl" ? "Volgende ?" : "Next ?")}
                 </button>
               )}
             </div>
