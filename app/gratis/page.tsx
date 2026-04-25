@@ -1,732 +1,251 @@
 "use client";
 
-import { useState, useEffect, useRef, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import QuestionCard from "@/components/QuestionCard";
-import WatermarkedImage from "@/components/WatermarkedImage";
 import { useLang } from "@/context/LangContext";
 import { MotorcycleIcon, CarIcon, TruckIcon } from "@/components/VehicleIcons";
 import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
+import nl from "@/locales/nl.json";
+import fr from "@/locales/fr.json";
+import ar from "@/locales/ar.json";
+import en from "@/locales/en.json";
 
-// ─── تبويب الشروح ────────────────────────────────────────────────────────────
-function LessonsTab({ questions, lang, router }: { questions: any[], lang: string, router: any }) {
-  const isRtl = lang === "ar";
-
-  // ترجمة عناوين الدروس
-  const lessonTitles = questions.map(q => q.lesson?.title || "");
-  const translatedTitles = useAutoTranslateList(lessonTitles, lang);
-
-  if (questions.length === 0) return (
-    <div className="text-center py-16">
-      <div className="text-5xl mb-4">📚</div>
-      <p className="text-gray-500 text-sm">{lang === "ar" ? "لا يوجد شروح مجانية بعد" : lang === "nl" ? "Nog geen gratis lessen" : lang === "fr" ? "Pas encore de leçons gratuites" : "No free lessons yet"}</p>
-    </div>
-  );
-
-  return (
-    <>
-      {/* عنوان + عدد */}
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-sm font-bold text-gray-500">{questions.length} {lang === "ar" ? "شرح" : lang === "nl" ? "uitleggen" : lang === "fr" ? "leçons" : "lessons"}</span>
-        <span className="text-xs font-bold px-2 py-1 rounded-full" style={{ background: "rgba(34,197,94,0.1)", color: "#16a34a" }}>🎁 Gratis</span>
-      </div>
-
-      {/* كل الشروحات معاً */}
-      <div className="space-y-4">
-        {questions.map((q, i) => (
-          <div key={q.id || i}>
-            {q.lesson && (
-              <div className="mb-1.5 px-4 py-2 rounded-xl text-xs font-bold text-[#003399]" style={{ background: "#eff6ff", border: "1px solid #bfdbfe" }}>
-                📚 {translatedTitles[i] || q.lesson.title}
-              </div>
-            )}
-            <QuestionCard question={q} index={i} total={questions.length} lang={lang} onNext={() => {}} onPrev={() => {}} />
-          </div>
-        ))}
-      </div>
-
-      {/* زر الاشتراك */}
-      <div className="mt-4">
-        <button onClick={() => router.push("/theorie")}
-          className="w-full py-3 rounded-xl font-black text-sm transition-all active:scale-95 hover:scale-[1.02]"
-          style={{ background: "linear-gradient(135deg, #ffcc00, #ff9900)", color: "#003399", boxShadow: "0 4px 14px rgba(255,153,0,0.35)" }}>
-          🔓 {lang === "ar" ? "اشترك للمزيد" : lang === "nl" ? "Meer? Inschrijven" : lang === "fr" ? "Plus? S'inscrire" : "More? Subscribe"}
-        </button>
-      </div>
-    </>
-  );
-}
-
-// ─── تبويب الامتحان المجاني ───────────────────────────────────────────────────
-function ExamTab({ questions, examGroups, lang, router }: { questions: any[], examGroups: any[], lang: string, router: any }) {
-  const [selectedGroup, setSelectedGroup] = useState<number | null>(null);
-
-  // إذا كانت مجموعة واحدة فقط، ابدأ مباشرة
-  const activeQuestions = selectedGroup !== null
-    ? (examGroups.find(g => g.group === selectedGroup)?.questions || [])
-    : questions;
-
-  // إذا لا توجد مجموعات متعددة، اعرض الامتحان مباشرة
-  const hasMultipleGroups = examGroups.length > 1;
-
-  if (hasMultipleGroups && selectedGroup === null) {
-    return (
-      <div className="py-4">
-        <div className="text-center mb-6">
-          <div className="text-4xl mb-2">🎯</div>
-          <h2 className="text-lg font-black text-gray-800">
-            {lang === "ar" ? "اختر الامتحان" : lang === "nl" ? "Kies een examen" : lang === "fr" ? "Choisissez un examen" : "Choose an exam"}
-          </h2>
-          <p className="text-sm text-gray-500 mt-1">
-            {lang === "ar" ? "كل امتحان يحتوي على مجموعة من الأسئلة" : lang === "nl" ? "Elk examen bevat een reeks vragen" : lang === "fr" ? "Chaque examen contient une série de questions" : "Each exam contains a set of questions"}
-          </p>
-        </div>
-        <div className="space-y-3">
-          {examGroups.map((g, i) => (
-            <button key={g.group} onClick={() => setSelectedGroup(g.group)}
-              className="w-full flex items-center justify-between px-5 py-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-95"
-              style={{ background: "white", border: "2px solid #e5e7eb", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-white text-sm"
-                  style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-                  {i + 1}
-                </div>
-                <div className="text-left">
-                  <p className="font-black text-gray-800 text-sm">
-                    {g.label || (lang === "ar" ? "امتحان مجاني" : lang === "nl" ? "Gratis Examen" : "Examen Gratuit")}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    {g.questions.length} {lang === "ar" ? "سؤال" : lang === "nl" ? "vragen" : "questions"}
-                    {" · "}{g.questions.reduce((s: number, q: any) => s + (q.points || 1), 0)} {lang === "ar" ? "نقطة" : lang === "nl" ? "punten" : "pts"}
-                  </p>
-                </div>
-              </div>
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <ExamRunner
-      questions={activeQuestions}
-      lang={lang}
-      router={router}
-      groupLabel={selectedGroup !== null ? (examGroups.find(g => g.group === selectedGroup)?.label || null) : null}
-      onBack={hasMultipleGroups ? () => setSelectedGroup(null) : undefined}
-    />
-  );
-}
-
-// ─── منفذ الامتحان ────────────────────────────────────────────────────────────
-function ExamRunner({ questions, lang, router, groupLabel, onBack }: { questions: any[], lang: string, router: any, groupLabel: string | null, onBack?: () => void }) {
-  const [started, setStarted] = useState(false);
-  const [finished, setFinished] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<number, number | null>>({});
-  const [timeLeft, setTimeLeft] = useState(15);
-  const [locked, setLocked] = useState(false);
-  const [readingDone, setReadingDone] = useState(false);
-  const [hasReadCurrentQuestion, setHasReadCurrentQuestion] = useState(false);
-  const [shuffledQuestions, setShuffledQuestions] = useState<any[]>([]);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const ttsRef = useRef<NodeJS.Timeout | null>(null);
-  const stopTtsRef = useRef(false);
-  const ttsSessionRef = useRef(0);
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const isRtl = lang === "ar";
-
-  // خلط الأسئلة عند أول تحميل أو عند تغيير الأسئلة
-  useEffect(() => {
-    if (questions.length > 0) {
-      setShuffledQuestions([...questions].sort(() => Math.random() - 0.5));
-    }
-  }, [questions]);
-
-  // فتح قناة الصوت عند أول تفاعل (مطلوب على iOS/Android)
-  const unlockAudio = () => {
-    if (!window.speechSynthesis) return;
-    const u = new SpeechSynthesisUtterance('');
-    u.volume = 0;
-    u.rate = 1;
-    window.speechSynthesis.speak(u);
-    // افتح AudioContext مسبقاً لضمان عمل التصفيق
-    try {
-      if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
-        audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      }
-      if (audioCtxRef.current.state === 'suspended') audioCtxRef.current.resume();
-    } catch {}
-  };
-
-  // دالة إيقاف فوري شاملة
-  const killTts = () => {
-    stopTtsRef.current = true;
-    ttsSessionRef.current += 1;
-    if (ttsRef.current) { clearTimeout(ttsRef.current); ttsRef.current = null; }
-    if (window.speechSynthesis) {
-      window.speechSynthesis.pause();
-      window.speechSynthesis.cancel();
-    }
-  };
-
-  const q = shuffledQuestions[currentIndex];
-  const textsToTranslate = q ? [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""] : ["", "", "", ""];
-  const translatedTexts = useAutoTranslateList(textsToTranslate, lang);
-  const translatedRef = useRef<string[]>(["", "", "", ""]);
-  useEffect(() => { translatedRef.current = translatedTexts; }, [translatedTexts]);
-
-  // القارئ التلقائي
-  const speakQuestion = (q: any, translated: string[]) => {
-    if (!window.speechSynthesis || !q) {
-      setReadingDone(true);
-      return;
-    }
-
-    stopTtsRef.current = false;
-    const session = ttsSessionRef.current;
-    window.speechSynthesis.cancel();
-    setReadingDone(false);
-
-    const langMap: Record<string, string> = { nl: "nl-NL", fr: "fr-FR", ar: "ar-SA", en: "en-US" };
-    const speechLang = langMap[lang] || "nl-NL";
-
-    const getVoice = (): SpeechSynthesisVoice | null => {
-      const voices = window.speechSynthesis.getVoices();
-      if (!voices.length) return null;
-      const femaleVoice = voices.find(v =>
-        v.lang === speechLang &&
-        (v.name.toLowerCase().includes('female') ||
-         v.name.toLowerCase().includes('woman') ||
-         v.name.toLowerCase().includes('zira') ||
-         v.name.toLowerCase().includes('hazel') ||
-         v.name.toLowerCase().includes('samantha') ||
-         v.name.toLowerCase().includes('karen') ||
-         v.name.toLowerCase().includes('tessa') ||
-         v.name.toLowerCase().includes('moira') ||
-         v.name.toLowerCase().includes('fiona') ||
-         v.name.toLowerCase().includes('amelie') ||
-         v.name.toLowerCase().includes('thomas') === false)
-      );
-      if (femaleVoice) return femaleVoice;
-      return voices.find(v => v.lang === speechLang)
-        || voices.find(v => v.lang.startsWith(speechLang.split("-")[0]))
-        || voices.find(v => v.lang === "nl-NL")
-        || null;
-    };
-
-    const isValid = () => ttsSessionRef.current === session && !stopTtsRef.current;
-
-    const speak = (text: string, onEnd?: () => void) => {
-      if (!isValid()) { setReadingDone(true); return; }
-      if (!text) { if (onEnd) onEnd(); else setReadingDone(true); return; }
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = speechLang;
-      u.rate = 0.3;
-      u.pitch = 1;
-      const v = getVoice();
-      if (v) u.voice = v;
-      if (onEnd) {
-        u.onend = () => { if (isValid()) onEnd(); else setReadingDone(true); };
-      } else {
-        u.onend = () => setReadingDone(true);
-      }
-      u.onerror = () => { if (isValid() && onEnd) onEnd(); else setReadingDone(true); };
-      window.speechSynthesis.speak(u);
-    };
-
-    const questionText = (translated[0] && translated[0] !== (q.textNL || q.text))
-      ? translated[0] : (q.textNL || q.text || "");
-    const ans1 = translated[1] || q.answer1 || "";
-    const ans2 = translated[2] || q.answer2 || "";
-    const ans3 = translated[3] || q.answer3 || "";
-    const answersList = [ans1, ans2, ans3].filter(Boolean);
-    const labels = lang === "ar"
-      ? ["الجواب A:", "الجواب B:", "الجواب C:"]
-      : lang === "fr" ? ["Réponse A:", "Réponse B:", "Réponse C:"]
-      : lang === "en" ? ["Answer A:", "Answer B:", "Answer C:"]
-      : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
-
-    if (!questionText) { setReadingDone(true); return; }
-
-    speak(questionText, () => {
-      if (!isValid()) { setReadingDone(true); return; }
-      let i = 0;
-      const readNext = () => {
-        if (!isValid()) { setReadingDone(true); return; }
-        if (i >= answersList.length) { setReadingDone(true); return; }
-        speak(`${labels[i]} ${answersList[i]}`, () => {
-          i++;
-          if (i >= answersList.length) {
-            setReadingDone(true);
-          } else {
-            ttsRef.current = setTimeout(() => {
-              if (isValid()) readNext(); else setReadingDone(true);
-            }, 400);
-          }
-        });
-      };
-      if (answersList.length === 0) {
-        setReadingDone(true);
-      } else {
-        ttsRef.current = setTimeout(() => {
-          if (isValid()) readNext(); else setReadingDone(true);
-        }, 600);
-      }
-    });
-  };
-
-  // تشغيل القراءة بعد ثانية - نفس السلوك على كل الأجهزة
-  useEffect(() => {
-    if (!started || finished) return;
-    killTts();
-    setReadingDone(false);
-    setHasReadCurrentQuestion(false);
-
-    // بدء القراءة بعد ثانية واحدة على كل الأجهزة
-    ttsRef.current = setTimeout(() => {
-      stopTtsRef.current = false;
-      const q = shuffledQuestions[currentIndex];
-      if (!q) { setReadingDone(true); return; }
-
-      setHasReadCurrentQuestion(true);
-
-      const texts = lang === "nl"
-        ? [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]
-        : translatedRef.current;
-
-      const voices = window.speechSynthesis.getVoices();
-      if (voices.length > 0) {
-        speakQuestion(q, texts);
-      } else {
-        let voiceStarted = false;
-        const startOnce = () => {
-          if (voiceStarted || stopTtsRef.current) return;
-          voiceStarted = true;
-          window.speechSynthesis.onvoiceschanged = null;
-          speakQuestion(q, texts);
-        };
-        window.speechSynthesis.onvoiceschanged = startOnce;
-        setTimeout(startOnce, 1000);
-      }
-    }, 1000);
-
-    return () => { killTts(); };
-  }, [currentIndex, started, finished]);
-
-  // مؤقت 15 ثانية - يبدأ فقط بعد انتهاء القراءة
-  useEffect(() => {
-    if (!started || finished || locked || !readingDone) return;
-    setTimeLeft(15);
-
-    timerRef.current = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(timerRef.current!);
-          setLocked(true);
-          setAnswers(a => ({ ...a, [currentIndex]: a[currentIndex] ?? null }));
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timerRef.current!);
-  }, [currentIndex, started, finished, readingDone]);
-
-  const [showRoses, setShowRoses] = useState(false);
-  const [showWrong, setShowWrong] = useState(false);
-
-  // صوت "Bravo!" عند الإجابة الصحيحة
-  const playApplause = () => {
-    try {
-      if (!window.speechSynthesis) return;
-      window.speechSynthesis.cancel();
-
-      const bravoTexts: Record<string, string[]> = {
-        nl: ["Bravo!", "Uitstekend!", "Geweldig!", "Perfect!"],
-        fr: ["Bravo!", "Excellent!", "Parfait!", "Très bien!"],
-        ar: ["برافو!", "ممتاز!", "أحسنت!", "رائع!"],
-        en: ["Bravo!", "Excellent!", "Well done!", "Perfect!"],
-      };
-      const options = bravoTexts[lang] || bravoTexts.nl;
-      const text = options[Math.floor(Math.random() * options.length)];
-
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = { nl: "nl-NL", fr: "fr-FR", ar: "ar-SA", en: "en-US" }[lang] || "nl-NL";
-      u.rate = 1.1;
-      u.pitch = 1.4;
-      u.volume = 1;
-
-      // صوت أنثى إن أمكن
-      const voices = window.speechSynthesis.getVoices();
-      const femaleVoice = voices.find(v =>
-        v.lang.startsWith(u.lang.split('-')[0]) &&
-        (v.name.toLowerCase().includes('female') ||
-         v.name.toLowerCase().includes('samantha') ||
-         v.name.toLowerCase().includes('karen') ||
-         v.name.toLowerCase().includes('zira') ||
-         v.name.toLowerCase().includes('hazel'))
-      );
-      if (femaleVoice) u.voice = femaleVoice;
-
-      window.speechSynthesis.speak(u);
-    } catch (e) {
-      console.error('Bravo error:', e);
-    }
-  };
-
-  const launchRoses = () => {
-    setShowRoses(true);
-    setTimeout(() => setShowRoses(false), 2500);
-  };
-
-  const launchWrong = () => {
-    setShowWrong(true);
-    setTimeout(() => setShowWrong(false), 800);
-  };
-
-  const handleAnswer = (num: number) => {
-    if (locked || answers[currentIndex] !== undefined) return;
-    killTts();
-    clearInterval(timerRef.current!);
-    if (shuffledQuestions[currentIndex]?.correctAnswer === num) {
-      launchRoses();
-    } else {
-      launchWrong();
-    }
-    setAnswers(a => ({ ...a, [currentIndex]: num }));
-    setLocked(true);
-  };
-
-  const handleNext = () => {
-    killTts();
-    setReadingDone(false);
-    if (currentIndex + 1 >= shuffledQuestions.length) setFinished(true);
-    else { setCurrentIndex(i => i + 1); setLocked(false); }
-  };
-
-  // حساب النتيجة مع مراعاة الـ 5 نقاط
-  const score = Object.entries(answers).reduce((total, [i, ans]) => {
-    if (ans === null || ans === undefined) return total;
-    const q = shuffledQuestions[parseInt(i)];
-    if (!q) return total;
-    const pts = q.points || 1;
-    return total + (q.correctAnswer === ans ? pts : 0);
-  }, 0);
-  const maxScore = shuffledQuestions.reduce((t, q) => t + (q.points || 1), 0);
-  const userAnswer = answers[currentIndex];
-  const isAnswered = userAnswer !== undefined;
-
-  if (shuffledQuestions.length === 0) return (
-    <div className="text-center py-16">
-      <div className="text-5xl mb-4">🎯</div>
-      <p className="text-gray-500 text-sm">{lang === "ar" ? "لا يوجد أسئلة مجانية بعد" : lang === "nl" ? "Nog geen gratis examenvragen" : lang === "fr" ? "Pas encore de questions gratuites" : "No free exam questions yet"}</p>
-    </div>
-  );
-
-  if (!started) return (
-    <div className="text-center py-10">
-      <div className="border-4 border-[#003399] rounded-2xl p-8 max-w-md mx-auto">
-        <div className="text-5xl mb-3">🎯</div>
-        <h2 className="text-xl font-black text-[#003399] mb-2">{groupLabel || "Gratis Examen"}</h2>
-        <p className="text-gray-500 mb-2">{shuffledQuestions.length} {lang === "ar" ? "سؤال" : lang === "nl" ? "vragen" : lang === "fr" ? "questions" : "questions"}</p>
-        <p className="text-sm text-orange-600 font-bold mb-6">⏱ {lang === "ar" ? "15 ثانية لكل سؤال" : lang === "nl" ? "15 seconden per vraag" : lang === "fr" ? "15 secondes par question" : "15 seconds per question"}</p>
-        <div className="flex gap-3 justify-center">
-          {onBack && (
-            <button onClick={onBack} className="px-6 py-3 font-black rounded-xl border-2 border-gray-300 text-gray-600 hover:bg-gray-50">
-              ← {lang === "ar" ? "العودة" : lang === "nl" ? "Terug" : "Retour"}
-            </button>
-          )}
-          <button onClick={() => { unlockAudio(); setStarted(true); }} className="px-8 py-3 font-black text-white rounded-xl" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-            {lang === "ar" ? "ابدأ" : lang === "nl" ? "Start" : lang === "fr" ? "Démarrer" : "Start"} →
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-
-  if (finished) {
-    const pct = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
-    const passed = pct >= 60;
-    return (
-      <div className="py-6">
-        <div className={`rounded-2xl p-6 mb-4 text-center border-4 ${passed ? "border-green-400 bg-green-50" : "border-red-400 bg-red-50"}`}>
-          <div className="text-5xl mb-2">{passed ? "🏆" : "😔"}</div>
-          <h2 className="text-xl font-black mb-1" style={{ color: passed ? "#16a34a" : "#dc2626" }}>
-            {passed
-              ? (lang === "ar" ? "🎉 مبروك! نجحت" : lang === "nl" ? "🎉 Geslaagd!" : lang === "fr" ? "🎉 Réussi!" : "🎉 Passed!")
-              : (lang === "ar" ? "❌ حاول مجدداً" : lang === "nl" ? "❌ Helaas niet geslaagd" : lang === "fr" ? "❌ Malheureusement échoué" : "❌ Not passed")}
-          </h2>
-          <div className="flex justify-center gap-4 mt-3">
-            <div className="bg-white rounded-xl px-5 py-3 shadow text-center">
-              <p className="text-xs text-gray-400 font-bold uppercase mb-1">{lang === "ar" ? "النقاط" : lang === "nl" ? "Behaald" : lang === "fr" ? "Points" : "Points"}</p>
-              <p className="text-3xl font-black text-green-600">{score}</p>
-            </div>
-            <div className="flex items-center text-3xl font-black text-gray-300">/</div>
-            <div className="bg-white rounded-xl px-5 py-3 shadow text-center">
-              <p className="text-xs text-gray-400 font-bold uppercase mb-1">{lang === "ar" ? "المجموع" : lang === "nl" ? "Totaal" : lang === "fr" ? "Total" : "Total"}</p>
-              <p className="text-3xl font-black text-indigo-600">{maxScore}</p>
-            </div>
-            <div className="bg-white rounded-xl px-5 py-3 shadow text-center">
-              <p className="text-xs text-gray-400 font-bold uppercase mb-1">Score</p>
-              <p className="text-3xl font-black" style={{ color: passed ? "#16a34a" : "#dc2626" }}>{pct}%</p>
-            </div>
-          </div>
-          <div className="flex justify-center gap-3 mt-3 text-sm">
-            <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 font-bold border border-green-200">
-              ✓ {lang === "ar" ? "صح" : lang === "nl" ? "Correct" : lang === "fr" ? "Correct" : "Correct"}: {shuffledQuestions.filter((q,i) => answers[i] === q.correctAnswer).length}
-            </span>
-            <span className="px-3 py-1 rounded-full bg-red-100 text-red-700 font-bold border border-red-200">
-              ✗ {lang === "ar" ? "خطأ" : lang === "nl" ? "Fout" : lang === "fr" ? "Faux" : "Wrong"}: {shuffledQuestions.filter((q,i) => answers[i] !== undefined && answers[i] !== null && answers[i] !== q.correctAnswer).length}
-            </span>
-          </div>
-        </div>
-        <div className="flex gap-3">
-          <button onClick={() => { unlockAudio(); setStarted(false); setFinished(false); setCurrentIndex(0); setAnswers({}); setLocked(false); setShuffledQuestions([...questions].sort(() => Math.random() - 0.5)); }}
-            className="flex-1 py-3 font-black text-white rounded-xl" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-            🔄 {lang === "ar" ? "إعادة" : lang === "nl" ? "Opnieuw" : lang === "fr" ? "Recommencer" : "Retry"}
-          </button>
-          <button onClick={() => router.push("/theorie")} className="flex-1 py-3 font-black rounded-xl" style={{ background: "linear-gradient(135deg, #ffcc00, #ff9900)", color: "#003399" }}>
-            🔓 {lang === "ar" ? "اشترك للمزيد" : lang === "nl" ? "Meer? Inschrijven" : lang === "fr" ? "Plus? S'inscrire" : "More? Subscribe"}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      {/* تأثير الإجابة الصحيحة - إشارة صح خضراء */}
-      {showRoses && (
-        <div className="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center">
-          <div className="absolute inset-0 bg-green-500 opacity-10" />
-          <div style={{ animation: "checkPop 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards" }}>
-            <div className="w-32 h-32 rounded-full flex items-center justify-center"
-              style={{ background: "rgba(34,197,94,0.95)", boxShadow: "0 0 60px rgba(34,197,94,0.7)" }}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-16 h-16">
-                <path d="M20 6L9 17l-5-5" />
-              </svg>
-            </div>
-          </div>
-          <style>{`
-            @keyframes checkPop {
-              0%   { transform: scale(0) rotate(-10deg); opacity: 0; }
-              60%  { transform: scale(1.15) rotate(3deg); opacity: 1; }
-              100% { transform: scale(1) rotate(0deg); opacity: 1; }
-            }
-          `}</style>
-        </div>
-      )}
-
-      {/* تأثير الإجابة الخاطئة - اهتزاز أحمر */}
-      {showWrong && (
-        <div className="fixed inset-0 z-[9999] pointer-events-none">
-          <div className="absolute inset-0 bg-red-500 opacity-20 animate-pulse"></div>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-8xl animate-bounce" style={{ animationDuration: '0.3s', animationIterationCount: '3' }}>
-              ❌
-            </div>
-          </div>
-          <style>{`
-            @keyframes shake {
-              0%, 100% { transform: translateX(0); }
-              25% { transform: translateX(-10px); }
-              75% { transform: translateX(10px); }
-            }
-          `}</style>
-        </div>
-      )}
-
-      {/* شريط التقدم */}
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-sm font-bold text-gray-500">{currentIndex + 1} / {shuffledQuestions.length}</span>
-        <span className="text-sm font-bold text-gray-500">Score: {score}</span>
-      </div>
-
-      {q && (
-        <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-100">
-          {/* رأس السؤال */}
-          <div className="px-5 py-3 flex items-center justify-between" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-            <div className="flex items-center gap-2">
-              <span className="text-white font-black text-sm">{currentIndex + 1} / {shuffledQuestions.length}</span>
-              {q.points === 5 && (
-                <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black"
-                  style={{ background: "rgba(239,68,68,0.85)", color: "white", border: "1.5px solid rgba(255,255,255,0.4)" }}>
-                  ⭐ 5 {lang === "ar" ? "نقاط" : lang === "nl" ? "punten" : "pts"}
-                </span>
-              )}
-            </div>
-            <div className={`flex items-center gap-2 px-3 py-1 rounded-full font-black text-sm border-2 transition-all ${
-              locked ? "bg-white/20 border-white/40 text-white" :
-              !readingDone ? "bg-blue-500 border-blue-300 text-white animate-pulse" :
-              timeLeft <= 5 ? "bg-red-500 border-red-300 text-white animate-pulse" :
-              timeLeft <= 10 ? "bg-orange-500 border-orange-300 text-white" :
-              "bg-green-500 border-green-300 text-white"
-            }`}>
-              <span>{!readingDone && !locked ? "🎧" : "⏱"}</span>
-              <span>{locked ? (isAnswered && userAnswer !== null ? (userAnswer === q?.correctAnswer ? "✅" : "❌") : "⏱") : !readingDone ? (lang === "ar" ? "قراءة..." : lang === "nl" ? "Lezen..." : lang === "fr" ? "Lecture..." : "Reading...") : timeLeft}</span>
-              {!locked && readingDone && <span className="text-xs opacity-80">s</span>}
-            </div>
-          </div>
-
-          {/* صورة */}
-          {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
-            <div className={`grid gap-1 p-2 bg-gray-100 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
-              {q.videoUrls.filter(Boolean).map((url: string, i: number) => (
-                <div key={i} className="relative overflow-hidden rounded-xl">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={url} alt="" style={{ width: "100%", height: "auto", display: "block" }} draggable={false} />
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/watermark.jpeg" alt="" className="absolute pointer-events-none"
-                    style={{ width: "50%", top: "50%", left: "50%", transform: "translate(-50%,-50%) rotate(-15deg)", opacity: 0.2, mixBlendMode: "multiply" }} draggable={false} />
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div className="px-5 py-4 bg-white">
-            <p className={`text-lg font-bold text-gray-900 leading-relaxed mb-3 ${isRtl ? "text-right" : "text-left"}`}>
-              {translatedTexts[0] || q.textNL || q.text}
-            </p>
-
-            {/* مؤشر حالة القراءة والمؤقت - محذوف */}
-            <div className="space-y-3">
-              {[1, 2, 3].map(num => {
-                const label = ["A", "B", "C"][num - 1];
-                const ansText = translatedTexts[num] || q[`answer${num}`];
-                if (!q[`answer${num}`]) return null;
-                const isCorrect = q.correctAnswer === num;
-                const isSelected = userAnswer === num;
-                let style = "bg-white border-2 border-gray-300 text-gray-800 hover:border-[#003399]";
-                if (isAnswered || locked) {
-                  if (isAnswered && userAnswer !== null) {
-                    if (isCorrect) style = "bg-green-50 border-2 border-green-500 text-green-800";
-                    else if (isSelected) style = "bg-red-50 border-2 border-red-500 text-red-800";
-                    else style = "bg-gray-50 border-2 border-gray-200 text-gray-500";
-                  } else style = "bg-gray-50 border-2 border-gray-200 text-gray-400 opacity-60";
-                }
-                return (
-                  <button key={num} onClick={() => handleAnswer(num)} disabled={isAnswered || locked}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${style} ${!isAnswered && !locked ? "cursor-pointer" : "cursor-default"}`}>
-                    <span className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0 ${
-                      isAnswered && userAnswer !== null ? isCorrect ? "bg-green-500 text-white" : isSelected ? "bg-red-500 text-white" : "bg-gray-200 text-gray-500"
-                      : locked ? "bg-gray-200 text-gray-400" : "bg-[#003399] text-white"
-                    }`}>
-                      {isAnswered && userAnswer !== null ? (isCorrect ? "✓" : isSelected ? "✗" : label) : label}
-                    </span>
-                    <span className={isRtl ? "text-right flex-1" : "text-left flex-1"}>{ansText}</span>
-                  </button>
-                );
-              })}
-            </div>
-            {(isAnswered || locked) && (
-              <button onClick={handleNext} className="w-full mt-4 py-3 font-black text-white rounded-xl" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-                {currentIndex + 1 >= shuffledQuestions.length ? (lang === "ar" ? "النتيجة 🏆" : lang === "nl" ? "Resultaat 🏆" : lang === "fr" ? "Résultat 🏆" : "Result 🏆") : (lang === "ar" ? "التالي ←" : lang === "nl" ? "Volgende →" : lang === "fr" ? "Suivant →" : "Next →")}
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── الصفحة الرئيسية ──────────────────────────────────────────────────────────
 function GratisContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { lang } = useLang();
+  const translations: any = { nl, fr, ar, en };
+  const t = translations[lang];
   const isRtl = lang === "ar";
 
-  const initialCat = searchParams.get("cat")?.toUpperCase();
-  const validCats = ["A", "B", "C"];
-  const [category, setCategory] = useState(validCats.includes(initialCat || "") ? initialCat! : "B");
-  const [tab, setTab] = useState<"lessons" | "exam">("lessons");
-  const [questions, setQuestions] = useState<any[]>([]);
-  const [examQuestions, setExamQuestions] = useState<any[]>([]);
+  const catParam = searchParams.get("cat")?.toUpperCase() || "B";
+  const [selectedCat, setSelectedCat] = useState(catParam);
+  const [lessons, setLessons] = useState<any[]>([]);
   const [examGroups, setExamGroups] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [examModal, setExamModal] = useState<{ lessonTitle: string; batches: { label: string; group: number }[] } | null>(null);
 
   const categories = [
-    { id: "A", label: "Rijbewijs A", icon: <MotorcycleIcon className="w-10 h-6" />, color: "#f97316" },
-    { id: "B", label: "Rijbewijs B", icon: <CarIcon className="w-10 h-6" />,        color: "#3b82f6" },
-    { id: "C", label: "Rijbewijs C", icon: <TruckIcon className="w-10 h-6" />,      color: "#22c55e" },
+    { id: "A", name: t.categoryA || "Rijbewijs A", icon: <MotorcycleIcon className="w-14 h-9" />, color: "#f97316" },
+    { id: "B", name: t.categoryB || "Rijbewijs B", icon: <CarIcon className="w-14 h-9" />, color: "#3b82f6" },
+    { id: "C", name: t.categoryC || "Rijbewijs C", icon: <TruckIcon className="w-14 h-9" />, color: "#22c55e" },
   ];
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/free-content?category=${category}`)
+    fetch(`/api/free-content?category=${selectedCat}`)
       .then(r => r.json())
-      .then(d => { if (d.success) { setQuestions(d.questions || []); setExamQuestions((d.examQuestions || []).sort(() => Math.random() - 0.5)); setExamGroups(d.examGroups || []); } })
+      .then(d => {
+        if (d.success) {
+          // استخراج الدروس الفريدة من الأسئلة المجانية
+          const lessonMap = new Map<number, any>();
+          for (const q of d.questions) {
+            if (q.lesson && q.lessonId && !lessonMap.has(q.lessonId)) {
+              lessonMap.set(q.lessonId, { id: q.lessonId, title: q.lesson.title, description: q.lesson.description });
+            }
+          }
+          setLessons(Array.from(lessonMap.values()));
+          setExamGroups(d.examGroups || []);
+        }
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [category]);
+  }, [selectedCat]);
+
+  const translatedTitles = useAutoTranslateList(lessons.map(l => l.title), lang);
+
+  const openExamModal = () => {
+    if (examGroups.length === 0) return;
+    const batches = examGroups.map(g => ({
+      label: g.label || (lang === "ar" ? "امتحان مجاني" : lang === "nl" ? "Gratis Examen" : "Examen Gratuit"),
+      group: g.group,
+    }));
+    setExamModal({ lessonTitle: lang === "ar" ? "امتحانات مجانية" : lang === "nl" ? "Gratis Examens" : "Examens Gratuits", batches });
+  };
 
   return (
     <div className="min-h-screen flex flex-col" dir={isRtl ? "rtl" : "ltr"} style={{ background: "#f0f0f0" }}>
       <Navbar />
-      <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #7c3aed 0%, #5b21b6 60%, #4c1d95 100%)" }}>
-        <div className="max-w-3xl mx-auto px-4 py-5">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
-              <span className="text-xl">🎁</span>
-            </div>
+
+      {/* Header - نفس تصميم theorie */}
+      <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%)" }}>
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-64 h-64 rounded-full blur-3xl" style={{ background: "#ffcc00", transform: "translate(-30%, -30%)" }}></div>
+        </div>
+        <div className="relative max-w-2xl md:max-w-4xl mx-auto px-4 py-5">
+          <div className="flex items-center justify-between gap-3">
             <div>
-              <h1 className="text-xl font-black text-white">Gratis Lessen</h1>
-              <p className="text-white/50 text-xs">{lang === "ar" ? "محتوى مجاني بدون اشتراك" : lang === "nl" ? "Gratis inhoud zonder abonnement" : lang === "fr" ? "Contenu gratuit sans abonnement" : "Free content without subscription"}</p>
+              <p className="text-white/50 text-xs font-bold uppercase tracking-wider mb-0.5">
+                🎁 {lang === "ar" ? "محتوى مجاني" : lang === "nl" ? "Gratis Inhoud" : lang === "fr" ? "Contenu Gratuit" : "Free Content"}
+              </p>
+              <h1 className="text-xl font-black text-white">
+                {categories.find(c => c.id === selectedCat)?.name || "Rijbewijs B"}
+              </h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1.5 rounded-xl text-xs font-black" style={{ background: "rgba(255,204,0,0.15)", color: "#ffcc00", border: "1px solid rgba(255,204,0,0.3)" }}>
+                {lessons.length} {lang === "ar" ? "درس" : lang === "nl" ? "lessen" : "leçons"}
+              </span>
             </div>
           </div>
-          <div className="flex gap-2 mb-3">
+
+          {/* أزرار الفئات */}
+          <div className="flex gap-2 mt-4">
             {categories.map(cat => (
-              <button key={cat.id} onClick={() => setCategory(cat.id)}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-black transition-all"
-                style={category === cat.id ? { background: "rgba(255,255,255,0.25)", color: "white" } : { background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.6)" }}>
-                {cat.icon}<span className="hidden sm:inline">{cat.label}</span><span className="sm:hidden">{cat.id}</span>
+              <button key={cat.id}
+                onClick={() => setSelectedCat(cat.id)}
+                className="px-4 py-2 rounded-xl font-black text-sm transition-all"
+                style={{
+                  background: selectedCat === cat.id ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.08)",
+                  color: "white",
+                  border: selectedCat === cat.id ? "2px solid rgba(255,255,255,0.6)" : "2px solid rgba(255,255,255,0.15)",
+                }}>
+                {cat.id}
               </button>
             ))}
-          </div>
-          <div className="flex gap-2">
-            <button onClick={() => setTab("lessons")} className="flex-1 py-2 rounded-xl text-xs font-black transition-all"
-              style={tab === "lessons" ? { background: "rgba(255,255,255,0.2)", color: "white" } : { background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.4)" }}>
-              📚 {lang === "ar" ? "شروح" : lang === "nl" ? "Lessen" : lang === "fr" ? "Leçons" : "Lessons"}
-              {questions.length > 0 && (
-                <span className="ml-1 px-1.5 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(34,197,94,0.3)", color: "#86efac" }}>
-                  🎁 {questions.length}
-                </span>
-              )}
-            </button>
-            <button onClick={() => setTab("exam")} className="flex-1 py-2 rounded-xl text-xs font-black transition-all"
-              style={tab === "exam" ? { background: "rgba(255,255,255,0.2)", color: "white" } : { background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.4)" }}>
-              🎯 {lang === "ar" ? "امتحانات" : lang === "nl" ? "Examens" : lang === "fr" ? "Examens" : "Exams"} ({examQuestions.length})
-            </button>
           </div>
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 py-6 flex-1">
+      {/* قائمة الدروس - نفس تصميم theorie */}
+      <div className="flex-1 max-w-2xl md:max-w-4xl mx-auto w-full px-4 py-4">
         {loading ? (
-          <div className="flex justify-center py-16"><div className="w-10 h-10 border-4 border-[#7c3aed] border-t-transparent rounded-full animate-spin"></div></div>
-        ) : tab === "lessons" ? (
-          <LessonsTab questions={questions} lang={lang} router={router} />
+          <div className="flex justify-center py-16">
+            <div className="w-10 h-10 border-3 border-[#003399] border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : lessons.length === 0 ? (
+          <div className="border border-yellow-300 bg-yellow-50 p-6 text-center">
+            <p className="font-bold text-gray-700">{lang === "ar" ? "لا توجد دروس مجانية متاحة" : lang === "nl" ? "Geen gratis lessen beschikbaar" : "Aucune leçon gratuite disponible"}</p>
+          </div>
         ) : (
-          <ExamTab questions={examQuestions} examGroups={examGroups} lang={lang} router={router} />
+          <table className="w-full border-collapse lessons-table" style={{ tableLayout: "fixed" }}>
+            <colgroup>
+              <col style={{ width: "60%" }} />
+              <col style={{ width: "20%" }} />
+              <col style={{ width: "20%" }} />
+            </colgroup>
+            <thead>
+              <tr style={{ backgroundColor: "#3399ff" }}>
+                <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc]">
+                  {lang === "ar" ? "الدرس" : lang === "nl" ? "LES" : lang === "fr" ? "LEÇON" : "LESSON"}
+                </th>
+                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
+                  {lang === "ar" ? "فتح" : lang === "nl" ? "OPENEN" : lang === "fr" ? "OUVRIR" : "OPEN"}
+                </th>
+                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
+                  EXAM
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {lessons.map((lesson, i) => (
+                <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#f5f5f5" }}>
+                  <td className="px-4 py-3 border border-gray-200">
+                    <div className="font-bold text-[#003399] text-base" style={{ wordBreak: "break-word", whiteSpace: "normal" }}>
+                      {i + 1}. {translatedTitles[i] || lesson.title}
+                    </div>
+                    {lesson.description && (
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <span className="w-1 h-3 rounded-full bg-[#3399ff] flex-shrink-0"></span>
+                        <span className="text-xs font-semibold text-[#3399ff]">{lesson.description}</span>
+                      </div>
+                    )}
+                  </td>
+                  {/* الدرس الأول: زر واحد "Start nu" */}
+                  {i === 0 ? (
+                    <td colSpan={2} className="px-4 py-3 border border-gray-200 text-center">
+                      <button
+                        onClick={() => router.push(`/gratis/lesson?lessonId=${lesson.id}&category=${selectedCat}&lesson=${encodeURIComponent(lesson.title)}`)}
+                        className="border-2 px-4 py-1 text-sm font-bold transition-colors w-full"
+                        style={{ background: "#7c3aed", borderColor: "#7c3aed", color: "white" }}
+                      >
+                        ✔ Start nu
+                      </button>
+                    </td>
+                  ) : (
+                    /* باقي الدروس: زر Les + زر EXAM */
+                    <>
+                      <td className="px-4 py-3 border border-gray-200 text-center">
+                        <button
+                          onClick={() => router.push(`/gratis/lesson?lessonId=${lesson.id}&category=${selectedCat}&lesson=${encodeURIComponent(lesson.title)}`)}
+                          className="bg-white border-2 border-gray-400 px-4 py-1 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors w-full"
+                        >
+                          {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
+                        </button>
+                      </td>
+                      <td className="px-4 py-3 border border-gray-200 text-center">
+                        <button
+                          onClick={openExamModal}
+                          disabled={examGroups.length === 0}
+                          className="bg-white border-2 border-orange-400 px-4 py-1 text-sm font-bold text-orange-600 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-colors disabled:opacity-60 w-full"
+                        >
+                          EXAM
+                        </button>
+                      </td>
+                    </>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+
+        {/* زر الاشتراك */}
+        {!loading && (
+          <div className="mt-6">
+            <button
+              onClick={() => router.push(`/theorie`)}
+              className="w-full py-4 rounded-2xl font-black text-base transition-all active:scale-95 hover:scale-[1.02]"
+              style={{ background: "linear-gradient(135deg, #d4af37, #f0d060, #d4af37)", color: "#0a0a0a", boxShadow: "0 8px 30px rgba(212,175,55,0.35)" }}>
+              🔓 {lang === "ar" ? "اشترك للوصول لكل الدروس" : lang === "nl" ? "Inschrijven voor alle lessen" : lang === "fr" ? "S'inscrire pour toutes les leçons" : "Subscribe for all lessons"}
+            </button>
+          </div>
         )}
       </div>
+
       <Footer />
+
+      {/* Modal اختيار الامتحان - نفس تصميم theorie */}
+      {examModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4"
+          onClick={() => setExamModal(null)}>
+          <div className="bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl w-full sm:max-w-md overflow-hidden"
+            onClick={e => e.stopPropagation()}>
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between"
+              style={{ background: "#eff6ff" }}>
+              <div>
+                <h3 className="font-black text-[#003399] text-base">🎯 {lang === "ar" ? "اختر الامتحان" : lang === "nl" ? "Kies examen" : lang === "fr" ? "Choisir examen" : "Choose exam"}</h3>
+                <p className="text-xs text-blue-500 mt-0.5">{examModal.lessonTitle}</p>
+              </div>
+              <button onClick={() => setExamModal(null)} className="text-gray-400 hover:text-gray-600 text-2xl w-8 h-8 flex items-center justify-center">✕</button>
+            </div>
+            <div className="p-4 grid grid-cols-2 gap-3">
+              {examModal.batches.map((b, i) => (
+                <button key={i}
+                  onClick={() => {
+                    setExamModal(null);
+                    router.push(`/gratis/exam?category=${selectedCat}&group=${b.group}`);
+                  }}
+                  className="flex flex-col items-center justify-center gap-2 py-4 rounded-xl font-black transition-all active:scale-95 hover:opacity-90"
+                  style={{background:"linear-gradient(135deg,#eff6ff,#dbeafe)", border:"2px solid #93c5fd", color:"#1d4ed8"}}
+                >
+                  <span className="text-2xl">🎯</span>
+                  <span className="text-sm">{b.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 export default function GratisPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="w-10 h-10 border-4 border-[#003399] border-t-transparent rounded-full animate-spin"></div></div>}>
+    <Suspense fallback={<div className="flex justify-center py-16"><div className="w-10 h-10 border-3 border-[#22c55e] border-t-transparent rounded-full animate-spin"></div></div>}>
       <GratisContent />
     </Suspense>
   );
