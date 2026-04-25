@@ -18,7 +18,7 @@ export default function LoginModal({ lang, onClose }: any) {
     if (type === "examen") window.location.assign(`/examen?email=${encodeURIComponent(email)}&cat=${category}&exp=${expiryDate}`);
     else if (type === "praktijk-lessons") window.location.assign(`/praktical/lessons?email=${encodeURIComponent(email)}&exp=${expiryDate}`);
     else if (type === "praktijk-exam") window.location.assign(`/praktical/exam?email=${encodeURIComponent(email)}&exp=${expiryDate}`);
-    else window.location.assign(`/lessons?cat=${category}&email=${encodeURIComponent(email)}&exp=${expiryDate}`);
+    else window.location.assign(`/theorie`);
   };
 
   const getSubscriptionLabel = (subscription: any) => {

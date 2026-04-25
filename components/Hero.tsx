@@ -25,9 +25,18 @@ export default function Hero({ onSelect }: HeroProps) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const email = localStorage.getItem("userEmail");
-    const category = localStorage.getItem("userCategory");
-    if (email && category) setIsLoggedIn(true);
+    const check = () => {
+      const email = localStorage.getItem("userEmail");
+      const category = localStorage.getItem("userCategory");
+      setIsLoggedIn(!!(email && category));
+    };
+    check();
+    window.addEventListener("userLoggedIn", check);
+    window.addEventListener("focus", check);
+    return () => {
+      window.removeEventListener("userLoggedIn", check);
+      window.removeEventListener("focus", check);
+    };
   }, []);
 
   const handleInstall = async () => {
