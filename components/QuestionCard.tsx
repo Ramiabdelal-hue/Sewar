@@ -1,7 +1,6 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
-import WatermarkedImage from "./WatermarkedImage";
 
 const cache: Record<string, string> = {};
 
@@ -70,7 +69,6 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
 
   const isRtl = lang === "ar";
 
-  // دالة لتحويل الروابط في النص إلى links قابلة للنقر
   const renderTextWithLinks = (text: string) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     const parts = text.split(urlRegex);
@@ -79,23 +77,29 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
         <a key={i} href={part} target="_blank" rel="noopener noreferrer"
           className="text-blue-600 underline font-bold break-all"
           onClick={e => e.stopPropagation()}>
-          🔗 {part}
+          {"\uD83D\uDD17"} {part}
         </a>
       ) : part
     );
   };
 
+  const ft: Record<string, { left: string; right: string }> = {
+    nl: { left: "\u00A9 Alle rechten voorbehouden \u00B7 SewarRijbewijsOnline", right: "\uD83D\uDEE1 Origineel educatief materiaal \u00B7 Wettelijk beschermd" },
+    fr: { left: "\u00A9 Tous droits r\u00E9serv\u00E9s \u00B7 SewarRijbewijsOnline", right: "\uD83D\uDEE1 Contenu \u00E9ducatif original \u00B7 Prot\u00E9g\u00E9 l\u00E9galement" },
+    ar: { left: "\u00A9 \u062C\u0645\u064A\u0639 \u0627\u0644\u062D\u0642\u0648\u0642 \u0645\u062D\u0641\u0648\u0638\u0629 \u00B7 SewarRijbewijsOnline", right: "\uD83D\uDEE1 \u0645\u062D\u062A\u0648\u0649 \u062A\u0639\u0644\u064A\u0645\u064A \u0623\u0635\u0644\u064A \u0645\u062D\u0645\u064A \u0642\u0627\u0646\u0648\u0646\u064A\u0627\u064B" },
+    en: { left: "\u00A9 All rights reserved \u00B7 SewarRijbewijsOnline", right: "\uD83D\uDEE1 Original educational content \u00B7 Legally protected" },
+  };
+  const text = ft[lang] || ft.nl;
+
   return (
     <div className="rounded-3xl overflow-hidden shadow-2xl border border-gray-100 mb-6" dir={isRtl ? "rtl" : "ltr"}>
 
-      {/* شريط الرأس الأزرق - الرقم + العنوان */}
+      {/* Header */}
       <div className="flex items-center gap-3 px-5 py-3"
         style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-        {/* رقم الكرت */}
         <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center text-white font-black flex-shrink-0">
           {index + 1}
         </div>
-        {/* العنوان بجانب الرقم */}
         {(question.textNL || question.text) && (
           <p className={`text-sm font-black text-white leading-snug flex-1 ${isRtl ? "text-right" : "text-left"}`}>
             {qText || question.textNL || question.text}
@@ -104,59 +108,40 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
         <span className="text-white/50 text-xs font-bold flex-shrink-0">{index + 1} / {total}</span>
       </div>
 
-      {/* الصور */}
-      {question.videoUrls && question.videoUrls.filter(Boolean).length > 0 && (() => {
-        const urls = question.videoUrls!.filter(Boolean);
-        const count = urls.length;
-        const isOdd = count % 2 !== 0;
-        const ft: Record<string, { left: string; right: string }> = {
-          nl: { left: "© Alle rechten voorbehouden · SewarRijbewijsOnline", right: "🛡 Origineel educatief materiaal · Wettelijk beschermd" },
-          fr: { left: "© Tous droits réservés · SewarRijbewijsOnline", right: "🛡 Contenu éducatif original · Protégé légalement" },
-          ar: { left: "© جميع الحقوق محفوظة · SewarRijbewijsOnline", right: "🛡 محتوى تعليمي أصلي محمي قانونياً" },
-          en: { left: "© All rights reserved · SewarRijbewijsOnline", right: "🛡 Original educational content · Legally protected" },
-        };
-        const text = ft[lang] || ft.nl;
-        return (
-          <div className="bg-gray-100">
-            <div className={`grid gap-1 p-2 ${count === 1 ? "grid-cols-1" : "grid-cols-2"}`}
-              style={{ height: "320px" }}>
-              {urls.map((url, i) => {
-                const isLastOdd = isOdd && i === count - 1;
-                return (
-                  <div key={i}
-                    className="relative overflow-hidden select-none bg-gray-100 rounded-xl"
-                    style={{ gridColumn: isLastOdd ? "1 / -1" : undefined, height: "100%" }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={url}
-                      alt=""
-                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                      draggable={false}
-                      onContextMenu={e => e.preventDefault()}
-                    />
-                    {/* watermark */}
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/watermark.jpeg" alt="" className="absolute pointer-events-none"
-                      style={{ width: "50%", top: "50%", left: "50%", transform: "translate(-50%,-50%) rotate(-15deg)", opacity: 0.2, mixBlendMode: "multiply" }}
-                      draggable={false} />
-                  </div>
-                );
-              })}
-            </div>
-            {/* شريط الحقوق — مرة واحدة أسفل كل الصور */}
-            <div
-              className="flex items-center justify-between px-3 py-1.5"
-              style={{
-                background: "linear-gradient(135deg, rgba(0,20,60,0.97), rgba(0,40,120,0.97))",
-                fontSize: "9px", fontWeight: 700, letterSpacing: "0.02em",
-                direction: lang === "ar" ? "rtl" : "ltr",
-              }}>
-              <span className="text-white/80">{text.left}</span>
-              <span className="text-white/80">{text.right}</span>
-            </div>
+      {/* Images - natural size, no cropping */}
+      {question.videoUrls && question.videoUrls.filter(Boolean).length > 0 && (
+        <div>
+          <div className={`grid gap-1 p-2 bg-gray-100 ${question.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+            {question.videoUrls.filter(Boolean).map((url, i) => {
+              const count = question.videoUrls!.filter(Boolean).length;
+              const isOdd = count % 2 !== 0;
+              const isLastOdd = isOdd && i === count - 1;
+              return (
+                <div key={i} className="relative overflow-hidden select-none rounded-xl"
+                  style={{ gridColumn: isLastOdd ? "1 / -1" : undefined }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={url}
+                    alt=""
+                    style={{ width: "100%", height: "auto", display: "block" }}
+                    draggable={false}
+                    onContextMenu={e => e.preventDefault()}
+                  />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/watermark.jpeg" alt="" className="absolute pointer-events-none"
+                    style={{ width: "50%", top: "50%", left: "50%", transform: "translate(-50%,-50%) rotate(-15deg)", opacity: 0.2, mixBlendMode: "multiply" }}
+                    draggable={false} />
+                </div>
+              );
+            })}
           </div>
-        );
-      })()}
+          <div className="flex items-center justify-between px-3 py-1.5"
+            style={{ background: "linear-gradient(135deg, rgba(0,20,60,0.97), rgba(0,40,120,0.97))", fontSize: "9px", fontWeight: 700, direction: lang === "ar" ? "rtl" : "ltr" }}>
+            <span className="text-white/80">{text.left}</span>
+            <span className="text-white/80">{text.right}</span>
+          </div>
+        </div>
+      )}
 
       {/* Audio */}
       {question.audioUrl && (
@@ -167,7 +152,7 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
         </div>
       )}
 
-      {/* الشرح */}
+      {/* Explanation */}
       {expText && (
         <div className="px-5 py-4 bg-white">
           {translating && <span className="text-xs text-gray-400 animate-pulse">...</span>}
