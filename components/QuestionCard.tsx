@@ -124,13 +124,13 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
                 const isLastOdd = isOdd && i === count - 1;
                 return (
                   <div key={i}
-                    className="relative overflow-hidden select-none bg-black rounded-xl"
+                    className="relative overflow-hidden select-none bg-gray-100 rounded-xl"
                     style={{ gridColumn: isLastOdd ? "1 / -1" : undefined, height: "100%" }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={url}
                       alt=""
-                      style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                       draggable={false}
                       onContextMenu={e => e.preventDefault()}
                     />

@@ -1,4 +1,4 @@
-ï»¿"use client";
+"use client";
 
 import { Suspense, useEffect, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -20,7 +20,7 @@ function ExamenTestContent() {
   const offsetParam = parseInt(searchParams.get("offset") || "0");
   const limitParam = parseInt(searchParams.get("limit") || "0");
 
-  // Ø¯Ø§Ù„Ø© Ø§Ù„Ø±Ø¬ÙˆØ¹ - ØªØ±Ø¬Ø¹ Ù„Ù„ØµÙØ­Ø© Ø§Ù„Ø³Ø§Ø¨Ù‚Ø©
+  // ÏÇáÉ ÇáÑÌæÚ - ÊÑÌÚ ááÕİÍÉ ÇáÓÇÈŞÉ
   const goBackToExamList = () => {
     router.back();
   };
@@ -87,7 +87,7 @@ function ExamenTestContent() {
     };
     const questionText = translated[0] || q.textNL || q.text || "";
     const answers = [translated[1] || q.answer1, translated[2] || q.answer2, translated[3] || q.answer3].filter(Boolean);
-    const labels = lang === "ar" ? ["Ø§Ù„Ø¬ÙˆØ§Ø¨ A:", "Ø§Ù„Ø¬ÙˆØ§Ø¨ B:", "Ø§Ù„Ø¬ÙˆØ§Ø¨ C:"] : lang === "fr" ? ["RÃ©ponse A:", "RÃ©ponse B:", "RÃ©ponse C:"] : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
+    const labels = lang === "ar" ? ["ÇáÌæÇÈ A:", "ÇáÌæÇÈ B:", "ÇáÌæÇÈ C:"] : lang === "fr" ? ["Réponse A:", "Réponse B:", "Réponse C:"] : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
     if (!questionText) { setReadingDone(true); return; }
     speak(questionText, () => {
       if (!isValid()) { setReadingDone(true); return; }
@@ -150,11 +150,11 @@ function ExamenTestContent() {
           if (data.success) {
             let qs = data.questions || [];
             if (limitParam > 0) {
-              // Ø£Ø®Ø° Ø§Ù„Ù€ batch Ø§Ù„Ù…Ø­Ø¯Ø¯ Ø«Ù… Ø®Ù„Ø· Ø¹Ø´ÙˆØ§Ø¦ÙŠ Ø¯Ø§Ø®Ù„Ù‡
+              // ÃÎĞ ÇáÜ batch ÇáãÍÏÏ Ëã ÎáØ ÚÔæÇÆí ÏÇÎáå
               qs = qs.slice(offsetParam, offsetParam + limitParam)
                      .sort(() => Math.random() - 0.5);
             } else {
-              // Ø¨Ø¯ÙˆÙ† offset = Ø®Ù„Ø· Ø¹Ø´ÙˆØ§Ø¦ÙŠ ÙˆØ£Ø®Ø° 50
+              // ÈÏæä offset = ÎáØ ÚÔæÇÆí æÃÎĞ 50
               qs = qs.sort(() => Math.random() - 0.5).slice(0, 50);
             }
             setQuestions(qs);
@@ -207,16 +207,16 @@ function ExamenTestContent() {
       <Navbar />
       <div className="max-w-2xl mx-auto px-4 py-12 text-center">
         <div className="border-4 border-[#003399] rounded-2xl p-10">
-          <div className="text-6xl mb-4">ğŸ¯</div>
+          <div className="text-6xl mb-4">??</div>
           <h1 className="text-2xl font-black text-[#003399] mb-2">{lessonName || `Examen ${category}`}</h1>
-          <p className="text-gray-500 mb-2">{questions.length} {lang === "ar" ? "Ø³Ø¤Ø§Ù„" : lang === "nl" ? "vragen" : "questions"}</p>
-          <p className="text-sm text-orange-600 font-bold mb-8">â± {lang === "ar" ? "15 Ø«Ø§Ù†ÙŠØ© Ù„ÙƒÙ„ Ø³Ø¤Ø§Ù„" : lang === "nl" ? "15 seconden per vraag" : "15 seconds per question"}</p>
+          <p className="text-gray-500 mb-2">{questions.length} {lang === "ar" ? "ÓÄÇá" : lang === "nl" ? "vragen" : "questions"}</p>
+          <p className="text-sm text-orange-600 font-bold mb-8">? {lang === "ar" ? "15 ËÇäíÉ áßá ÓÄÇá" : lang === "nl" ? "15 seconden per vraag" : "15 seconds per question"}</p>
           {questions.length === 0
-            ? <p className="text-red-500 font-bold">{lang === "ar" ? "Ù„Ø§ ØªÙˆØ¬Ø¯ Ø£Ø³Ø¦Ù„Ø©" : "Geen vragen"}</p>
+            ? <p className="text-red-500 font-bold">{lang === "ar" ? "áÇ ÊæÌÏ ÃÓÆáÉ" : "Geen vragen"}</p>
             : <button onClick={() => { unlockAudio(); setStarted(true); }}
                 className="px-10 py-4 font-black text-white text-lg rounded-xl hover:scale-105 active:scale-95 transition-all"
                 style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-                {lang === "ar" ? "Ø§Ø¨Ø¯Ø£ Ø§Ù„Ø§Ù…ØªØ­Ø§Ù†" : lang === "nl" ? "Start Examen" : "Start Exam"} â†’
+                {lang === "ar" ? "ÇÈÏÃ ÇáÇãÊÍÇä" : lang === "nl" ? "Start Examen" : "Start Exam"} ?
               </button>
           }
         </div>
@@ -233,15 +233,15 @@ function ExamenTestContent() {
         <Navbar />
         <div className="max-w-3xl mx-auto px-4 py-8">
           <div className={`rounded-2xl p-8 mb-6 text-center border-4 ${passed ? "border-green-400 bg-green-50" : "border-red-400 bg-red-50"}`}>
-            <div className="text-6xl mb-3">{passed ? "ğŸ†" : "ğŸ˜”"}</div>
+            <div className="text-6xl mb-3">{passed ? "??" : "??"}</div>
             <h1 className="text-2xl font-black mb-1" style={{ color: passed ? "#16a34a" : "#dc2626" }}>
-              {passed ? (lang === "ar" ? "Ù…Ø¨Ø±ÙˆÙƒ! Ù†Ø¬Ø­Øª" : lang === "nl" ? "Geslaagd!" : "Passed!") : (lang === "ar" ? "Ù„Ù… ØªÙ†Ø¬Ø­ Ù‡Ø°Ù‡ Ø§Ù„Ù…Ø±Ø©" : lang === "nl" ? "Helaas niet geslaagd" : "Not passed")}
+              {passed ? (lang === "ar" ? "ãÈÑæß! äÌÍÊ" : lang === "nl" ? "Geslaagd!" : "Passed!") : (lang === "ar" ? "áã ÊäÌÍ åĞå ÇáãÑÉ" : lang === "nl" ? "Helaas niet geslaagd" : "Not passed")}
             </h1>
             <div className="flex items-center justify-center gap-4 mt-4 flex-wrap">
               {[
-                { label: lang === "ar" ? "Ø§Ù„Ù†Ù‚Ø§Ø·" : "Behaald", value: score, sub: `/ ${maxScore}`, color: "text-green-600" },
-                { label: lang === "ar" ? "ØµØ­" : "Correct", value: correctCount, sub: `/ ${questions.length}`, color: "text-blue-600" },
-                { label: lang === "ar" ? "Ø®Ø·Ø£" : "Fout", value: questions.length - correctCount, sub: "", color: "text-red-500" },
+                { label: lang === "ar" ? "ÇáäŞÇØ" : "Behaald", value: score, sub: `/ ${maxScore}`, color: "text-green-600" },
+                { label: lang === "ar" ? "ÕÍ" : "Correct", value: correctCount, sub: `/ ${questions.length}`, color: "text-blue-600" },
+                { label: lang === "ar" ? "ÎØÃ" : "Fout", value: questions.length - correctCount, sub: "", color: "text-red-500" },
                 { label: "Score", value: `${pct}%`, sub: "", color: passed ? "text-green-600" : "text-red-600" },
               ].map((s, i) => (
                 <div key={i} className="bg-white rounded-xl px-5 py-3 shadow text-center">
@@ -253,12 +253,12 @@ function ExamenTestContent() {
             </div>
           </div>
 
-          {/* Ø§Ù„Ø£Ø³Ø¦Ù„Ø© Ø§Ù„Ø®Ø§Ø·Ø¦Ø© */}
+          {/* ÇáÃÓÆáÉ ÇáÎÇØÆÉ */}
           {questions.some((q, i) => answers[i] !== q.correctAnswer) && (
             <div className="mb-6">
               <h2 className="text-lg font-black text-gray-800 mb-3 flex items-center gap-2">
-                <span className="w-7 h-7 rounded-lg bg-red-500 flex items-center justify-center text-white text-sm">âœ—</span>
-                {lang === "ar" ? "Ø§Ù„Ø£Ø³Ø¦Ù„Ø© Ø§Ù„Ø®Ø§Ø·Ø¦Ø©" : lang === "nl" ? "Foute antwoorden" : "Wrong answers"}
+                <span className="w-7 h-7 rounded-lg bg-red-500 flex items-center justify-center text-white text-sm">?</span>
+                {lang === "ar" ? "ÇáÃÓÆáÉ ÇáÎÇØÆÉ" : lang === "nl" ? "Foute antwoorden" : "Wrong answers"}
               </h2>
               <div className="space-y-4">
                 {questions.map((q, i) => {
@@ -268,16 +268,16 @@ function ExamenTestContent() {
                     <div key={i} className="bg-white rounded-2xl overflow-hidden shadow border border-red-100">
                       <div className="px-4 py-2 flex items-center gap-2" style={{ background: "#fef2f2" }}>
                         <span className="w-6 h-6 rounded-full bg-red-500 text-white text-xs font-black flex items-center justify-center">{i + 1}</span>
-                        {q.points === 5 && <span className="text-xs font-black px-1.5 py-0.5 rounded-full" style={{ background: "rgba(239,68,68,0.15)", color: "#dc2626" }}>â­ 5 pts</span>}
-                        {(userAns === null || userAns === undefined) && <span className="text-xs font-black text-orange-500">â± {lang === "ar" ? "Ø§Ù†ØªÙ‡Ù‰ Ø§Ù„ÙˆÙ‚Øª" : "Tijd verlopen"}</span>}
+                        {q.points === 5 && <span className="text-xs font-black px-1.5 py-0.5 rounded-full" style={{ background: "rgba(239,68,68,0.15)", color: "#dc2626" }}>? 5 pts</span>}
+                        {(userAns === null || userAns === undefined) && <span className="text-xs font-black text-orange-500">? {lang === "ar" ? "ÇäÊåì ÇáæŞÊ" : "Tijd verlopen"}</span>}
                       </div>
                       {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
                         <div className={`grid gap-0.5`}
                           style={{ height: "320px", gridTemplateColumns: q.videoUrls.filter(Boolean).length === 1 ? "1fr" : "1fr 1fr" }}>
                           {q.videoUrls.filter(Boolean).map((url: string, idx: number) => (
-                            <div key={idx} className="relative overflow-hidden bg-black" style={{ height: "100%" }}>
+                            <div key={idx} className="relative overflow-hidden bg-gray-100" style={{ height: "100%" }}>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={url} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} draggable={false} />
+                              <img src={url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} draggable={false} />
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img src="/watermark.jpeg" alt="" className="absolute pointer-events-none"
                                 style={{ width: "50%", top: "50%", left: "50%", transform: "translate(-50%,-50%) rotate(-15deg)", opacity: 0.2, mixBlendMode: "multiply" }} draggable={false} />
@@ -296,11 +296,11 @@ function ExamenTestContent() {
                             return (
                               <div key={num} className={`flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium border-2 ${isCorrectAns ? "bg-green-50 border-green-400 text-green-800" : isUserAns ? "bg-red-50 border-red-400 text-red-800" : "bg-gray-50 border-gray-200 text-gray-500"}`}>
                                 <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0 ${isCorrectAns ? "bg-green-500 text-white" : isUserAns ? "bg-red-500 text-white" : "bg-gray-300 text-gray-600"}`}>
-                                  {isCorrectAns ? "âœ“" : isUserAns ? "âœ—" : num}
+                                  {isCorrectAns ? "?" : isUserAns ? "?" : num}
                                 </span>
                                 <span className="flex-1">{ansText}</span>
-                                {isCorrectAns && <span className="text-xs font-black text-green-600">{lang === "ar" ? "Ø§Ù„ØµØ­ÙŠØ­Ø©" : "Correct"}</span>}
-                                {isUserAns && !isCorrectAns && <span className="text-xs font-black text-red-500">{lang === "ar" ? "Ø¥Ø¬Ø§Ø¨ØªÙƒ" : "Jouw antwoord"}</span>}
+                                {isCorrectAns && <span className="text-xs font-black text-green-600">{lang === "ar" ? "ÇáÕÍíÍÉ" : "Correct"}</span>}
+                                {isUserAns && !isCorrectAns && <span className="text-xs font-black text-red-500">{lang === "ar" ? "ÅÌÇÈÊß" : "Jouw antwoord"}</span>}
                               </div>
                             );
                           })}
@@ -317,11 +317,11 @@ function ExamenTestContent() {
             <button onClick={() => { unlockAudio(); setStarted(false); setFinished(false); setCurrentIndex(0); setAnswers({}); setLocked(false); }}
               className="flex-1 py-3 font-black text-white rounded-xl hover:opacity-90 active:scale-95"
               style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-              ğŸ”„ {lang === "ar" ? "Ø¥Ø¹Ø§Ø¯Ø©" : lang === "nl" ? "Opnieuw" : "Retry"}
+              ?? {lang === "ar" ? "ÅÚÇÏÉ" : lang === "nl" ? "Opnieuw" : "Retry"}
             </button>
             <button onClick={goBackToExamList}
               className="flex-1 py-3 font-black border-2 border-gray-300 text-gray-600 rounded-xl hover:bg-gray-50 active:scale-95">
-              â† {lang === "ar" ? "Ø±Ø¬ÙˆØ¹" : lang === "nl" ? "Terug" : "Back"}
+              ? {lang === "ar" ? "ÑÌæÚ" : lang === "nl" ? "Terug" : "Back"}
             </button>
           </div>
         </div>
@@ -352,7 +352,7 @@ function ExamenTestContent() {
         <div className="fixed inset-0 z-[9999] pointer-events-none">
           <div className="absolute inset-0 bg-red-500 opacity-20 animate-pulse"></div>
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-8xl" style={{ animation: "wrongBounce 0.3s ease-in-out 3" }}>âŒ</div>
+            <div className="text-8xl" style={{ animation: "wrongBounce 0.3s ease-in-out 3" }}>?</div>
           </div>
           <style>{`@keyframes wrongBounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }`}</style>
         </div>
@@ -365,12 +365,12 @@ function ExamenTestContent() {
               <div className="flex items-center gap-2">
                 <span className="text-white font-black text-sm">{currentIndex + 1} / {questions.length}</span>
                 {q.points === 5 && (
-                  <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(239,68,68,0.85)", color: "white", border: "1.5px solid rgba(255,255,255,0.4)" }}>â­ 5 pts</span>
+                  <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(239,68,68,0.85)", color: "white", border: "1.5px solid rgba(255,255,255,0.4)" }}>? 5 pts</span>
                 )}
               </div>
               <div className={`flex items-center gap-2 px-3 py-1 rounded-full font-black text-sm border-2 transition-all ${locked ? "bg-white/20 border-white/40 text-white" : !readingDone ? "bg-blue-500 border-blue-300 text-white animate-pulse" : timeLeft <= 5 ? "bg-red-500 border-red-300 text-white animate-pulse" : timeLeft <= 10 ? "bg-orange-500 border-orange-300 text-white" : "bg-green-500 border-green-300 text-white"}`}>
-                <span>{!readingDone && !locked ? "ğŸ§" : "â±"}</span>
-                <span>{locked ? (isAnswered && userAnswer !== null ? (userAnswer === q.correctAnswer ? "âœ…" : "âŒ") : "â±") : !readingDone ? (lang === "ar" ? "Ù‚Ø±Ø§Ø¡Ø©..." : "Lezen...") : timeLeft}</span>
+                <span>{!readingDone && !locked ? "??" : "?"}</span>
+                <span>{locked ? (isAnswered && userAnswer !== null ? (userAnswer === q.correctAnswer ? "?" : "?") : "?") : !readingDone ? (lang === "ar" ? "ŞÑÇÁÉ..." : "Lezen...") : timeLeft}</span>
                 {!locked && readingDone && <span className="text-xs opacity-80">s</span>}
               </div>
             </div>
@@ -379,9 +379,9 @@ function ExamenTestContent() {
               <div className={`grid gap-1 p-2 bg-gray-100`}
                 style={{ height: "320px", gridTemplateColumns: q.videoUrls.filter(Boolean).length === 1 ? "1fr" : "1fr 1fr" }}>
                 {q.videoUrls.filter(Boolean).map((url: string, i: number) => (
-                  <div key={i} className="relative overflow-hidden rounded-xl bg-black" style={{ height: "100%" }}>
+                  <div key={i} className="relative overflow-hidden rounded-xl bg-gray-100" style={{ height: "100%" }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={url} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} draggable={false} />
+                    <img src={url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} draggable={false} />
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="/watermark.jpeg" alt="" className="absolute pointer-events-none"
                       style={{ width: "50%", top: "50%", left: "50%", transform: "translate(-50%,-50%) rotate(-15deg)", opacity: 0.2, mixBlendMode: "multiply" }} draggable={false} />
@@ -413,7 +413,7 @@ function ExamenTestContent() {
                     <button key={num} onClick={() => handleAnswer(num)} disabled={isAnswered || locked}
                       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${style} ${!isAnswered && !locked ? "cursor-pointer active:scale-95" : "cursor-default"}`}>
                       <span className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0 ${isAnswered && userAnswer !== null ? isCorrect ? "bg-green-500 text-white" : isSelected ? "bg-red-500 text-white" : "bg-gray-200 text-gray-500" : locked ? "bg-gray-200 text-gray-400" : "bg-[#003399] text-white"}`}>
-                        {isAnswered && userAnswer !== null ? (isCorrect ? "âœ“" : isSelected ? "âœ—" : label) : label}
+                        {isAnswered && userAnswer !== null ? (isCorrect ? "?" : isSelected ? "?" : label) : label}
                       </span>
                       <span className={isRtl ? "text-right flex-1" : "text-left flex-1"}>{ansText}</span>
                     </button>
@@ -422,7 +422,7 @@ function ExamenTestContent() {
               </div>
               {(isAnswered || locked) && (
                 <button onClick={handleNext} className="w-full mt-5 py-3 font-black text-white rounded-xl hover:opacity-90 active:scale-95" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-                  {currentIndex + 1 >= questions.length ? (lang === "ar" ? "Ø¹Ø±Ø¶ Ø§Ù„Ù†ØªÙŠØ¬Ø© ğŸ†" : lang === "nl" ? "Resultaat ğŸ†" : "Result ğŸ†") : (lang === "ar" ? "Ø§Ù„ØªØ§Ù„ÙŠ â†" : lang === "nl" ? "Volgende â†’" : "Next â†’")}
+                  {currentIndex + 1 >= questions.length ? (lang === "ar" ? "ÚÑÖ ÇáäÊíÌÉ ??" : lang === "nl" ? "Resultaat ??" : "Result ??") : (lang === "ar" ? "ÇáÊÇáí ?" : lang === "nl" ? "Volgende ?" : "Next ?")}
                 </button>
               )}
             </div>
