@@ -272,9 +272,16 @@ function ExamenTestContent() {
                         {(userAns === null || userAns === undefined) && <span className="text-xs font-black text-orange-500">⏱ {lang === "ar" ? "انتهى الوقت" : "Tijd verlopen"}</span>}
                       </div>
                       {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
-                        <div className={`grid gap-0.5 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+                        <div className={`grid gap-0.5`}
+                          style={{ height: "320px", gridTemplateColumns: q.videoUrls.filter(Boolean).length === 1 ? "1fr" : "1fr 1fr" }}>
                           {q.videoUrls.filter(Boolean).map((url: string, idx: number) => (
-                            <WatermarkedImage key={idx} src={url} className="w-full" />
+                            <div key={idx} className="relative overflow-hidden bg-black" style={{ height: "100%" }}>
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={url} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} draggable={false} />
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src="/watermark.jpeg" alt="" className="absolute pointer-events-none"
+                                style={{ width: "50%", top: "50%", left: "50%", transform: "translate(-50%,-50%) rotate(-15deg)", opacity: 0.2, mixBlendMode: "multiply" }} draggable={false} />
+                            </div>
                           ))}
                         </div>
                       )}
@@ -369,9 +376,16 @@ function ExamenTestContent() {
             </div>
 
             {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
-              <div className={`grid gap-1 p-2 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+              <div className={`grid gap-1 p-2 bg-gray-100`}
+                style={{ height: "320px", gridTemplateColumns: q.videoUrls.filter(Boolean).length === 1 ? "1fr" : "1fr 1fr" }}>
                 {q.videoUrls.filter(Boolean).map((url: string, i: number) => (
-                  <div key={i} className="rounded-xl overflow-hidden"><WatermarkedImage src={url} className="w-full" /></div>
+                  <div key={i} className="relative overflow-hidden rounded-xl bg-black" style={{ height: "100%" }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={url} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} draggable={false} />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/watermark.jpeg" alt="" className="absolute pointer-events-none"
+                      style={{ width: "50%", top: "50%", left: "50%", transform: "translate(-50%,-50%) rotate(-15deg)", opacity: 0.2, mixBlendMode: "multiply" }} draggable={false} />
+                  </div>
                 ))}
               </div>
             )}

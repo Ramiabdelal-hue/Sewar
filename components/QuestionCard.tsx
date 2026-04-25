@@ -117,15 +117,28 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
         };
         const text = ft[lang] || ft.nl;
         return (
-          <div className="bg-gray-50">
-            <div className={`grid gap-1 p-2 ${count === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+          <div className="bg-gray-100">
+            <div className={`grid gap-1 p-2 ${count === 1 ? "grid-cols-1" : "grid-cols-2"}`}
+              style={{ height: "320px" }}>
               {urls.map((url, i) => {
                 const isLastOdd = isOdd && i === count - 1;
                 return (
                   <div key={i}
-                    className="relative rounded-xl overflow-hidden select-none"
-                    style={{ gridColumn: isLastOdd ? "1 / -1" : undefined }}>
-                    <WatermarkedImage src={url} className="w-full" />
+                    className="relative overflow-hidden select-none bg-black rounded-xl"
+                    style={{ gridColumn: isLastOdd ? "1 / -1" : undefined, height: "100%" }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={url}
+                      alt=""
+                      style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+                      draggable={false}
+                      onContextMenu={e => e.preventDefault()}
+                    />
+                    {/* watermark */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/watermark.jpeg" alt="" className="absolute pointer-events-none"
+                      style={{ width: "50%", top: "50%", left: "50%", transform: "translate(-50%,-50%) rotate(-15deg)", opacity: 0.2, mixBlendMode: "multiply" }}
+                      draggable={false} />
                   </div>
                 );
               })}
