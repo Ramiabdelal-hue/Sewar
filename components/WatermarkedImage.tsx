@@ -10,20 +10,17 @@ export default function WatermarkedImage({ src, className, style }: Props) {
   return (
     <div
       className={`relative select-none ${className || ""}`}
-      style={{ width: "100%", height: "600px", background: "#000", ...style }}
+      style={style}
       onContextMenu={e => e.preventDefault()}
     >
-      {/* الصورة تملأ الصندوق بدون قص */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
         alt=""
-        style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+        className="w-full h-auto block"
         draggable={false}
         onContextMenu={e => e.preventDefault()}
       />
-
-      {/* الـ watermark */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/watermark.jpeg"
