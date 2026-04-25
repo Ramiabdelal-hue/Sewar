@@ -78,7 +78,10 @@ export async function DELETE(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { id, title, description, category } = await request.json();
+    const body = await request.json();
+    const { title, description, category } = body;
+    const id = typeof body.id === "string" ? parseInt(body.id) : body.id;
+    
     if (!id || !title || !category) return NextResponse.json({ success: false, message: "id, title and category required" }, { status: 400 });
 
     const cat = category.toUpperCase();

@@ -229,17 +229,26 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
   };
 
   const updateLesson = async (id: number) => {
-    if (!editTitle.trim()) return;
+    if (!editTitle.trim()) return alert("العنوان لا يمكن أن يكون فارغاً");
     try {
       const res = await fetch("/api/lessons", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, title: editTitle, description: editDescription, category }),
+        body: JSON.stringify({ id, title: editTitle.trim(), description: editDescription.trim() || null, category }),
       });
       const data = await res.json();
-      if (data.success) { setEditingId(null); setEditTitle(""); setEditDescription(""); fetchLessons(category); }
-      else alert(data.message || "خطأ في التعديل");
-    } catch (e) { alert("خطأ في الاتصال"); }
+      if (data.success) { 
+        setEditingId(null); 
+        setEditTitle(""); 
+        setEditDescription(""); 
+        fetchLessons(category); 
+        alert("✅ تم حفظ التعديل بنجاح");
+      } else { 
+        alert("❌ " + (data.message || "خطأ في التعديل")); 
+      }
+    } catch (e) { 
+      alert("❌ خطأ في الاتصال: " + String(e)); 
+    }
   };
 
   return (
