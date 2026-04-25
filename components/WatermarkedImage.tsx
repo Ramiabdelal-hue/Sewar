@@ -51,35 +51,29 @@ export default function WatermarkedImage({ src, className, style }: Props) {
     logo.crossOrigin = "anonymous";
     logo.src = "/watermark.jpeg";
 
-    let imgLoaded = false;
-    let logoLoaded = false;
-
-    const tryDraw = () => {
-      if (!imgLoaded || !logoLoaded) return;
-
+    // ارسم الصورة فوراً بمجرد تحميلها بدون انتظار اللوغو
+    img.onload = () => {
       canvas.width = img.naturalWidth;
       canvas.height = img.naturalHeight;
-
       ctx.drawImage(img, 0, 0);
+      setLoaded(true); // أظهر الصورة فوراً
 
-      const logoW = canvas.width * 0.5;
-      const logoH = (logo.naturalHeight / logo.naturalWidth) * logoW;
-      const logoX = (canvas.width - logoW) / 2;
-      const logoY = (canvas.height - logoH) / 2;
+      // ثم أضف الـ watermark عند تحميل اللوغو
+      logo.onload = () => {
+        const logoW = canvas.width * 0.5;
+        const logoH = (logo.naturalHeight / logo.naturalWidth) * logoW;
+        const logoX = (canvas.width - logoW) / 2;
+        const logoY = (canvas.height - logoH) / 2;
 
-      ctx.save();
-      ctx.globalAlpha = 0.75;
-      ctx.globalCompositeOperation = "screen";
-      ctx.translate(logoX + logoW / 2, logoY + logoH / 2);
-      ctx.rotate(-15 * Math.PI / 180);
-      ctx.drawImage(logo, -logoW / 2, -logoH / 2, logoW, logoH);
-      ctx.restore();
-
-      setLoaded(true);
+        ctx.save();
+        ctx.globalAlpha = 0.75;
+        ctx.globalCompositeOperation = "screen";
+        ctx.translate(logoX + logoW / 2, logoY + logoH / 2);
+        ctx.rotate(-15 * Math.PI / 180);
+        ctx.drawImage(logo, -logoW / 2, -logoH / 2, logoW, logoH);
+        ctx.restore();
+      };
     };
-
-    img.onload = () => { imgLoaded = true; tryDraw(); };
-    logo.onload = () => { logoLoaded = true; tryDraw(); };
 
     img.onerror = () => {
       canvas.width = 400;
