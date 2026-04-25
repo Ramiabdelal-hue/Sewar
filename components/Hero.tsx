@@ -95,7 +95,7 @@ export default function Hero({ onSelect }: HeroProps) {
         </p>
 
         <button onClick={() => router.push("/theorie")}
-          className="group flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm md:text-base transition-all hover:scale-105 active:scale-95 mb-3 w-full justify-center"
+          className="group relative flex items-center justify-center px-6 py-3 rounded-full font-bold text-sm md:text-base transition-all hover:scale-105 active:scale-95 mb-3 w-full"
           style={{ background: "linear-gradient(135deg, #d4af37, #f0d060, #d4af37)", color: "#0a0a0a", boxShadow: "0 4px 16px rgba(212,175,55,0.4)" }}>
           {isLoggedIn ? (
             <span>✔ Start nu</span>
@@ -104,7 +104,7 @@ export default function Hero({ onSelect }: HeroProps) {
               Start vandaag met<br />je rijbewijs B
             </span>
           )}
-          <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="absolute w-4 h-4 group-hover:translate-x-1 transition-transform" style={{ [lang === "ar" ? "left" : "right"]: "1.25rem" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={lang === "ar" ? "M15 19l-7-7 7-7" : "M9 5l7 7-7 7"} />
           </svg>
         </button>
