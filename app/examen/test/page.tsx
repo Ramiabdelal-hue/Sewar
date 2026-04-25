@@ -272,9 +272,9 @@ function ExamenTestContent() {
                         {(userAns === null || userAns === undefined) && <span className="text-xs font-black text-orange-500">⏱ {lang === "ar" ? "انتهى الوقت" : "Tijd verlopen"}</span>}
                       </div>
                       {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
-                        <div className={`grid gap-0.5 bg-gray-900 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+                        <div className={`grid gap-0.5 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
                           {q.videoUrls.filter(Boolean).map((url: string, idx: number) => (
-                            <WatermarkedImage key={idx} src={url} className="w-full h-auto" />
+                            <WatermarkedImage key={idx} src={url} className="w-full" />
                           ))}
                         </div>
                       )}
@@ -369,9 +369,9 @@ function ExamenTestContent() {
             </div>
 
             {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
-              <div className={`grid gap-1 bg-gray-900 p-2 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+              <div className={`grid gap-1 p-2 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
                 {q.videoUrls.filter(Boolean).map((url: string, i: number) => (
-                  <div key={i} className="rounded-xl overflow-hidden"><WatermarkedImage src={url} className="w-full h-auto" /></div>
+                  <div key={i} className="rounded-xl overflow-hidden"><WatermarkedImage src={url} className="w-full" /></div>
                 ))}
               </div>
             )}

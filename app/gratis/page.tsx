@@ -581,7 +581,7 @@ function ExamRunner({ questions, lang, router, groupLabel, onBack }: { questions
             <div className={`grid gap-1 bg-gray-900 p-2 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
               {q.videoUrls.filter(Boolean).map((url: string, i: number) => (
                 <div key={i} className="rounded-xl overflow-hidden">
-                  <WatermarkedImage src={url} className="w-full h-auto" />
+                  <WatermarkedImage src={url} className="w-full" />
                 </div>
               ))}
             </div>

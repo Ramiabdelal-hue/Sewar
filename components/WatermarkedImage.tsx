@@ -1,7 +1,5 @@
 "use client";
 
-import { useLang } from "@/context/LangContext";
-
 interface Props {
   src: string;
   className?: string;
@@ -9,15 +7,13 @@ interface Props {
 }
 
 export default function WatermarkedImage({ src, className, style }: Props) {
-  const { lang } = useLang();
-
   return (
     <div
       className={`relative select-none ${className || ""}`}
       style={style}
       onContextMenu={e => e.preventDefault()}
     >
-      {/* الصورة الأصلية - تظهر فوراً */}
+      {/* الصورة الأصلية بحجمها الطبيعي */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
@@ -32,8 +28,9 @@ export default function WatermarkedImage({ src, className, style }: Props) {
       <img
         src="/watermark.jpeg"
         alt=""
-        className="absolute inset-0 w-1/2 h-auto pointer-events-none"
+        className="absolute pointer-events-none"
         style={{
+          width: "50%",
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%) rotate(-15deg)",

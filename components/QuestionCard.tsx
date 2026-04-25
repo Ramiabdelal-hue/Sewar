@@ -117,15 +117,15 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
         };
         const text = ft[lang] || ft.nl;
         return (
-          <div className="bg-gray-900">
+          <div className="bg-gray-50">
             <div className={`grid gap-1 p-2 ${count === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
               {urls.map((url, i) => {
                 const isLastOdd = isOdd && i === count - 1;
                 return (
                   <div key={i}
                     className="relative rounded-xl overflow-hidden select-none"
-                    style={isLastOdd ? { gridColumn: "1 / -1" } : {}}>
-                    <WatermarkedImage src={url} className="w-full h-auto" />
+                    style={{ gridColumn: isLastOdd ? "1 / -1" : undefined }}>
+                    <WatermarkedImage src={url} className="w-full" />
                   </div>
                 );
               })}
