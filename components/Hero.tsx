@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import nl from "@/locales/nl.json";
 import fr from "@/locales/fr.json";
 import ar from "@/locales/ar.json";
@@ -22,6 +22,13 @@ export default function Hero({ onSelect }: HeroProps) {
   const [showPWA, setShowPWA] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<any>(null);
   const [pwaSelected, setPwaSelected] = useState<"android"|"iphone"|null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const email = localStorage.getItem("userEmail");
+    const category = localStorage.getItem("userCategory");
+    if (email && category) setIsLoggedIn(true);
+  }, []);
 
   const handleInstall = async () => {
     if (installPrompt) {
@@ -81,7 +88,7 @@ export default function Hero({ onSelect }: HeroProps) {
         <button onClick={() => router.push("/theorie")}
           className="group flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm md:text-base transition-all hover:scale-105 active:scale-95 mb-3 w-full justify-center"
           style={{ background: "linear-gradient(135deg, #d4af37, #f0d060, #d4af37)", color: "#0a0a0a", boxShadow: "0 4px 16px rgba(212,175,55,0.4)" }}>
-          <span>{t.heroButton}</span>
+          <span>{isLoggedIn ? "✔ Start nu" : t.heroButton}</span>
           <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={lang === "ar" ? "M15 19l-7-7 7-7" : "M9 5l7 7-7 7"} />
           </svg>
