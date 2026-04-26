@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit, getClientIp } from "@/lib/adminAuth";
+import bcrypt from "bcrypt";
 
 export async function POST(req: NextRequest) {
   // التحقق من قفل التسجيل - غير إلى false لفتح التسجيل
@@ -94,13 +95,14 @@ export async function POST(req: NextRequest) {
 
     // 6️⃣ إنشاء أو تحديث المستخدم
     let user;
+    const hashedPassword = await bcrypt.hash(body.password, 12);
     if (existingUser) {
       // المستخدم موجود، نحدث بياناته الأساسية فقط إذا لزم الأمر
       user = await prisma.user.update({
         where: { email: emailNormalized },
         data: {
           name: body.fullName,
-          password: body.password,
+          password: hashedPassword,
           phone: body.phone,
           // تحديث الحقول القديمة للتوافق (نستخدم آخر اشتراك)
           category: body.category || existingUser.category,
@@ -118,7 +120,7 @@ export async function POST(req: NextRequest) {
         data: {
           email: emailNormalized,
           name: body.fullName,
-          password: body.password,
+          password: hashedPassword,
           phone: body.phone,
           category: body.category || "B",
           paymentType: body.paymentMethod,

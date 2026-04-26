@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendScreenshotWarningEmail } from "@/lib/email";
+import { verifyAdminToken, unauthorizedResponse } from "@/lib/adminAuth";
 
 // POST - إرسال إيميل تحذيري يدوياً من لوحة الأدمن
 export async function POST(request: NextRequest) {
+  if (!verifyAdminToken(request)) return unauthorizedResponse();
   try {
     const body = await request.json();
     const { userEmail } = body;

@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { verifyAdminToken, unauthorizedResponse } from "@/lib/adminAuth";
 
 export async function GET(request: NextRequest) {
+  if (!verifyAdminToken(request)) return unauthorizedResponse();
   try {
     const { searchParams } = new URL(request.url);
     const searchName = searchParams.get("name");

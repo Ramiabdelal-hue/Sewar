@@ -8,7 +8,13 @@ export function verifyAdminToken(request: NextRequest): boolean {
   const token = request.headers.get("x-admin-token");
   const secret = process.env.ADMIN_API_SECRET;
   if (!secret || !token) return false;
-  return token === secret;
+  // Constant-time comparison to prevent timing attacks
+  if (token.length !== secret.length) return false;
+  let result = 0;
+  for (let i = 0; i < token.length; i++) {
+    result |= token.charCodeAt(i) ^ secret.charCodeAt(i);
+  }
+  return result === 0;
 }
 
 export function unauthorizedResponse() {
@@ -46,6 +52,22 @@ export function getClientIp(request: NextRequest): string {
   return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
     request.headers.get("x-real-ip") ||
     "unknown";
+}
+
+/**
+ * Sanitize string input — strip dangerous characters
+ */
+export function sanitizeString(input: unknown, maxLength = 500): string {
+  if (typeof input !== "string") return "";
+  return input.trim().slice(0, maxLength).replace(/[<>]/g, "");
+}
+
+/**
+ * Validate email format
+ */
+export function isValidEmail(email: unknown): boolean {
+  if (typeof email !== "string") return false;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length <= 254;
 }
 
 /**
