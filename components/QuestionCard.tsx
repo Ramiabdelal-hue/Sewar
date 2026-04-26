@@ -96,7 +96,7 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
 
       {/* Header */}
       <div className="flex items-center gap-3 px-5 py-3"
-        style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
+        style={{ background: "linear-gradient(135deg, #7c3aed, #5b21b6)" }}>
         <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center text-white font-black flex-shrink-0">
           {index + 1}
         </div>
