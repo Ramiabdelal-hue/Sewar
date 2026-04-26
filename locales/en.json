@@ -88,5 +88,7 @@
   "daysRemaining": "days remaining",
   "hoursRemaining": "hours remaining",
   "expired": "Expired",
-  "gratis": "Free"
+  "gratis": "Free",
+  "siteOwner": "Website Owner",
+  "webDesigner": "Web Designer"
 }

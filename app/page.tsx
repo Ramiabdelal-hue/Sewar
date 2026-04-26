@@ -6,27 +6,32 @@ import Hero from "@/components/Hero";
 import LoginModal from "@/components/LoginModal";
 import CheckoutForm from "@/components/CheckoutForm";
 import { useLang } from "@/context/LangContext";
+import nl from "@/locales/nl.json";
+import fr from "@/locales/fr.json";
+import ar from "@/locales/ar.json";
+import en from "@/locales/en.json";
 
 export default function HomePage() {
   const [showLogin, setShowLogin] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
-  const { lang, setLang } = useLang();
+  const { lang } = useLang();
+  const translations: any = { nl, fr, ar, en };
+  const t = translations[lang] || nl;
+  const isRtl = lang === "ar";
 
   return (
     <div style={{ height: "100dvh", overflow: "hidden", display: "flex", flexDirection: "column" }}>
       <Navbar onOpenLogin={() => setShowLogin(true)} />
-      {/* Hero يملأ المساحة المتبقية */}
       <div style={{ flex: 1, overflow: "hidden" }}>
         <Hero onSelect={() => setShowCheckout(true)} />
       </div>
-      {/* Footer ثابت في الأسفل */}
-      <footer style={{ background: "#ffffff", borderTop: "1px solid #e5e7eb", flexShrink: 0 }}>
-        <div className="max-w-5xl mx-auto px-4 py-3">
 
-          {/* سطر واحد على الموبايل: الثلاثة عناصر */}
+      {/* Footer */}
+      <footer style={{ background: "#ffffff", borderTop: "1px solid #e5e7eb", flexShrink: 0 }} dir={isRtl ? "rtl" : "ltr"}>
+        <div className="max-w-5xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-2">
 
-            {/* Sewar Achour — صاحبة الموقع */}
+            {/* صاحبة الموقع */}
             <div className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
                 style={{ background: "#fff7ed", border: "1px solid #fed7aa" }}>
@@ -35,7 +40,7 @@ export default function HomePage() {
                 </svg>
               </div>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "#ea580c" }}>Eigenaar</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "#ea580c" }}>{t.siteOwner}</p>
                 <p className="font-black text-xs tracking-wide" style={{ color: "#1a1a1a" }}>Sewar Achour</p>
                 <p className="text-[10px]" style={{ color: "#9ca3af" }}>BTW: 0766.704.232</p>
               </div>
@@ -44,9 +49,9 @@ export default function HomePage() {
             {/* حقوق النشر — مخفي على الموبايل */}
             <p className="text-[10px] text-center hidden md:block" style={{ color: "#9ca3af" }}>
               © {new Date().getFullYear()} Sewar Rijbewijsonline.{" "}
-              {lang === "nl" ? "Alle rechten voorbehouden" :
+              {t.gratis === "مجاني" ? "جميع الحقوق محفوظة" :
+               lang === "nl" ? "Alle rechten voorbehouden" :
                lang === "fr" ? "Tous droits réservés" :
-               lang === "ar" ? "جميع الحقوق محفوظة" :
                "All rights reserved"}
             </p>
 
@@ -59,7 +64,7 @@ export default function HomePage() {
                 </svg>
               </div>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "#7c3aed" }}>Web Designer</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "#7c3aed" }}>{t.webDesigner}</p>
                 <p className="font-black text-xs tracking-wide" style={{ color: "#1a1a1a" }}>Rami Abdelal</p>
                 <a href="https://wa.me/32465574440" target="_blank" rel="noopener noreferrer"
                   className="text-[10px] font-semibold flex items-center gap-0.5" style={{ color: "#25d366" }}>
@@ -75,6 +80,7 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+
       {showLogin && <LoginModal lang={lang} onClose={() => setShowLogin(false)} />}
       {showCheckout && <CheckoutForm selectedData={{}} onBack={() => setShowCheckout(false)} />}
     </div>
