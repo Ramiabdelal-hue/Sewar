@@ -663,7 +663,7 @@ function ExamenCategoryContent() {
           <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-100">
             {/* رأس السؤال - العد + المؤقت */}
             <div className="px-5 py-3 flex items-center justify-between"
-              style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
+              style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
               <div className="flex items-center gap-2">
                 <span className="text-white font-black text-sm">
                   {currentIndex + 1} / {questions.length}
