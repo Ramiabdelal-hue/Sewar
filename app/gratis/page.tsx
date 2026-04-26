@@ -23,9 +23,7 @@ function GratisContent() {
   const catParam = searchParams.get("cat")?.toUpperCase() || "B";
   const [selectedCat, setSelectedCat] = useState(catParam);
   const [lessons, setLessons] = useState<any[]>([]);
-  const [examGroups, setExamGroups] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [examModal, setExamModal] = useState<{ lessonTitle: string; batches: { label: string; group: number }[] } | null>(null);
 
   const categories = [
     { id: "A", name: t.categoryA || "Rijbewijs A", icon: <MotorcycleIcon className="w-14 h-9" />, color: "#f97316" },
@@ -39,17 +37,14 @@ function GratisContent() {
       .then(r => r.json())
       .then(d => {
         if (d.success) {
-          // استخراج الدروس الفريدة مرتبة حسب lessonId (نفس ترتيب theorie)
           const lessonMap = new Map<number, any>();
           for (const q of d.questions) {
             if (q.lesson && q.lessonId && !lessonMap.has(q.lessonId)) {
               lessonMap.set(q.lessonId, { id: q.lessonId, title: q.lesson.title, description: q.lesson.description });
             }
           }
-          // ترتيب حسب id تصاعدياً مثل theorie
           const sorted = Array.from(lessonMap.values()).sort((a, b) => a.id - b.id);
           setLessons(sorted);
-          setExamGroups(d.examGroups || []);
         }
       })
       .catch(() => {})
@@ -57,15 +52,6 @@ function GratisContent() {
   }, [selectedCat]);
 
   const translatedTitles = useAutoTranslateList(lessons.map(l => l.title), lang);
-
-  const openExamModal = () => {
-    if (examGroups.length === 0) return;
-    const batches = examGroups.map(g => ({
-      label: g.label || (lang === "ar" ? "امتحان مجاني" : lang === "nl" ? "Gratis Examen" : "Examen Gratuit"),
-      group: g.group,
-    }));
-    setExamModal({ lessonTitle: lang === "ar" ? "امتحانات مجانية" : lang === "nl" ? "Gratis Examens" : "Examens Gratuits", batches });
-  };
 
   return (
     <div className="min-h-screen flex flex-col" dir={isRtl ? "rtl" : "ltr"} style={{ background: "#f0f0f0" }}>
@@ -166,9 +152,8 @@ function GratisContent() {
                   </td>
                   <td className="px-4 py-3 border border-gray-200 text-center">
                     <button
-                      onClick={openExamModal}
-                      disabled={examGroups.length === 0}
-                      className="border-2 px-4 py-1 text-sm font-bold transition-colors disabled:opacity-60 w-full"
+                      onClick={() => router.push(`/gratis/exam?category=${selectedCat}&lessonId=${lesson.id}&lesson=${encodeURIComponent(lesson.title)}`)}
+                      className="border-2 px-4 py-1 text-sm font-bold transition-colors w-full"
                       style={{ background: "#22c55e", borderColor: "#16a34a", color: "white" }}
                     >
                       EXAM
@@ -195,38 +180,6 @@ function GratisContent() {
 
       <Footer />
 
-      {/* Modal اختيار الامتحان - نفس تصميم theorie */}
-      {examModal && (
-        <div className="fixed inset-0 bg-black/60 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4"
-          onClick={() => setExamModal(null)}>
-          <div className="bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl w-full sm:max-w-md overflow-hidden"
-            onClick={e => e.stopPropagation()}>
-            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between"
-              style={{ background: "#eff6ff" }}>
-              <div>
-                <h3 className="font-black text-[#003399] text-base">🎯 {lang === "ar" ? "اختر الامتحان" : lang === "nl" ? "Kies examen" : lang === "fr" ? "Choisir examen" : "Choose exam"}</h3>
-                <p className="text-xs text-blue-500 mt-0.5">{examModal.lessonTitle}</p>
-              </div>
-              <button onClick={() => setExamModal(null)} className="text-gray-400 hover:text-gray-600 text-2xl w-8 h-8 flex items-center justify-center">✕</button>
-            </div>
-            <div className="p-4 grid grid-cols-2 gap-3">
-              {examModal.batches.map((b, i) => (
-                <button key={i}
-                  onClick={() => {
-                    setExamModal(null);
-                    router.push(`/gratis/exam?category=${selectedCat}&group=${b.group}`);
-                  }}
-                  className="flex flex-col items-center justify-center gap-2 py-4 rounded-xl font-black transition-all active:scale-95 hover:opacity-90"
-                  style={{background:"linear-gradient(135deg,#eff6ff,#dbeafe)", border:"2px solid #93c5fd", color:"#1d4ed8"}}
-                >
-                  <span className="text-2xl">🎯</span>
-                  <span className="text-sm">{b.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

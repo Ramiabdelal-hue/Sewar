@@ -14,7 +14,8 @@ function GratisExamContent() {
   const { lang } = useLang();
 
   const category = searchParams.get("category") || "B";
-  const group = searchParams.get("group") || "0";
+  const lessonId = searchParams.get("lessonId") || "";
+  const lessonTitle = searchParams.get("lesson") || "";
 
   const [questions, setQuestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -137,15 +138,14 @@ function GratisExamContent() {
       .then(r => r.json())
       .then(d => {
         if (d.success) {
-          const examGroup = d.examGroups.find((g: any) => g.group === Number(group));
-          if (examGroup) {
-            setQuestions(examGroup.questions);
-          }
+          // تصفية أسئلة الامتحان المجانية حسب lessonId
+          const filtered = d.examQuestions.filter((q: any) => q.lessonId === Number(lessonId));
+          setQuestions(filtered);
         }
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [category, group]);
+  }, [category, lessonId]);
 
   const q = questions[currentIndex];
   const textsToTranslate = q ? [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""] : ["", "", "", ""];
@@ -215,10 +215,7 @@ function GratisExamContent() {
         <div className="border-4 border-[#22c55e] rounded-2xl p-10">
           <div className="text-6xl mb-4">🎯</div>
           <h1 className="text-2xl font-black text-[#22c55e] mb-2">
-            {group === "0" ? 
-              (lang === "ar" ? "امتحان مجاني" : lang === "nl" ? "Gratis Examen" : "Free Exam") :
-              `Examen ${group}`
-            }
+            {lessonTitle || (lang === "ar" ? "امتحان مجاني" : lang === "nl" ? "Gratis Examen" : "Free Exam")}
           </h1>
           <p className="text-gray-500 mb-2">{questions.length} {lang === "ar" ? "سؤال" : lang === "nl" ? "vragen" : "questions"}</p>
           <p className="text-sm text-orange-600 font-bold mb-8">⏱ {lang === "ar" ? "15 ثانية لكل سؤال" : lang === "nl" ? "15 seconden per vraag" : "15 seconds per question"}</p>
