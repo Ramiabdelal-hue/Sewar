@@ -22,8 +22,10 @@ export default function HomePage() {
       {/* Footer ثابت في الأسفل */}
       <footer style={{ background: "#ffffff", borderTop: "1px solid #e5e7eb", flexShrink: 0 }}>
         <div className="max-w-5xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+
+            {/* Sewar Achour + BTW */}
+            <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
                 style={{ background: "#f3f4f6", border: "1px solid #e5e7eb" }}>
                 <span className="text-sm">©</span>
@@ -33,13 +35,34 @@ export default function HomePage() {
                 <p className="text-xs" style={{ color: "#9ca3af" }}>BTW nr: 0766.704.232</p>
               </div>
             </div>
-            <p className="text-xs text-center" style={{ color: "#9ca3af" }}>
+
+            {/* حقوق النشر */}
+            <p className="text-xs text-center hidden sm:block" style={{ color: "#9ca3af" }}>
               © {new Date().getFullYear()} Sewar Rijbewijsonline.{" "}
               {lang === "nl" ? "Alle rechten voorbehouden" :
                lang === "fr" ? "Tous droits réservés" :
                lang === "ar" ? "جميع الحقوق محفوظة" :
                "All rights reserved"}
             </p>
+
+            {/* المصمم */}
+            <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl"
+              style={{ background: "linear-gradient(135deg, #f5f3ff, #ede9fe)", border: "1px solid #ddd6fe" }}>
+              <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ background: "linear-gradient(135deg, #7c3aed, #5b21b6)" }}>
+                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+              </div>
+              <div className="leading-tight">
+                <p className="text-[9px] font-bold uppercase tracking-widest" style={{ color: "#7c3aed", opacity: 0.7 }}>Designed by</p>
+                <p className="text-xs font-black" style={{ color: "#4c1d95" }}>Rami Abdelal</p>
+                <a href="tel:0465574440" className="text-[10px] font-semibold" style={{ color: "#7c3aed" }}>
+                  0465 57 44 40
+                </a>
+              </div>
+            </div>
+
           </div>
         </div>
       </footer>
