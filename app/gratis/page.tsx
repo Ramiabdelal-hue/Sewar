@@ -39,14 +39,16 @@ function GratisContent() {
       .then(r => r.json())
       .then(d => {
         if (d.success) {
-          // استخراج الدروس الفريدة من الأسئلة المجانية
+          // استخراج الدروس الفريدة مرتبة حسب lessonId (نفس ترتيب theorie)
           const lessonMap = new Map<number, any>();
           for (const q of d.questions) {
             if (q.lesson && q.lessonId && !lessonMap.has(q.lessonId)) {
               lessonMap.set(q.lessonId, { id: q.lessonId, title: q.lesson.title, description: q.lesson.description });
             }
           }
-          setLessons(Array.from(lessonMap.values()));
+          // ترتيب حسب id تصاعدياً مثل theorie
+          const sorted = Array.from(lessonMap.values()).sort((a, b) => a.id - b.id);
+          setLessons(sorted);
           setExamGroups(d.examGroups || []);
         }
       })
@@ -166,7 +168,8 @@ function GratisContent() {
                     <button
                       onClick={openExamModal}
                       disabled={examGroups.length === 0}
-                      className="bg-white border-2 border-orange-400 px-4 py-1 text-sm font-bold text-orange-600 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-colors disabled:opacity-60 w-full"
+                      className="border-2 px-4 py-1 text-sm font-bold transition-colors disabled:opacity-60 w-full"
+                      style={{ background: "#22c55e", borderColor: "#16a34a", color: "white" }}
                     >
                       EXAM
                     </button>

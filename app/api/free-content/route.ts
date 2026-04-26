@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
 
     if (category === "A") {
       questions = await prisma.questionA.findMany({
-        where: { isFree: true }, orderBy: { createdAt: "asc" },
+        where: { isFree: true }, orderBy: [{ lessonId: "asc" }, { createdAt: "asc" }],
         include: { lesson: { select: { title: true, description: true } } }
       });
       examQuestions = await prisma.examQuestionA.findMany({
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
       });
     } else if (category === "B") {
       questions = await prisma.questionB.findMany({
-        where: { isFree: true }, orderBy: { createdAt: "asc" },
+        where: { isFree: true }, orderBy: [{ lessonId: "asc" }, { createdAt: "asc" }],
         include: { lesson: { select: { title: true, description: true } } }
       });
       examQuestions = await prisma.examQuestionB.findMany({
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       });
     } else if (category === "C") {
       questions = await prisma.questionC.findMany({
-        where: { isFree: true }, orderBy: { createdAt: "asc" },
+        where: { isFree: true }, orderBy: [{ lessonId: "asc" }, { createdAt: "asc" }],
         include: { lesson: { select: { title: true, description: true } } }
       });
       examQuestions = await prisma.examQuestionC.findMany({
