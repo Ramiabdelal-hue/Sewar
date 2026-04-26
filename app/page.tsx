@@ -46,21 +46,20 @@ export default function HomePage() {
             </p>
 
             {/* المصمم */}
-            <div className="flex items-center gap-2">
-              <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" style={{ color: "#7c3aed" }}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-              </svg>
-              <span className="text-xs font-bold" style={{ color: "#6b7280" }}>Designed by</span>
-              <span className="text-xs font-black" style={{ color: "#4c1d95" }}>Rami Abdelal</span>
-              <a
-                href="https://wa.me/32465574440"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs font-semibold"
-                style={{ color: "#25d366" }}
-              >
-                0465 57 44 40
-              </a>
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                style={{ background: "#f3f4f6", border: "1px solid #e5e7eb" }}>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" style={{ color: "#7c3aed" }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+              </div>
+              <div>
+                <p className="font-black text-xs tracking-wide" style={{ color: "#1a1a1a" }}>Rami Abdelal</p>
+                <a href="https://wa.me/32465574440" target="_blank" rel="noopener noreferrer"
+                  className="text-xs" style={{ color: "#25d366" }}>
+                  0465 57 44 40
+                </a>
+              </div>
             </div>
 
           </div>
