@@ -38,13 +38,32 @@ function GratisContent() {
       .then(d => {
         if (d.success) {
           const lessonMap = new Map<number, any>();
+
+          // أضف الدروس التي عندها أسئلة درس مجانية
           for (const q of d.questions) {
             if (q.lesson && q.lessonId && !lessonMap.has(q.lessonId)) {
               lessonMap.set(q.lessonId, { id: q.lessonId, title: q.lesson.title, description: q.lesson.description });
             }
           }
+
+          // أضف الدروس التي عندها أسئلة امتحان مجانية (إذا لم تكن موجودة بالفعل)
+          for (const q of (d.examQuestions || [])) {
+            if (q.lesson && q.lessonId && !lessonMap.has(q.lessonId)) {
+              lessonMap.set(q.lessonId, { id: q.lessonId, title: q.lesson.title, description: q.lesson.description });
+            }
+          }
+
           const sorted = Array.from(lessonMap.values()).sort((a, b) => a.id - b.id);
-          setLessons(sorted);
+
+          // حساب أي درس عنده أسئلة درس وأيها عنده أسئلة امتحان
+          const lessonHasQuestions = new Set(d.questions.map((q: any) => q.lessonId));
+          const lessonHasExam = new Set((d.examQuestions || []).map((q: any) => q.lessonId));
+
+          setLessons(sorted.map(l => ({
+            ...l,
+            hasQuestions: lessonHasQuestions.has(l.id),
+            hasExam: lessonHasExam.has(l.id),
+          })));
         }
       })
       .catch(() => {})
@@ -154,21 +173,29 @@ function GratisContent() {
                   ) : (
                     <>
                       <td className="px-4 py-3 border border-gray-200 text-center">
-                        <button
-                          onClick={() => router.push(`/gratis/lesson?lessonId=${lesson.id}&category=${selectedCat}&lesson=${encodeURIComponent(lesson.title)}`)}
-                          className="bg-white border-2 border-gray-400 px-4 py-1 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors w-full"
-                        >
-                          {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
-                        </button>
+                        {lesson.hasQuestions ? (
+                          <button
+                            onClick={() => router.push(`/gratis/lesson?lessonId=${lesson.id}&category=${selectedCat}&lesson=${encodeURIComponent(lesson.title)}`)}
+                            className="bg-white border-2 border-gray-400 px-4 py-1 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors w-full"
+                          >
+                            {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
+                          </button>
+                        ) : (
+                          <span className="text-gray-300 text-xs">—</span>
+                        )}
                       </td>
                       <td className="px-4 py-3 border border-gray-200 text-center">
-                        <button
-                          onClick={() => router.push(`/gratis/exam?category=${selectedCat}&lessonId=${lesson.id}&lesson=${encodeURIComponent(lesson.title)}`)}
-                          className="border-2 px-4 py-1 text-sm font-bold transition-colors w-full"
-                          style={{ background: "#22c55e", borderColor: "#16a34a", color: "white" }}
-                        >
-                          EXAM
-                        </button>
+                        {lesson.hasExam ? (
+                          <button
+                            onClick={() => router.push(`/gratis/exam?category=${selectedCat}&lessonId=${lesson.id}&lesson=${encodeURIComponent(lesson.title)}`)}
+                            className="border-2 px-4 py-1 text-sm font-bold transition-colors w-full"
+                            style={{ background: "#22c55e", borderColor: "#16a34a", color: "white" }}
+                          >
+                            EXAM
+                          </button>
+                        ) : (
+                          <span className="text-gray-300 text-xs">—</span>
+                        )}
                       </td>
                     </>
                   )}
