@@ -360,16 +360,16 @@ function ExamenTestContent() {
       <div className="max-w-2xl mx-auto px-4 py-6">
         {q && (
           <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-100">
-            <div className="px-5 py-3 flex items-center justify-between" style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
+            <div className="px-5 py-3 flex items-center justify-between" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
               <div className="flex items-center gap-2">
                 <span className="text-white font-black text-sm">{currentIndex + 1} / {questions.length}</span>
                 {q.points === 5 && (
-                  <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(239,68,68,0.85)", color: "white", border: "1.5px solid rgba(255,255,255,0.4)" }}>? 5 pts</span>
+                  <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(239,68,68,0.85)", color: "white", border: "1.5px solid rgba(255,255,255,0.4)" }}>⭐ 5 pts</span>
                 )}
               </div>
               <div className={`flex items-center gap-2 px-3 py-1 rounded-full font-black text-sm border-2 transition-all ${locked ? "bg-white/20 border-white/40 text-white" : !readingDone ? "bg-blue-500 border-blue-300 text-white animate-pulse" : timeLeft <= 5 ? "bg-red-500 border-red-300 text-white animate-pulse" : timeLeft <= 10 ? "bg-orange-500 border-orange-300 text-white" : "bg-green-500 border-green-300 text-white"}`}>
-                <span>{!readingDone && !locked ? "??" : "?"}</span>
-                <span>{locked ? (isAnswered && userAnswer !== null ? (userAnswer === q.correctAnswer ? "?" : "?") : "?") : !readingDone ? (lang === "ar" ? "�����..." : "Lezen...") : timeLeft}</span>
+                <span>{!readingDone && !locked ? "🔊" : "⏱"}</span>
+                <span>{locked ? (isAnswered && userAnswer !== null ? (userAnswer === q.correctAnswer ? "✓" : "✗") : "⏰") : !readingDone ? (lang === "ar" ? "يقرأ..." : "Lezen...") : timeLeft}</span>
                 {!locked && readingDone && <span className="text-xs opacity-80">s</span>}
               </div>
             </div>
