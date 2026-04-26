@@ -26,13 +26,16 @@ export default function HomePage() {
           {/* سطر واحد على الموبايل: الثلاثة عناصر */}
           <div className="flex items-center justify-between gap-2">
 
-            {/* Sewar Achour + BTW */}
+            {/* Sewar Achour — صاحبة الموقع */}
             <div className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-                style={{ background: "#f3f4f6", border: "1px solid #e5e7eb" }}>
-                <span className="text-xs">©</span>
+                style={{ background: "#fff7ed", border: "1px solid #fed7aa" }}>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" style={{ color: "#ea580c" }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
               </div>
               <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "#ea580c" }}>Eigenaar</p>
                 <p className="font-black text-xs tracking-wide" style={{ color: "#1a1a1a" }}>Sewar Achour</p>
                 <p className="text-[10px]" style={{ color: "#9ca3af" }}>BTW: 0766.704.232</p>
               </div>
