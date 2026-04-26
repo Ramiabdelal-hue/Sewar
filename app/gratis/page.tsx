@@ -127,14 +127,14 @@ function GratisContent() {
               <col style={{ width: "20%" }} />
             </colgroup>
             <thead>
-              <tr style={{ backgroundColor: "#3399ff" }}>
-                <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc]">
+              <tr style={{ backgroundColor: "#22c55e" }}>
+                <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#16a34a]">
                   {lang === "ar" ? "الدرس" : lang === "nl" ? "LES" : lang === "fr" ? "LEÇON" : "LESSON"}
                 </th>
-                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
+                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#16a34a] text-center">
                   {lang === "ar" ? "فتح" : lang === "nl" ? "OPENEN" : lang === "fr" ? "OUVRIR" : "OPEN"}
                 </th>
-                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
+                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#16a34a] text-center">
                   EXAM
                 </th>
               </tr>
