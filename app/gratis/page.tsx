@@ -147,7 +147,14 @@ function GratisContent() {
               </tr>
             </thead>
             <tbody>
-              {lessons.map((lesson, i) => (
+              {lessons.map((lesson, i) => {
+                // إذا لا يوجد أي محتوى مجاني — لا تعرض الصف
+                if (!lesson.hasQuestions && !lesson.hasExam) return null;
+
+                // الدرس الأول الذي عنده أسئلة درس — يظهر بـ Start nu
+                const isFirstWithQuestions = i === 0 && lesson.hasQuestions;
+
+                return (
                 <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#f5f5f5" }}>
                   <td className="px-4 py-3 border border-gray-200">
                     <div className="font-bold text-[#003399] text-base" style={{ wordBreak: "break-word", whiteSpace: "normal" }}>
@@ -160,7 +167,7 @@ function GratisContent() {
                       </div>
                     )}
                   </td>
-                  {i === 0 ? (
+                  {isFirstWithQuestions ? (
                     <td colSpan={2} className="px-4 py-3 border border-gray-200 text-center">
                       <button
                         onClick={() => router.push(`/gratis/lesson?lessonId=${lesson.id}&category=${selectedCat}&lesson=${encodeURIComponent(lesson.title)}`)}
@@ -200,7 +207,8 @@ function GratisContent() {
                     </>
                   )}
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         )}
