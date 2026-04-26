@@ -20,6 +20,20 @@ function GratisContent() {
   const t = translations[lang];
   const isRtl = lang === "ar";
 
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [loginUser, setLoginUser] = useState("");
+  const [loginPass, setLoginPass] = useState("");
+  const [loginError, setLoginError] = useState(false);
+
+  const handleUnlock = () => {
+    if (loginUser === "admin" && loginPass === "admin") {
+      setIsUnlocked(true);
+      setLoginError(false);
+    } else {
+      setLoginError(true);
+    }
+  };
+
   const catParam = searchParams.get("cat")?.toUpperCase() || "B";
   const [selectedCat, setSelectedCat] = useState(catParam);
   const [lessons, setLessons] = useState<any[]>([]);
@@ -71,6 +85,63 @@ function GratisContent() {
   }, [selectedCat]);
 
   const translatedTitles = useAutoTranslateList(lessons.map(l => l.title), lang);
+
+  // شاشة تسجيل الدخول
+  if (!isUnlocked) {
+    return (
+      <div className="min-h-screen flex flex-col" style={{ background: "#f0f0f0" }}>
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center px-4">
+          <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm text-center">
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              style={{ background: "linear-gradient(135deg, #7c3aed, #5b21b6)" }}>
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-black text-gray-800 mb-1">
+              {lang === "ar" ? "قيد المعالجة" : lang === "nl" ? "In behandeling" : lang === "fr" ? "En cours de traitement" : "Under maintenance"}
+            </h2>
+            <p className="text-gray-400 text-sm mb-6">
+              {lang === "ar" ? "هذه الصفحة قيد المعالجة حالياً" : lang === "nl" ? "Deze pagina is momenteel in behandeling" : lang === "fr" ? "Cette page est en cours de traitement" : "This page is currently under maintenance"}
+            </p>
+            <div className="space-y-3">
+              <input
+                type="text"
+                value={loginUser}
+                onChange={e => setLoginUser(e.target.value)}
+                placeholder="Username"
+                className="w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none"
+                style={{ border: "1.5px solid #e5e7eb", background: "#f9fafb" }}
+              />
+              <input
+                type="password"
+                value={loginPass}
+                onChange={e => setLoginPass(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && handleUnlock()}
+                placeholder="Password"
+                className="w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none"
+                style={{ border: loginError ? "1.5px solid #ef4444" : "1.5px solid #e5e7eb", background: "#f9fafb" }}
+              />
+              {loginError && (
+                <p className="text-red-500 text-xs font-bold">
+                  {lang === "ar" ? "بيانات خاطئة" : lang === "nl" ? "Onjuiste gegevens" : "Incorrect credentials"}
+                </p>
+              )}
+              <button
+                onClick={handleUnlock}
+                className="w-full py-3 rounded-xl font-black text-white text-sm transition-all active:scale-95"
+                style={{ background: "linear-gradient(135deg, #7c3aed, #5b21b6)" }}
+              >
+                {lang === "ar" ? "دخول" : lang === "nl" ? "Inloggen" : "Login"}
+              </button>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col" dir={isRtl ? "rtl" : "ltr"} style={{ background: "#f0f0f0" }}>
