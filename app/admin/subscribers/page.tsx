@@ -61,6 +61,8 @@ export default function AdminSubscribersPage() {
     else alert("بيانات الدخول غير صحيحة");
   };
 
+  const ADMIN_TOKEN = process.env.NEXT_PUBLIC_ADMIN_TOKEN || "";
+
   const fetchSubscribers = async () => {
     setLoading(true);
     try {
@@ -69,14 +71,14 @@ export default function AdminSubscribersPage() {
       if (searchMonth) p.append("month", searchMonth);
       if (searchCategory) p.append("category", searchCategory);
       if (searchType) p.append("type", searchType);
-      const res = await fetch(`/api/admin/subscribers?${p}`);
+      const res = await fetch(`/api/admin/subscribers?${p}`, { headers: { "x-admin-token": ADMIN_TOKEN } });
       const d = await res.json();
       if (d.success) { setSubscriptions(d.data.subscriptions); setStats(d.data.stats); setWarnings(d.data.warnings); }
     } catch {} finally { setLoading(false); }
   };
 
   const fetchActivityStats = async () => {
-    try { const r = await fetch("/api/activity"); const d = await r.json(); if (d.success) setActivityStats(d.stats); } catch {}
+    try { const r = await fetch("/api/activity", { headers: { "x-admin-token": ADMIN_TOKEN } }); const d = await r.json(); if (d.success) setActivityStats(d.stats); } catch {}
   };
 
   useEffect(() => { if (isLogged) { fetchSubscribers(); fetch("/api/admin/subscribers?getNames=true").then(r=>r.json()).then(d=>{ if(d.success) setAvailableNames(d.names); }); } }, [isLogged]);
@@ -89,7 +91,7 @@ export default function AdminSubscribersPage() {
   const sendWarningEmail = async (email: string) => {
     setEmailSending(true); setEmailResult(null);
     try {
-      const r = await fetch("/api/admin/send-warning", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({userEmail:email}) });
+      const r = await fetch("/api/admin/send-warning", { method:"POST", headers:{"Content-Type":"application/json","x-admin-token":ADMIN_TOKEN}, body: JSON.stringify({userEmail:email}) });
       const d = await r.json();
       setEmailResult({success:d.success, message:d.message});
     } catch { setEmailResult({success:false, message:"خطأ في الاتصال"}); }
@@ -99,7 +101,7 @@ export default function AdminSubscribersPage() {
   const suspendUser = async (email: string, action: "suspend"|"unsuspend") => {
     setSuspendLoading(email); setSuspendResult(null);
     try {
-      const r = await fetch("/api/admin/suspend-user", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({userEmail:email, action, reason:suspendReason}) });
+      const r = await fetch("/api/admin/suspend-user", { method:"POST", headers:{"Content-Type":"application/json","x-admin-token":ADMIN_TOKEN}, body: JSON.stringify({userEmail:email, action, reason:suspendReason}) });
       const d = await r.json();
       // عرض نتيجة الإيميل أيضاً
       const msg = d.emailStatus

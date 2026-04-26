@@ -208,7 +208,7 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
     try {
       const res = await fetch("/api/lessons", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-admin-token": ADMIN_TOKEN },
         body: JSON.stringify({ title: newTitle, description: newDescription, category }),
       });
       const data = await res.json();
@@ -221,7 +221,10 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
   const deleteLesson = async (id: number) => {
     if (!confirm("هل تريد حذف هذا الدرس؟ سيتم حذف جميع أسئلته أيضاً!")) return;
     try {
-      const res = await fetch(`/api/lessons?id=${id}&category=${category}`, { method: "DELETE" });
+      const res = await fetch(`/api/lessons?id=${id}&category=${category}`, {
+        method: "DELETE",
+        headers: { "x-admin-token": ADMIN_TOKEN },
+      });
       const data = await res.json();
       if (data.success) fetchLessons(category);
       else alert(data.message || "خطأ في الحذف");
@@ -233,7 +236,7 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
     try {
       const res = await fetch("/api/lessons", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-admin-token": ADMIN_TOKEN },
         body: JSON.stringify({ id, title: editTitle.trim(), description: editDescription.trim() || null, category }),
       });
       const data = await res.json();
@@ -862,7 +865,7 @@ export default function AdminQuestionsPage() {
       
       const res = await fetch(apiUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-admin-token": ADMIN_TOKEN },
         body: JSON.stringify(payload),
       });
 
@@ -925,7 +928,7 @@ export default function AdminQuestionsPage() {
 
       const res = await fetch(apiUrl, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-admin-token": ADMIN_TOKEN },
         body: JSON.stringify({
           id: questionId,
           category: category, // مهم لتجنب تعارض IDs
@@ -998,6 +1001,7 @@ export default function AdminQuestionsPage() {
       
       const res = await fetch(url, {
         method: "DELETE",
+        headers: { "x-admin-token": ADMIN_TOKEN },
       });
 
       const data = await res.json();
