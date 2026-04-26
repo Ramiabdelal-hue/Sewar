@@ -148,12 +148,7 @@ function GratisContent() {
             </thead>
             <tbody>
               {lessons.map((lesson, i) => {
-                // إذا لا يوجد أي محتوى مجاني — لا تعرض الصف
-                if (!lesson.hasQuestions && !lesson.hasExam) return null;
-
-                // الدرس الأول الذي عنده أسئلة درس — يظهر بـ Start nu
                 const isFirstWithQuestions = i === 0 && lesson.hasQuestions;
-
                 return (
                 <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#f5f5f5" }}>
                   <td className="px-4 py-3 border border-gray-200">
@@ -180,29 +175,21 @@ function GratisContent() {
                   ) : (
                     <>
                       <td className="px-4 py-3 border border-gray-200 text-center">
-                        {lesson.hasQuestions ? (
-                          <button
-                            onClick={() => router.push(`/gratis/lesson?lessonId=${lesson.id}&category=${selectedCat}&lesson=${encodeURIComponent(lesson.title)}`)}
-                            className="bg-white border-2 border-gray-400 px-4 py-1 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors w-full"
-                          >
-                            {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
-                          </button>
-                        ) : (
-                          <span className="text-gray-300 text-xs">—</span>
-                        )}
+                        <button
+                          onClick={() => router.push(`/gratis/lesson?lessonId=${lesson.id}&category=${selectedCat}&lesson=${encodeURIComponent(lesson.title)}`)}
+                          className="bg-white border-2 border-gray-400 px-4 py-1 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors w-full"
+                        >
+                          {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
+                        </button>
                       </td>
                       <td className="px-4 py-3 border border-gray-200 text-center">
-                        {lesson.hasExam ? (
-                          <button
-                            onClick={() => router.push(`/gratis/exam?category=${selectedCat}&lessonId=${lesson.id}&lesson=${encodeURIComponent(lesson.title)}`)}
-                            className="border-2 px-4 py-1 text-sm font-bold transition-colors w-full"
-                            style={{ background: "#22c55e", borderColor: "#16a34a", color: "white" }}
-                          >
-                            EXAM
-                          </button>
-                        ) : (
-                          <span className="text-gray-300 text-xs">—</span>
-                        )}
+                        <button
+                          onClick={() => router.push(`/gratis/exam?category=${selectedCat}&lessonId=${lesson.id}&lesson=${encodeURIComponent(lesson.title)}`)}
+                          className="border-2 px-4 py-1 text-sm font-bold transition-colors w-full"
+                          style={{ background: "#22c55e", borderColor: "#16a34a", color: "white" }}
+                        >
+                          EXAM
+                        </button>
                       </td>
                     </>
                   )}
