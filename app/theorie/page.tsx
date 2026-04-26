@@ -315,14 +315,14 @@ export default function TheoriePage() {
               <col style={{ width: "20%" }} />
             </colgroup>
             <thead>
-              <tr style={{ backgroundColor: "#3399ff" }}>
-                <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc]">
+              <tr style={{ backgroundColor: "#22c55e" }}>
+                <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#16a34a]">
                   {lang === "ar" ? "الدرس" : lang === "nl" ? "LES" : lang === "fr" ? "LEÇON" : "LESSON"}
                 </th>
-                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
+                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#16a34a] text-center">
                   {lang === "ar" ? "فتح" : lang === "nl" ? "OPENEN" : lang === "fr" ? "OUVRIR" : "OPEN"}
                 </th>
-                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#2277cc] text-center">
+                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#16a34a] text-center">
                   EXAM
                 </th>
               </tr>
@@ -365,7 +365,8 @@ export default function TheoriePage() {
                         <button
                           onClick={() => openExamModal(lesson.id, lesson.title)}
                           disabled={loadingExam}
-                          className="bg-white border-2 border-orange-400 px-4 py-1 text-sm font-bold text-orange-600 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-colors disabled:opacity-60 w-full"
+                          className="border-2 px-4 py-1 text-sm font-bold transition-colors disabled:opacity-60 w-full"
+                          style={{ background: "#22c55e", borderColor: "#16a34a", color: "white" }}
                         >
                           EXAM
                         </button>

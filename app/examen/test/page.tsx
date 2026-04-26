@@ -410,7 +410,7 @@ function ExamenTestContent() {
                   return (
                     <button key={num} onClick={() => handleAnswer(num)} disabled={isAnswered || locked}
                       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${style} ${!isAnswered && !locked ? "cursor-pointer active:scale-95" : "cursor-default"}`}>
-                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0 ${isAnswered && userAnswer !== null ? isCorrect ? "bg-green-500 text-white" : isSelected ? "bg-red-500 text-white" : "bg-gray-200 text-gray-500" : locked ? "bg-gray-200 text-gray-400" : "bg-[#003399] text-white"}`}>
+                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0 ${isAnswered && userAnswer !== null ? isCorrect ? "bg-green-500 text-white" : isSelected ? "bg-red-500 text-white" : "bg-gray-200 text-gray-500" : locked ? "bg-gray-200 text-gray-400" : "bg-green-500 text-white"}`}>
                         {isAnswered && userAnswer !== null ? (isCorrect ? "?" : isSelected ? "?" : label) : label}
                       </span>
                       <span className={isRtl ? "text-right flex-1" : "text-left flex-1"}>{ansText}</span>
