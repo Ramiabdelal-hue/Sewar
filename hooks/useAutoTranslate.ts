@@ -4,17 +4,17 @@ import { useState, useEffect, useRef } from "react";
 // Cache في الذاكرة (يدوم طول الجلسة)
 const memCache: Record<string, string> = {};
 
-// تحميل cache من sessionStorage عند البداية
+// تحميل cache من localStorage عند البداية
 if (typeof window !== "undefined") {
   try {
-    const stored = sessionStorage.getItem("translateCache");
+    const stored = localStorage.getItem("translateCache");
     if (stored) Object.assign(memCache, JSON.parse(stored));
   } catch {}
 }
 
 function saveCache() {
   try {
-    sessionStorage.setItem("translateCache", JSON.stringify(memCache));
+    localStorage.setItem("translateCache", JSON.stringify(memCache));
   } catch {}
 }
 
