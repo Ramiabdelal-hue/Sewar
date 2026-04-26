@@ -26,7 +26,7 @@ function GratisContent() {
   const [loginError, setLoginError] = useState(false);
 
   const handleUnlock = () => {
-    if (loginUser === "admin" && loginPass === "admin") {
+    if (loginUser === "sewar" && loginPass === "70709090") {
       setIsUnlocked(true);
       setLoginError(false);
     } else {
