@@ -240,9 +240,9 @@ function TheorieLessonContent() {
             <h1 className="text-2xl font-bold text-gray-800 mb-2">{translatedLessonTitle || lesson}</h1>
             {lessonDescription && (
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mt-1"
-                style={{ background: "linear-gradient(135deg, #eff6ff, #dbeafe)", border: "1px solid #93c5fd" }}>
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0"></span>
-                <span className="text-sm font-semibold text-blue-700">{lessonDescription}</span>
+                style={{ background: "linear-gradient(135deg, #f5f3ff, #ede9fe)", border: "1px solid #c4b5fd" }}>
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-500 flex-shrink-0"></span>
+                <span className="text-sm font-semibold text-purple-700">{lessonDescription}</span>
               </div>
             )}
           </div>
