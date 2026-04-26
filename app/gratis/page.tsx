@@ -94,16 +94,24 @@ function GratisContent() {
         <div className="flex-1 flex items-center justify-center px-4">
           <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm text-center">
             <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
-              style={{ background: "linear-gradient(135deg, #7c3aed, #5b21b6)" }}>
+              style={{ background: "linear-gradient(135deg, #f97316, #ea580c)" }}>
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
               </svg>
             </div>
-            <h2 className="text-xl font-black text-gray-800 mb-1">
-              {lang === "ar" ? "قيد المعالجة" : lang === "nl" ? "In behandeling" : lang === "fr" ? "En cours de traitement" : "Under maintenance"}
+            <div className="mb-2 px-3 py-1 rounded-full inline-block" style={{ background: "#fff7ed", border: "1.5px solid #fed7aa" }}>
+              <span className="text-xs font-black uppercase tracking-widest" style={{ color: "#ea580c" }}>
+                {lang === "ar" ? "إشعار مؤقت" : lang === "nl" ? "Tijdelijke melding" : lang === "fr" ? "Avis temporaire" : "Temporary notice"}
+              </span>
+            </div>
+            <h2 className="text-2xl font-black mb-2" style={{ color: "#1a1a1a" }}>
+              {lang === "ar" ? "🚧 قيد المعالجة مؤقتاً 🚧" : lang === "nl" ? "🚧 Tijdelijk in behandeling 🚧" : lang === "fr" ? "🚧 Temporairement en traitement 🚧" : "🚧 Temporarily Under Maintenance 🚧"}
             </h2>
-            <p className="text-gray-400 text-sm mb-6">
-              {lang === "ar" ? "هذه الصفحة قيد المعالجة حالياً" : lang === "nl" ? "Deze pagina is momenteel in behandeling" : lang === "fr" ? "Cette page est en cours de traitement" : "This page is currently under maintenance"}
+            <p className="text-gray-500 text-sm mb-1">
+              {lang === "ar" ? "نعمل على تحسين هذه الصفحة وستعود قريباً." : lang === "nl" ? "We werken aan verbetering van deze pagina. Ze komt binnenkort terug." : lang === "fr" ? "Nous travaillons à l'amélioration de cette page. Elle reviendra bientôt." : "We are improving this page. It will be back soon."}
+            </p>
+            <p className="text-xs font-bold mb-6" style={{ color: "#ea580c" }}>
+              {lang === "ar" ? "نعتذر عن الإزعاج 🙏" : lang === "nl" ? "Onze excuses voor het ongemak 🙏" : lang === "fr" ? "Nous nous excusons pour la gêne 🙏" : "We apologize for the inconvenience 🙏"}
             </p>
             <div className="space-y-3">
               <input
