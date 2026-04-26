@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
+import { verifyAdminToken, unauthorizedResponse } from "@/lib/adminAuth";
 
 // Helper to determine category from lessonId
 async function getCategoryFromLessonId(lessonId: number): Promise<string | null> {
@@ -62,6 +63,7 @@ export async function GET(request: NextRequest) {
 
 // POST - إضافة سؤال امتحان جديد
 export async function POST(request: NextRequest) {
+  if (!verifyAdminToken(request)) return unauthorizedResponse();
   try {
     const body = await request.json();
     const { lessonId, textNL, videoUrls = [], audioUrl = "", answer1, answer2, answer3, correctAnswer, category: categoryParam } = body;
@@ -91,6 +93,7 @@ export async function POST(request: NextRequest) {
 
 // DELETE - حذف سؤال امتحان
 export async function DELETE(request: NextRequest) {
+  if (!verifyAdminToken(request)) return unauthorizedResponse();
   try {
     const { searchParams } = new URL(request.url);
     const id = parseInt(searchParams.get("id") || "");
@@ -147,6 +150,7 @@ export async function DELETE(request: NextRequest) {
 
 // PUT - تعديل سؤال امتحان
 export async function PUT(request: NextRequest) {
+  if (!verifyAdminToken(request)) return unauthorizedResponse();
   try {
     const body = await request.json();
     const { id, textNL, answer1, answer2, answer3, correctAnswer, videoUrls, audioUrl, category: categoryParam, isFree } = body;

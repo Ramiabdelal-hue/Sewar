@@ -1,28 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendScreenshotWarningEmail } from "@/lib/email";
+import { verifyAdminToken, unauthorizedResponse, checkRateLimit, getClientIp, isValidEmail } from "@/lib/adminAuth";
 
 // الحد: إرسال إيميل عند المحاولة رقم 3 بالضبط، ثم كل 3 محاولات (6، 9، ...)
 const EMAIL_WARNING_THRESHOLD = 3;
 
 // POST - تسجيل نشاط
 export async function POST(request: NextRequest) {
+  // Rate limit: max 30 activity logs per minute per IP
+  const ip = getClientIp(request);
+  if (!checkRateLimit(ip, 30, 60000)) {
+    return NextResponse.json({ success: false }, { status: 429 });
+  }
+
   try {
     const body = await request.json();
     const { userEmail, eventType, page } = body;
 
-    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
-      || request.headers.get("x-real-ip")
-      || "unknown";
+    // Validate eventType whitelist
+    const allowedEvents = ["pageview", "screenshot_attempt", "login", "logout"];
+    if (!eventType || !allowedEvents.includes(eventType)) {
+      return NextResponse.json({ success: false, message: "Invalid event type" }, { status: 400 });
+    }
+
+    // Validate email if provided
+    if (userEmail && !isValidEmail(userEmail)) {
+      return NextResponse.json({ success: false, message: "Invalid email" }, { status: 400 });
+    }
+
     const userAgent = request.headers.get("user-agent") || "";
 
-    // حفظ النشاط في قاعدة البيانات
     await prisma.activityLog.create({
       data: {
         userEmail: userEmail || null,
         eventType,
-        page: page || null,
-        userAgent,
+        page: page ? String(page).slice(0, 200) : null,
+        userAgent: userAgent.slice(0, 500),
         ip,
       },
     });
@@ -61,8 +75,9 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET - جلب الإحصائيات للأدمن
+// GET - جلب الإحصائيات للأدمن فقط
 export async function GET(request: NextRequest) {
+  if (!verifyAdminToken(request)) return unauthorizedResponse();
   try {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());

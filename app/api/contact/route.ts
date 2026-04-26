@@ -1,12 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { checkRateLimit, getClientIp, sanitizeString, isValidEmail } from "@/lib/adminAuth";
 
 export async function POST(request: NextRequest) {
-  try {
-    const { name, email, phone, subject, message } = await request.json();
+  // Rate limit: max 3 contact messages per 10 minutes per IP
+  const ip = getClientIp(request);
+  if (!checkRateLimit(ip, 3, 600000)) {
+    return NextResponse.json({ success: false, message: "Too many requests. Try again later." }, { status: 429 });
+  }
 
-    if (!name || !email || !message) {
-      return NextResponse.json({ success: false, message: "Name, email, and message are required" }, { status: 400 });
+  try {
+    const body = await request.json();
+    const name = sanitizeString(body.name, 100);
+    const email = sanitizeString(body.email, 254);
+    const phone = sanitizeString(body.phone, 20);
+    const subject = sanitizeString(body.subject, 200);
+    const message = sanitizeString(body.message, 2000);
+
+    if (!name || !isValidEmail(email) || !message) {
+      return NextResponse.json({ success: false, message: "Name, valid email, and message are required" }, { status: 400 });
     }
 
     const smtpUser = process.env.SMTP_USER;
@@ -14,11 +26,7 @@ export async function POST(request: NextRequest) {
 
     if (!smtpUser || !smtpPass) {
       console.error("SMTP credentials missing");
-      return NextResponse.json({
-        success: false,
-        message: "Email service not configured",
-        debug: { smtp_user: smtpUser ? "set" : "MISSING", smtp_pass: smtpPass ? "set" : "MISSING" }
-      }, { status: 500 });
+      return NextResponse.json({ success: false, message: "Email service not configured" }, { status: 500 });
     }
 
     // ننشئ transporter هنا (وقت التشغيل) لضمان قراءة env vars
@@ -55,12 +63,6 @@ export async function POST(request: NextRequest) {
 
   } catch (error: any) {
     console.error("Contact email error:", error.message);
-    return NextResponse.json({
-      success: false,
-      message: "Failed to send email",
-      error: error?.message || String(error),
-      smtp_user: process.env.SMTP_USER ? "set" : "MISSING",
-      smtp_pass: process.env.SMTP_PASS ? "set" : "MISSING",
-    }, { status: 500 });
+    return NextResponse.json({ success: false, message: "Failed to send email" }, { status: 500 });
   }
 }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit, getClientIp } from "@/lib/adminAuth";
 
 // cache في الذاكرة لتجنب طلبات متكررة
 const memCache: Record<string, string> = {};
@@ -25,6 +26,12 @@ async function translateText(text: string, target: string): Promise<string> {
 }
 
 export async function POST(req: NextRequest) {
+  // Rate limit: max 60 translate requests per minute per IP
+  const ip = getClientIp(req);
+  if (!checkRateLimit(ip, 60, 60000)) {
+    return NextResponse.json({ success: false, translated: "" }, { status: 429 });
+  }
+
   try {
     const body = await req.json();
     const { targetLang } = body;
