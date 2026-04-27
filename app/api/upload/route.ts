@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { uploadImage, uploadVideo, uploadAudio } from '@/lib/cloudinary';
+import { uploadImageUnsigned, uploadVideoUnsigned, uploadAudioUnsigned } from '@/lib/cloudinary-unsigned';
 import { checkRateLimit, getClientIp } from '@/lib/adminAuth';
 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -11,6 +12,9 @@ const MAX_SIZES: Record<string, number> = {
   video: 100 * 1024 * 1024, // 100MB
   audio: 10 * 1024 * 1024,  // 10MB
 };
+
+// استخدام Unsigned Upload كحل بديل
+const USE_UNSIGNED_UPLOAD = true;
 
 export async function POST(request: NextRequest) {
   // Rate limiting: max 20 uploads per minute per IP
@@ -49,11 +53,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `File too large. Max ${MAX_SIZES[type] / 1024 / 1024}MB` }, { status: 400 });
     }
 
-    console.log('🔄 بدء رفع الملف إلى Cloudinary...');
+    console.log(`🔄 بدء رفع الملف إلى Cloudinary... (${USE_UNSIGNED_UPLOAD ? 'Unsigned' : 'Signed'})`);
+    
     let result;
-    if (type === 'image') result = await uploadImage(file);
-    else if (type === 'video') result = await uploadVideo(file);
-    else result = await uploadAudio(file);
+    
+    if (USE_UNSIGNED_UPLOAD) {
+      // استخدام Unsigned Upload (لا يحتاج API Secret)
+      try {
+        if (type === 'image') result = await uploadImageUnsigned(file);
+        else if (type === 'video') result = await uploadVideoUnsigned(file);
+        else result = await uploadAudioUnsigned(file);
+      } catch (unsignedError: any) {
+        console.error('❌ فشل Unsigned Upload، محاولة Signed Upload...', unsignedError.message);
+        // إذا فشل Unsigned، جرب Signed
+        if (type === 'image') result = await uploadImage(file);
+        else if (type === 'video') result = await uploadVideo(file);
+        else result = await uploadAudio(file);
+      }
+    } else {
+      // استخدام Signed Upload (الطريقة القديمة)
+      if (type === 'image') result = await uploadImage(file);
+      else if (type === 'video') result = await uploadVideo(file);
+      else result = await uploadAudio(file);
+    }
 
     console.log('✅ تم الرفع بنجاح:', (result as any).secure_url);
 
@@ -67,7 +89,8 @@ export async function POST(request: NextRequest) {
     const errorMessage = error instanceof Error ? error.message : 'Upload failed';
     return NextResponse.json({ 
       error: errorMessage,
-      details: error instanceof Error ? error.stack : String(error)
+      details: error instanceof Error ? error.stack : String(error),
+      hint: 'تأكد من إنشاء Upload Preset بإسم "sewar_unsigned" في Cloudinary Dashboard مع Signing Mode: Unsigned'
     }, { status: 500 });
   }
 }
