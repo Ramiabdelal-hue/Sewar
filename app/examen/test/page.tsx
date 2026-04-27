@@ -20,7 +20,7 @@ function ExamenTestContent() {
   const offsetParam = parseInt(searchParams.get("offset") || "0");
   const limitParam = parseInt(searchParams.get("limit") || "0");
 
-  // ���� ������ - ���� ������ �������
+  // دالة الرجوع - تعود للصفحة السابقة
   const goBackToExamList = () => {
     router.back();
   };
@@ -87,7 +87,7 @@ function ExamenTestContent() {
     };
     const questionText = translated[0] || q.textNL || q.text || "";
     const answers = [translated[1] || q.answer1, translated[2] || q.answer2, translated[3] || q.answer3].filter(Boolean);
-    const labels = lang === "ar" ? ["������ A:", "������ B:", "������ C:"] : lang === "fr" ? ["R�ponse A:", "R�ponse B:", "R�ponse C:"] : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
+    const labels = lang === "ar" ? ["إجابة A:", "إجابة B:", "إجابة C:"] : lang === "fr" ? ["Réponse A:", "Réponse B:", "Réponse C:"] : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
     if (!questionText) { setReadingDone(true); return; }
     speak(questionText, () => {
       if (!isValid()) { setReadingDone(true); return; }
@@ -150,11 +150,11 @@ function ExamenTestContent() {
           if (data.success) {
             let qs = data.questions || [];
             if (limitParam > 0) {
-              // ��� ��� batch ������ �� ��� ������ �����
+              // جلب batch محدد من الأسئلة
               qs = qs.slice(offsetParam, offsetParam + limitParam)
                      .sort(() => Math.random() - 0.5);
             } else {
-              // ���� offset = ��� ������ ���� 50
+              // بدون offset = جلب أول 50 سؤال
               qs = qs.sort(() => Math.random() - 0.5).slice(0, 50);
             }
             setQuestions(qs);
@@ -318,7 +318,7 @@ function ExamenTestContent() {
             </button>
             <button onClick={goBackToExamList}
               className="flex-1 py-3 font-black border-2 border-gray-300 text-gray-600 rounded-xl hover:bg-gray-50 active:scale-95">
-              ? {lang === "ar" ? "����" : lang === "nl" ? "Terug" : "Back"}
+              {lang === "ar" ? "← رجوع" : lang === "nl" ? "← Terug" : "← Back"}
             </button>
           </div>
         </div>
@@ -407,7 +407,11 @@ function ExamenTestContent() {
                     <button key={num} onClick={() => handleAnswer(num)} disabled={isAnswered || locked}
                       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${style} ${!isAnswered && !locked ? "cursor-pointer active:scale-95" : "cursor-default"}`}>
                       <span className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0 ${isAnswered && userAnswer !== null ? isCorrect ? "bg-green-500 text-white" : isSelected ? "bg-red-500 text-white" : "bg-gray-200 text-gray-500" : locked ? "bg-gray-200 text-gray-400" : "bg-green-500 text-white"}`}>
-                        {isAnswered && userAnswer !== null ? (isCorrect ? "?" : isSelected ? "?" : label) : label}
+                        {isAnswered && userAnswer !== null ? (isCorrect ? (
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M20 6L9 17l-5-5"/></svg>
+                        ) : isSelected ? (
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                        ) : label) : label}
                       </span>
                       <span className={isRtl ? "text-right flex-1" : "text-left flex-1"}>{ansText}</span>
                     </button>
@@ -416,7 +420,9 @@ function ExamenTestContent() {
               </div>
               {(isAnswered || locked) && (
                 <button onClick={handleNext} className="w-full mt-5 py-3 font-black text-white rounded-xl hover:opacity-90 active:scale-95" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
-                  {currentIndex + 1 >= questions.length ? (lang === "ar" ? "��� ������� ??" : lang === "nl" ? "Resultaat ??" : "Result ??") : (lang === "ar" ? "������ ?" : lang === "nl" ? "Volgende ?" : "Next ?")}
+                  {currentIndex + 1 >= questions.length
+                    ? (lang === "ar" ? "عرض النتيجة 🏆" : lang === "nl" ? "Resultaat 🏆" : "Result 🏆")
+                    : (lang === "ar" ? "التالي ←" : lang === "nl" ? "Volgende →" : "Next →")}
                 </button>
               )}
             </div>
