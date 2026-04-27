@@ -52,14 +52,24 @@ export default function FileUploader({
         formData.append("file", file);
         formData.append("type", type);
 
+        console.log(`🔄 رفع الملف ${i + 1}/${files.length}:`, file.name, `(${(file.size / 1024 / 1024).toFixed(2)}MB)`);
+
         const response = await fetch("/api/upload", {
           method: "POST",
           body: formData,
         });
 
-        if (!response.ok) throw new Error("فشل الرفع");
+        console.log(`📡 استجابة الخادم:`, response.status, response.statusText);
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: "خطأ غير معروف" }));
+          console.error("❌ خطأ من الخادم:", errorData);
+          throw new Error(errorData.error || `فشل الرفع: ${response.status}`);
+        }
 
         const data = await response.json();
+        console.log("✅ تم الرفع بنجاح:", data.url);
+        
         onUploadComplete(data.url, data.publicId);
         setUploadedCount(i + 1);
         setProgress(Math.round(((i + 1) / files.length) * 100));
@@ -73,8 +83,9 @@ export default function FileUploader({
         setTotalCount(0);
       }, 2000);
     } catch (err) {
-      setError("حدث خطأ أثناء رفع الملف");
-      console.error(err);
+      const errorMessage = err instanceof Error ? err.message : "حدث خطأ أثناء رفع الملف";
+      setError(errorMessage);
+      console.error("❌ خطأ في رفع الملف:", err);
     } finally {
       setUploading(false);
       // reset input
