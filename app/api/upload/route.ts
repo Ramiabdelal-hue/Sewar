@@ -14,9 +14,9 @@ const MAX_SIZES: Record<string, number> = {
   audio: 10 * 1024 * 1024,  // 10MB
 };
 
-// استخدام Direct API (fetch مباشرة مع signature)
-const USE_DIRECT_API = false; // معطل مؤقتاً
-const USE_UNSIGNED_UPLOAD = true; // تفعيل Unsigned Upload
+// استخدام Signed Upload (الطريقة الآمنة)
+const USE_DIRECT_API = false;
+const USE_UNSIGNED_UPLOAD = false;
 
 export async function POST(request: NextRequest) {
   // Rate limiting: max 20 uploads per minute per IP
