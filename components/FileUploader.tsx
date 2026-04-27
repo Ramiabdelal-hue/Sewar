@@ -56,6 +56,9 @@ export default function FileUploader({
 
         const response = await fetch("/api/upload", {
           method: "POST",
+          headers: {
+            "x-admin-token": process.env.NEXT_PUBLIC_ADMIN_TOKEN || "",
+          },
           body: formData,
         });
 
