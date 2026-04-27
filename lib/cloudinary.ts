@@ -1,20 +1,32 @@
 import { v2 as cloudinary } from 'cloudinary';
 
-// تكوين Cloudinary
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+// دالة لتكوين Cloudinary في كل مرة
+const configureCloudinary = () => {
+  const config = {
+    cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  };
+
+  console.log('🔧 تكوين Cloudinary:', {
+    cloud_name: config.cloud_name || '❌ مفقود',
+    api_key: config.api_key ? `${config.api_key.substring(0, 6)}...` : '❌ مفقود',
+    api_secret: config.api_secret ? '✓ موجود' : '❌ مفقود',
+  });
+
+  cloudinary.config(config);
+  return config;
+};
 
 // التحقق من الإعدادات
 const checkConfig = () => {
-  const config = cloudinary.config();
+  const config = configureCloudinary();
+  
   if (!config.cloud_name || !config.api_key || !config.api_secret) {
     console.error('❌ إعدادات Cloudinary غير مكتملة:', {
       cloud_name: config.cloud_name ? '✓' : '✗',
       api_key: config.api_key ? '✓' : '✗',
-      api_secret: config.api_secret ? '✓' : '✗',
+      api_secret: config.api_secret ? '✗',
     });
     throw new Error('Cloudinary configuration is incomplete. Check your environment variables.');
   }
@@ -33,21 +45,27 @@ export async function uploadImage(file: File) {
   console.log('📤 رفع صورة:', file.name, `(${(file.size / 1024 / 1024).toFixed(2)}MB)`);
 
   return new Promise((resolve, reject) => {
-    cloudinary.uploader.upload_stream(
+    const uploadStream = cloudinary.uploader.upload_stream(
       {
         folder: 'driving-app/images',
         resource_type: 'image',
       },
       (error, result) => {
         if (error) {
-          console.error('❌ خطأ Cloudinary:', error);
+          console.error('❌ خطأ Cloudinary في رفع الصورة:', {
+            message: error.message,
+            http_code: error.http_code,
+            error: error,
+          });
           reject(error);
         } else {
           console.log('✅ تم رفع الصورة:', result?.secure_url);
           resolve(result);
         }
       }
-    ).end(buffer);
+    );
+    
+    uploadStream.end(buffer);
   });
 }
 
@@ -61,21 +79,27 @@ export async function uploadVideo(file: File) {
   console.log('📤 رفع فيديو:', file.name, `(${(file.size / 1024 / 1024).toFixed(2)}MB)`);
 
   return new Promise((resolve, reject) => {
-    cloudinary.uploader.upload_stream(
+    const uploadStream = cloudinary.uploader.upload_stream(
       {
         folder: 'driving-app/videos',
         resource_type: 'video',
       },
       (error, result) => {
         if (error) {
-          console.error('❌ خطأ Cloudinary:', error);
+          console.error('❌ خطأ Cloudinary في رفع الفيديو:', {
+            message: error.message,
+            http_code: error.http_code,
+            error: error,
+          });
           reject(error);
         } else {
           console.log('✅ تم رفع الفيديو:', result?.secure_url);
           resolve(result);
         }
       }
-    ).end(buffer);
+    );
+    
+    uploadStream.end(buffer);
   });
 }
 
@@ -89,31 +113,40 @@ export async function uploadAudio(file: File) {
   console.log('📤 رفع صوت:', file.name, `(${(file.size / 1024 / 1024).toFixed(2)}MB)`);
 
   return new Promise((resolve, reject) => {
-    cloudinary.uploader.upload_stream(
+    const uploadStream = cloudinary.uploader.upload_stream(
       {
         folder: 'driving-app/audio',
         resource_type: 'video', // Cloudinary يستخدم 'video' للصوت أيضاً
       },
       (error, result) => {
         if (error) {
-          console.error('❌ خطأ Cloudinary:', error);
+          console.error('❌ خطأ Cloudinary في رفع الصوت:', {
+            message: error.message,
+            http_code: error.http_code,
+            error: error,
+          });
           reject(error);
         } else {
           console.log('✅ تم رفع الصوت:', result?.secure_url);
           resolve(result);
         }
       }
-    ).end(buffer);
+    );
+    
+    uploadStream.end(buffer);
   });
 }
 
 // دالة لحذف ملف
 export async function deleteFile(publicId: string) {
+  checkConfig();
+  
   try {
     const result = await cloudinary.uploader.destroy(publicId);
+    console.log('🗑️ تم حذف الملف:', publicId);
     return result;
   } catch (error) {
-    console.error('Error deleting file:', error);
+    console.error('❌ خطأ في حذف الملف:', error);
     throw error;
   }
 }
