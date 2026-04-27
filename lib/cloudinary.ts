@@ -26,7 +26,7 @@ const checkConfig = () => {
     console.error('❌ إعدادات Cloudinary غير مكتملة:', {
       cloud_name: config.cloud_name ? '✓' : '✗',
       api_key: config.api_key ? '✓' : '✗',
-      api_secret: config.api_secret ? '✗',
+      api_secret: config.api_secret ? '✓' : '✗',
     });
     throw new Error('Cloudinary configuration is incomplete. Check your environment variables.');
   }
