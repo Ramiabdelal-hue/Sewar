@@ -24,6 +24,21 @@ export default function WatermarkedImage({ src, alt = "", className, style }: Pr
     setImageLoading(false);
   };
 
+  // تحسين رابط الصورة تلقائياً
+  const optimizeImageUrl = (url: string) => {
+    // إذا كان الرابط من Cloudinary
+    if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
+      // إضافة transformations لتقليل الحجم
+      // f_auto = تحويل تلقائي للصيغة الأفضل (WebP, AVIF)
+      // q_auto = جودة تلقائية محسّنة
+      // w_1200 = عرض أقصى 1200px (كافي للشاشات)
+      return url.replace('/upload/', '/upload/f_auto,q_auto,w_1200/');
+    }
+    return url;
+  };
+
+  const optimizedSrc = optimizeImageUrl(src);
+
   return (
     <div
       className={`relative select-none ${className || ""}`}
@@ -51,7 +66,7 @@ export default function WatermarkedImage({ src, alt = "", className, style }: Pr
       {/* الصورة */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={src}
+        src={optimizedSrc}
         alt={alt}
         className={`w-full h-auto block ${imageLoading || imageError ? "hidden" : ""}`}
         draggable={false}
