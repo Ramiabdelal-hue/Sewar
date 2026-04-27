@@ -64,7 +64,7 @@ function addSecurityHeaders(res: NextResponse): NextResponse {
   res.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
   res.headers.set(
     'Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'none';"
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://translate.google.com https://translate.googleapis.com; style-src 'self' 'unsafe-inline' https://translate.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https:; frame-src https://translate.google.com; frame-ancestors 'none';"
   );
   return res;
 }
