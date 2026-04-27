@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { uploadImage, uploadVideo, uploadAudio } from '@/lib/cloudinary';
 import { uploadImageUnsigned, uploadVideoUnsigned, uploadAudioUnsigned } from '@/lib/cloudinary-unsigned';
+import { uploadImageDirect, uploadVideoDirect, uploadAudioDirect } from '@/lib/cloudinary-direct';
 import { checkRateLimit, getClientIp } from '@/lib/adminAuth';
 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -13,8 +14,8 @@ const MAX_SIZES: Record<string, number> = {
   audio: 10 * 1024 * 1024,  // 10MB
 };
 
-// استخدام Unsigned Upload كحل بديل
-const USE_UNSIGNED_UPLOAD = false; // معطل - استخدام Signed Upload فقط
+// استخدام Direct API (fetch مباشرة مع signature)
+const USE_DIRECT_API = true;
 
 export async function POST(request: NextRequest) {
   // Rate limiting: max 20 uploads per minute per IP
@@ -53,25 +54,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `File too large. Max ${MAX_SIZES[type] / 1024 / 1024}MB` }, { status: 400 });
     }
 
-    console.log(`🔄 بدء رفع الملف إلى Cloudinary... (${USE_UNSIGNED_UPLOAD ? 'Unsigned' : 'Signed'})`);
+    console.log(`🔄 بدء رفع الملف إلى Cloudinary... (${USE_DIRECT_API ? 'Direct API' : 'SDK'})`);
     
     let result;
     
-    if (USE_UNSIGNED_UPLOAD) {
-      // استخدام Unsigned Upload (لا يحتاج API Secret)
+    if (USE_DIRECT_API) {
+      // استخدام Direct API مع signature يدوي
       try {
-        if (type === 'image') result = await uploadImageUnsigned(file);
-        else if (type === 'video') result = await uploadVideoUnsigned(file);
-        else result = await uploadAudioUnsigned(file);
-      } catch (unsignedError: any) {
-        console.error('❌ فشل Unsigned Upload، محاولة Signed Upload...', unsignedError.message);
-        // إذا فشل Unsigned، جرب Signed
+        if (type === 'image') result = await uploadImageDirect(file);
+        else if (type === 'video') result = await uploadVideoDirect(file);
+        else result = await uploadAudioDirect(file);
+      } catch (directError: any) {
+        console.error('❌ فشل Direct API، محاولة SDK...', directError.message);
+        // إذا فشل Direct، جرب SDK
         if (type === 'image') result = await uploadImage(file);
         else if (type === 'video') result = await uploadVideo(file);
         else result = await uploadAudio(file);
       }
     } else {
-      // استخدام Signed Upload (الطريقة القديمة)
+      // استخدام SDK (الطريقة القديمة)
       if (type === 'image') result = await uploadImage(file);
       else if (type === 'video') result = await uploadVideo(file);
       else result = await uploadAudio(file);
