@@ -15,7 +15,8 @@ const MAX_SIZES: Record<string, number> = {
 };
 
 // استخدام Direct API (fetch مباشرة مع signature)
-const USE_DIRECT_API = true;
+const USE_DIRECT_API = false; // معطل مؤقتاً
+const USE_UNSIGNED_UPLOAD = true; // تفعيل Unsigned Upload
 
 export async function POST(request: NextRequest) {
   // Rate limiting: max 20 uploads per minute per IP
@@ -54,11 +55,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `File too large. Max ${MAX_SIZES[type] / 1024 / 1024}MB` }, { status: 400 });
     }
 
-    console.log(`🔄 بدء رفع الملف إلى Cloudinary... (${USE_DIRECT_API ? 'Direct API' : 'SDK'})`);
+    console.log(`🔄 بدء رفع الملف إلى Cloudinary... (${USE_UNSIGNED_UPLOAD ? 'Unsigned' : USE_DIRECT_API ? 'Direct API' : 'SDK'})`);
     
     let result;
     
-    if (USE_DIRECT_API) {
+    if (USE_UNSIGNED_UPLOAD) {
+      // استخدام Unsigned Upload (لا يحتاج API Secret)
+      console.log('🔓 استخدام Unsigned Upload...');
+      try {
+        if (type === 'image') result = await uploadImageUnsigned(file);
+        else if (type === 'video') result = await uploadVideoUnsigned(file);
+        else result = await uploadAudioUnsigned(file);
+      } catch (unsignedError: any) {
+        console.error('❌ فشل Unsigned Upload:', unsignedError.message);
+        throw unsignedError; // لا نجرب Signed لأنه يعطي 401
+      }
+    } else if (USE_DIRECT_API) {
       // استخدام Direct API مع signature يدوي
       try {
         if (type === 'image') result = await uploadImageDirect(file);
