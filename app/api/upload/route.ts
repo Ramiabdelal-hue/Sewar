@@ -14,7 +14,7 @@ const MAX_SIZES: Record<string, number> = {
 };
 
 // استخدام Unsigned Upload كحل بديل
-const USE_UNSIGNED_UPLOAD = true;
+const USE_UNSIGNED_UPLOAD = false; // معطل - استخدام Signed Upload فقط
 
 export async function POST(request: NextRequest) {
   // Rate limiting: max 20 uploads per minute per IP
