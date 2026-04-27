@@ -349,7 +349,13 @@ function ExamenTestContent() {
         <div className="fixed inset-0 z-[9999] pointer-events-none">
           <div className="absolute inset-0 bg-red-500 opacity-20 animate-pulse"></div>
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-8xl" style={{ animation: "wrongBounce 0.3s ease-in-out 3" }}>?</div>
+            <div style={{ animation: "wrongBounce 0.3s ease-in-out 3" }}>
+              <div className="w-32 h-32 rounded-full flex items-center justify-center" style={{ background: "rgba(239,68,68,0.95)", boxShadow: "0 0 60px rgba(239,68,68,0.7)" }}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-16 h-16">
+                  <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+              </div>
+            </div>
           </div>
           <style>{`@keyframes wrongBounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }`}</style>
         </div>
