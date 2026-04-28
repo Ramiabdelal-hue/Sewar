@@ -144,26 +144,18 @@ export async function GET(request: NextRequest) {
     // تحويل البيانات لعرض كل اشتراك على حدة
     const subscriptionRows: any[] = [];
     
-    // جلب محاولات Screenshot لجميع المستخدمين
+    // جلب جميع screenshot_attempts (حتى بدون email)
     const allScreenshots = await prisma.activityLog.findMany({
-      where: {
-        eventType: 'screenshot_attempt',
-        userEmail: {
-          in: users.map((u: any) => u.email)
-        }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
+      where: { eventType: 'screenshot_attempt' },
+      orderBy: { createdAt: 'desc' },
     });
 
     // تجميع محاولات Screenshot حسب البريد الإلكتروني
     const screenshotsByEmail: Record<string, any[]> = {};
     allScreenshots.forEach((log: any) => {
-      if (!screenshotsByEmail[log.userEmail]) {
-        screenshotsByEmail[log.userEmail] = [];
-      }
-      screenshotsByEmail[log.userEmail].push({
+      const key = log.userEmail || `ip:${log.ip}`;
+      if (!screenshotsByEmail[key]) screenshotsByEmail[key] = [];
+      screenshotsByEmail[key].push({
         date: log.createdAt,
         page: log.page || 'غير محدد',
         ip: log.ip || 'unknown'
@@ -230,6 +222,12 @@ export async function GET(request: NextRequest) {
       success: true,
       data: {
         subscriptions: subscriptionRows,
+        allScreenshots: allScreenshots.map((s: any) => ({
+          userEmail: s.userEmail,
+          page: s.page,
+          ip: s.ip,
+          date: s.createdAt,
+        })),
         stats: {
           totalSubscribers,
           totalRevenue,

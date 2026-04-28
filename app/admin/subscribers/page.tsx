@@ -12,6 +12,13 @@ interface Sub {
   screenshotDetails?: { count: number; attempts: { date: string; page: string; ip: string }[] };
 }
 
+interface AllScreenshot {
+  userEmail: string | null;
+  page: string;
+  ip: string;
+  date: string;
+}
+
 const PKG: Record<string, string> = {
   theorie: "نظرية", examen: "امتحانات",
   "praktijk-lessons": "عملية-فيديو", "praktijk-exam": "عملية-خطر"
@@ -55,6 +62,7 @@ export default function AdminSubscribersPage() {
   const [isLogged, setIsLogged] = useState(false);
   const [user, setUser] = useState(""); const [pass, setPass] = useState("");
   const [subs, setSubs] = useState<Sub[]>([]);
+  const [allScreenshots, setAllScreenshots] = useState<AllScreenshot[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [filterCat, setFilterCat] = useState("");
@@ -83,7 +91,10 @@ export default function AdminSubscribersPage() {
       if (filterType) p.append("type", filterType);
       const res = await fetch(`/api/admin/subscribers?${p}`, { headers: { "x-admin-token": ADMIN_TOKEN } });
       const d = await res.json();
-      if (d.success) setSubs(d.data.subscriptions);
+      if (d.success) {
+        setSubs(d.data.subscriptions);
+        setAllScreenshots(d.data.allScreenshots || []);
+      }
     } catch {} finally { setLoading(false); }
   }, [search, filterCat, filterType, ADMIN_TOKEN]);
 
@@ -135,7 +146,7 @@ export default function AdminSubscribersPage() {
   // فلترة
   const onlineCount = subs.filter(s => isOnline(s.lastSeen)).length;
   const suspendedCount = subs.filter(s => s.userStatus === "suspended").length;
-  const screenshotCount = subs.filter(s => (s.screenshotDetails?.count || 0) > 0).length;
+  const screenshotCount = allScreenshots.length;
 
   const filtered = subs.filter(s => {
     if (tab === "online" && !isOnline(s.lastSeen)) return false;
@@ -235,7 +246,48 @@ export default function AdminSubscribersPage() {
           </div>
         </div>
 
-        {/* List */}
+        {/* ══ SCREENSHOTS TAB ══════════════════════════════════════════ */}
+          {tab === "screenshots" && (
+            <div className="space-y-3">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between" style={{ background: "#fff7ed" }}>
+                  <h2 className="font-black text-orange-700 text-sm flex items-center gap-2">
+                    📸 جميع محاولات Screenshot
+                  </h2>
+                  <span className="bg-orange-100 text-orange-700 text-xs font-black px-3 py-1 rounded-full">{allScreenshots.length}</span>
+                </div>
+                {allScreenshots.length === 0 ? (
+                  <div className="p-12 text-center">
+                    <div className="text-4xl mb-3">✅</div>
+                    <p className="text-gray-500 font-bold">لا توجد محاولات Screenshot</p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-gray-50">
+                    {allScreenshots.map((s, i) => (
+                      <div key={i} className="flex items-center gap-3 px-4 py-3 hover:bg-orange-50 transition">
+                        <span className="text-2xl flex-shrink-0">📸</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-gray-800 text-sm truncate">
+                            {s.userEmail ? (
+                              <span className="text-orange-600">{s.userEmail}</span>
+                            ) : (
+                              <span className="text-gray-400 italic">زائر غير مسجل</span>
+                            )}
+                          </p>
+                          <p className="text-gray-400 text-xs truncate">📄 {s.page} · 🌐 {s.ip}</p>
+                        </div>
+                        <span className="text-gray-400 text-xs flex-shrink-0 font-mono">{formatTime(s.date)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ══ SUBSCRIBERS LIST ══════════════════════════════════════════ */}
+          {tab !== "screenshots" && (
+            <>
         {loading ? (
           <div className="flex justify-center py-16"><div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" /></div>
         ) : filtered.length === 0 ? (
@@ -388,6 +440,8 @@ export default function AdminSubscribersPage() {
           </div>
         )}
       </div>
+            </>
+          )}
 
       {/* Suspend Modal */}
       {suspendModal && (

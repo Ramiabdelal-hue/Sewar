@@ -21,19 +21,21 @@ export default function ScreenProtection() {
   let lastLogTime = 0;
   const logScreenshotAttempt = async () => {
     const now = Date.now();
-    if (now - lastLogTime < 1000) return; // تجاهل إذا أُرسل منذ أقل من ثانية
+    if (now - lastLogTime < 1000) return;
     lastLogTime = now;
     try {
       const userEmail = localStorage.getItem("userEmail");
+      const page = window.location.pathname + window.location.search;
       await fetch("/api/activity", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userEmail: userEmail || null,
           eventType: "screenshot_attempt",
-          page: window.location.pathname,
+          page: page,
         }),
       });
+      console.warn("📸 Screenshot attempt logged:", { userEmail, page });
     } catch {}
   };
 
