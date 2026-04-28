@@ -57,15 +57,12 @@ function jsonTooMany(retryAfter = 60) {
 function addSecurityHeaders(res: NextResponse): NextResponse {
   res.headers.set('X-DNS-Prefetch-Control', 'on');
   res.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
-  res.headers.set('X-Frame-Options', 'DENY');
+  res.headers.set('X-Frame-Options', 'SAMEORIGIN');
   res.headers.set('X-Content-Type-Options', 'nosniff');
   res.headers.set('X-XSS-Protection', '1; mode=block');
   res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
-  res.headers.set(
-    'Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://translate.google.com https://translate.googleapis.com https://translate-pa.googleapis.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://translate.googleapis.com https://www.gstatic.com; img-src 'self' data: blob: https:; font-src 'self' data: https://www.gstatic.com; connect-src 'self' https: https://translate.googleapis.com https://translate-pa.googleapis.com; frame-src https://translate.google.com; frame-ancestors 'none';"
-  );
+  // لا نضيف CSP هنا لأنها تسبب مشاكل مع Firefox
   return res;
 }
 
@@ -127,3 +124,5 @@ export const config = {
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:jpg|jpeg|png|gif|svg|webp|ico|mp4|webm|ogg|mp3|wav)).*)',
   ],
 };
+
+export default proxy;
