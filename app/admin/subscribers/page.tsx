@@ -440,7 +440,7 @@ export default function AdminSubscribersPage() {
           </div>
         )}
       </div>
-            </>
+          </>
           )}
 
       {/* Suspend Modal */}

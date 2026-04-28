@@ -124,5 +124,3 @@ export const config = {
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:jpg|jpeg|png|gif|svg|webp|ico|mp4|webm|ogg|mp3|wav)).*)',
   ],
 };
-
-export default proxy;
