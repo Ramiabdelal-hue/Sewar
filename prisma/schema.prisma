@@ -22,12 +22,14 @@ model User {
   subscriptionType String?
   examCategory     String?
   sessionToken     String?
+  lastSeen         DateTime?
   examResults      ExamResult[]
   subscriptions    Subscription[]
 
   @@index([email])
   @@index([status])
   @@index([expiryDate])
+  @@index([lastSeen])
 }
 
 model Subscription {

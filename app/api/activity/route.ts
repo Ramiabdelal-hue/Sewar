@@ -41,6 +41,14 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // تحديث lastSeen للمستخدم المسجل
+    if (userEmail && isValidEmail(userEmail)) {
+      await prisma.user.updateMany({
+        where: { email: userEmail.toLowerCase().trim() },
+        data: { lastSeen: new Date() },
+      }).catch(() => {});
+    }
+
     // ── إرسال إيميل تحذيري تلقائياً ─────────────────────────────────────────
     if (eventType === "screenshot_attempt" && userEmail) {
       const totalAttempts = await prisma.activityLog.count({

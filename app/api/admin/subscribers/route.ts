@@ -108,18 +108,30 @@ export async function GET(request: NextRequest) {
       where: whereConditions,
       include: {
         subscriptions: {
-          where: {
-            isActive: true
-          }
+          where: { isActive: true }
         }
       } as any,
-      orderBy: {
-        createdAt: 'desc'
-      },
-      // نجلب status أيضاً
+      orderBy: { createdAt: 'desc' },
     });
 
-    console.log("📊 Found users:", users.length);
+    // جلب آخر نشاط لكل مستخدم (pageviews + screenshots)
+    const recentActivityByUser = await prisma.activityLog.findMany({
+      where: {
+        userEmail: { in: users.map((u: any) => u.email) },
+        eventType: { in: ['pageview', 'screenshot_attempt', 'login'] }
+      },
+      orderBy: { createdAt: 'desc' },
+      select: { userEmail: true, eventType: true, page: true, createdAt: true, ip: true }
+    });
+
+    // تجميع النشاط حسب البريد
+    const activityByEmail: Record<string, any[]> = {};
+    recentActivityByUser.forEach((log: any) => {
+      if (!activityByEmail[log.userEmail]) activityByEmail[log.userEmail] = [];
+      if (activityByEmail[log.userEmail].length < 20) {
+        activityByEmail[log.userEmail].push(log);
+      }
+    });
 
     // تعريف أسعار الباقات
     const packagePrices: Record<string, number> = {
@@ -181,6 +193,8 @@ export async function GET(request: NextRequest) {
             createdAt: sub.createdAt,
             isActive: sub.isActive,
             userStatus: user.status,
+            lastSeen: (user as any).lastSeen || null,
+            recentActivity: activityByEmail[user.email] || [],
             screenshotDetails: {
               count: userScreenshots.length,
               attempts: userScreenshots
