@@ -80,25 +80,26 @@ export default function TheoriePage() {
 
   const checkAndFetch = async (email: string, category: string) => {
     try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 15000); // 15 ثانية
-      
-      const res = await fetch("/api/check-subscription", { 
+      // استخدام Promise.race بدلاً من AbortController لتجنب NetworkError في Firefox
+      const fetchPromise = fetch("/api/check-subscription", { 
         method: "POST", 
         headers: { "Content-Type": "application/json" }, 
         body: JSON.stringify({ email }),
-        signal: controller.signal,
       });
-      clearTimeout(timeout);
+      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 12000));
       
-      if (!res.ok) {
+      const res = await Promise.race([fetchPromise, timeoutPromise]);
+      
+      // إذا timeout أو فشل - جلب الدروس مباشرة
+      if (!res) {
         const lr = await fetch(`/api/lessons?category=${category}`);
         const ld = await lr.json();
         if (ld.success) setLessons(ld.lessons);
         return;
       }
-      
-      const data = await res.json();
+
+      let data: any = {};
+      try { data = await res.json(); } catch {}
 
       if (data.expired) { setIsExpired(true); setLoading(false); return; }
 
@@ -106,8 +107,7 @@ export default function TheoriePage() {
       const ld = await lr.json();
       if (ld.success) setLessons(ld.lessons);
     } catch (e) { 
-      console.error("checkAndFetch error:", e);
-      // عند خطأ أو timeout - جلب الدروس بدون التحقق
+      // عند أي خطأ - جلب الدروس بدون التحقق
       try {
         const lr = await fetch(`/api/lessons?category=${category}`);
         const ld = await lr.json();

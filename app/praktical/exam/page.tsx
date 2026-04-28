@@ -47,24 +47,18 @@ function ExamContent() {
       }
 
       try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 12000);
-        const response = await fetch("/api/check-subscription", {
+        const fetchPromise = fetch("/api/check-subscription", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: userEmail }),
-          signal: controller.signal,
         });
-        clearTimeout(timeout);
-
-        const data = await response.json();
-
-        if (data.expired || !data.success) {
-          setIsExpired(true);
-          setPrefillData({ email: userEmail });
-        }
-      } catch (error) {
-        console.error("Error checking subscription:", error);
+        const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 12000));
+        const response = await Promise.race([fetchPromise, timeoutPromise]);
+        if (!response) { setChecking(false); return; }
+        let data: any = {};
+        try { data = await response.json(); } catch {}
+        if (data.expired || !data.success) { setIsExpired(true); setPrefillData({ email: userEmail }); }
+      } catch {
       } finally {
         setChecking(false);
       }

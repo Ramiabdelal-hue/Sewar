@@ -84,21 +84,19 @@ export async function checkSubscriptionWithSession(email: string): Promise<{
 }> {
   const sessionToken = typeof window !== "undefined" ? localStorage.getItem("sessionToken") || undefined : undefined;
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 12000); // 12 ثانية
-    
-    const res = await fetch("/api/check-subscription", {
+    const fetchPromise = fetch("/api/check-subscription", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, sessionToken }),
-      signal: controller.signal,
     });
-    clearTimeout(timeout);
+    const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 12000));
     
+    const res = await Promise.race([fetchPromise, timeoutPromise]);
+    if (!res) return { success: true }; // timeout - نسمح بالدخول
     if (!res.ok) return { success: false };
     return await res.json();
   } catch {
-    return { success: false }; // عند timeout أو NetworkError - نعتبره ناجحاً
+    return { success: true }; // NetworkError - نسمح بالدخول
   }
 }
 
