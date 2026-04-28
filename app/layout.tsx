@@ -30,21 +30,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Sewar" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              function googleTranslateElementInit() {
-                new google.translate.TranslateElement({
-                  pageLanguage: 'nl',
-                  includedLanguages: 'nl,fr,ar,en',
-                  autoDisplay: false,
-                  layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-                }, 'google_translate_element');
-              }
-            `,
-          }}
-        />
-        <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async />
       </head>
       <body>
         <style>{`
