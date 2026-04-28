@@ -43,8 +43,16 @@ export default function LoginModal({ lang, onClose }: any) {
         signal: controller.signal,
       });
       clearTimeout(timeout);
-      const data = await response.json();
-      if (response.ok && data.success) {
+      
+      // قراءة الـ response حتى لو كان 401
+      let data: any = {};
+      try {
+        data = await response.json();
+      } catch {
+        data = { success: false, message: "خطأ في قراءة الاستجابة" };
+      }
+      
+      if (data.success) {
         if (data.role === "admin") { window.location.assign("/admin/questions"); return; }
         const { subscriptionType, cat, email, exp, subscriptions: userSubscriptions } = data;
         localStorage.setItem("userEmail", email);
@@ -65,9 +73,14 @@ export default function LoginModal({ lang, onClose }: any) {
       } else {
         alert(data.message || (lang === "ar" ? "البيانات غير صحيحة" : lang === "nl" ? "Onjuiste gegevens" : lang === "fr" ? "Données incorrectes" : "Incorrect credentials"));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
-      alert(lang === "ar" ? "خطأ في الاتصال. تحقق من الإنترنت وحاول مرة أخرى." : lang === "nl" ? "Verbindingsfout. Controleer je internet en probeer opnieuw." : lang === "fr" ? "Erreur de connexion. Vérifiez votre internet." : "Connection error. Check your internet and try again.");
+      // NetworkError في Firefox عند 401 - نعرض رسالة واضحة
+      if (error?.name === 'AbortError') {
+        alert(lang === "ar" ? "انتهت مهلة الاتصال. حاول مرة أخرى." : lang === "nl" ? "Verbinding time-out. Probeer opnieuw." : "Connection timed out. Try again.");
+      } else {
+        alert(lang === "ar" ? "البيانات غير صحيحة أو خطأ في الاتصال." : lang === "nl" ? "Onjuiste gegevens of verbindingsfout." : "Incorrect credentials or connection error.");
+      }
     } finally {
       setLoading(false);
     }
