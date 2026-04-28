@@ -69,11 +69,15 @@ function TheorieLessonContent() {
         return;
       }
       try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 12000);
         const response = await fetch("/api/check-subscription", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: emailToCheck })
+          body: JSON.stringify({ email: emailToCheck }),
+          signal: controller.signal,
         });
+        clearTimeout(timeout);
         // إذا فشل الـ API - لا نعتبره منتهياً
         if (!response.ok) {
           console.warn("check-subscription failed:", response.status);

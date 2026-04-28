@@ -47,11 +47,15 @@ function ExamContent() {
       }
 
       try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 12000);
         const response = await fetch("/api/check-subscription", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: userEmail })
+          body: JSON.stringify({ email: userEmail }),
+          signal: controller.signal,
         });
+        clearTimeout(timeout);
 
         const data = await response.json();
 

@@ -41,11 +41,15 @@ function LessonsContent() {
     const checkSubscription = async () => {
       if (!userEmail) { setIsExpired(true); setChecking(false); return; }
       try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 12000);
         const res = await fetch("/api/check-subscription", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: userEmail }),
+          signal: controller.signal,
         });
+        clearTimeout(timeout);
         const data = await res.json();
         if (data.expired || !data.success) { setIsExpired(true); setPrefillData({ email: userEmail }); }
       } catch (e) { console.error(e); }

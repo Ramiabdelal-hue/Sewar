@@ -36,18 +36,19 @@ export default function ExamenPage() {
     // التحقق من اشتراك examen موجود في localStorage فقط
     const email = localStorage.getItem("userEmail");
     if (email) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 12000);
       fetch("/api/check-subscription", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
+        signal: controller.signal,
       })
-        .then(r => r.json())
+        .then(r => { clearTimeout(timeout); return r.json(); })
         .then(data => {
           if (data.success && data.subscriptions) {
             const examenSub = data.subscriptions.find((s: any) => s.subscriptionType === "examen");
-            if (examenSub) {
-              setUserEmail(email);
-            }
+            if (examenSub) setUserEmail(email);
           }
         })
         .catch(() => {});

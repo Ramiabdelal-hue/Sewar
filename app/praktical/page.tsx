@@ -27,10 +27,13 @@ export default function VideoLessonsPage() {
 
     const email = localStorage.getItem("userEmail");
     if (email) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 12000);
       fetch("/api/check-subscription", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
-      }).then(r => r.json()).then(data => {
+        signal: controller.signal,
+      }).then(r => { clearTimeout(timeout); return r.json(); }).then(data => {
         if (data.success && data.subscriptions) {
           const pl = data.subscriptions.find((s: any) => s.subscriptionType === "praktijk-lessons");
           const pe = data.subscriptions.find((s: any) => s.subscriptionType === "praktijk-exam");

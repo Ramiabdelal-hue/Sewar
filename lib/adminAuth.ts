@@ -84,15 +84,21 @@ export async function checkSubscriptionWithSession(email: string): Promise<{
 }> {
   const sessionToken = typeof window !== "undefined" ? localStorage.getItem("sessionToken") || undefined : undefined;
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000); // 12 ثانية
+    
     const res = await fetch("/api/check-subscription", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, sessionToken }),
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
+    
     if (!res.ok) return { success: false };
     return await res.json();
   } catch {
-    return { success: false };
+    return { success: false }; // عند timeout أو NetworkError - نعتبره ناجحاً
   }
 }
 
