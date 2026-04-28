@@ -70,6 +70,7 @@ export default function WatermarkedImage({ src, alt = "", className, style }: Pr
         alt={alt}
         className={`w-full h-auto block ${imageLoading || imageError ? "hidden" : ""}`}
         draggable={false}
+        loading="lazy"
         onContextMenu={e => e.preventDefault()}
         onError={handleImageError}
         onLoad={handleImageLoad}
