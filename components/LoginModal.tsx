@@ -33,11 +33,16 @@ export default function LoginModal({ lang, onClose }: any) {
     e.preventDefault();
     setLoading(true);
     try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+      
       const response = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
+        signal: controller.signal,
       });
+      clearTimeout(timeout);
       const data = await response.json();
       if (response.ok && data.success) {
         if (data.role === "admin") { window.location.assign("/admin/questions"); return; }
@@ -62,6 +67,7 @@ export default function LoginModal({ lang, onClose }: any) {
       }
     } catch (error) {
       console.error("Login error:", error);
+      alert(lang === "ar" ? "خطأ في الاتصال. تحقق من الإنترنت وحاول مرة أخرى." : lang === "nl" ? "Verbindingsfout. Controleer je internet en probeer opnieuw." : lang === "fr" ? "Erreur de connexion. Vérifiez votre internet." : "Connection error. Check your internet and try again.");
     } finally {
       setLoading(false);
     }
