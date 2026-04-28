@@ -1222,7 +1222,11 @@ export default function AdminQuestionsPage() {
               <button
                 key={type}
                 onClick={() => {
-                  if (type === "subscribers") window.open("/admin/subscribers", "_blank");
+                  if (type === "subscribers") {
+                    // حفظ حالة الـ login حتى لا تطلب مرة أخرى
+                    localStorage.setItem("adminSubsLogged", "true");
+                    window.open("/admin/subscribers", "_blank");
+                  }
                   else if (type === "lessons-manager") setQuestionType("lessons-manager" as any);
                   else if (type === "prices") setQuestionType("prices" as any);
                   else setQuestionType(type as any);

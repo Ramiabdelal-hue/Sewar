@@ -54,10 +54,25 @@ export default function AdminSubscribersPage() {
   const [suspendLoading, setSuspendLoading] = useState<string|null>(null);
   const [suspendResult, setSuspendResult] = useState<{success:boolean;message:string}|null>(null);
 
+  // تحقق من localStorage عند التحميل
+  useEffect(() => {
+    const adminLogged = localStorage.getItem("adminSubsLogged");
+    if (adminLogged === "true") {
+      setIsLogged(true);
+      fetchSubscribers();
+      fetchActivityStats();
+    }
+  }, []);
+
   const handleLogin = () => {
     const u = process.env.NEXT_PUBLIC_ADMIN_USER || "sewar";
     const p = process.env.NEXT_PUBLIC_ADMIN_PASS || "70709090";
-    if (user === u && password === p) { setIsLogged(true); fetchSubscribers(); fetchActivityStats(); }
+    if (user === u && password === p) {
+      localStorage.setItem("adminSubsLogged", "true");
+      setIsLogged(true);
+      fetchSubscribers();
+      fetchActivityStats();
+    }
     else alert("بيانات الدخول غير صحيحة");
   };
 
@@ -175,7 +190,7 @@ export default function AdminSubscribersPage() {
             </div>
           </nav>
           <div className="p-4 border-t border-white/10">
-            <button onClick={()=>setIsLogged(false)} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-400 hover:bg-red-500/10 transition-all">
+            <button onClick={()=>{ localStorage.removeItem("adminSubsLogged"); setIsLogged(false); }} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-400 hover:bg-red-500/10 transition-all">
               <span className="text-lg">🚪</span><span>تسجيل الخروج</span>
             </button>
           </div>
@@ -208,7 +223,7 @@ export default function AdminSubscribersPage() {
           </div>
         </nav>
         <div className="p-4 border-t border-white/10">
-          <button onClick={()=>setIsLogged(false)} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-400 hover:bg-red-500/10 transition-all">
+          <button onClick={()=>{ localStorage.removeItem("adminSubsLogged"); setIsLogged(false); }} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-400 hover:bg-red-500/10 transition-all">
             <span className="text-lg">🚪</span><span>تسجيل الخروج</span>
           </button>
         </div>
@@ -683,3 +698,4 @@ export default function AdminSubscribersPage() {
   </div>
   );
 }
+
