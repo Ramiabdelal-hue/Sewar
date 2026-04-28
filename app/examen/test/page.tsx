@@ -171,6 +171,22 @@ function ExamenTestContent() {
   const translatedTexts = useAutoTranslateList(textsToTranslate, lang);
   useEffect(() => { translatedRef.current = translatedTexts; }, [translatedTexts]);
 
+  // Preload صورة السؤال التالي
+  useEffect(() => {
+    if (!questions.length) return;
+    const nextIndex = currentIndex + 1;
+    if (nextIndex >= questions.length) return;
+    const nextQ = questions[nextIndex];
+    if (!nextQ?.videoUrls?.length) return;
+    nextQ.videoUrls.filter(Boolean).forEach((url: string) => {
+      const img = new Image();
+      const optimized = url.includes('res.cloudinary.com') && !url.includes('/upload/f_auto')
+        ? url.replace('/upload/', '/upload/f_auto,q_auto,w_1200/')
+        : url;
+      img.src = optimized;
+    });
+  }, [currentIndex, questions]);
+
   const score = Object.entries(answers).reduce((total, [i, ans]) => {
     if (ans === null || ans === undefined) return total;
     const question = questions[parseInt(i)];
