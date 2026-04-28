@@ -81,7 +81,7 @@ export default function TheoriePage() {
   const checkAndFetch = async (email: string, category: string) => {
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 8000); // 8 ثواني كحد أقصى
+      const timeout = setTimeout(() => controller.abort(), 15000); // 15 ثانية
       
       const res = await fetch("/api/check-subscription", { 
         method: "POST", 

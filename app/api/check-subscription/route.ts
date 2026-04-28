@@ -12,6 +12,11 @@ export async function POST(request: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { email: email.toLowerCase().trim() },
+      include: {
+        subscriptions: {
+          where: { isActive: true, expiryDate: { gt: new Date() } },
+        },
+      },
     });
 
     if (!user) {
@@ -50,9 +55,7 @@ export async function POST(request: NextRequest) {
       where: { userEmail: email, eventType: "screenshot_attempt" },
     });
 
-    const subscriptions = await prisma.subscription.findMany({
-      where: { userId: user.id, isActive: true, expiryDate: { gt: now } },
-    });
+    const subscriptions = user.subscriptions;
 
     return NextResponse.json({
       success: true,
