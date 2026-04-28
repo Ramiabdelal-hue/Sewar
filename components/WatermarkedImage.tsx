@@ -13,9 +13,7 @@ export default function WatermarkedImage({ src, alt = "", className, style }: Pr
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
 
-  // معالجة خطأ تحميل الصورة
   const handleImageError = () => {
-    console.error("فشل تحميل الصورة:", src);
     setImageError(true);
     setImageLoading(false);
   };
@@ -24,14 +22,12 @@ export default function WatermarkedImage({ src, alt = "", className, style }: Pr
     setImageLoading(false);
   };
 
-  // تحسين رابط الصورة تلقائياً
+  // تحسين رابط الصورة - تجنب التكرار
   const optimizeImageUrl = (url: string) => {
-    // إذا كان الرابط من Cloudinary
+    if (!url) return url;
     if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
-      // إضافة transformations لتقليل الحجم
-      // f_auto = تحويل تلقائي للصيغة الأفضل (WebP, AVIF)
-      // q_auto = جودة تلقائية محسّنة
-      // w_1200 = عرض أقصى 1200px (كافي للشاشات)
+      // تجنب إضافة التحسينات مرتين
+      if (url.includes('/upload/f_auto')) return url;
       return url.replace('/upload/', '/upload/f_auto,q_auto,w_1200/');
     }
     return url;
@@ -47,19 +43,21 @@ export default function WatermarkedImage({ src, alt = "", className, style }: Pr
     >
       {/* حالة التحميل */}
       {imageLoading && !imageError && (
-        <div className="w-full h-48 bg-gray-200 animate-pulse flex items-center justify-center">
-          <span className="text-gray-500 text-sm">جاري التحميل...</span>
+        <div className="w-full h-48 bg-gray-100 animate-pulse flex items-center justify-center rounded">
+          <svg className="w-8 h-8 text-gray-300 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+          </svg>
         </div>
       )}
 
       {/* حالة الخطأ */}
       {imageError && (
-        <div className="w-full h-48 bg-red-50 border-2 border-red-200 flex flex-col items-center justify-center gap-2">
-          <svg className="w-12 h-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        <div className="w-full h-48 bg-gray-100 flex flex-col items-center justify-center gap-2 rounded">
+          <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
-          <span className="text-red-600 text-sm font-medium">فشل تحميل الصورة</span>
-          <span className="text-red-400 text-xs px-4 text-center break-all">{src}</span>
+          <span className="text-gray-400 text-xs">لا يمكن تحميل الصورة</span>
         </div>
       )}
 
@@ -70,13 +68,12 @@ export default function WatermarkedImage({ src, alt = "", className, style }: Pr
         alt={alt}
         className={`w-full h-auto block ${imageLoading || imageError ? "hidden" : ""}`}
         draggable={false}
-        loading="lazy"
         onContextMenu={e => e.preventDefault()}
         onError={handleImageError}
         onLoad={handleImageLoad}
       />
 
-      {/* علامة مائية وسط الصورة */}
+      {/* علامة مائية */}
       {!imageLoading && !imageError && (
         <>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -94,8 +91,6 @@ export default function WatermarkedImage({ src, alt = "", className, style }: Pr
             }}
             draggable={false}
           />
-
-          {/* زنار حقوق النشر في أسفل الصورة */}
           <div
             className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-3 py-1 pointer-events-none select-none"
             style={{
@@ -110,7 +105,7 @@ export default function WatermarkedImage({ src, alt = "", className, style }: Pr
               <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
-              Origineel educatief materiaal · Wettelijk beschermd
+              Wettelijk beschermd
             </span>
           </div>
         </>
