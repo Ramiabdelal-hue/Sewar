@@ -287,160 +287,134 @@ export default function AdminSubscribersPage() {
 
           {/* ══ SUBSCRIBERS LIST ══════════════════════════════════════════ */}
           {tab !== "screenshots" && (
-            <>
-        {loading ? (
-          <div className="flex justify-center py-16"><div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" /></div>
-        ) : filtered.length === 0 ? (
-          <div className="bg-white rounded-2xl p-12 text-center shadow-sm border border-gray-100">
-            <div className="text-4xl mb-3">📭</div>
-            <p className="text-gray-500 font-bold">لا توجد نتائج</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {filtered.map(sub => {
-              const online = isOnline(sub.lastSeen);
-              const expired = new Date(sub.expiryDate) <= new Date();
-              const suspended = sub.userStatus === "suspended";
-              const shots = sub.screenshotDetails?.count || 0;
-              const pkgColor = PKG_COLOR[sub.subscriptionType] || "#6b7280";
-
-              return (
-                <div key={sub.id}
-                  className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => setSelected(selected?.id === sub.id ? null : sub)}>
-
-                  {/* Main Row */}
-                  <div className="p-4">
-                    <div className="flex items-center gap-3">
-
-                      {/* Avatar + Online */}
-                      <div className="relative flex-shrink-0">
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-lg"
-                          style={{ background: `linear-gradient(135deg, ${pkgColor}, ${pkgColor}99)` }}>
-                          {sub.name.charAt(0).toUpperCase()}
-                        </div>
-                        {online && (
-                          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-green-500 border-2 border-white flex items-center justify-center">
-                            <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-black text-gray-800 text-sm">{sub.name}</span>
-                          {online && <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-bold animate-pulse">🟢 Online</span>}
-                          {suspended && <span className="text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 font-bold">🔒 معلق</span>}
-                          {!suspended && expired && <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700 font-bold">منتهي</span>}
-                          {!suspended && !expired && !online && <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-bold">نشط</span>}
-                        </div>
-                        <p className="text-gray-400 text-xs mt-0.5 truncate">{sub.email}</p>
-                        {sub.phone && <p className="text-gray-400 text-xs">📱 {sub.phone}</p>}
-                      </div>
-
-                      {/* Right Side */}
-                      <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                        <span className="text-xs px-2.5 py-1 rounded-full font-bold text-white" style={{ background: pkgColor }}>
-                          {PKG[sub.subscriptionType]} {sub.category}
-                        </span>
-                        <span className="text-xs font-black text-gray-600">€{sub.amount}</span>
-                        {shots > 0 && (
-                          <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${shots > 3 ? "bg-red-100 text-red-700 animate-pulse" : "bg-orange-100 text-orange-700"}`}>
-                            📸 {shots}{shots > 3 ? " ⚠️" : ""}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Last Seen */}
-                    {sub.lastSeen && (
-                      <div className="mt-2 flex items-center gap-1.5 text-xs text-gray-400">
-                        <span>⏱</span>
-                        <span>آخر نشاط: {online ? "الآن" : timeAgo(sub.lastSeen)} · {formatTime(sub.lastSeen)}</span>
-                      </div>
-                    )}
-
-                    {/* Expiry */}
-                    <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-400">
-                      <span>📅</span>
-                      <span>ينتهي: {new Date(sub.expiryDate).toLocaleDateString("ar-EG")}</span>
-                    </div>
-                  </div>
-
-                  {/* Expanded Details */}
-                  {selected?.id === sub.id && (
-                    <div className="border-t border-gray-100 bg-gray-50 p-4 space-y-4">
-
-                      {/* Activity Timeline */}
-                      {sub.recentActivity && sub.recentActivity.length > 0 && (
-                        <div>
-                          <h4 className="text-xs font-black text-gray-600 mb-2 flex items-center gap-1">
-                            📊 آخر النشاطات
-                          </h4>
-                          <div className="space-y-1.5 max-h-48 overflow-y-auto">
-                            {sub.recentActivity.map((a, i) => (
-                              <div key={i} className="flex items-center gap-2 text-xs bg-white rounded-lg px-3 py-2 border border-gray-100">
-                                <span className="text-base flex-shrink-0">{eventIcon(a.eventType)}</span>
-                                <div className="flex-1 min-w-0">
-                                  <span className="font-bold text-gray-700 truncate block">{a.page || "/"}</span>
-                                  <span className="text-gray-400">{a.ip}</span>
-                                </div>
-                                <span className="text-gray-400 flex-shrink-0 font-mono">{formatTime(a.createdAt)}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Screenshot Details */}
-                      {shots > 0 && sub.screenshotDetails?.attempts && (
-                        <div>
-                          <h4 className="text-xs font-black text-red-600 mb-2 flex items-center gap-1">
-                            📸 محاولات Screenshot ({shots})
-                          </h4>
-                          <div className="space-y-1.5 max-h-36 overflow-y-auto">
-                            {sub.screenshotDetails.attempts.map((a, i) => (
-                              <div key={i} className="flex items-center gap-2 text-xs bg-red-50 rounded-lg px-3 py-2 border border-red-100">
-                                <span className="text-base">📸</span>
-                                <div className="flex-1 min-w-0">
-                                  <span className="font-bold text-red-700 truncate block">{a.page}</span>
-                                  <span className="text-red-400">{a.ip}</span>
-                                </div>
-                                <span className="text-red-400 flex-shrink-0 font-mono">{formatTime(a.date)}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Actions */}
-                      <div className="flex gap-2 pt-1">
-                        {suspended ? (
-                          <button onClick={e => { e.stopPropagation(); setSuspendModal({ ...sub, userStatus: "unsuspend" as any }); }}
-                            className="flex-1 py-2.5 rounded-xl text-sm font-black bg-green-100 text-green-700 hover:bg-green-200 transition">
-                            ✅ رفع التعليق
-                          </button>
-                        ) : (
-                          <button onClick={e => { e.stopPropagation(); setSuspendModal(sub); }}
-                            className="flex-1 py-2.5 rounded-xl text-sm font-black bg-purple-100 text-purple-700 hover:bg-purple-200 transition">
-                            🔒 تعليق الحساب
-                          </button>
-                        )}
-                        <a href={`mailto:${sub.email}`} onClick={e => e.stopPropagation()}
-                          className="flex-1 py-2.5 rounded-xl text-sm font-black bg-blue-100 text-blue-700 hover:bg-blue-200 transition text-center">
-                          📧 إرسال إيميل
-                        </a>
-                      </div>
-                    </div>
-                  )}
+            <div>
+              {loading ? (
+                <div className="flex justify-center py-16"><div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" /></div>
+              ) : filtered.length === 0 ? (
+                <div className="bg-white rounded-2xl p-12 text-center shadow-sm border border-gray-100">
+                  <div className="text-4xl mb-3">📭</div>
+                  <p className="text-gray-500 font-bold">لا توجد نتائج</p>
                 </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-          </>
+              ) : (
+                <div className="space-y-3">
+                  {filtered.map(sub => {
+                    const online = isOnline(sub.lastSeen);
+                    const expired = new Date(sub.expiryDate) <= new Date();
+                    const suspended = sub.userStatus === "suspended";
+                    const shots = sub.screenshotDetails?.count || 0;
+                    const pkgColor = PKG_COLOR[sub.subscriptionType] || "#6b7280";
+                    return (
+                      <div key={sub.id}
+                        className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                        onClick={() => setSelected(selected?.id === sub.id ? null : sub)}>
+                        <div className="p-4">
+                          <div className="flex items-center gap-3">
+                            <div className="relative flex-shrink-0">
+                              <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-lg"
+                                style={{ background: `linear-gradient(135deg, ${pkgColor}, ${pkgColor}99)` }}>
+                                {sub.name.charAt(0).toUpperCase()}
+                              </div>
+                              {online && (
+                                <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-green-500 border-2 border-white flex items-center justify-center">
+                                  <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-black text-gray-800 text-sm">{sub.name}</span>
+                                {online && <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-bold animate-pulse">🟢 Online</span>}
+                                {suspended && <span className="text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 font-bold">🔒 معلق</span>}
+                                {!suspended && expired && <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700 font-bold">منتهي</span>}
+                                {!suspended && !expired && !online && <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-bold">نشط</span>}
+                              </div>
+                              <p className="text-gray-400 text-xs mt-0.5 truncate">{sub.email}</p>
+                              {sub.phone && <p className="text-gray-400 text-xs">📱 {sub.phone}</p>}
+                            </div>
+                            <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+                              <span className="text-xs px-2.5 py-1 rounded-full font-bold text-white" style={{ background: pkgColor }}>
+                                {PKG[sub.subscriptionType]} {sub.category}
+                              </span>
+                              <span className="text-xs font-black text-gray-600">€{sub.amount}</span>
+                              {shots > 0 && (
+                                <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${shots > 3 ? "bg-red-100 text-red-700 animate-pulse" : "bg-orange-100 text-orange-700"}`}>
+                                  📸 {shots}{shots > 3 ? " ⚠️" : ""}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          {sub.lastSeen && (
+                            <div className="mt-2 flex items-center gap-1.5 text-xs text-gray-400">
+                              <span>⏱</span>
+                              <span>آخر نشاط: {online ? "الآن" : timeAgo(sub.lastSeen)} · {formatTime(sub.lastSeen)}</span>
+                            </div>
+                          )}
+                          <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-400">
+                            <span>📅</span>
+                            <span>ينتهي: {new Date(sub.expiryDate).toLocaleDateString("ar-EG")}</span>
+                          </div>
+                        </div>
+                        {selected?.id === sub.id && (
+                          <div className="border-t border-gray-100 bg-gray-50 p-4 space-y-4">
+                            {sub.recentActivity && sub.recentActivity.length > 0 && (
+                              <div>
+                                <h4 className="text-xs font-black text-gray-600 mb-2">📊 آخر النشاطات</h4>
+                                <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                                  {sub.recentActivity.map((a, i) => (
+                                    <div key={i} className="flex items-center gap-2 text-xs bg-white rounded-lg px-3 py-2 border border-gray-100">
+                                      <span className="text-base flex-shrink-0">{eventIcon(a.eventType)}</span>
+                                      <div className="flex-1 min-w-0">
+                                        <span className="font-bold text-gray-700 truncate block">{a.page || "/"}</span>
+                                        <span className="text-gray-400">{a.ip}</span>
+                                      </div>
+                                      <span className="text-gray-400 flex-shrink-0 font-mono">{formatTime(a.createdAt)}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            {shots > 0 && sub.screenshotDetails?.attempts && (
+                              <div>
+                                <h4 className="text-xs font-black text-red-600 mb-2">📸 محاولات Screenshot ({shots})</h4>
+                                <div className="space-y-1.5 max-h-36 overflow-y-auto">
+                                  {sub.screenshotDetails.attempts.map((a, i) => (
+                                    <div key={i} className="flex items-center gap-2 text-xs bg-red-50 rounded-lg px-3 py-2 border border-red-100">
+                                      <span className="text-base">📸</span>
+                                      <div className="flex-1 min-w-0">
+                                        <span className="font-bold text-red-700 truncate block">{a.page}</span>
+                                        <span className="text-red-400">{a.ip}</span>
+                                      </div>
+                                      <span className="text-red-400 flex-shrink-0 font-mono">{formatTime(a.date)}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            <div className="flex gap-2 pt-1">
+                              {suspended ? (
+                                <button onClick={e => { e.stopPropagation(); setSuspendModal({ ...sub, userStatus: "unsuspend" as any }); }}
+                                  className="flex-1 py-2.5 rounded-xl text-sm font-black bg-green-100 text-green-700 hover:bg-green-200 transition">
+                                  ✅ رفع التعليق
+                                </button>
+                              ) : (
+                                <button onClick={e => { e.stopPropagation(); setSuspendModal(sub); }}
+                                  className="flex-1 py-2.5 rounded-xl text-sm font-black bg-purple-100 text-purple-700 hover:bg-purple-200 transition">
+                                  🔒 تعليق الحساب
+                                </button>
+                              )}
+                              <a href={`mailto:${sub.email}`} onClick={e => e.stopPropagation()}
+                                className="flex-1 py-2.5 rounded-xl text-sm font-black bg-blue-100 text-blue-700 hover:bg-blue-200 transition text-center">
+                                📧 إرسال إيميل
+                              </a>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           )}
 
       {/* Suspend Modal */}
