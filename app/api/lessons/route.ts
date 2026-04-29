@@ -1,36 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { unstable_cache } from "next/cache";
+
+// Cache دالة جلب الدروس - تتجدد كل 5 دقائق
+const getCachedLessons = unstable_cache(
+  async (category: string, questionType?: string) => {
+    const whereCondition: any = {};
+    if (questionType) whereCondition.questionType = questionType;
+    const orderBy = { id: 'asc' as const };
+
+    if (category === "A") return prisma.lessonA.findMany({ where: whereCondition, orderBy });
+    if (category === "B") return prisma.lessonB.findMany({ where: whereCondition, orderBy });
+    if (category === "C") return prisma.lessonC.findMany({ where: whereCondition, orderBy });
+    return [];
+  },
+  ["lessons"],
+  { revalidate: 300, tags: ["lessons"] }
+);
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const categoryParam = searchParams.get("category");
-    const questionType = searchParams.get("questionType");
+    const questionType = searchParams.get("questionType") || undefined;
 
     if (!categoryParam) {
       return NextResponse.json({ success: false, message: "category required" }, { status: 400 });
     }
 
     let category = categoryParam.toUpperCase();
-    if (category.startsWith("EXAM")) {
-      category = category.replace("EXAM", "");
-    }
+    if (category.startsWith("EXAM")) category = category.replace("EXAM", "");
 
-    const whereCondition: any = {};
-    if (questionType) {
-      whereCondition.questionType = questionType;
-    }
-
-    let lessons;
-    if (category === "A") {
-      lessons = await prisma.lessonA.findMany({ where: whereCondition, orderBy: { id: 'asc' } });
-    } else if (category === "B") {
-      lessons = await prisma.lessonB.findMany({ where: whereCondition, orderBy: { id: 'asc' } });
-    } else if (category === "C") {
-      lessons = await prisma.lessonC.findMany({ where: whereCondition, orderBy: { id: 'asc' } });
-    } else {
+    if (!["A", "B", "C"].includes(category)) {
       return NextResponse.json({ success: false, message: `Invalid category: ${category}` }, { status: 400 });
     }
+
+    // ✅ استخدام cached version
+    const lessons = await getCachedLessons(category, questionType);
 
     return NextResponse.json({ success: true, lessons });
 

@@ -52,38 +52,46 @@ function LessonsContent() {
     const checkSubscription = async () => {
       if (!userEmail) { setIsExpired(true); setChecking(false); return; }
       try {
-        const fetchPromise = fetch("/api/check-subscription", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: userEmail }),
-        });
-        const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 12000));
-        const res = await Promise.race([fetchPromise, timeoutPromise]);
-        if (!res) { setChecking(false); return; }
-        let data: any = {};
-        try { data = await res.json(); } catch {}
-        if (data.expired || !data.success) { setIsExpired(true); setPrefillData({ email: userEmail }); setChecking(false); return; }
+        // ✅ Parallel - جلب check-subscription والدروس في نفس الوقت
+        const [subResult, lessonsResult] = await Promise.allSettled([
+          Promise.race([
+            fetch("/api/check-subscription", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email: userEmail }),
+            }),
+            new Promise<null>((resolve) => setTimeout(() => resolve(null), 12000)),
+          ]),
+          fetch(`/api/lessons?category=${(cat || "B").toUpperCase()}`),
+        ]);
 
-        const subs = data.subscriptions || [];
-        const hasTheorie = subs.some((s: any) => s.subscriptionType === "theorie") ||
-                           data.user?.subscriptionType === "theorie";
-
-        if (!hasTheorie && subs.length > 0) {
-          const praktijkLessons = subs.find((s: any) => s.subscriptionType === "praktijk-lessons");
-          const praktijkExam = subs.find((s: any) => s.subscriptionType === "praktijk-exam");
-          if (praktijkLessons) {
-            router.push(`/praktical/lessons?email=${encodeURIComponent(userEmail!)}&exp=${new Date(praktijkLessons.expiryDate).getTime()}`);
-          } else if (praktijkExam) {
-            router.push(`/praktical/exam?email=${encodeURIComponent(userEmail!)}&exp=${new Date(praktijkExam.expiryDate).getTime()}`);
-          } else {
-            setIsExpired(true);
-          }
+        // معالجة check-subscription
+        if (subResult.status === "fulfilled" && subResult.value) {
+          try {
+            const data = await (subResult.value as Response).json();
+            if (data.expired || !data.success) { setIsExpired(true); setPrefillData({ email: userEmail }); setChecking(false); return; }
+            const subs = data.subscriptions || [];
+            const hasTheorie = subs.some((s: any) => s.subscriptionType === "theorie") || data.user?.subscriptionType === "theorie";
+            if (!hasTheorie && subs.length > 0) {
+              const praktijkLessons = subs.find((s: any) => s.subscriptionType === "praktijk-lessons");
+              const praktijkExam = subs.find((s: any) => s.subscriptionType === "praktijk-exam");
+              if (praktijkLessons) { router.push(`/praktical/lessons?email=${encodeURIComponent(userEmail!)}&exp=${new Date(praktijkLessons.expiryDate).getTime()}`); return; }
+              else if (praktijkExam) { router.push(`/praktical/exam?email=${encodeURIComponent(userEmail!)}&exp=${new Date(praktijkExam.expiryDate).getTime()}`); return; }
+              else { setIsExpired(true); }
+            }
+          } catch {}
         }
-      } catch (e) { 
+
+        // معالجة الدروس (تم جلبها بالتوازي)
+        if (lessonsResult.status === "fulfilled") {
+          try {
+            const data = await (lessonsResult.value as Response).json();
+            if (data.success) { setLessons(data.lessons); setLoadingLessons(false); }
+          } catch {}
+        }
+      } catch (e) {
         console.error(e);
-        // عند خطأ في الشبكة نعرض الدروس بدل إخفائها
-      }
-      finally { setChecking(false); }
+      } finally { setChecking(false); }
     };
     checkSubscription();
   }, [userEmail, cat, exp]);

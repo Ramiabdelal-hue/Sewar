@@ -80,41 +80,41 @@ export default function TheoriePage() {
 
   const checkAndFetch = async (email: string, category: string) => {
     try {
-      // استخدام Promise.race بدلاً من AbortController لتجنب NetworkError في Firefox
-      const fetchPromise = fetch("/api/check-subscription", { 
-        method: "POST", 
-        headers: { "Content-Type": "application/json" }, 
-        body: JSON.stringify({ email }),
-      });
-      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 12000));
-      
-      const res = await Promise.race([fetchPromise, timeoutPromise]);
-      
-      // إذا timeout أو فشل - جلب الدروس مباشرة
-      if (!res) {
-        const lr = await fetch(`/api/lessons?category=${category}`);
-        const ld = await lr.json();
-        if (ld.success) setLessons(ld.lessons);
-        return;
+      // ✅ Parallel requests - جلب check-subscription والدروس في نفس الوقت
+      const [subResult, lessonsResult] = await Promise.allSettled([
+        Promise.race([
+          fetch("/api/check-subscription", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email }),
+          }),
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), 12000)),
+        ]),
+        fetch(`/api/lessons?category=${category}`),
+      ]);
+
+      // معالجة check-subscription
+      if (subResult.status === "fulfilled" && subResult.value) {
+        try {
+          const subData = await (subResult.value as Response).json();
+          if (subData.expired) { setIsExpired(true); setLoading(false); return; }
+        } catch {}
       }
 
-      let data: any = {};
-      try { data = await res.json(); } catch {}
-
-      if (data.expired) { setIsExpired(true); setLoading(false); return; }
-
-      const lr = await fetch(`/api/lessons?category=${category}`);
-      const ld = await lr.json();
-      if (ld.success) setLessons(ld.lessons);
-    } catch (e) { 
-      // عند أي خطأ - جلب الدروس بدون التحقق
+      // معالجة الدروس
+      if (lessonsResult.status === "fulfilled") {
+        try {
+          const ld = await (lessonsResult.value as Response).json();
+          if (ld.success) setLessons(ld.lessons);
+        } catch {}
+      }
+    } catch {
       try {
         const lr = await fetch(`/api/lessons?category=${category}`);
         const ld = await lr.json();
         if (ld.success) setLessons(ld.lessons);
       } catch {}
-    }
-    finally { setLoading(false); }
+    } finally { setLoading(false); }
   };
 
   if (showCheckout && globalSelection) {

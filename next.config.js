@@ -54,6 +54,18 @@ const nextConfig = {
           { key: 'Cache-Control', value: 'public, s-maxage=300, stale-while-revalidate=600' },
         ],
       },
+      {
+        source: '/api/exam-questions',
+        headers: [
+          { key: 'Cache-Control', value: 'public, s-maxage=600, stale-while-revalidate=1200' },
+        ],
+      },
+      {
+        source: '/api/free-content',
+        headers: [
+          { key: 'Cache-Control', value: 'public, s-maxage=3600, stale-while-revalidate=7200' },
+        ],
+      },
     ];
   },
 };

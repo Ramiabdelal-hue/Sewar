@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyAdminToken, unauthorizedResponse } from "@/lib/adminAuth";
+import { unstable_cache, revalidateTag } from "next/cache";
 
 const DEFAULT_PRICES: Record<string, string> = {
   theorie_2w: "25", theorie_1m: "50",
@@ -8,12 +9,22 @@ const DEFAULT_PRICES: Record<string, string> = {
   examen_2w: "25", examen_1m: "50",
 };
 
-export async function GET() {
-  try {
+// ✅ Cache الإعدادات - تتجدد كل 5 دقائق أو عند التعديل
+const getCachedSettings = unstable_cache(
+  async () => {
     const settings = await prisma.setting.findMany();
     const result: Record<string, string> = { ...DEFAULT_PRICES };
     settings.forEach(s => { result[s.key] = s.value; });
-    return NextResponse.json({ success: true, settings: result });
+    return result;
+  },
+  ["settings"],
+  { revalidate: 300, tags: ["settings"] }
+);
+
+export async function GET() {
+  try {
+    const settings = await getCachedSettings();
+    return NextResponse.json({ success: true, settings });
   } catch (error) {
     return NextResponse.json({ success: false, message: "خطأ في جلب الإعدادات" }, { status: 500 });
   }
@@ -35,6 +46,8 @@ export async function PUT(request: NextRequest) {
         create: { key, value },
       });
     }
+    // ✅ إبطال cache الإعدادات عند التعديل
+    revalidateTag("settings");
     return NextResponse.json({ success: true, message: "تم حفظ الأسعار بنجاح" });
   } catch (error) {
     return NextResponse.json({ success: false, message: "خطأ في حفظ الإعدادات" }, { status: 500 });
