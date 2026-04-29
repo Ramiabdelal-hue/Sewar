@@ -280,7 +280,7 @@ function GratisExamContent() {
                         {(userAns === null || userAns === undefined) && <span className="text-xs font-black text-orange-500">âڈ° {lang === "ar" ? "ط§ظ†طھظ‡ظ‰ ط§ظ„ظˆظ‚طھ" : "Tijd verlopen"}</span>}
                       </div>
                       {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
-                        <div className={`grid gap-1 p-1 bg-gray-100 grid-cols-2 items-stretch`}>
+                        <div className={`flex gap-1 p-1 bg-gray-100`}>
                           {q.videoUrls.filter(Boolean).map((url: string, idx: number) => (
                             <WatermarkedImage key={idx} src={url} alt="" />
                           ))}
@@ -377,7 +377,7 @@ function GratisExamContent() {
             </div>
 
             {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
-              <div className={`grid gap-1 p-2 bg-gray-100 grid-cols-2 items-stretch`}>
+              <div className={`flex gap-1 p-2 bg-gray-100`}>
                 {q.videoUrls.filter(Boolean).map((url: string, i: number) => (
                   <WatermarkedImage key={i} src={url} alt="" />
                 ))}
@@ -435,5 +435,6 @@ export default function GratisExamPage() {
     </Suspense>
   );
 }
+
 
 
