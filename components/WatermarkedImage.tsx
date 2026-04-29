@@ -23,12 +23,13 @@ export default function WatermarkedImage({ src, alt = "", className, style }: Pr
   };
 
   // تحسين رابط الصورة - تجنب التكرار
+  // عرض الصورة الأصلية بدون أي تعديل
   const optimizeImageUrl = (url: string) => {
     if (!url) return url;
+    // إزالة أي transformations قديمة وإضافة f_auto,q_auto فقط بدون تغيير الحجم
     if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
       if (url.includes('/upload/f_auto')) return url;
-      // c_limit = لا يقص الصورة، فقط يصغّرها إذا كانت أكبر من 1200px
-      return url.replace('/upload/', '/upload/f_auto,q_auto,w_1200,c_limit/');
+      return url.replace('/upload/', '/upload/f_auto,q_auto/');
     }
     return url;
   };
