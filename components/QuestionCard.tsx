@@ -111,14 +111,10 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
       {/* Images - natural size, no cropping */}
       {question.videoUrls && question.videoUrls.filter(Boolean).length > 0 && (
         <div>
-          <div className={`grid gap-1 p-2 bg-gray-100 ${question.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+          <div className="grid gap-1 p-2 bg-gray-100 grid-cols-1">
             {question.videoUrls.filter(Boolean).map((url, i) => {
-              const count = question.videoUrls!.filter(Boolean).length;
-              const isOdd = count % 2 !== 0;
-              const isLastOdd = isOdd && i === count - 1;
               return (
-                <div key={i} className="relative overflow-hidden select-none rounded-xl"
-                  style={{ gridColumn: isLastOdd ? "1 / -1" : undefined }}>
+                <div key={i} className="relative overflow-hidden select-none rounded-xl">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={url}

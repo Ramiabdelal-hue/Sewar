@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Suspense, useEffect, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -17,7 +17,7 @@ function ExamenCategoryContent() {
 
   const cat = searchParams.get("cat") || "B";
   const email = searchParams.get("email") || "";
-  const lessonId = searchParams.get("lessonId"); // إذا موجود يجلب درس محدد فقط
+  const lessonId = searchParams.get("lessonId"); // ط¥ط°ط§ ظ…ظˆط¬ظˆط¯ ظٹط¬ظ„ط¨ ط¯ط±ط³ ظ…ط­ط¯ط¯ ظپظ‚ط·
 
   const [questions, setQuestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,7 +37,7 @@ function ExamenCategoryContent() {
   const [showWrong, setShowWrong] = useState(false);
   const audioCtxRef = useRef<AudioContext | null>(null);
 
-  // دالة إيقاف فوري شاملة
+  // ط¯ط§ظ„ط© ط¥ظٹظ‚ط§ظپ ظپظˆط±ظٹ ط´ط§ظ…ظ„ط©
   const killTts = () => {
     stopTtsRef.current = true;
     ttsSessionRef.current += 1;
@@ -48,7 +48,7 @@ function ExamenCategoryContent() {
     }
   };
 
-  // قراءة تلقائية للسؤال والإجابات - نفس السلوك على كل الأجهزة
+  // ظ‚ط±ط§ط،ط© طھظ„ظ‚ط§ط¦ظٹط© ظ„ظ„ط³ط¤ط§ظ„ ظˆط§ظ„ط¥ط¬ط§ط¨ط§طھ - ظ†ظپط³ ط§ظ„ط³ظ„ظˆظƒ ط¹ظ„ظ‰ ظƒظ„ ط§ظ„ط£ط¬ظ‡ط²ط©
   const speakQuestion = (q: any, translated: string[]) => {
     if (!window.speechSynthesis || !q) {
       setReadingDone(true);
@@ -67,7 +67,7 @@ function ExamenCategoryContent() {
       const voices = window.speechSynthesis.getVoices();
       if (!voices.length) return null;
       
-      // البحث عن صوت أنثى أولاً
+      // ط§ظ„ط¨ط­ط« ط¹ظ† طµظˆطھ ط£ظ†ط«ظ‰ ط£ظˆظ„ط§ظ‹
       const femaleVoice = voices.find(v => 
         v.lang === speechLang && 
         (v.name.toLowerCase().includes('female') || 
@@ -85,14 +85,14 @@ function ExamenCategoryContent() {
       
       if (femaleVoice) return femaleVoice;
       
-      // إذا لم نجد صوت أنثى محدد، نبحث عن أي صوت باللغة المطلوبة
+      // ط¥ط°ط§ ظ„ظ… ظ†ط¬ط¯ طµظˆطھ ط£ظ†ط«ظ‰ ظ…ط­ط¯ط¯طŒ ظ†ط¨ط­ط« ط¹ظ† ط£ظٹ طµظˆطھ ط¨ط§ظ„ظ„ط؛ط© ط§ظ„ظ…ط·ظ„ظˆط¨ط©
       return voices.find(v => v.lang === speechLang)
         || voices.find(v => v.lang.startsWith(speechLang.split("-")[0]))
         || voices.find(v => v.lang === "nl-NL")
         || null;
     };
 
-    // تحقق من صلاحية الـ session قبل أي عمل
+    // طھط­ظ‚ظ‚ ظ…ظ† طµظ„ط§ط­ظٹط© ط§ظ„ظ€ session ظ‚ط¨ظ„ ط£ظٹ ط¹ظ…ظ„
     const isValid = () => ttsSessionRef.current === session && !stopTtsRef.current;
 
     const speak = (text: string, onEnd?: () => void) => {
@@ -107,7 +107,7 @@ function ExamenCategoryContent() {
       }
       const u = new SpeechSynthesisUtterance(text);
       u.lang = speechLang;
-      u.rate = 0.3; // سرعة أبطأ للوضوح
+      u.rate = 0.3; // ط³ط±ط¹ط© ط£ط¨ط·ط£ ظ„ظ„ظˆط¶ظˆط­
       u.pitch = 1;
       const v = getVoice();
       if (v) u.voice = v;
@@ -134,9 +134,9 @@ function ExamenCategoryContent() {
     ].filter(Boolean);
 
     const labels = lang === "ar"
-      ? ["الجواب A:", "الجواب B:", "الجواب C:"]
+      ? ["ط§ظ„ط¬ظˆط§ط¨ A:", "ط§ظ„ط¬ظˆط§ط¨ B:", "ط§ظ„ط¬ظˆط§ط¨ C:"]
       : lang === "fr"
-      ? ["Réponse A:", "Réponse B:", "Réponse C:"]
+      ? ["Rأ©ponse A:", "Rأ©ponse B:", "Rأ©ponse C:"]
       : lang === "en"
       ? ["Answer A:", "Answer B:", "Answer C:"]
       : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
@@ -186,14 +186,14 @@ function ExamenCategoryContent() {
     });
   };
 
-  // تشغيل القراءة بعد ثانية من كل سؤال جديد - نفس السلوك على كل الأجهزة
+  // طھط´ط؛ظٹظ„ ط§ظ„ظ‚ط±ط§ط،ط© ط¨ط¹ط¯ ط«ط§ظ†ظٹط© ظ…ظ† ظƒظ„ ط³ط¤ط§ظ„ ط¬ط¯ظٹط¯ - ظ†ظپط³ ط§ظ„ط³ظ„ظˆظƒ ط¹ظ„ظ‰ ظƒظ„ ط§ظ„ط£ط¬ظ‡ط²ط©
   useEffect(() => {
     if (!started || finished) return;
     killTts();
     setReadingDone(false);
     setHasReadCurrentQuestion(false);
 
-    // بدء القراءة بعد ثانية واحدة على كل الأجهزة
+    // ط¨ط¯ط، ط§ظ„ظ‚ط±ط§ط،ط© ط¨ط¹ط¯ ط«ط§ظ†ظٹط© ظˆط§ط­ط¯ط© ط¹ظ„ظ‰ ظƒظ„ ط§ظ„ط£ط¬ظ‡ط²ط©
     ttsRef.current = setTimeout(() => {
       stopTtsRef.current = false;
       const q = questions[currentIndex];
@@ -235,7 +235,7 @@ function ExamenCategoryContent() {
           const qRes = await fetch(`/api/exam-questions?lessonId=${lessonId}&category=${cat.toUpperCase()}`);
           const qData = await qRes.json();
           if (qData.success) {
-            // حد 50 سؤال لكل امتحان
+            // ط­ط¯ 50 ط³ط¤ط§ظ„ ظ„ظƒظ„ ط§ظ…طھط­ط§ظ†
             const shuffled = qData.questions.sort(() => Math.random() - 0.5);
             setQuestions(shuffled.slice(0, 50));
           }
@@ -249,7 +249,7 @@ function ExamenCategoryContent() {
             const qData = await qRes.json();
             if (qData.success && qData.questions?.length > 0) allQ.push(...qData.questions);
           }
-          // خلط عشوائي ثم أخذ 50 سؤال فقط
+          // ط®ظ„ط· ط¹ط´ظˆط§ط¦ظٹ ط«ظ… ط£ط®ط° 50 ط³ط¤ط§ظ„ ظپظ‚ط·
           const shuffled = allQ.sort(() => Math.random() - 0.5);
           setQuestions(shuffled.slice(0, 50));
         }
@@ -259,7 +259,7 @@ function ExamenCategoryContent() {
     fetchAll();
   }, [cat]);
 
-  // مؤقت 15 ثانية - يبدأ فقط بعد انتهاء القراءة
+  // ظ…ط¤ظ‚طھ 15 ط«ط§ظ†ظٹط© - ظٹط¨ط¯ط£ ظپظ‚ط· ط¨ط¹ط¯ ط§ظ†طھظ‡ط§ط، ط§ظ„ظ‚ط±ط§ط،ط©
   useEffect(() => {
     if (!started || finished || locked || !readingDone) return;
     setTimeLeft(15);
@@ -279,7 +279,7 @@ function ExamenCategoryContent() {
     return () => clearInterval(timerRef.current!);
   }, [currentIndex, started, finished, readingDone]);
 
-  // فتح قناة الصوت عند أول تفاعل (مطلوب على iOS/Android)
+  // ظپطھط­ ظ‚ظ†ط§ط© ط§ظ„طµظˆطھ ط¹ظ†ط¯ ط£ظˆظ„ طھظپط§ط¹ظ„ (ظ…ط·ظ„ظˆط¨ ط¹ظ„ظ‰ iOS/Android)
   const unlockAudio = () => {
     if (!window.speechSynthesis) return;
     const u = new SpeechSynthesisUtterance('');
@@ -294,7 +294,7 @@ function ExamenCategoryContent() {
     } catch {}
   };
 
-  // صوت "Bravo!" عند الإجابة الصحيحة
+  // طµظˆطھ "Bravo!" ط¹ظ†ط¯ ط§ظ„ط¥ط¬ط§ط¨ط© ط§ظ„طµط­ظٹط­ط©
   const playApplause = () => {
     try {
       if (!window.speechSynthesis) return;
@@ -302,8 +302,8 @@ function ExamenCategoryContent() {
 
       const bravoTexts: Record<string, string[]> = {
         nl: ["Bravo!", "Uitstekend!", "Geweldig!", "Perfect!"],
-        fr: ["Bravo!", "Excellent!", "Parfait!", "Très bien!"],
-        ar: ["برافو!", "ممتاز!", "أحسنت!", "رائع!"],
+        fr: ["Bravo!", "Excellent!", "Parfait!", "Trأ¨s bien!"],
+        ar: ["ط¨ط±ط§ظپظˆ!", "ظ…ظ…طھط§ط²!", "ط£ط­ط³ظ†طھ!", "ط±ط§ط¦ط¹!"],
         en: ["Bravo!", "Excellent!", "Well done!", "Perfect!"],
       };
       const options = bravoTexts[lang] || bravoTexts.nl;
@@ -378,7 +378,7 @@ function ExamenCategoryContent() {
 
   const translatedRef = useRef<string[]>(["", "", "", ""]);
 
-  // Hook يجب أن يكون دائماً قبل أي return مشروط
+  // Hook ظٹط¬ط¨ ط£ظ† ظٹظƒظˆظ† ط¯ط§ط¦ظ…ط§ظ‹ ظ‚ط¨ظ„ ط£ظٹ return ظ…ط´ط±ظˆط·
   const textsToTranslate = q ? [
     q.textNL || q.text || "",
     q.answer1 || "",
@@ -387,7 +387,7 @@ function ExamenCategoryContent() {
   ] : ["", "", "", ""];
   const translatedTexts = useAutoTranslateList(textsToTranslate, lang);
 
-  // Preload صورة السؤال التالي
+  // Preload طµظˆط±ط© ط§ظ„ط³ط¤ط§ظ„ ط§ظ„طھط§ظ„ظٹ
   useEffect(() => {
     if (!questions.length) return;
     const nextIndex = currentIndex + 1;
@@ -403,7 +403,7 @@ function ExamenCategoryContent() {
     });
   }, [currentIndex, questions]);
 
-  // حفظ آخر ترجمة في ref
+  // ط­ظپط¸ ط¢ط®ط± طھط±ط¬ظ…ط© ظپظٹ ref
   useEffect(() => {
     translatedRef.current = translatedTexts;
   }, [translatedTexts]);
@@ -414,27 +414,27 @@ function ExamenCategoryContent() {
     </div>
   );
 
-  // صفحة البداية
+  // طµظپط­ط© ط§ظ„ط¨ط¯ط§ظٹط©
   if (!started) return (
     <div className="min-h-screen bg-white" dir={isRtl ? "rtl" : "ltr"}>
       <Navbar />
       <div className="max-w-2xl mx-auto px-4 py-12 text-center">
         <div className="border-4 border-[#003399] rounded-2xl p-10">
-          <div className="text-6xl mb-4">🎯</div>
+          <div className="text-6xl mb-4">ًںژ¯</div>
           <h1 className="text-2xl font-black text-[#003399] mb-2 uppercase">
-            {lang === "ar" ? `امتحان الفئة ${cat}` : lang === "nl" ? `Examen Categorie ${cat}` : lang === "fr" ? `Examen Catégorie ${cat}` : `Exam Category ${cat}`}
+            {lang === "ar" ? `ط§ظ…طھط­ط§ظ† ط§ظ„ظپط¦ط© ${cat}` : lang === "nl" ? `Examen Categorie ${cat}` : lang === "fr" ? `Examen Catأ©gorie ${cat}` : `Exam Category ${cat}`}
           </h1>
-          <p className="text-gray-500 mb-2">{questions.length} {lang === "ar" ? "سؤال" : lang === "nl" ? "vragen" : lang === "fr" ? "questions" : "questions"}</p>
+          <p className="text-gray-500 mb-2">{questions.length} {lang === "ar" ? "ط³ط¤ط§ظ„" : lang === "nl" ? "vragen" : lang === "fr" ? "questions" : "questions"}</p>
           <p className="text-sm text-orange-600 font-bold mb-8">
-            ⏱ {lang === "ar" ? "15 ثانية لكل سؤال" : lang === "nl" ? "15 seconden per vraag" : lang === "fr" ? "15 secondes par question" : "15 seconds per question"}
+            âڈ± {lang === "ar" ? "15 ط«ط§ظ†ظٹط© ظ„ظƒظ„ ط³ط¤ط§ظ„" : lang === "nl" ? "15 seconden per vraag" : lang === "fr" ? "15 secondes par question" : "15 seconds per question"}
           </p>
           {questions.length === 0 ? (
-            <p className="text-red-500 font-bold">{lang === "ar" ? "لا توجد أسئلة بعد" : lang === "nl" ? "Geen vragen beschikbaar" : lang === "fr" ? "Pas encore de questions" : "No questions yet"}</p>
+            <p className="text-red-500 font-bold">{lang === "ar" ? "ظ„ط§ طھظˆط¬ط¯ ط£ط³ط¦ظ„ط© ط¨ط¹ط¯" : lang === "nl" ? "Geen vragen beschikbaar" : lang === "fr" ? "Pas encore de questions" : "No questions yet"}</p>
           ) : (
             <button onClick={() => { unlockAudio(); setStarted(true); }}
               className="px-10 py-4 font-black text-white text-lg rounded-xl transition-all hover:scale-105 active:scale-95"
               style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-              {lang === "ar" ? "ابدأ الامتحان" : lang === "nl" ? "Start Examen" : lang === "fr" ? "Démarrer l'examen" : "Start Exam"} →
+              {lang === "ar" ? "ط§ط¨ط¯ط£ ط§ظ„ط§ظ…طھط­ط§ظ†" : lang === "nl" ? "Start Examen" : lang === "fr" ? "Dأ©marrer l'examen" : "Start Exam"} â†’
             </button>
           )}
         </div>
@@ -442,7 +442,7 @@ function ExamenCategoryContent() {
     </div>
   );
 
-  // صفحة النتيجة
+  // طµظپط­ط© ط§ظ„ظ†طھظٹط¬ط©
   if (finished) {
     const pct = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
     const passed = pct >= 60;
@@ -454,32 +454,32 @@ function ExamenCategoryContent() {
         <Navbar />
         <div className="max-w-3xl mx-auto px-4 py-8">
 
-          {/* بطاقة النتيجة */}
+          {/* ط¨ط·ط§ظ‚ط© ط§ظ„ظ†طھظٹط¬ط© */}
           <div className={`rounded-2xl p-8 mb-6 text-center border-4 ${passed ? "border-green-400 bg-green-50" : "border-red-400 bg-red-50"}`}>
-            <div className="text-6xl mb-3">{passed ? "🏆" : "😔"}</div>
+            <div className="text-6xl mb-3">{passed ? "ًںڈ†" : "ًںک”"}</div>
             <h1 className="text-2xl font-black mb-1" style={{ color: passed ? "#16a34a" : "#dc2626" }}>
               {passed
-                ? (lang === "ar" ? "مبروك! نجحت" : lang === "nl" ? "Gefeliciteerd! Geslaagd!" : lang === "fr" ? "Félicitations! Réussi!" : "Congratulations! Passed!")
-                : (lang === "ar" ? "لم تنجح هذه المرة" : lang === "nl" ? "Helaas niet geslaagd" : lang === "fr" ? "Malheureusement pas réussi" : "Unfortunately not passed")}
+                ? (lang === "ar" ? "ظ…ط¨ط±ظˆظƒ! ظ†ط¬ط­طھ" : lang === "nl" ? "Gefeliciteerd! Geslaagd!" : lang === "fr" ? "Fأ©licitations! Rأ©ussi!" : "Congratulations! Passed!")
+                : (lang === "ar" ? "ظ„ظ… طھظ†ط¬ط­ ظ‡ط°ظ‡ ط§ظ„ظ…ط±ط©" : lang === "nl" ? "Helaas niet geslaagd" : lang === "fr" ? "Malheureusement pas rأ©ussi" : "Unfortunately not passed")}
             </h1>
             <div className="flex items-center justify-center gap-4 mt-4 flex-wrap">
               <div className="bg-white rounded-xl px-5 py-3 shadow text-center">
                 <p className="text-xs text-gray-400 font-bold uppercase mb-1">
-                  {lang === "ar" ? "النقاط" : lang === "nl" ? "Behaald" : lang === "fr" ? "Points" : "Points"}
+                  {lang === "ar" ? "ط§ظ„ظ†ظ‚ط§ط·" : lang === "nl" ? "Behaald" : lang === "fr" ? "Points" : "Points"}
                 </p>
                 <p className="text-3xl font-black text-green-600">{score}</p>
                 <p className="text-xs text-gray-400">/ {maxScore}</p>
               </div>
               <div className="bg-white rounded-xl px-5 py-3 shadow text-center">
                 <p className="text-xs text-gray-400 font-bold uppercase mb-1">
-                  {lang === "ar" ? "صح" : lang === "nl" ? "Correct" : lang === "fr" ? "Correct" : "Correct"}
+                  {lang === "ar" ? "طµط­" : lang === "nl" ? "Correct" : lang === "fr" ? "Correct" : "Correct"}
                 </p>
                 <p className="text-3xl font-black text-blue-600">{correctCount}</p>
                 <p className="text-xs text-gray-400">/ {questions.length}</p>
               </div>
               <div className="bg-white rounded-xl px-5 py-3 shadow text-center">
                 <p className="text-xs text-gray-400 font-bold uppercase mb-1">
-                  {lang === "ar" ? "خطأ" : lang === "nl" ? "Fout" : lang === "fr" ? "Faux" : "Wrong"}
+                  {lang === "ar" ? "ط®ط·ط£" : lang === "nl" ? "Fout" : lang === "fr" ? "Faux" : "Wrong"}
                 </p>
                 <p className="text-3xl font-black text-red-500">{questions.length - correctCount}</p>
               </div>
@@ -490,12 +490,12 @@ function ExamenCategoryContent() {
             </div>
           </div>
 
-          {/* مراجعة الأسئلة الخاطئة */}
+          {/* ظ…ط±ط§ط¬ط¹ط© ط§ظ„ط£ط³ط¦ظ„ط© ط§ظ„ط®ط§ط·ط¦ط© */}
           {wrongAnswers.length > 0 && (
             <div className="mb-6">
               <h2 className="text-lg font-black text-gray-800 mb-3 flex items-center gap-2">
-                <span className="w-7 h-7 rounded-lg bg-red-500 flex items-center justify-center text-white text-sm">✗</span>
-                {lang === "ar" ? `الأسئلة الخاطئة (${wrongAnswers.length})` : lang === "nl" ? `Foute antwoorden (${wrongAnswers.length})` : lang === "fr" ? `Mauvaises réponses (${wrongAnswers.length})` : `Wrong answers (${wrongAnswers.length})`}
+                <span className="w-7 h-7 rounded-lg bg-red-500 flex items-center justify-center text-white text-sm">âœ—</span>
+                {lang === "ar" ? `ط§ظ„ط£ط³ط¦ظ„ط© ط§ظ„ط®ط§ط·ط¦ط© (${wrongAnswers.length})` : lang === "nl" ? `Foute antwoorden (${wrongAnswers.length})` : lang === "fr" ? `Mauvaises rأ©ponses (${wrongAnswers.length})` : `Wrong answers (${wrongAnswers.length})`}
               </h2>
               <div className="space-y-4">
                 {questions.map((q, i) => {
@@ -507,21 +507,21 @@ function ExamenCategoryContent() {
 
                   return (
                     <div key={i} className="bg-white rounded-2xl overflow-hidden shadow border border-red-100">
-                      {/* رأس */}
+                      {/* ط±ط£ط³ */}
                       <div className="px-4 py-2 flex items-center gap-2" style={{ background: "#fef2f2" }}>
                         <span className="w-6 h-6 rounded-full bg-red-500 text-white text-xs font-black flex items-center justify-center">{i + 1}</span>
                         {q.points === 5 && (
-                          <span className="text-xs font-black px-1.5 py-0.5 rounded-full" style={{ background: "rgba(239,68,68,0.15)", color: "#dc2626" }}>⭐ 5 {lang === "ar" ? "نقاط" : lang === "nl" ? "punten" : "pts"}</span>)}
+                          <span className="text-xs font-black px-1.5 py-0.5 rounded-full" style={{ background: "rgba(239,68,68,0.15)", color: "#dc2626" }}>â­گ 5 {lang === "ar" ? "ظ†ظ‚ط§ط·" : lang === "nl" ? "punten" : "pts"}</span>)}
                         {timedOut && (
                           <span className="text-xs font-black text-orange-500 flex items-center gap-1">
-                            ⏱ {lang === "ar" ? "انتهى الوقت" : lang === "nl" ? "Tijd verlopen" : lang === "fr" ? "Temps écoulé" : "Time out"}
+                            âڈ± {lang === "ar" ? "ط§ظ†طھظ‡ظ‰ ط§ظ„ظˆظ‚طھ" : lang === "nl" ? "Tijd verlopen" : lang === "fr" ? "Temps أ©coulأ©" : "Time out"}
                           </span>
                         )}
                       </div>
 
-                      {/* صورة */}
+                      {/* طµظˆط±ط© */}
                       {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
-                        <div className={`grid gap-0.5 p-1 bg-gray-100 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+                        <div className={`grid gap-1 p-1 bg-gray-100 grid-cols-1`}>
                           {q.videoUrls.filter(Boolean).map((url: string, idx: number) => (
                             <WatermarkedImage key={idx} src={url} />
                           ))}
@@ -529,10 +529,10 @@ function ExamenCategoryContent() {
                       )}
 
                       <div className="p-4">
-                        {/* نص السؤال */}
+                        {/* ظ†طµ ط§ظ„ط³ط¤ط§ظ„ */}
                         <p className="font-bold text-gray-800 mb-4 text-sm leading-relaxed">{q.textNL || q.text}</p>
 
-                        {/* الإجابات */}
+                        {/* ط§ظ„ط¥ط¬ط§ط¨ط§طھ */}
                         <div className="space-y-2">
                           {[1, 2, 3].map(num => {
                             const ansText = q[`answer${num}`];
@@ -551,17 +551,17 @@ function ExamenCategoryContent() {
                                   isUserAns ? "bg-red-500 text-white" :
                                   "bg-gray-300 text-gray-600"
                                 }`}>
-                                  {isCorrectAns ? "✓" : isUserAns ? "✗" : num}
+                                  {isCorrectAns ? "âœ“" : isUserAns ? "âœ—" : num}
                                 </span>
                                 <span className="flex-1">{ansText}</span>
                                 {isCorrectAns && (
                                   <span className="text-xs font-black text-green-600">
-                                    {lang === "ar" ? "الصحيحة" : lang === "nl" ? "Correct" : lang === "fr" ? "Correct" : "Correct"}
+                                    {lang === "ar" ? "ط§ظ„طµط­ظٹط­ط©" : lang === "nl" ? "Correct" : lang === "fr" ? "Correct" : "Correct"}
                                   </span>
                                 )}
                                 {isUserAns && !isCorrectAns && (
                                   <span className="text-xs font-black text-red-500">
-                                    {lang === "ar" ? "إجابتك" : lang === "nl" ? "Jouw antwoord" : lang === "fr" ? "Votre réponse" : "Your answer"}
+                                    {lang === "ar" ? "ط¥ط¬ط§ط¨طھظƒ" : lang === "nl" ? "Jouw antwoord" : lang === "fr" ? "Votre rأ©ponse" : "Your answer"}
                                   </span>
                                 )}
                               </div>
@@ -576,12 +576,12 @@ function ExamenCategoryContent() {
             </div>
           )}
 
-          {/* الأسئلة الصحيحة */}
+          {/* ط§ظ„ط£ط³ط¦ظ„ط© ط§ظ„طµط­ظٹط­ط© */}
           {correctCount > 0 && (
             <details className="mb-6">
               <summary className="cursor-pointer text-sm font-black text-gray-500 flex items-center gap-2 mb-3 select-none">
-                <span className="w-7 h-7 rounded-lg bg-green-500 flex items-center justify-center text-white text-sm">✓</span>
-                {lang === "ar" ? `الأسئلة الصحيحة (${correctCount})` : lang === "nl" ? `Goede antwoorden (${correctCount})` : lang === "fr" ? `Bonnes réponses (${correctCount})` : `Correct answers (${correctCount})`}
+                <span className="w-7 h-7 rounded-lg bg-green-500 flex items-center justify-center text-white text-sm">âœ“</span>
+                {lang === "ar" ? `ط§ظ„ط£ط³ط¦ظ„ط© ط§ظ„طµط­ظٹط­ط© (${correctCount})` : lang === "nl" ? `Goede antwoorden (${correctCount})` : lang === "fr" ? `Bonnes rأ©ponses (${correctCount})` : `Correct answers (${correctCount})`}
               </summary>
               <div className="space-y-2 mt-2">
                 {questions.map((q, i) => {
@@ -591,9 +591,9 @@ function ExamenCategoryContent() {
                       <span className="w-6 h-6 rounded-full bg-green-500 text-white text-xs font-black flex items-center justify-center flex-shrink-0">{i + 1}</span>
                       <p className="text-sm text-gray-700 flex-1 truncate">{q.textNL || q.text}</p>
                       {q.points === 5 && (
-                        <span className="text-xs font-black text-red-500">⭐ 5</span>
+                        <span className="text-xs font-black text-red-500">â­گ 5</span>
                       )}
-                      <span className="text-green-500 font-black text-sm">✓</span>
+                      <span className="text-green-500 font-black text-sm">âœ“</span>
                     </div>
                   );
                 })}
@@ -601,16 +601,16 @@ function ExamenCategoryContent() {
             </details>
           )}
 
-          {/* أزرار */}
+          {/* ط£ط²ط±ط§ط± */}
           <div className="flex gap-3">
             <button onClick={() => { unlockAudio(); setStarted(false); setFinished(false); setCurrentIndex(0); setAnswers({}); setLocked(false); setQuestions(q => [...q].sort(() => Math.random() - 0.5).slice(0, 50)); }}
               className="flex-1 py-3 font-black text-white rounded-xl transition-all hover:opacity-90 active:scale-95"
               style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
-              🔄 {lang === "ar" ? "إعادة" : lang === "nl" ? "Opnieuw" : lang === "fr" ? "Recommencer" : "Retry"}
+              ًں”„ {lang === "ar" ? "ط¥ط¹ط§ط¯ط©" : lang === "nl" ? "Opnieuw" : lang === "fr" ? "Recommencer" : "Retry"}
             </button>
             <button onClick={() => router.back()}
               className="flex-1 py-3 font-black border-2 border-gray-300 text-gray-600 rounded-xl hover:bg-gray-50 active:scale-95">
-              ← {lang === "ar" ? "رجوع" : lang === "nl" ? "Terug" : lang === "fr" ? "Retour" : "Back"}
+              â†گ {lang === "ar" ? "ط±ط¬ظˆط¹" : lang === "nl" ? "Terug" : lang === "fr" ? "Retour" : "Back"}
             </button>
           </div>
         </div>
@@ -618,7 +618,7 @@ function ExamenCategoryContent() {
     );
   }
 
-  // صفحة السؤال
+  // طµظپط­ط© ط§ظ„ط³ط¤ط§ظ„
   const userAnswer = answers[currentIndex];
   const isAnswered = userAnswer !== undefined;
 
@@ -626,7 +626,7 @@ function ExamenCategoryContent() {
     <div className="min-h-screen bg-white" dir={isRtl ? "rtl" : "ltr"}>
       <Navbar />
 
-      {/* تأثير الإجابة الصحيحة - إشارة صح خضراء */}
+      {/* طھط£ط«ظٹط± ط§ظ„ط¥ط¬ط§ط¨ط© ط§ظ„طµط­ظٹط­ط© - ط¥ط´ط§ط±ط© طµط­ ط®ط¶ط±ط§ط، */}
       {showRoses && (
         <div className="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center">
           <div className="absolute inset-0 bg-green-500 opacity-10" />
@@ -648,13 +648,13 @@ function ExamenCategoryContent() {
         </div>
       )}
 
-      {/* تأثير الإجابة الخاطئة */}
+      {/* طھط£ط«ظٹط± ط§ظ„ط¥ط¬ط§ط¨ط© ط§ظ„ط®ط§ط·ط¦ط© */}
       {showWrong && (
         <div className="fixed inset-0 z-[9999] pointer-events-none">
           <div className="absolute inset-0 bg-red-500 opacity-20 animate-pulse"></div>
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-8xl" style={{ animation: 'wrongBounce 0.3s ease-in-out 3' }}>
-              ❌
+              â‌Œ
             </div>
           </div>
           <style>{`
@@ -668,26 +668,26 @@ function ExamenCategoryContent() {
       
       <div className="max-w-2xl mx-auto px-4 py-6">
 
-        {/* السؤال */}
+        {/* ط§ظ„ط³ط¤ط§ظ„ */}
         {q && (
           <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-100">
-            {/* رأس السؤال - العد + المؤقت */}
+            {/* ط±ط£ط³ ط§ظ„ط³ط¤ط§ظ„ - ط§ظ„ط¹ط¯ + ط§ظ„ظ…ط¤ظ‚طھ */}
             <div className="px-5 py-3 flex items-center justify-between"
               style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
               <div className="flex items-center gap-2">
                 <span className="text-white font-black text-sm">
                   {currentIndex + 1} / {questions.length}
                 </span>
-                {/* شارة 5 نقاط */}
+                {/* ط´ط§ط±ط© 5 ظ†ظ‚ط§ط· */}
                 {q.points === 5 && (
                   <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black"
                     style={{ background: "rgba(239,68,68,0.85)", color: "white", border: "1.5px solid rgba(255,255,255,0.4)" }}>
-                    ⭐ 5 {lang === "ar" ? "نقاط" : lang === "nl" ? "punten" : lang === "fr" ? "pts" : "pts"}
+                    â­گ 5 {lang === "ar" ? "ظ†ظ‚ط§ط·" : lang === "nl" ? "punten" : lang === "fr" ? "pts" : "pts"}
                   </span>
                 )}
               </div>
 
-              {/* المؤقت بجانب رقم السؤال */}
+              {/* ط§ظ„ظ…ط¤ظ‚طھ ط¨ط¬ط§ظ†ط¨ ط±ظ‚ظ… ط§ظ„ط³ط¤ط§ظ„ */}
               <div className={`flex items-center gap-2 px-3 py-1 rounded-full font-black text-sm border-2 transition-all ${
                 locked ? "bg-white/20 border-white/40 text-white" :
                 !readingDone ? "bg-blue-500 border-blue-300 text-white animate-pulse" :
@@ -695,33 +695,33 @@ function ExamenCategoryContent() {
                 timeLeft <= 10 ? "bg-orange-500 border-orange-300 text-white" :
                 "bg-green-500 border-green-300 text-white"
               }`}>
-                <span>{!readingDone && !locked ? "🎧" : "⏱"}</span>
+                <span>{!readingDone && !locked ? "ًںژ§" : "âڈ±"}</span>
                 <span className="text-lg">
                   {locked
-                    ? (isAnswered && userAnswer !== null ? (userAnswer === q?.correctAnswer ? "✅" : "❌") : "⏱")
-                    : !readingDone ? (lang === "ar" ? "قراءة..." : lang === "nl" ? "Lezen..." : lang === "fr" ? "Lecture..." : "Reading...") : timeLeft}
+                    ? (isAnswered && userAnswer !== null ? (userAnswer === q?.correctAnswer ? "âœ…" : "â‌Œ") : "âڈ±")
+                    : !readingDone ? (lang === "ar" ? "ظ‚ط±ط§ط،ط©..." : lang === "nl" ? "Lezen..." : lang === "fr" ? "Lecture..." : "Reading...") : timeLeft}
                 </span>
                 {!locked && readingDone && <span className="text-xs opacity-80">s</span>}
               </div>
             </div>
 
-            {/* الصور */}
+            {/* ط§ظ„طµظˆط± */}
             {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
-              <div className={`grid gap-1 p-2 bg-gray-100 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+              <div className={`grid gap-1 p-2 bg-gray-100 grid-cols-1`}>
                 {q.videoUrls.filter(Boolean).map((url: string, i: number) => (
                   <WatermarkedImage key={i} src={url} className="rounded-xl" />
                 ))}
               </div>
             )}
 
-            {/* نص السؤال */}
+            {/* ظ†طµ ط§ظ„ط³ط¤ط§ظ„ */}
             <div className="px-5 py-4 bg-white">
               <p className={`text-lg font-bold text-gray-900 leading-relaxed mb-3 ${isRtl ? "text-right" : "text-left"}`}>
                 {translatedTexts[0] || q.textNL || q.text}
               </p>
 
-              {/* مؤشر حالة القراءة والمؤقت */}
-              {/* الإجابات */}
+              {/* ظ…ط¤ط´ط± ط­ط§ظ„ط© ط§ظ„ظ‚ط±ط§ط،ط© ظˆط§ظ„ظ…ط¤ظ‚طھ */}
+              {/* ط§ظ„ط¥ط¬ط§ط¨ط§طھ */}
               <div className="space-y-3">
                 {[1, 2, 3].map(num => {
                   const label = ["A", "B", "C"][num - 1];
@@ -751,7 +751,7 @@ function ExamenCategoryContent() {
                           : locked ? "bg-gray-200 text-gray-400"
                           : "bg-[#003399] text-white"
                       }`}>
-                        {isAnswered && userAnswer !== null ? (isCorrect ? "✓" : isSelected ? "✗" : label) : label}
+                        {isAnswered && userAnswer !== null ? (isCorrect ? "âœ“" : isSelected ? "âœ—" : label) : label}
                       </span>
                       <span className={isRtl ? "text-right flex-1" : "text-left flex-1"}>{ansText}</span>
                     </button>
@@ -759,14 +759,14 @@ function ExamenCategoryContent() {
                 })}
               </div>
 
-              {/* زر التالي */}
+              {/* ط²ط± ط§ظ„طھط§ظ„ظٹ */}
               {(isAnswered || locked) && (
                 <button onClick={handleNext}
                   className="w-full mt-5 py-3 font-black text-white rounded-xl transition-all hover:opacity-90 active:scale-95"
                   style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
                   {currentIndex + 1 >= questions.length
-                    ? (lang === "ar" ? "عرض النتيجة 🏆" : lang === "nl" ? "Resultaat bekijken 🏆" : lang === "fr" ? "Voir le résultat 🏆" : "View Result 🏆")
-                    : (lang === "ar" ? "التالي ←" : lang === "nl" ? "Volgende →" : lang === "fr" ? "Suivant →" : "Next →")}
+                    ? (lang === "ar" ? "ط¹ط±ط¶ ط§ظ„ظ†طھظٹط¬ط© ًںڈ†" : lang === "nl" ? "Resultaat bekijken ًںڈ†" : lang === "fr" ? "Voir le rأ©sultat ًںڈ†" : "View Result ًںڈ†")
+                    : (lang === "ar" ? "ط§ظ„طھط§ظ„ظٹ â†گ" : lang === "nl" ? "Volgende â†’" : lang === "fr" ? "Suivant â†’" : "Next â†’")}
                 </button>
               )}
             </div>
@@ -785,3 +785,4 @@ export default function ExamenCategoryPage() {
     </Suspense>
   );
 }
+

@@ -288,7 +288,7 @@ function ExamenTestContent() {
                         {(userAns === null || userAns === undefined) && <span className="text-xs font-black text-orange-500">⏰ {lang === "ar" ? "انتهى الوقت" : "Tijd verlopen"}</span>}
                       </div>
                       {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
-                        <div className={`grid gap-0.5 p-1 bg-gray-100 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+                        <div className={`grid gap-1 p-1 bg-gray-100 grid-cols-1`}>
                           {q.videoUrls.filter(Boolean).map((url: string, idx: number) => (
                             <WatermarkedImage key={idx} src={url} />
                           ))}
@@ -399,7 +399,7 @@ function ExamenTestContent() {
             </div>
 
             {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
-              <div className={`grid gap-1 p-2 bg-gray-100 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+              <div className={`grid gap-1 p-2 bg-gray-100 grid-cols-1`}>
                 {q.videoUrls.filter(Boolean).map((url: string, i: number) => (
                   <WatermarkedImage key={i} src={url} className="rounded-xl" />
                 ))}
@@ -463,3 +463,4 @@ export default function ExamenTestPage() {
     </Suspense>
   );
 }
+

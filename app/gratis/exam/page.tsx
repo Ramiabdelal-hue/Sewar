@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Suspense, useEffect, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -79,7 +79,7 @@ function GratisExamContent() {
     };
     const questionText = translated[0] || q.textNL || q.text || "";
     const answers = [translated[1] || q.answer1, translated[2] || q.answer2, translated[3] || q.answer3].filter(Boolean);
-    const labels = lang === "ar" ? ["الجواب A:", "الجواب B:", "الجواب C:"] : lang === "fr" ? ["Réponse A:", "Réponse B:", "Réponse C:"] : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
+    const labels = lang === "ar" ? ["ط§ظ„ط¬ظˆط§ط¨ A:", "ط§ظ„ط¬ظˆط§ط¨ B:", "ط§ظ„ط¬ظˆط§ط¨ C:"] : lang === "fr" ? ["Rأ©ponse A:", "Rأ©ponse B:", "Rأ©ponse C:"] : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
     if (!questionText) { setReadingDone(true); return; }
     speak(questionText, () => {
       if (!isValid()) { setReadingDone(true); return; }
@@ -138,7 +138,7 @@ function GratisExamContent() {
       .then(r => r.json())
       .then(d => {
         if (d.success) {
-          // تصفية أسئلة الامتحان المجانية حسب lessonId
+          // طھطµظپظٹط© ط£ط³ط¦ظ„ط© ط§ظ„ط§ظ…طھط­ط§ظ† ط§ظ„ظ…ط¬ط§ظ†ظٹط© ط­ط³ط¨ lessonId
           const filtered = d.examQuestions.filter((q: any) => q.lessonId === Number(lessonId));
           setQuestions(filtered);
         }
@@ -196,12 +196,12 @@ function GratisExamContent() {
       <Navbar />
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="bg-white rounded-2xl p-8 text-center max-w-sm shadow">
-          <div className="text-4xl mb-3">🎯</div>
+          <div className="text-4xl mb-3">ًںژ¯</div>
           <p className="font-bold text-gray-700 mb-4">
-            {lang === "ar" ? "لا توجد أسئلة امتحان مجانية" : lang === "nl" ? "Geen gratis examenvragen" : "No free exam questions"}
+            {lang === "ar" ? "ظ„ط§ طھظˆط¬ط¯ ط£ط³ط¦ظ„ط© ط§ظ…طھط­ط§ظ† ظ…ط¬ط§ظ†ظٹط©" : lang === "nl" ? "Geen gratis examenvragen" : "No free exam questions"}
           </p>
           <button onClick={() => router.back()} className="px-6 py-2 rounded-xl font-bold text-white" style={{ background: "#22c55e" }}>
-            {lang === "ar" ? "رجوع" : lang === "nl" ? "Terug" : "Retour"}
+            {lang === "ar" ? "ط±ط¬ظˆط¹" : lang === "nl" ? "Terug" : "Retour"}
           </button>
         </div>
       </div>
@@ -213,18 +213,18 @@ function GratisExamContent() {
       <Navbar />
       <div className="max-w-2xl mx-auto px-4 py-12 text-center">
         <div className="border-4 border-[#22c55e] rounded-2xl p-10">
-          <div className="text-6xl mb-4">🎯</div>
+          <div className="text-6xl mb-4">ًںژ¯</div>
           <h1 className="text-2xl font-black text-[#22c55e] mb-2">
-            {lessonTitle || (lang === "ar" ? "امتحان مجاني" : lang === "nl" ? "Gratis Examen" : "Free Exam")}
+            {lessonTitle || (lang === "ar" ? "ط§ظ…طھط­ط§ظ† ظ…ط¬ط§ظ†ظٹ" : lang === "nl" ? "Gratis Examen" : "Free Exam")}
           </h1>
-          <p className="text-gray-500 mb-2">{questions.length} {lang === "ar" ? "سؤال" : lang === "nl" ? "vragen" : "questions"}</p>
-          <p className="text-sm text-orange-600 font-bold mb-8">⏱ {lang === "ar" ? "15 ثانية لكل سؤال" : lang === "nl" ? "15 seconden per vraag" : "15 seconds per question"}</p>
+          <p className="text-gray-500 mb-2">{questions.length} {lang === "ar" ? "ط³ط¤ط§ظ„" : lang === "nl" ? "vragen" : "questions"}</p>
+          <p className="text-sm text-orange-600 font-bold mb-8">âڈ± {lang === "ar" ? "15 ط«ط§ظ†ظٹط© ظ„ظƒظ„ ط³ط¤ط§ظ„" : lang === "nl" ? "15 seconden per vraag" : "15 seconds per question"}</p>
           {questions.length === 0
-            ? <p className="text-red-500 font-bold">{lang === "ar" ? "لا توجد أسئلة" : "Geen vragen"}</p>
+            ? <p className="text-red-500 font-bold">{lang === "ar" ? "ظ„ط§ طھظˆط¬ط¯ ط£ط³ط¦ظ„ط©" : "Geen vragen"}</p>
             : <button onClick={() => { unlockAudio(); setStarted(true); }}
                 className="px-10 py-4 font-black text-white text-lg rounded-xl hover:scale-105 active:scale-95 transition-all"
                 style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
-                {lang === "ar" ? "ابدأ الامتحان" : lang === "nl" ? "Start Examen" : "Start Exam"} 🚀
+                {lang === "ar" ? "ط§ط¨ط¯ط£ ط§ظ„ط§ظ…طھط­ط§ظ†" : lang === "nl" ? "Start Examen" : "Start Exam"} ًںڑ€
               </button>
           }
         </div>
@@ -241,15 +241,15 @@ function GratisExamContent() {
         <Navbar />
         <div className="max-w-3xl mx-auto px-4 py-8">
           <div className={`rounded-2xl p-8 mb-6 text-center border-4 ${passed ? "border-green-400 bg-green-50" : "border-red-400 bg-red-50"}`}>
-            <div className="text-6xl mb-3">{passed ? "🎉" : "😔"}</div>
+            <div className="text-6xl mb-3">{passed ? "ًںژ‰" : "ًںک”"}</div>
             <h1 className="text-2xl font-black mb-1" style={{ color: passed ? "#16a34a" : "#dc2626" }}>
-              {passed ? (lang === "ar" ? "مبروك! نجحت" : lang === "nl" ? "Geslaagd!" : "Passed!") : (lang === "ar" ? "لم تنجح هذه المرة" : lang === "nl" ? "Helaas niet geslaagd" : "Not passed")}
+              {passed ? (lang === "ar" ? "ظ…ط¨ط±ظˆظƒ! ظ†ط¬ط­طھ" : lang === "nl" ? "Geslaagd!" : "Passed!") : (lang === "ar" ? "ظ„ظ… طھظ†ط¬ط­ ظ‡ط°ظ‡ ط§ظ„ظ…ط±ط©" : lang === "nl" ? "Helaas niet geslaagd" : "Not passed")}
             </h1>
             <div className="flex items-center justify-center gap-4 mt-4 flex-wrap">
               {[
-                { label: lang === "ar" ? "النقاط" : "Behaald", value: score, sub: `/ ${maxScore}`, color: "text-green-600" },
-                { label: lang === "ar" ? "صح" : "Correct", value: correctCount, sub: `/ ${questions.length}`, color: "text-blue-600" },
-                { label: lang === "ar" ? "خطأ" : "Fout", value: questions.length - correctCount, sub: "", color: "text-red-500" },
+                { label: lang === "ar" ? "ط§ظ„ظ†ظ‚ط§ط·" : "Behaald", value: score, sub: `/ ${maxScore}`, color: "text-green-600" },
+                { label: lang === "ar" ? "طµط­" : "Correct", value: correctCount, sub: `/ ${questions.length}`, color: "text-blue-600" },
+                { label: lang === "ar" ? "ط®ط·ط£" : "Fout", value: questions.length - correctCount, sub: "", color: "text-red-500" },
                 { label: "Score", value: `${pct}%`, sub: "", color: passed ? "text-green-600" : "text-red-600" },
               ].map((s, i) => (
                 <div key={i} className="bg-white rounded-xl px-5 py-3 shadow text-center">
@@ -261,12 +261,12 @@ function GratisExamContent() {
             </div>
           </div>
 
-          {/* الأسئلة الخاطئة */}
+          {/* ط§ظ„ط£ط³ط¦ظ„ط© ط§ظ„ط®ط§ط·ط¦ط© */}
           {questions.some((q, i) => answers[i] !== q.correctAnswer) && (
             <div className="mb-6">
               <h2 className="text-lg font-black text-gray-800 mb-3 flex items-center gap-2">
-                <span className="w-7 h-7 rounded-lg bg-red-500 flex items-center justify-center text-white text-sm">❌</span>
-                {lang === "ar" ? "الأجوبة الخاطئة" : lang === "nl" ? "Foute antwoorden" : "Wrong answers"}
+                <span className="w-7 h-7 rounded-lg bg-red-500 flex items-center justify-center text-white text-sm">â‌Œ</span>
+                {lang === "ar" ? "ط§ظ„ط£ط¬ظˆط¨ط© ط§ظ„ط®ط§ط·ط¦ط©" : lang === "nl" ? "Foute antwoorden" : "Wrong answers"}
               </h2>
               <div className="space-y-4">
                 {questions.map((q, i) => {
@@ -276,11 +276,11 @@ function GratisExamContent() {
                     <div key={i} className="bg-white rounded-2xl overflow-hidden shadow border border-red-100">
                       <div className="px-4 py-2 flex items-center gap-2" style={{ background: "#fef2f2" }}>
                         <span className="w-6 h-6 rounded-full bg-red-500 text-white text-xs font-black flex items-center justify-center">{i + 1}</span>
-                        {q.points === 5 && <span className="text-xs font-black px-1.5 py-0.5 rounded-full" style={{ background: "rgba(239,68,68,0.15)", color: "#dc2626" }}>⭐ 5 pts</span>}
-                        {(userAns === null || userAns === undefined) && <span className="text-xs font-black text-orange-500">⏰ {lang === "ar" ? "انتهى الوقت" : "Tijd verlopen"}</span>}
+                        {q.points === 5 && <span className="text-xs font-black px-1.5 py-0.5 rounded-full" style={{ background: "rgba(239,68,68,0.15)", color: "#dc2626" }}>â­گ 5 pts</span>}
+                        {(userAns === null || userAns === undefined) && <span className="text-xs font-black text-orange-500">âڈ° {lang === "ar" ? "ط§ظ†طھظ‡ظ‰ ط§ظ„ظˆظ‚طھ" : "Tijd verlopen"}</span>}
                       </div>
                       {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
-                        <div className={`grid gap-0.5 p-1 bg-gray-100 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+                        <div className={`grid gap-1 p-1 bg-gray-100 grid-cols-1`}>
                           {q.videoUrls.filter(Boolean).map((url: string, idx: number) => (
                             <WatermarkedImage key={idx} src={url} alt="" />
                           ))}
@@ -297,11 +297,11 @@ function GratisExamContent() {
                             return (
                               <div key={num} className={`flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium border-2 ${isCorrectAns ? "bg-green-50 border-green-400 text-green-800" : isUserAns ? "bg-red-50 border-red-400 text-red-800" : "bg-gray-50 border-gray-200 text-gray-500"}`}>
                                 <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0 ${isCorrectAns ? "bg-green-500 text-white" : isUserAns ? "bg-red-500 text-white" : "bg-gray-300 text-gray-600"}`}>
-                                  {isCorrectAns ? "✓" : isUserAns ? "✗" : num}
+                                  {isCorrectAns ? "âœ“" : isUserAns ? "âœ—" : num}
                                 </span>
                                 <span className="flex-1">{ansText}</span>
-                                {isCorrectAns && <span className="text-xs font-black text-green-600">{lang === "ar" ? "الصحيح" : "Correct"}</span>}
-                                {isUserAns && !isCorrectAns && <span className="text-xs font-black text-red-500">{lang === "ar" ? "اختيارك" : "Jouw antwoord"}</span>}
+                                {isCorrectAns && <span className="text-xs font-black text-green-600">{lang === "ar" ? "ط§ظ„طµط­ظٹط­" : "Correct"}</span>}
+                                {isUserAns && !isCorrectAns && <span className="text-xs font-black text-red-500">{lang === "ar" ? "ط§ط®طھظٹط§ط±ظƒ" : "Jouw antwoord"}</span>}
                               </div>
                             );
                           })}
@@ -318,11 +318,11 @@ function GratisExamContent() {
             <button onClick={() => { unlockAudio(); setStarted(false); setFinished(false); setCurrentIndex(0); setAnswers({}); setLocked(false); }}
               className="flex-1 py-3 font-black text-white rounded-xl hover:opacity-90 active:scale-95"
               style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
-              🔄 {lang === "ar" ? "إعادة" : lang === "nl" ? "Opnieuw" : "Retry"}
+              ًں”„ {lang === "ar" ? "ط¥ط¹ط§ط¯ط©" : lang === "nl" ? "Opnieuw" : "Retry"}
             </button>
             <button onClick={() => router.back()}
               className="flex-1 py-3 font-black border-2 border-gray-300 text-gray-600 rounded-xl hover:bg-gray-50 active:scale-95">
-              ← {lang === "ar" ? "رجوع" : lang === "nl" ? "Terug" : "Back"}
+              â†گ {lang === "ar" ? "ط±ط¬ظˆط¹" : lang === "nl" ? "Terug" : "Back"}
             </button>
           </div>
         </div>
@@ -353,7 +353,7 @@ function GratisExamContent() {
         <div className="fixed inset-0 z-[9999] pointer-events-none">
           <div className="absolute inset-0 bg-red-500 opacity-20 animate-pulse"></div>
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-8xl" style={{ animation: "wrongBounce 0.3s ease-in-out 3" }}>❌</div>
+            <div className="text-8xl" style={{ animation: "wrongBounce 0.3s ease-in-out 3" }}>â‌Œ</div>
           </div>
           <style>{`@keyframes wrongBounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }`}</style>
         </div>
@@ -366,18 +366,18 @@ function GratisExamContent() {
               <div className="flex items-center gap-2">
                 <span className="text-white font-black text-sm">{currentIndex + 1} / {questions.length}</span>
                 {q.points === 5 && (
-                  <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(239,68,68,0.85)", color: "white", border: "1.5px solid rgba(255,255,255,0.4)" }}>⭐ 5 pts</span>
+                  <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(239,68,68,0.85)", color: "white", border: "1.5px solid rgba(255,255,255,0.4)" }}>â­گ 5 pts</span>
                 )}
               </div>
               <div className={`flex items-center gap-2 px-3 py-1 rounded-full font-black text-sm border-2 transition-all ${locked ? "bg-white/20 border-white/40 text-white" : !readingDone ? "bg-blue-500 border-blue-300 text-white animate-pulse" : timeLeft <= 5 ? "bg-red-500 border-red-300 text-white animate-pulse" : timeLeft <= 10 ? "bg-orange-500 border-orange-300 text-white" : "bg-green-500 border-green-300 text-white"}`}>
-                <span>{!readingDone && !locked ? "🔊" : "⏱"}</span>
-                <span>{locked ? (isAnswered && userAnswer !== null ? (userAnswer === q.correctAnswer ? "✓" : "✗") : "⏰") : !readingDone ? (lang === "ar" ? "يقرأ..." : "Lezen...") : timeLeft}</span>
+                <span>{!readingDone && !locked ? "ًں”ٹ" : "âڈ±"}</span>
+                <span>{locked ? (isAnswered && userAnswer !== null ? (userAnswer === q.correctAnswer ? "âœ“" : "âœ—") : "âڈ°") : !readingDone ? (lang === "ar" ? "ظٹظ‚ط±ط£..." : "Lezen...") : timeLeft}</span>
                 {!locked && readingDone && <span className="text-xs opacity-80">s</span>}
               </div>
             </div>
 
             {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
-              <div className={`grid gap-1 p-2 bg-gray-100 ${q.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+              <div className={`grid gap-1 p-2 bg-gray-100 grid-cols-1`}>
                 {q.videoUrls.filter(Boolean).map((url: string, i: number) => (
                   <WatermarkedImage key={i} src={url} alt="" />
                 ))}
@@ -407,7 +407,7 @@ function GratisExamContent() {
                     <button key={num} onClick={() => handleAnswer(num)} disabled={isAnswered || locked}
                       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${style} ${!isAnswered && !locked ? "cursor-pointer active:scale-95" : "cursor-default"}`}>
                       <span className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0 ${isAnswered && userAnswer !== null ? isCorrect ? "bg-green-500 text-white" : isSelected ? "bg-red-500 text-white" : "bg-gray-200 text-gray-500" : locked ? "bg-gray-200 text-gray-400" : "bg-[#22c55e] text-white"}`}>
-                        {isAnswered && userAnswer !== null ? (isCorrect ? "✓" : isSelected ? "✗" : label) : label}
+                        {isAnswered && userAnswer !== null ? (isCorrect ? "âœ“" : isSelected ? "âœ—" : label) : label}
                       </span>
                       <span className={isRtl ? "text-right flex-1" : "text-left flex-1"}>{ansText}</span>
                     </button>
@@ -416,7 +416,7 @@ function GratisExamContent() {
               </div>
               {(isAnswered || locked) && (
                 <button onClick={handleNext} className="w-full mt-5 py-3 font-black text-white rounded-xl hover:opacity-90 active:scale-95" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
-                  {currentIndex + 1 >= questions.length ? (lang === "ar" ? "عرض النتائج 🏆" : lang === "nl" ? "Resultaat 🏆" : "Result 🏆") : (lang === "ar" ? "التالي ➤" : lang === "nl" ? "Volgende ➤" : "Next ➤")}
+                  {currentIndex + 1 >= questions.length ? (lang === "ar" ? "ط¹ط±ط¶ ط§ظ„ظ†طھط§ط¦ط¬ ًںڈ†" : lang === "nl" ? "Resultaat ًںڈ†" : "Result ًںڈ†") : (lang === "ar" ? "ط§ظ„طھط§ظ„ظٹ â‍¤" : lang === "nl" ? "Volgende â‍¤" : "Next â‍¤")}
                 </button>
               )}
             </div>
