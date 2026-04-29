@@ -206,77 +206,67 @@ function GratisContent() {
             <p className="font-bold text-gray-700">{lang === "ar" ? "لا توجد دروس مجانية متاحة" : lang === "nl" ? "Geen gratis lessen beschikbaar" : "Aucune leçon gratuite disponible"}</p>
           </div>
         ) : (
-          <table className="w-full border-collapse lessons-table" style={{ tableLayout: "fixed" }}>
-            <colgroup>
-              <col style={{ width: "60%" }} />
-              <col style={{ width: "20%" }} />
-              <col style={{ width: "20%" }} />
-            </colgroup>
-            <thead>
-              <tr style={{ backgroundColor: "#22c55e" }}>
-                <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#16a34a]">
-                  {lang === "ar" ? "الدرس" : lang === "nl" ? "LES" : lang === "fr" ? "LEÇON" : "LESSON"}
-                </th>
-                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#16a34a] text-center">
-                  {lang === "ar" ? "فتح" : lang === "nl" ? "OPENEN" : lang === "fr" ? "OUVRIR" : "OPEN"}
-                </th>
-                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#16a34a] text-center">
-                  EXAM
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {lessons.map((lesson, i) => {
-                const isFirstWithQuestions = i === 0 && lesson.hasQuestions;
-                return (
-                <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#f5f5f5" }}>
-                  <td className="px-4 py-3 border border-gray-200">
-                    <div className="font-bold text-[#003399] text-base" style={{ wordBreak: "break-word", whiteSpace: "normal" }}>
-                      {i + 1}. {translatedTitles[i] || lesson.title}
-                    </div>
-                    {lesson.description && (
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <span className="w-1 h-3 rounded-full bg-[#3399ff] flex-shrink-0"></span>
-                        <span className="text-xs font-semibold text-[#3399ff]">{lesson.description}</span>
+          <div className="space-y-2">
+            {lessons.map((lesson, i) => {
+              const isFirstWithQuestions = i === 0 && lesson.hasQuestions;
+              return (
+                <div key={lesson.id} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+                  {/* عنوان الدرس */}
+                  <div className="px-4 py-3 border-b border-gray-50">
+                    <div className="flex items-start gap-3">
+                      <span className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black text-white flex-shrink-0 mt-0.5"
+                        style={{ background: "linear-gradient(135deg, #7c3aed, #5b21b6)" }}>
+                        {i + 1}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-[#003399] text-sm leading-snug">
+                          {translatedTitles[i] || lesson.title}
+                        </p>
+                        {lesson.description && (
+                          <p className="text-xs text-[#3399ff] font-semibold mt-0.5">{lesson.description}</p>
+                        )}
                       </div>
-                    )}
-                  </td>
-                  {isFirstWithQuestions ? (
-                    <td colSpan={2} className="px-4 py-3 border border-gray-200 text-center">
+                    </div>
+                  </div>
+
+                  {/* أزرار الدرس والامتحان */}
+                  <div className="px-4 py-3 flex gap-2">
+                    {isFirstWithQuestions ? (
                       <button
                         onClick={() => router.push(`/gratis/lesson?lessonId=${lesson.id}&category=${selectedCat}&lesson=${encodeURIComponent(lesson.title)}`)}
-                        className="border-2 px-4 py-1 text-sm font-bold transition-colors w-full"
-                        style={{ background: "#7c3aed", borderColor: "#7c3aed", color: "white" }}
-                      >
+                        className="flex-1 py-2.5 rounded-xl text-sm font-black text-white transition-all active:scale-95"
+                        style={{ background: "linear-gradient(135deg, #7c3aed, #5b21b6)" }}>
                         ✔ Start nu
                       </button>
-                    </td>
-                  ) : (
-                    <>
-                      <td className="px-4 py-3 border border-gray-200 text-center">
-                        <button
-                          onClick={() => router.push(`/gratis/lesson?lessonId=${lesson.id}&category=${selectedCat}&lesson=${encodeURIComponent(lesson.title)}`)}
-                          className="bg-white border-2 border-gray-400 px-4 py-1 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors w-full"
-                        >
-                          {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
-                        </button>
-                      </td>
-                      <td className="px-4 py-3 border border-gray-200 text-center">
-                        <button
-                          onClick={() => router.push(`/gratis/exam?category=${selectedCat}&lessonId=${lesson.id}&lesson=${encodeURIComponent(lesson.title)}`)}
-                          className="border-2 px-4 py-1 text-sm font-bold transition-colors w-full"
-                          style={{ background: "#22c55e", borderColor: "#16a34a", color: "white" }}
-                        >
-                          EXAM
-                        </button>
-                      </td>
-                    </>
-                  )}
-                </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                    ) : (
+                      <>
+                        {lesson.hasQuestions && (
+                          <button
+                            onClick={() => router.push(`/gratis/lesson?lessonId=${lesson.id}&category=${selectedCat}&lesson=${encodeURIComponent(lesson.title)}`)}
+                            className="flex-1 py-2.5 rounded-xl text-sm font-black transition-all active:scale-95 border-2 border-gray-300 text-gray-700 hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff]">
+                            📖 {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
+                          </button>
+                        )}
+                        {lesson.hasExam && (
+                          <button
+                            onClick={() => router.push(`/gratis/exam?category=${selectedCat}&lessonId=${lesson.id}&lesson=${encodeURIComponent(lesson.title)}`)}
+                            className="flex-1 py-2.5 rounded-xl text-sm font-black text-white transition-all active:scale-95"
+                            style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
+                            🎯 EXAM
+                          </button>
+                        )}
+                        {!lesson.hasQuestions && !lesson.hasExam && (
+                          <span className="flex-1 py-2.5 rounded-xl text-sm font-bold text-center text-gray-400 bg-gray-50 border border-gray-200">
+                            {lang === "ar" ? "قريباً" : lang === "nl" ? "Binnenkort" : "Coming soon"}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         )}
 
         {/* زر الاشتراك */}
