@@ -913,7 +913,8 @@ export default function AdminQuestionsPage() {
     }
   };
   const handleEditQuestion = async (questionId: number) => {
-    const form = editFormRef.current;
+    // استخدام editForm مباشرة بدلاً من editFormRef لضمان أحدث القيم
+    const form = editForm;
     if (!form.textNL && !form.textFR && !form.textAR) {
       alert("أدخل نص السؤال بلغة واحدة على الأقل");
       return;
@@ -2017,8 +2018,7 @@ export default function AdminQuestionsPage() {
                         <button onClick={() => handleEditQuestion(q.id)} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black transition-all hover:scale-[1.02] active:scale-95" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white", boxShadow: "0 4px 14px rgba(34,197,94,0.35)" }}>
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                           حفظ التعديلات
-                        </button>
-                        <button onClick={() => setEditingQuestion(null)} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black transition-all hover:scale-[1.02] active:scale-95" style={{ background: "#f1f5f9", color: "#64748b", border: "1.5px solid #e2e8f0" }}>
+                        </button>                        <button onClick={() => setEditingQuestion(null)} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black transition-all hover:scale-[1.02] active:scale-95" style={{ background: "#f1f5f9", color: "#64748b", border: "1.5px solid #e2e8f0" }}>
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                           إلغاء
                         </button>
