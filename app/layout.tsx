@@ -11,6 +11,28 @@ export const metadata = {
     apple: '/her.jpeg',
     shortcut: '/her.jpeg',
   },
+  openGraph: {
+    title: 'Sewar Rijbewijs Online',
+    description: 'Haal je rijbewijs in één keer! Theorie, Examen & Praktijk.',
+    url: 'https://sewar-1q112.vercel.app',
+    siteName: 'Sewar Rijbewijs Online',
+    images: [
+      {
+        url: 'https://sewar-1q112.vercel.app/Logo.jpeg',
+        width: 800,
+        height: 600,
+        alt: 'Sewar Rijbewijs Online',
+      },
+    ],
+    locale: 'nl_BE',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Sewar Rijbewijs Online',
+    description: 'Haal je rijbewijs in één keer!',
+    images: ['https://sewar-1q112.vercel.app/Logo.jpeg'],
+  },
 };
 
 export const viewport = {
