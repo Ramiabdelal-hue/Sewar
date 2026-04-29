@@ -70,7 +70,7 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
       localStorage.setItem("renewPrefillData", JSON.stringify({ fullName: formData.fullName, email: formData.email, phone: formData.phone }));
       const res = await fetch("/api/subscribe", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, category: targetCat, subscriptionType, expiry: expiryDate.getTime(), forceRenew: prefillData ? true : false }),
+        body: JSON.stringify({ ...formData, category: targetCat, subscriptionType, duration, expiry: expiryDate.getTime(), forceRenew: prefillData ? true : false }),
       });
       const data = await res.json();
       if (data.success) {

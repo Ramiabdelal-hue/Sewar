@@ -198,3 +198,242 @@ export async function sendSuspensionEmail(
     return { success: false, error: error.message };
   }
 }
+
+/**
+ * إرسال إيميل تأكيد الاشتراك مع الفاتورة
+ */
+export async function sendSubscriptionConfirmationEmail(params: {
+  toEmail: string;
+  userName: string;
+  subscriptionType: string;
+  category: string;
+  duration: string;
+  amount: number;
+  expiryDate: Date;
+  paymentMethod: string;
+  invoiceNumber: string;
+}): Promise<{ success: boolean; error?: string }> {
+  try {
+    const transporter = createTransporter();
+
+    const { toEmail, userName, subscriptionType, category, duration, amount, expiryDate, paymentMethod, invoiceNumber } = params;
+
+    // حساب الضريبة (21% BTW في بلجيكا)
+    const BTW_RATE = 0.21;
+    const amountExclBTW = Math.round((amount / (1 + BTW_RATE)) * 100) / 100;
+    const btwAmount = Math.round((amount - amountExclBTW) * 100) / 100;
+
+    // ترجمة نوع الاشتراك
+    const subTypeNL: Record<string, string> = {
+      theorie: "Theorie Rijbewijs",
+      examen: "Examen Training",
+      "praktijk-lessons": "Praktijk - Oefenvideo's",
+      "praktijk-exam": "Praktijk - Gevaarherkenning",
+    };
+    const subTypeAR: Record<string, string> = {
+      theorie: "دروس نظرية",
+      examen: "تدريب الامتحانات",
+      "praktijk-lessons": "عملي - فيديوهات",
+      "praktijk-exam": "عملي - إدراك المخاطر",
+    };
+    const payMethodNL: Record<string, string> = {
+      bancontact: "Bancontact",
+      cash: "Contant",
+      card: "Bankkaart",
+      bank_transfer: "Overschrijving",
+      payconiq: "Payconiq",
+    };
+
+    const subLabel = subTypeNL[subscriptionType] || subscriptionType;
+    const subLabelAR = subTypeAR[subscriptionType] || subscriptionType;
+    const payLabel = payMethodNL[paymentMethod] || paymentMethod;
+    const durationLabel = duration === "2w" ? "2 Weken" : "1 Maand";
+    const durationLabelAR = duration === "2w" ? "أسبوعان" : "شهر واحد";
+    const expiryFormatted = expiryDate.toLocaleDateString("nl-BE", { day: "2-digit", month: "2-digit", year: "numeric" });
+    const expiryFormattedAR = expiryDate.toLocaleDateString("ar-EG", { day: "2-digit", month: "2-digit", year: "numeric" });
+    const today = new Date().toLocaleDateString("nl-BE", { day: "2-digit", month: "2-digit", year: "numeric" });
+    const todayAR = new Date().toLocaleDateString("ar-EG", { day: "2-digit", month: "2-digit", year: "numeric" });
+
+    const subject = `✅ Bevestiging abonnement – Sewar RijbewijsOnline | تأكيد الاشتراك`;
+
+    const html = `
+<!DOCTYPE html>
+<html lang="nl">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head>
+<body style="margin:0;padding:0;background:#f4f6fb;font-family:Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6fb;padding:32px 0;">
+  <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);max-width:600px;width:100%;">
+
+      <!-- Header -->
+      <tr>
+        <td style="background:linear-gradient(135deg,#003399,#0055cc);padding:32px 40px;text-align:center;">
+          <div style="font-size:48px;margin-bottom:12px;">🎉</div>
+          <h1 style="color:#fff;margin:0;font-size:24px;font-weight:900;">Sewar RijbewijsOnline</h1>
+          <p style="color:rgba(255,255,255,0.85);margin:8px 0 0;font-size:14px;">Abonnement bevestigd / تم تأكيد الاشتراك</p>
+        </td>
+      </tr>
+
+      <!-- NL Content -->
+      <tr>
+        <td style="padding:32px 40px 24px;">
+          <p style="color:#374151;font-size:16px;margin:0 0 8px;">Beste <strong>${userName}</strong>,</p>
+          <p style="color:#374151;font-size:15px;line-height:1.7;margin:0 0 20px;">
+            Bedankt voor uw inschrijving! Uw abonnement is succesvol geactiveerd.
+          </p>
+
+          <!-- Subscription Details Box -->
+          <div style="background:#eff6ff;border:2px solid #bfdbfe;border-radius:12px;padding:20px;margin-bottom:24px;">
+            <h3 style="color:#1d4ed8;margin:0 0 16px;font-size:16px;">📋 Abonnementsdetails</h3>
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="color:#6b7280;font-size:14px;padding:4px 0;">Type:</td>
+                <td style="color:#111827;font-size:14px;font-weight:700;text-align:right;">${subLabel} – Categorie ${category}</td>
+              </tr>
+              <tr>
+                <td style="color:#6b7280;font-size:14px;padding:4px 0;">Duur:</td>
+                <td style="color:#111827;font-size:14px;font-weight:700;text-align:right;">${durationLabel}</td>
+              </tr>
+              <tr>
+                <td style="color:#6b7280;font-size:14px;padding:4px 0;">Geldig tot:</td>
+                <td style="color:#16a34a;font-size:14px;font-weight:700;text-align:right;">${expiryFormatted}</td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- Invoice -->
+          <div style="border:2px solid #e5e7eb;border-radius:12px;overflow:hidden;margin-bottom:24px;">
+            <div style="background:#f9fafb;padding:16px 20px;border-bottom:1px solid #e5e7eb;">
+              <h3 style="color:#111827;margin:0;font-size:16px;">🧾 Factuur / Invoice</h3>
+              <p style="color:#6b7280;font-size:12px;margin:4px 0 0;">Nr: ${invoiceNumber} | Datum: ${today}</p>
+            </div>
+            <table width="100%" cellpadding="0" cellspacing="0" style="padding:16px 20px;">
+              <tr>
+                <td style="color:#374151;font-size:14px;padding:6px 0;">${subLabel} – Cat. ${category} (${durationLabel})</td>
+                <td style="color:#374151;font-size:14px;text-align:right;padding:6px 0;">€${amountExclBTW.toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td style="color:#6b7280;font-size:13px;padding:4px 0;">BTW 21%</td>
+                <td style="color:#6b7280;font-size:13px;text-align:right;padding:4px 0;">€${btwAmount.toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td colspan="2" style="border-top:2px solid #e5e7eb;padding-top:8px;"></td>
+              </tr>
+              <tr>
+                <td style="color:#111827;font-size:16px;font-weight:900;padding:4px 0;">Totaal (incl. BTW)</td>
+                <td style="color:#003399;font-size:16px;font-weight:900;text-align:right;padding:4px 0;">€${amount.toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td style="color:#6b7280;font-size:13px;padding:4px 0;">Betaalmethode:</td>
+                <td style="color:#374151;font-size:13px;text-align:right;padding:4px 0;">${payLabel}</td>
+              </tr>
+            </table>
+          </div>
+
+          <div style="background:#f0fdf4;border:2px solid #bbf7d0;border-radius:12px;padding:16px;margin-bottom:20px;text-align:center;">
+            <p style="color:#16a34a;font-size:15px;font-weight:700;margin:0;">✅ Betaling ontvangen – Abonnement actief!</p>
+          </div>
+
+          <p style="color:#6b7280;font-size:13px;margin:0;">
+            Vragen? <a href="mailto:sewarrijbewijs@gmail.com" style="color:#2563eb;">sewarrijbewijs@gmail.com</a>
+          </p>
+        </td>
+      </tr>
+
+      <!-- Divider -->
+      <tr><td style="padding:0 40px;"><hr style="border:none;border-top:3px dashed #e5e7eb;margin:0;"/></td></tr>
+
+      <!-- AR Content -->
+      <tr>
+        <td style="padding:32px 40px 24px;" dir="rtl">
+          <p style="color:#374151;font-size:16px;margin:0 0 8px;">عزيزي <strong>${userName}</strong>،</p>
+          <p style="color:#374151;font-size:15px;line-height:1.7;margin:0 0 20px;">
+            شكراً لاشتراكك! تم تفعيل اشتراكك بنجاح.
+          </p>
+
+          <!-- تفاصيل الاشتراك -->
+          <div style="background:#eff6ff;border:2px solid #bfdbfe;border-radius:12px;padding:20px;margin-bottom:24px;">
+            <h3 style="color:#1d4ed8;margin:0 0 16px;font-size:16px;">📋 تفاصيل الاشتراك</h3>
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="color:#6b7280;font-size:14px;padding:4px 0;">النوع:</td>
+                <td style="color:#111827;font-size:14px;font-weight:700;text-align:left;">${subLabelAR} – فئة ${category}</td>
+              </tr>
+              <tr>
+                <td style="color:#6b7280;font-size:14px;padding:4px 0;">المدة:</td>
+                <td style="color:#111827;font-size:14px;font-weight:700;text-align:left;">${durationLabelAR}</td>
+              </tr>
+              <tr>
+                <td style="color:#6b7280;font-size:14px;padding:4px 0;">صالح حتى:</td>
+                <td style="color:#16a34a;font-size:14px;font-weight:700;text-align:left;">${expiryFormattedAR}</td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- الفاتورة -->
+          <div style="border:2px solid #e5e7eb;border-radius:12px;overflow:hidden;margin-bottom:24px;">
+            <div style="background:#f9fafb;padding:16px 20px;border-bottom:1px solid #e5e7eb;">
+              <h3 style="color:#111827;margin:0;font-size:16px;">🧾 الفاتورة</h3>
+              <p style="color:#6b7280;font-size:12px;margin:4px 0 0;">رقم: ${invoiceNumber} | التاريخ: ${todayAR}</p>
+            </div>
+            <table width="100%" cellpadding="0" cellspacing="0" style="padding:16px 20px;">
+              <tr>
+                <td style="color:#374151;font-size:14px;padding:6px 0;">${subLabelAR} – فئة ${category} (${durationLabelAR})</td>
+                <td style="color:#374151;font-size:14px;text-align:left;padding:6px 0;">€${amountExclBTW.toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td style="color:#6b7280;font-size:13px;padding:4px 0;">ضريبة القيمة المضافة 21%</td>
+                <td style="color:#6b7280;font-size:13px;text-align:left;padding:4px 0;">€${btwAmount.toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td colspan="2" style="border-top:2px solid #e5e7eb;padding-top:8px;"></td>
+              </tr>
+              <tr>
+                <td style="color:#111827;font-size:16px;font-weight:900;padding:4px 0;">الإجمالي (شامل الضريبة)</td>
+                <td style="color:#003399;font-size:16px;font-weight:900;text-align:left;padding:4px 0;">€${amount.toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td style="color:#6b7280;font-size:13px;padding:4px 0;">طريقة الدفع:</td>
+                <td style="color:#374151;font-size:13px;text-align:left;padding:4px 0;">${payLabel}</td>
+              </tr>
+            </table>
+          </div>
+
+          <div style="background:#f0fdf4;border:2px solid #bbf7d0;border-radius:12px;padding:16px;margin-bottom:20px;text-align:center;">
+            <p style="color:#16a34a;font-size:15px;font-weight:700;margin:0;">✅ تم استلام الدفع – الاشتراك نشط!</p>
+          </div>
+
+          <p style="color:#6b7280;font-size:13px;margin:0;">
+            للتواصل: <a href="mailto:sewarrijbewijs@gmail.com" style="color:#2563eb;">sewarrijbewijs@gmail.com</a>
+          </p>
+        </td>
+      </tr>
+
+      <!-- Footer -->
+      <tr>
+        <td style="background:#f9fafb;padding:20px 40px;text-align:center;border-top:1px solid #e5e7eb;">
+          <p style="color:#9ca3af;font-size:12px;margin:0;">© ${new Date().getFullYear()} Sewar RijbewijsOnline · sewarrijbewijs@gmail.com</p>
+          <p style="color:#d1d5db;font-size:11px;margin:4px 0 0;">BTW-nummer: BE0XXX.XXX.XXX</p>
+        </td>
+      </tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>`;
+
+    await transporter.sendMail({
+      from: `"Sewar RijbewijsOnline" <${process.env.SMTP_USER}>`,
+      to: toEmail,
+      subject,
+      html,
+    });
+
+    console.log(`✅ Subscription confirmation email sent to ${toEmail}`);
+    return { success: true };
+  } catch (error: any) {
+    console.error(`❌ Subscription confirmation email failed to ${toEmail}:`, error.message);
+    return { success: false, error: error.message };
+  }
+}

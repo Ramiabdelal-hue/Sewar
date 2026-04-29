@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit, getClientIp } from "@/lib/adminAuth";
 import bcrypt from "bcrypt";
+import { sendSubscriptionConfirmationEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   // التحقق من قفل التسجيل - غير إلى false لفتح التسجيل
@@ -159,7 +160,29 @@ export async function POST(req: NextRequest) {
 
     console.log("✅ Subscription created/updated with active status - ready to use");
 
-    // 8️⃣ إعادة الاستجابة الناجحة (الاشتراك مفعّل)
+    // 8️⃣ إرسال إيميل تأكيد الاشتراك مع الفاتورة
+    const invoiceNumber = `INV-${Date.now()}-${user.id}`;
+    const packagePrices: Record<string, number> = {
+      theorie: body.duration === "2w" ? 25 : 50,
+      examen: body.duration === "2w" ? 25 : 50,
+      "praktijk-lessons": 49,
+      "praktijk-exam": 39,
+    };
+    const amount = body.amount || packagePrices[body.subscriptionType || "theorie"] || 25;
+
+    sendSubscriptionConfirmationEmail({
+      toEmail: user.email,
+      userName: user.name,
+      subscriptionType: body.subscriptionType || "theorie",
+      category: body.category || "B",
+      duration: body.duration || "2w",
+      amount,
+      expiryDate,
+      paymentMethod: body.paymentMethod || "bancontact",
+      invoiceNumber,
+    }).catch(err => console.error("❌ Failed to send confirmation email:", err));
+
+    // 9️⃣ إعادة الاستجابة الناجحة (الاشتراك مفعّل)
     return NextResponse.json({
       success: true,
       email: user.email,
