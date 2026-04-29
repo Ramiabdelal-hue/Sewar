@@ -52,27 +52,19 @@ function GratisContent() {
       .then(d => {
         if (d.success) {
           const lessonMap = new Map<number, any>();
-
-          // ╪ث╪╢┘ ╪د┘╪»╪▒┘ê╪│ ╪د┘╪ز┘è ╪╣┘╪»┘ç╪د ╪ث╪│╪خ┘╪ر ╪»╪▒╪│ ┘à╪ش╪د┘┘è╪ر
           for (const q of d.questions) {
             if (q.lesson && q.lessonId && !lessonMap.has(q.lessonId)) {
               lessonMap.set(q.lessonId, { id: q.lessonId, title: q.lesson.title, description: q.lesson.description });
             }
           }
-
-          // ╪ث╪╢┘ ╪د┘╪»╪▒┘ê╪│ ╪د┘╪ز┘è ╪╣┘╪»┘ç╪د ╪ث╪│╪خ┘╪ر ╪د┘à╪ز╪ص╪د┘ ┘à╪ش╪د┘┘è╪ر (╪ح╪░╪د ┘┘à ╪ز┘â┘ ┘à┘ê╪ش┘ê╪»╪ر ╪ذ╪د┘┘╪╣┘)
           for (const q of (d.examQuestions || [])) {
             if (q.lesson && q.lessonId && !lessonMap.has(q.lessonId)) {
               lessonMap.set(q.lessonId, { id: q.lessonId, title: q.lesson.title, description: q.lesson.description });
             }
           }
-
           const sorted = Array.from(lessonMap.values()).sort((a, b) => a.id - b.id);
-
-          // ╪ص╪│╪د╪ذ ╪ث┘è ╪»╪▒╪│ ╪╣┘╪»┘ç ╪ث╪│╪خ┘╪ر ╪»╪▒╪│ ┘ê╪ث┘è┘ç╪د ╪╣┘╪»┘ç ╪ث╪│╪خ┘╪ر ╪د┘à╪ز╪ص╪د┘
           const lessonHasQuestions = new Set(d.questions.map((q: any) => q.lessonId));
           const lessonHasExam = new Set((d.examQuestions || []).map((q: any) => q.lessonId));
-
           setLessons(sorted.map(l => ({
             ...l,
             hasQuestions: lessonHasQuestions.has(l.id),
@@ -86,7 +78,6 @@ function GratisContent() {
 
   const translatedTitles = useAutoTranslateList(lessons.map(l => l.title), lang);
 
-  // ╪┤╪د╪┤╪ر ╪ز╪│╪ش┘è┘ ╪د┘╪»╪«┘ê┘
   if (!isUnlocked) {
     return (
       <div className="min-h-screen flex flex-col" style={{ background: "#f0f0f0" }}>
@@ -101,47 +92,35 @@ function GratisContent() {
             </div>
             <div className="mb-2 px-3 py-1 rounded-full inline-block" style={{ background: "#fff7ed", border: "1.5px solid #fed7aa" }}>
               <span className="text-xs font-black uppercase tracking-widest" style={{ color: "#ea580c" }}>
-                {lang === "ar" ? "╪ح╪┤╪╣╪د╪▒ ┘à╪ج┘é╪ز" : lang === "nl" ? "Tijdelijke melding" : lang === "fr" ? "Avis temporaire" : "Temporary notice"}
+                {lang === "ar" ? "إشعار مؤقت" : lang === "nl" ? "Tijdelijke melding" : lang === "fr" ? "Avis temporaire" : "Temporary notice"}
               </span>
             </div>
             <h2 className="text-2xl font-black mb-2" style={{ color: "#1a1a1a" }}>
-              {lang === "ar" ? "≡اأد ┘é┘è╪» ╪د┘┘à╪╣╪د┘╪ش╪ر ┘à╪ج┘é╪ز╪د┘ï ≡اأد" : lang === "nl" ? "≡اأد Tijdelijk in behandeling ≡اأد" : lang === "fr" ? "≡اأد Temporairement en traitement ≡اأد" : "≡اأد Temporarily Under Maintenance ≡اأد"}
+              {lang === "ar" ? "🚧 قيد المعالجة مؤقتاً 🚧" : lang === "nl" ? "🚧 Tijdelijk in behandeling 🚧" : lang === "fr" ? "🚧 Temporairement en traitement 🚧" : "🚧 Temporarily Under Maintenance 🚧"}
             </h2>
             <p className="text-gray-500 text-sm mb-1">
-              {lang === "ar" ? "┘╪╣┘à┘ ╪╣┘┘ë ╪ز╪ص╪│┘è┘ ┘ç╪░┘ç ╪د┘╪╡┘╪ص╪ر ┘ê╪│╪ز╪╣┘ê╪» ┘é╪▒┘è╪ذ╪د┘ï." : lang === "nl" ? "We werken aan verbetering van deze pagina. Ze komt binnenkort terug." : lang === "fr" ? "Nous travaillons ├ب l'am├رlioration de cette page. Elle reviendra bient├┤t." : "We are improving this page. It will be back soon."}
+              {lang === "ar" ? "نعمل على تحسين هذه الصفحة وستعود قريباً." : lang === "nl" ? "We werken aan verbetering van deze pagina. Ze komt binnenkort terug." : lang === "fr" ? "Nous travaillons à l'amélioration de cette page. Elle reviendra bientôt." : "We are improving this page. It will be back soon."}
             </p>
             <p className="text-xs font-bold mb-6" style={{ color: "#ea580c" }}>
-              {lang === "ar" ? "┘╪╣╪ز╪░╪▒ ╪╣┘ ╪د┘╪ح╪▓╪╣╪د╪ش ≡اآ" : lang === "nl" ? "Onze excuses voor het ongemak ≡اآ" : lang === "fr" ? "Nous nous excusons pour la g├زne ≡اآ" : "We apologize for the inconvenience ≡اآ"}
+              {lang === "ar" ? "نعتذر عن الإزعاج 🙏" : lang === "nl" ? "Onze excuses voor het ongemak 🙏" : lang === "fr" ? "Nous nous excusons pour la gêne 🙏" : "We apologize for the inconvenience 🙏"}
             </p>
             <div className="space-y-3">
-              <input
-                type="text"
-                value={loginUser}
-                onChange={e => setLoginUser(e.target.value)}
-                placeholder="Username"
+              <input type="text" value={loginUser} onChange={e => setLoginUser(e.target.value)} placeholder="Username"
                 className="w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none"
-                style={{ border: "1.5px solid #e5e7eb", background: "#f9fafb" }}
-              />
-              <input
-                type="password"
-                value={loginPass}
-                onChange={e => setLoginPass(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && handleUnlock()}
-                placeholder="Password"
+                style={{ border: "1.5px solid #e5e7eb", background: "#f9fafb" }} />
+              <input type="password" value={loginPass} onChange={e => setLoginPass(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && handleUnlock()} placeholder="Password"
                 className="w-full px-4 py-3 rounded-xl text-sm font-medium focus:outline-none"
-                style={{ border: loginError ? "1.5px solid #ef4444" : "1.5px solid #e5e7eb", background: "#f9fafb" }}
-              />
+                style={{ border: loginError ? "1.5px solid #ef4444" : "1.5px solid #e5e7eb", background: "#f9fafb" }} />
               {loginError && (
                 <p className="text-red-500 text-xs font-bold">
-                  {lang === "ar" ? "╪ذ┘è╪د┘╪د╪ز ╪«╪د╪╖╪خ╪ر" : lang === "nl" ? "Onjuiste gegevens" : "Incorrect credentials"}
+                  {lang === "ar" ? "بيانات خاطئة" : lang === "nl" ? "Onjuiste gegevens" : "Incorrect credentials"}
                 </p>
               )}
-              <button
-                onClick={handleUnlock}
+              <button onClick={handleUnlock}
                 className="w-full py-3 rounded-xl font-black text-white text-sm transition-all active:scale-95"
-                style={{ background: "linear-gradient(135deg, #7c3aed, #5b21b6)" }}
-              >
-                {lang === "ar" ? "╪»╪«┘ê┘" : lang === "nl" ? "Inloggen" : "Login"}
+                style={{ background: "linear-gradient(135deg, #7c3aed, #5b21b6)" }}>
+                {lang === "ar" ? "دخول" : lang === "nl" ? "Inloggen" : "Login"}
               </button>
             </div>
           </div>
@@ -155,7 +134,7 @@ function GratisContent() {
     <div className="min-h-screen flex flex-col" dir={isRtl ? "rtl" : "ltr"} style={{ background: "#f0f0f0" }}>
       <Navbar />
 
-      {/* Header - ┘┘╪│ ╪ز╪╡┘à┘è┘à theorie */}
+      {/* Header */}
       <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%)" }}>
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-64 h-64 rounded-full blur-3xl" style={{ background: "#ffcc00", transform: "translate(-30%, -30%)" }}></div>
@@ -164,7 +143,7 @@ function GratisContent() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-white/50 text-xs font-bold uppercase tracking-wider mb-0.5">
-                ≡ا {lang === "ar" ? "┘à╪ص╪ز┘ê┘ë ┘à╪ش╪د┘┘è" : lang === "nl" ? "Gratis Inhoud" : lang === "fr" ? "Contenu Gratuit" : "Free Content"}
+                🎁 {lang === "ar" ? "محتوى مجاني" : lang === "nl" ? "Gratis Inhoud" : lang === "fr" ? "Contenu Gratuit" : "Free Content"}
               </p>
               <h1 className="text-xl font-black text-white">
                 {categories.find(c => c.id === selectedCat)?.name || "Rijbewijs B"}
@@ -172,16 +151,15 @@ function GratisContent() {
             </div>
             <div className="flex items-center gap-2">
               <span className="px-3 py-1.5 rounded-xl text-xs font-black" style={{ background: "rgba(255,204,0,0.15)", color: "#ffcc00", border: "1px solid rgba(255,204,0,0.3)" }}>
-                {lessons.length} {lang === "ar" ? "╪»╪▒╪│" : lang === "nl" ? "lessen" : "le├دons"}
+                {lessons.length} {lang === "ar" ? "درس" : lang === "nl" ? "lessen" : "leçons"}
               </span>
             </div>
           </div>
 
-          {/* ╪ث╪▓╪▒╪د╪▒ ╪د┘┘╪خ╪د╪ز */}
+          {/* أزرار الفئات */}
           <div className="flex gap-2 mt-4">
             {categories.map(cat => (
-              <button key={cat.id}
-                onClick={() => setSelectedCat(cat.id)}
+              <button key={cat.id} onClick={() => setSelectedCat(cat.id)}
                 className="px-4 py-2 rounded-xl font-black text-sm transition-all"
                 style={{
                   background: selectedCat === cat.id ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.08)",
@@ -195,7 +173,7 @@ function GratisContent() {
         </div>
       </div>
 
-      {/* ┘é╪د╪خ┘à╪ر ╪د┘╪»╪▒┘ê╪│ - ┘┘╪│ ╪ز╪╡┘à┘è┘à theorie */}
+      {/* قائمة الدروس */}
       <div className="flex-1 max-w-2xl md:max-w-4xl mx-auto w-full px-4 py-4">
         {loading ? (
           <div className="flex justify-center py-16">
@@ -203,7 +181,9 @@ function GratisContent() {
           </div>
         ) : lessons.length === 0 ? (
           <div className="border border-yellow-300 bg-yellow-50 p-6 text-center">
-            <p className="font-bold text-gray-700">{lang === "ar" ? "┘╪د ╪ز┘ê╪ش╪» ╪»╪▒┘ê╪│ ┘à╪ش╪د┘┘è╪ر ┘à╪ز╪د╪ص╪ر" : lang === "nl" ? "Geen gratis lessen beschikbaar" : "Aucune le├دon gratuite disponible"}</p>
+            <p className="font-bold text-gray-700">
+              {lang === "ar" ? "لا توجد دروس مجانية متاحة" : lang === "nl" ? "Geen gratis lessen beschikbaar" : "Aucune leçon gratuite disponible"}
+            </p>
           </div>
         ) : (
           <table className="w-full border-collapse lessons-table" style={{ tableLayout: "fixed" }}>
@@ -215,10 +195,10 @@ function GratisContent() {
             <thead>
               <tr style={{ backgroundColor: "#22c55e" }}>
                 <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#16a34a]">
-                  {lang === "ar" ? "╪د┘╪»╪▒╪│" : lang === "nl" ? "LES" : lang === "fr" ? "LE├çON" : "LESSON"}
+                  {lang === "ar" ? "الدرس" : lang === "nl" ? "LES" : lang === "fr" ? "LEÇON" : "LESSON"}
                 </th>
                 <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#16a34a] text-center">
-                  {lang === "ar" ? "┘╪ز╪ص" : lang === "nl" ? "OPENEN" : lang === "fr" ? "OUVRIR" : "OPEN"}
+                  {lang === "ar" ? "فتح" : lang === "nl" ? "OPENEN" : lang === "fr" ? "OUVRIR" : "OPEN"}
                 </th>
                 <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#16a34a] text-center">
                   EXAM
@@ -229,71 +209,67 @@ function GratisContent() {
               {lessons.map((lesson, i) => {
                 const isFirstWithQuestions = i === 0 && lesson.hasQuestions;
                 return (
-                <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#f5f5f5" }}>
-                  <td className="px-4 py-3 border border-gray-200">
-                    <div className="font-bold text-[#003399] text-base" style={{ wordBreak: "break-word", whiteSpace: "normal" }}>
-                      {i + 1}. {translatedTitles[i] || lesson.title}
-                    </div>
-                    {lesson.description && (
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <span className="w-1 h-3 rounded-full bg-[#3399ff] flex-shrink-0"></span>
-                        <span className="text-xs font-semibold text-[#3399ff]">{lesson.description}</span>
+                  <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#f5f5f5" }}>
+                    <td className="px-4 py-3 border border-gray-200">
+                      <div className="font-bold text-[#003399] text-base" style={{ wordBreak: "break-word", whiteSpace: "normal" }}>
+                        {i + 1}. {translatedTitles[i] || lesson.title}
                       </div>
-                    )}
-                  </td>
-                  {isFirstWithQuestions ? (
-                    <td colSpan={2} className="px-4 py-3 border border-gray-200 text-center">
-                      <button
-                        onClick={() => router.push(`/gratis/lesson?lessonId=${lesson.id}&category=${selectedCat}&lesson=${encodeURIComponent(lesson.title)}`)}
-                        className="border-2 px-4 py-1 text-sm font-bold transition-colors w-full"
-                        style={{ background: "#7c3aed", borderColor: "#7c3aed", color: "white" }}
-                      >
-                        ظ£¤ Start nu
-                      </button>
+                      {lesson.description && (
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <span className="w-1 h-3 rounded-full bg-[#3399ff] flex-shrink-0"></span>
+                          <span className="text-xs font-semibold text-[#3399ff]">{lesson.description}</span>
+                        </div>
+                      )}
                     </td>
-                  ) : (
-                    <>
-                      <td className="px-4 py-3 border border-gray-200 text-center">
+                    {isFirstWithQuestions ? (
+                      <td colSpan={2} className="px-4 py-3 border border-gray-200 text-center">
                         <button
                           onClick={() => router.push(`/gratis/lesson?lessonId=${lesson.id}&category=${selectedCat}&lesson=${encodeURIComponent(lesson.title)}`)}
-                          className="bg-white border-2 border-gray-400 px-4 py-1 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors w-full"
-                        >
-                          {lang === "ar" ? "╪»╪▒╪│" : lang === "nl" ? "Les" : lang === "fr" ? "Le├دon" : "Lesson"}
-                        </button>
-                      </td>
-                      <td className="px-4 py-3 border border-gray-200 text-center">
-                        <button
-                          onClick={() => router.push(`/gratis/exam?category=${selectedCat}&lessonId=${lesson.id}&lesson=${encodeURIComponent(lesson.title)}`)}
                           className="border-2 px-4 py-1 text-sm font-bold transition-colors w-full"
-                          style={{ background: "#22c55e", borderColor: "#16a34a", color: "white" }}
-                        >
-                          EXAM
+                          style={{ background: "#7c3aed", borderColor: "#7c3aed", color: "white" }}>
+                          ✔ Start nu
                         </button>
                       </td>
-                    </>
-                  )}
-                </tr>
+                    ) : (
+                      <>
+                        <td className="px-4 py-3 border border-gray-200 text-center">
+                          <button
+                            onClick={() => router.push(`/gratis/lesson?lessonId=${lesson.id}&category=${selectedCat}&lesson=${encodeURIComponent(lesson.title)}`)}
+                            className="bg-white border-2 border-gray-400 px-4 py-1 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors w-full">
+                            {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
+                          </button>
+                        </td>
+                        <td className="px-4 py-3 border border-gray-200 text-center">
+                          <button
+                            onClick={() => router.push(`/gratis/exam?category=${selectedCat}&lessonId=${lesson.id}&lesson=${encodeURIComponent(lesson.title)}`)}
+                            className="border-2 px-4 py-1 text-sm font-bold transition-colors w-full"
+                            style={{ background: "#22c55e", borderColor: "#16a34a", color: "white" }}>
+                            EXAM
+                          </button>
+                        </td>
+                      </>
+                    )}
+                  </tr>
                 );
               })}
             </tbody>
           </table>
         )}
 
-        {/* ╪▓╪▒ ╪د┘╪د╪┤╪ز╪▒╪د┘â */}
+        {/* زر الاشتراك */}
         {!loading && (
           <div className="mt-6">
             <button
               onClick={() => router.push(`/theorie`)}
               className="w-full py-4 rounded-2xl font-black text-base transition-all active:scale-95 hover:scale-[1.02]"
               style={{ background: "linear-gradient(135deg, #d4af37, #f0d060, #d4af37)", color: "#0a0a0a", boxShadow: "0 8px 30px rgba(212,175,55,0.35)" }}>
-              ≡ا¤ô {lang === "ar" ? "╪د╪┤╪ز╪▒┘â ┘┘┘ê╪╡┘ê┘ ┘┘â┘ ╪د┘╪»╪▒┘ê╪│" : lang === "nl" ? "Inschrijven voor alle lessen" : lang === "fr" ? "S'inscrire pour toutes les le├دons" : "Subscribe for all lessons"}
+              🔓 {lang === "ar" ? "اشترك للوصول لكل الدروس" : lang === "nl" ? "Inschrijven voor alle lessen" : lang === "fr" ? "S'inscrire pour toutes les leçons" : "Subscribe for all lessons"}
             </button>
           </div>
         )}
       </div>
 
       <Footer />
-
     </div>
   );
 }
