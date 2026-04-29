@@ -108,18 +108,35 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
         <span className="text-white/50 text-xs font-bold flex-shrink-0">{index + 1} / {total}</span>
       </div>
 
-      {/* Images - natural size, no cropping */}
+      {/* Images */}
       {question.videoUrls && question.videoUrls.filter(Boolean).length > 0 && (
         <div>
-          <div className={`flex gap-1 p-2 bg-gray-100 ${question.videoUrls.filter(Boolean).length === 1 ? "" : ""}`}>
-            {question.videoUrls.filter(Boolean).map((url, i) => {
-              return (
-                <div key={i} className="relative select-none rounded-xl overflow-hidden flex-1">
+          {question.videoUrls.filter(Boolean).length === 1 ? (
+            /* صورة واحدة - عرض كامل */
+            <div className="relative select-none bg-gray-100">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={question.videoUrls.filter(Boolean)[0]}
+                alt=""
+                style={{ width: "100%", height: "auto", display: "block" }}
+                draggable={false}
+                onContextMenu={e => e.preventDefault()}
+              />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/watermark.jpeg" alt="" className="absolute pointer-events-none"
+                style={{ width: "40%", top: "50%", left: "50%", transform: "translate(-50%,-50%) rotate(-15deg)", opacity: 0.8, mixBlendMode: "multiply" }}
+                draggable={false} />
+            </div>
+          ) : (
+            /* صورتان - جنباً إلى جنب بنفس الارتفاع */
+            <div className="grid bg-gray-100 p-1 gap-1" style={{ gridTemplateColumns: "1fr 1fr" }}>
+              {question.videoUrls.filter(Boolean).map((url, i) => (
+                <div key={i} className="relative select-none rounded overflow-hidden" style={{ aspectRatio: "auto" }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={url}
                     alt=""
-                    style={{ width: "100%", height: "auto", display: "block" }}
+                    style={{ width: "100%", height: "100%", display: "block", objectFit: "cover" }}
                     draggable={false}
                     onContextMenu={e => e.preventDefault()}
                   />
@@ -128,9 +145,9 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
                     style={{ width: "50%", top: "50%", left: "50%", transform: "translate(-50%,-50%) rotate(-15deg)", opacity: 0.8, mixBlendMode: "multiply" }}
                     draggable={false} />
                 </div>
-              );
-            })}
-          </div>
+              ))}
+            </div>
+          )}
           <div className="flex items-center justify-between px-3 py-1.5"
             style={{ background: "linear-gradient(135deg, rgba(0,20,60,0.97), rgba(0,40,120,0.97))", fontSize: "9px", fontWeight: 700, direction: lang === "ar" ? "rtl" : "ltr" }}>
             <span className="text-white/80">{text.left}</span>
