@@ -26,9 +26,9 @@ export default function WatermarkedImage({ src, alt = "", className, style }: Pr
   const optimizeImageUrl = (url: string) => {
     if (!url) return url;
     if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
-      // تجنب إضافة التحسينات مرتين
       if (url.includes('/upload/f_auto')) return url;
-      return url.replace('/upload/', '/upload/f_auto,q_auto,w_1200/');
+      // c_limit = لا يقص الصورة، فقط يصغّرها إذا كانت أكبر من 1200px
+      return url.replace('/upload/', '/upload/f_auto,q_auto,w_1200,c_limit/');
     }
     return url;
   };
