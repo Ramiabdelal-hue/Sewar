@@ -186,16 +186,16 @@ function GratisContent() {
             </p>
           </div>
         ) : (
-          <div className="w-full overflow-x-auto">
-          <table className="w-full border-collapse" style={{ tableLayout: "fixed", minWidth: "100%" }}>
+          <div className="w-full overflow-x-hidden">
+          <table className="w-full border-collapse" style={{ tableLayout: "fixed" }}>
             <colgroup>
-              <col style={{ width: "60%" }} />
-              <col style={{ width: "20%" }} />
-              <col style={{ width: "20%" }} />
+              <col style={{ width: "55%" }} />
+              <col style={{ width: "22.5%" }} />
+              <col style={{ width: "22.5%" }} />
             </colgroup>
             <thead>
               <tr style={{ backgroundColor: "#22c55e" }}>
-                <th className="text-left px-2 py-2 font-black uppercase text-xs text-white border border-[#16a34a]">
+                <th className="text-left px-3 py-2 font-black uppercase text-xs text-white border border-[#16a34a]">
                   {lang === "ar" ? "الدرس" : lang === "nl" ? "LES" : lang === "fr" ? "LEÇON" : "LESSON"}
                 </th>
                 <th className="px-2 py-2 font-black uppercase text-xs text-white border border-[#16a34a] text-center">
@@ -211,8 +211,8 @@ function GratisContent() {
                 const isFirstWithQuestions = i === 0 && lesson.hasQuestions;
                 return (
                   <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#f5f5f5" }}>
-                    <td className="px-2 py-2 border border-gray-200">
-                      <div className="font-bold text-[#003399] text-xs" style={{ wordBreak: "break-word", whiteSpace: "normal" }}>
+                    <td className="px-3 py-2 border border-gray-200">
+                      <div className="font-bold text-[#003399] text-xs leading-snug" style={{ wordBreak: "break-word", whiteSpace: "normal" }}>
                         {i + 1}. {translatedTitles[i] || lesson.title}
                       </div>
                       {lesson.description && (
