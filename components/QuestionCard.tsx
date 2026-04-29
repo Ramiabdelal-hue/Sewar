@@ -111,15 +111,15 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
       {/* Images - natural size, no cropping */}
       {question.videoUrls && question.videoUrls.filter(Boolean).length > 0 && (
         <div>
-          <div className={`grid gap-1 p-2 bg-gray-100 ${question.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+          <div className={`grid gap-1 p-2 bg-gray-100 items-stretch ${question.videoUrls.filter(Boolean).length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
             {question.videoUrls.filter(Boolean).map((url, i) => {
               return (
-                <div key={i} className="relative overflow-hidden select-none rounded-xl">
+                <div key={i} className="relative select-none rounded-xl overflow-hidden flex flex-col">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={url}
                     alt=""
-                    style={{ width: "100%", height: "auto", display: "block", objectFit: "contain" }}
+                    style={{ width: "100%", flex: 1, display: "block", objectFit: "contain", minHeight: 0 }}
                     draggable={false}
                     onContextMenu={e => e.preventDefault()}
                   />

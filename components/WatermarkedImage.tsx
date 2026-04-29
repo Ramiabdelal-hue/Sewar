@@ -38,8 +38,8 @@ export default function WatermarkedImage({ src, alt = "", className, style }: Pr
 
   return (
     <div
-      className={`relative select-none ${className || ""}`}
-      style={style}
+      className={`relative select-none flex flex-col ${className || ""}`}
+      style={{ ...style, height: "100%" }}
       onContextMenu={e => e.preventDefault()}
     >
       {/* حالة التحميل */}
@@ -67,8 +67,8 @@ export default function WatermarkedImage({ src, alt = "", className, style }: Pr
       <img
         src={optimizedSrc}
         alt={alt}
-        className={`w-full h-auto block ${imageLoading || imageError ? "hidden" : ""}`}
-        style={{ objectFit: "contain", maxWidth: "100%" }}
+        className={`w-full flex-1 block ${imageLoading || imageError ? "hidden" : ""}`}
+        style={{ objectFit: "contain", minHeight: 0 }}
         draggable={false}
         onContextMenu={e => e.preventDefault()}
         onError={handleImageError}
