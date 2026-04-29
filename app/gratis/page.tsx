@@ -131,7 +131,7 @@ function GratisContent() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col" dir={isRtl ? "rtl" : "ltr"} style={{ background: "#f0f0f0" }}>
+    <div className="min-h-screen flex flex-col" dir={isRtl ? "rtl" : "ltr"} style={{ background: "#f0f0f0", overflowX: "hidden" }}>
       <Navbar />
 
       {/* Header */}
@@ -186,7 +186,8 @@ function GratisContent() {
             </p>
           </div>
         ) : (
-          <table className="w-full border-collapse lessons-table" style={{ tableLayout: "fixed" }}>
+          <div className="w-full overflow-x-auto">
+          <table className="w-full border-collapse" style={{ tableLayout: "fixed", minWidth: "100%" }}>
             <colgroup>
               <col style={{ width: "60%" }} />
               <col style={{ width: "20%" }} />
@@ -194,13 +195,13 @@ function GratisContent() {
             </colgroup>
             <thead>
               <tr style={{ backgroundColor: "#22c55e" }}>
-                <th className="text-left px-4 py-3 font-black uppercase text-sm text-white border border-[#16a34a]">
+                <th className="text-left px-2 py-2 font-black uppercase text-xs text-white border border-[#16a34a]">
                   {lang === "ar" ? "الدرس" : lang === "nl" ? "LES" : lang === "fr" ? "LEÇON" : "LESSON"}
                 </th>
-                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#16a34a] text-center">
-                  {lang === "ar" ? "فتح" : lang === "nl" ? "OPENEN" : lang === "fr" ? "OUVRIR" : "OPEN"}
+                <th className="px-2 py-2 font-black uppercase text-xs text-white border border-[#16a34a] text-center">
+                  {lang === "ar" ? "فتح" : lang === "nl" ? "OPEN" : lang === "fr" ? "OUVRIR" : "OPEN"}
                 </th>
-                <th className="px-4 py-3 font-black uppercase text-sm text-white border border-[#16a34a] text-center">
+                <th className="px-2 py-2 font-black uppercase text-xs text-white border border-[#16a34a] text-center">
                   EXAM
                 </th>
               </tr>
@@ -210,39 +211,39 @@ function GratisContent() {
                 const isFirstWithQuestions = i === 0 && lesson.hasQuestions;
                 return (
                   <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#f5f5f5" }}>
-                    <td className="px-4 py-3 border border-gray-200">
-                      <div className="font-bold text-[#003399] text-base" style={{ wordBreak: "break-word", whiteSpace: "normal" }}>
+                    <td className="px-2 py-2 border border-gray-200">
+                      <div className="font-bold text-[#003399] text-xs" style={{ wordBreak: "break-word", whiteSpace: "normal" }}>
                         {i + 1}. {translatedTitles[i] || lesson.title}
                       </div>
                       {lesson.description && (
-                        <div className="flex items-center gap-1.5 mt-1">
-                          <span className="w-1 h-3 rounded-full bg-[#3399ff] flex-shrink-0"></span>
-                          <span className="text-xs font-semibold text-[#3399ff]">{lesson.description}</span>
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <span className="w-1 h-2.5 rounded-full bg-[#3399ff] flex-shrink-0"></span>
+                          <span className="text-[10px] font-semibold text-[#3399ff]">{lesson.description}</span>
                         </div>
                       )}
                     </td>
                     {isFirstWithQuestions ? (
-                      <td colSpan={2} className="px-4 py-3 border border-gray-200 text-center">
+                      <td colSpan={2} className="px-2 py-2 border border-gray-200 text-center">
                         <button
                           onClick={() => router.push(`/gratis/lesson?lessonId=${lesson.id}&category=${selectedCat}&lesson=${encodeURIComponent(lesson.title)}`)}
-                          className="border-2 px-4 py-1 text-sm font-bold transition-colors w-full"
+                          className="border-2 px-2 py-1 text-xs font-bold transition-colors w-full"
                           style={{ background: "#7c3aed", borderColor: "#7c3aed", color: "white" }}>
-                          ✔ Start nu
+                          ✔ {lang === "ar" ? "ابدأ" : lang === "nl" ? "Start" : lang === "fr" ? "Début" : "Start"}
                         </button>
                       </td>
                     ) : (
                       <>
-                        <td className="px-4 py-3 border border-gray-200 text-center">
+                        <td className="px-2 py-2 border border-gray-200 text-center">
                           <button
                             onClick={() => router.push(`/gratis/lesson?lessonId=${lesson.id}&category=${selectedCat}&lesson=${encodeURIComponent(lesson.title)}`)}
-                            className="bg-white border-2 border-gray-400 px-4 py-1 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors w-full">
+                            className="bg-white border-2 border-gray-400 px-2 py-1 text-xs font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors w-full">
                             {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
                           </button>
                         </td>
-                        <td className="px-4 py-3 border border-gray-200 text-center">
+                        <td className="px-2 py-2 border border-gray-200 text-center">
                           <button
                             onClick={() => router.push(`/gratis/exam?category=${selectedCat}&lessonId=${lesson.id}&lesson=${encodeURIComponent(lesson.title)}`)}
-                            className="border-2 px-4 py-1 text-sm font-bold transition-colors w-full"
+                            className="border-2 px-2 py-1 text-xs font-bold transition-colors w-full"
                             style={{ background: "#22c55e", borderColor: "#16a34a", color: "white" }}>
                             EXAM
                           </button>
@@ -254,6 +255,7 @@ function GratisContent() {
               })}
             </tbody>
           </table>
+          </div>
         )}
 
         {/* زر الاشتراك */}
