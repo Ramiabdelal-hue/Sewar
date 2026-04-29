@@ -3,8 +3,8 @@ import { LangProvider } from '@/context/LangContext';
 import ScreenProtection from '@/components/ScreenProtection';
 
 export const metadata = {
-  title: 'S & A',
-  description: 'Next.js + Tailwind example',
+  title: 'Sewar Rijbewijs Online',
+  description: 'Sewar Rijbewijs Online - Haal je rijbewijs in één keer!',
   manifest: '/manifest.json',
   icons: {
     icon: '/her.jpeg',
