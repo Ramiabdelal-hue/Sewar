@@ -1,125 +1,103 @@
+/**
+ * Admin Lessons API
+ * Pattern: thin route → service → DB
+ */
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { getLessons, createLesson, updateLesson, deleteLesson } from "@/lib/services/lesson.service";
+import { validateLesson, validateLessonUpdate } from "@/lib/validators/lesson";
+import { rateLimits } from "@/lib/security/rateLimit";
+import { getClientIp } from "@/lib/adminAuth";
 
-// دالة مساعدة لجلب الدروس مباشرة من DB (بدون cache)
-async function getLessonsFromDB(category: string) {
-  const orderBy = { id: "asc" as const };
-  if (category === "A") return prisma.lessonA.findMany({ orderBy });
-  if (category === "B") return prisma.lessonB.findMany({ orderBy });
-  if (category === "C") return prisma.lessonC.findMany({ orderBy });
-  return [];
-}
+const NO_CACHE = { "Cache-Control": "no-store, no-cache, must-revalidate" };
 
-// GET - جلب الدروس (بدون cache للأدمن)
+// GET — جلب الدروس بدون cache
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const categoryParam = searchParams.get("category") || "";
-    const cat = categoryParam.toUpperCase();
+    const ip = getClientIp(request);
+    const rl = rateLimits.api(ip);
+    if (!rl.allowed) {
+      return NextResponse.json({ success: false, message: "Too many requests" }, { status: 429 });
+    }
 
+    const cat = (request.nextUrl.searchParams.get("category") || "").toUpperCase() as "A" | "B" | "C";
     if (!["A", "B", "C"].includes(cat)) {
       return NextResponse.json({ success: false, message: "category must be A, B, or C" }, { status: 400 });
     }
 
-    const lessons = await getLessonsFromDB(cat);
-    return NextResponse.json({ success: true, lessons }, {
-      headers: { "Cache-Control": "no-store, no-cache, must-revalidate" },
-    });
+    const lessons = await getLessons(cat);
+    return NextResponse.json({ success: true, lessons }, { headers: NO_CACHE });
   } catch (error) {
     console.error("GET /api/admin/lessons:", error);
     return NextResponse.json({ success: false, message: String(error) }, { status: 500 });
   }
 }
 
-// POST - إضافة درس جديد
+// POST — إضافة درس
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIp(request);
+    const rl = rateLimits.api(ip);
+    if (!rl.allowed) {
+      return NextResponse.json({ success: false, message: "Too many requests" }, { status: 429 });
+    }
+
     const body = await request.json();
-    const { title, description, category } = body;
-
-    if (!title?.trim() || !category) {
-      return NextResponse.json({ success: false, message: "title and category required" }, { status: 400 });
+    const validation = validateLesson(body);
+    if (!validation.valid) {
+      return NextResponse.json({ success: false, errors: validation.errors }, { status: 400 });
     }
 
-    const cat = category.toUpperCase();
-    let lesson;
-
-    if (cat === "A") {
-      lesson = await prisma.lessonA.create({ data: { title: title.trim(), description: description?.trim() || null } });
-    } else if (cat === "B") {
-      lesson = await prisma.lessonB.create({ data: { title: title.trim(), description: description?.trim() || null } });
-    } else if (cat === "C") {
-      lesson = await prisma.lessonC.create({ data: { title: title.trim(), description: description?.trim() || null } });
-    } else {
-      return NextResponse.json({ success: false, message: "Invalid category" }, { status: 400 });
-    }
-
-    return NextResponse.json({ success: true, lesson }, {
-      headers: { "Cache-Control": "no-store" },
-    });
+    const { title, description, category } = validation.data;
+    const lesson = await createLesson(category as "A" | "B" | "C", title, description);
+    return NextResponse.json({ success: true, lesson }, { headers: NO_CACHE });
   } catch (error) {
     console.error("POST /api/admin/lessons:", error);
     return NextResponse.json({ success: false, message: String(error) }, { status: 500 });
   }
 }
 
-// PUT - تعديل درس
+// PUT — تعديل درس
 export async function PUT(request: NextRequest) {
   try {
+    const ip = getClientIp(request);
+    const rl = rateLimits.api(ip);
+    if (!rl.allowed) {
+      return NextResponse.json({ success: false, message: "Too many requests" }, { status: 429 });
+    }
+
     const body = await request.json();
-    const { title, description, category } = body;
-    const id = typeof body.id === "string" ? parseInt(body.id) : Number(body.id);
-
-    if (!id || !title?.trim() || !category) {
-      return NextResponse.json({ success: false, message: "id, title and category required" }, { status: 400 });
+    const validation = validateLessonUpdate(body);
+    if (!validation.valid) {
+      return NextResponse.json({ success: false, errors: validation.errors }, { status: 400 });
     }
 
-    const cat = category.toUpperCase();
-    let lesson;
-
-    if (cat === "A") {
-      lesson = await prisma.lessonA.update({ where: { id }, data: { title: title.trim(), description: description?.trim() || null } });
-    } else if (cat === "B") {
-      lesson = await prisma.lessonB.update({ where: { id }, data: { title: title.trim(), description: description?.trim() || null } });
-    } else if (cat === "C") {
-      lesson = await prisma.lessonC.update({ where: { id }, data: { title: title.trim(), description: description?.trim() || null } });
-    } else {
-      return NextResponse.json({ success: false, message: "Invalid category" }, { status: 400 });
-    }
-
-    return NextResponse.json({ success: true, lesson }, {
-      headers: { "Cache-Control": "no-store" },
-    });
+    const { id, title, description, category } = validation.data;
+    const lesson = await updateLesson(category as "A" | "B" | "C", id, title, description);
+    return NextResponse.json({ success: true, lesson }, { headers: NO_CACHE });
   } catch (error) {
     console.error("PUT /api/admin/lessons:", error);
     return NextResponse.json({ success: false, message: String(error) }, { status: 500 });
   }
 }
 
-// DELETE - حذف درس (مع جميع أسئلته بسبب onDelete: Cascade)
+// DELETE — حذف درس
 export async function DELETE(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const id = parseInt(searchParams.get("id") || "0");
-    const cat = (searchParams.get("category") || "").toUpperCase();
-
-    if (!id || !cat) {
-      return NextResponse.json({ success: false, message: "id and category required" }, { status: 400 });
+    const ip = getClientIp(request);
+    const rl = rateLimits.api(ip);
+    if (!rl.allowed) {
+      return NextResponse.json({ success: false, message: "Too many requests" }, { status: 429 });
     }
 
-    if (cat === "A") {
-      await prisma.lessonA.delete({ where: { id } });
-    } else if (cat === "B") {
-      await prisma.lessonB.delete({ where: { id } });
-    } else if (cat === "C") {
-      await prisma.lessonC.delete({ where: { id } });
-    } else {
-      return NextResponse.json({ success: false, message: "Invalid category" }, { status: 400 });
+    const id = parseInt(request.nextUrl.searchParams.get("id") || "0");
+    const cat = (request.nextUrl.searchParams.get("category") || "").toUpperCase() as "A" | "B" | "C";
+
+    if (!id || !["A", "B", "C"].includes(cat)) {
+      return NextResponse.json({ success: false, message: "id and valid category required" }, { status: 400 });
     }
 
-    return NextResponse.json({ success: true }, {
-      headers: { "Cache-Control": "no-store" },
-    });
+    await deleteLesson(cat, id);
+    return NextResponse.json({ success: true }, { headers: NO_CACHE });
   } catch (error) {
     console.error("DELETE /api/admin/lessons:", error);
     return NextResponse.json({ success: false, message: String(error) }, { status: 500 });
