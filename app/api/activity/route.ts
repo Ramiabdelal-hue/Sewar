@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendScreenshotWarningEmail } from "@/lib/email";
 import { verifyAdminToken, unauthorizedResponse, checkRateLimit, getClientIp, isValidEmail } from "@/lib/adminAuth";
+import { runAutoBanCheck } from "@/lib/security/autoBan";
 
 // الحد: إرسال إيميل عند المحاولة رقم 3 بالضبط، ثم كل 3 محاولات (6، 9، ...)
 const EMAIL_WARNING_THRESHOLD = 3;
@@ -47,6 +48,12 @@ export async function POST(request: NextRequest) {
         where: { email: userEmail.toLowerCase().trim() },
         data: { lastSeen: new Date() },
       }).catch(() => {});
+    }
+
+    // ── Auto-Ban Check (بعد كل نشاط للمستخدمين المسجلين) ────────────────────
+    if (userEmail && isValidEmail(userEmail)) {
+      // نشغّله في الخلفية بدون انتظار حتى لا يبطئ الـ response
+      runAutoBanCheck(userEmail).catch(() => {});
     }
 
     // ── إرسال إيميل تحذيري تلقائياً ─────────────────────────────────────────
