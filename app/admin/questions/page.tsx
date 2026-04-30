@@ -913,11 +913,20 @@ export default function AdminQuestionsPage() {
     }
   };
   const handleEditQuestion = async (questionId: number) => {
-    // استخدام editForm مباشرة بدلاً من editFormRef لضمان أحدث القيم
     const form = editForm;
-    if (!form.textNL && !form.textFR && !form.textAR) {
-      alert("أدخل نص السؤال بلغة واحدة على الأقل");
-      return;
+    
+    // للشروحات: يكفي وجود explanationNL أو textNL
+    // للامتحانات: يجب وجود textNL
+    if (questionType === "Examen") {
+      if (!form.textNL && !form.textFR && !form.textAR) {
+        alert("أدخل نص السؤال بلغة واحدة على الأقل");
+        return;
+      }
+    } else {
+      if (!form.textNL && !form.explanationNL) {
+        alert("أدخل عنوان النقطة أو الشرح");
+        return;
+      }
     }
 
     try {
@@ -1833,19 +1842,12 @@ export default function AdminQuestionsPage() {
                 >
                   {editingQuestion?.id === q.id ? (
                     <div className="space-y-4 p-5">
-                      {/* نص السؤال - هولندي فقط */}
-                      <div>
-                        <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">🇳🇱 نص السؤال (Nederlands)</label>
-                        <textarea value={editForm.textNL} onChange={(e) => setEditForm({ ...editForm, textNL: e.target.value })}
-                          className="w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-700 focus:outline-none resize-none"
-                          style={{ background: "#f0f4ff", border: "1.5px solid #c7d2fe" }} rows={3} />
-                      </div>
 
-                      {/* الشرح - هولندي فقط - للدروس فقط */}
-                      {questionType !== "Examen" && (
+                      {/* للشروحات: عنوان النقطة + الشرح فقط */}
+                      {questionType !== "Examen" ? (
                         <div className="space-y-3">
                           <div>
-                            <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">📌 عنوان النقطة</label>
+                            <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">📌 عنوان النقطة (Nederlands)</label>
                             <input type="text" value={editForm.textNL}
                               onChange={(e) => setEditForm({ ...editForm, textNL: e.target.value })}
                               placeholder="عنوان النقطة..."
@@ -1858,6 +1860,14 @@ export default function AdminQuestionsPage() {
                               className="w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-700 focus:outline-none"
                               style={{ background: "#eff6ff", border: "1.5px solid #bfdbfe", resize: "vertical", minHeight: "96px" }} />
                           </div>
+                        </div>
+                      ) : (
+                        /* للامتحانات: نص السؤال فقط */
+                        <div>
+                          <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">🇳🇱 نص السؤال (Nederlands)</label>
+                          <textarea value={editForm.textNL} onChange={(e) => setEditForm({ ...editForm, textNL: e.target.value })}
+                            className="w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-700 focus:outline-none resize-none"
+                            style={{ background: "#f0f4ff", border: "1.5px solid #c7d2fe" }} rows={3} />
                         </div>
                       )}
 
