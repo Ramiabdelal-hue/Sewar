@@ -78,22 +78,26 @@ function GratisExamContent() {
       window.speechSynthesis.speak(u);
     };
     const questionText = translated[0] || q.textNL || q.text || "";
-    const answers = [translated[1] || q.answer1, translated[2] || q.answer2, translated[3] || q.answer3].filter(Boolean);
-    const labels = lang === "ar" ? ["������ A:", "������ B:", "������ C:"] : lang === "fr" ? ["R�ponse A:", "R�ponse B:", "R�ponse C:"] : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
+    const ans = [translated[1] || q.answer1, translated[2] || q.answer2, translated[3] || q.answer3].filter(Boolean);
+    const labels = lang === "ar"
+      ? ["\u0627\u0644\u062c\u0648\u0627\u0628 A:", "\u0627\u0644\u062c\u0648\u0627\u0628 B:", "\u0627\u0644\u062c\u0648\u0627\u0628 C:"]
+      : lang === "fr"
+      ? ["R\u00e9ponse A:", "R\u00e9ponse B:", "R\u00e9ponse C:"]
+      : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
     if (!questionText) { setReadingDone(true); return; }
     speak(questionText, () => {
       if (!isValid()) { setReadingDone(true); return; }
       let i = 0;
       const readNext = () => {
         if (!isValid()) { setReadingDone(true); return; }
-        if (i >= answers.length) { setReadingDone(true); return; }
-        speak(`${labels[i]} ${answers[i]}`, () => {
+        if (i >= ans.length) { setReadingDone(true); return; }
+        speak(`${labels[i]} ${ans[i]}`, () => {
           i++;
-          if (i >= answers.length) { setReadingDone(true); }
+          if (i >= ans.length) { setReadingDone(true); }
           else { ttsRef.current = setTimeout(() => { if (isValid()) readNext(); else setReadingDone(true); }, 400); }
         });
       };
-      if (answers.length === 0) { setReadingDone(true); }
+      if (ans.length === 0) { setReadingDone(true); }
       else { ttsRef.current = setTimeout(() => { if (isValid()) readNext(); else setReadingDone(true); }, 600); }
     });
   };
@@ -126,7 +130,12 @@ function GratisExamContent() {
     setTimeLeft(15);
     timerRef.current = setInterval(() => {
       setTimeLeft(prev => {
-        if (prev <= 1) { clearInterval(timerRef.current!); setLocked(true); setAnswers(a => ({ ...a, [currentIndex]: a[currentIndex] ?? null })); return 0; }
+        if (prev <= 1) {
+          clearInterval(timerRef.current!);
+          setLocked(true);
+          setAnswers(a => ({ ...a, [currentIndex]: a[currentIndex] ?? null }));
+          return 0;
+        }
         return prev - 1;
       });
     }, 1000);
@@ -138,7 +147,6 @@ function GratisExamContent() {
       .then(r => r.json())
       .then(d => {
         if (d.success) {
-          // ����� ����� �������� �������� ��� lessonId
           const filtered = d.examQuestions.filter((q: any) => q.lessonId === Number(lessonId));
           setQuestions(filtered);
         }
@@ -148,12 +156,12 @@ function GratisExamContent() {
   }, [category, lessonId]);
 
   const q = questions[currentIndex];
-  const textsToTranslate = q ? [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""] : ["", "", "", ""];
+  const textsToTranslate = q
+    ? [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]
+    : ["", "", "", ""];
   const translatedTexts = useAutoTranslateList(textsToTranslate, lang);
 
-  useEffect(() => {
-    translatedRef.current = translatedTexts;
-  }, [translatedTexts]);
+  useEffect(() => { translatedRef.current = translatedTexts; }, [translatedTexts]);
 
   const score = Object.entries(answers).reduce((total, [i, ans]) => {
     if (ans === null || ans === undefined) return total;
@@ -167,12 +175,12 @@ function GratisExamContent() {
     if (locked || answers[currentIndex] !== undefined) return;
     killTts();
     clearInterval(timerRef.current!);
-    if (questions[currentIndex]?.correctAnswer === num) { 
-      setShowCorrect(true); 
-      setTimeout(() => setShowCorrect(false), 1500); 
-    } else { 
-      setShowWrong(true); 
-      setTimeout(() => setShowWrong(false), 800); 
+    if (questions[currentIndex]?.correctAnswer === num) {
+      setShowCorrect(true);
+      setTimeout(() => setShowCorrect(false), 1500);
+    } else {
+      setShowWrong(true);
+      setTimeout(() => setShowWrong(false), 800);
     }
     setAnswers(a => ({ ...a, [currentIndex]: num }));
     setLocked(true);
@@ -185,12 +193,14 @@ function GratisExamContent() {
     else { setCurrentIndex(i => i + 1); setLocked(false); }
   };
 
+  // ── Loading ──────────────────────────────────────────────────────────────────
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: "#f0f0f0" }}>
-      <div className="w-10 h-10 border-4 border-[#22c55e] border-t-transparent rounded-full animate-spin"></div>
+      <div className="w-10 h-10 border-4 border-[#22c55e] border-t-transparent rounded-full animate-spin" />
     </div>
   );
 
+  // ── No questions ─────────────────────────────────────────────────────────────
   if (questions.length === 0) return (
     <div className="min-h-screen flex flex-col" style={{ background: "#f0f0f0" }}>
       <Navbar />
@@ -198,16 +208,17 @@ function GratisExamContent() {
         <div className="bg-white rounded-2xl p-8 text-center max-w-sm shadow">
           <div className="text-4xl mb-3">🎯</div>
           <p className="font-bold text-gray-700 mb-4">
-          {lang === "ar" ? "�� ���� ����� ������ ������" : lang === "nl" ? "Geen gratis examenvragen" : "No free exam questions"}
+            {lang === "ar" ? "لا توجد أسئلة امتحان مجانية" : lang === "nl" ? "Geen gratis examenvragen" : "No free exam questions"}
           </p>
           <button onClick={() => router.back()} className="px-6 py-2 rounded-xl font-bold text-white" style={{ background: "#22c55e" }}>
-            {lang === "ar" ? "����" : lang === "nl" ? "Terug" : "Retour"}
+            {lang === "ar" ? "رجوع" : lang === "nl" ? "Terug" : "Back"}
           </button>
         </div>
       </div>
     </div>
   );
 
+  // ── Start screen ─────────────────────────────────────────────────────────────
   if (!started) return (
     <div className="min-h-screen bg-white" dir={isRtl ? "rtl" : "ltr"}>
       <Navbar />
@@ -215,23 +226,27 @@ function GratisExamContent() {
         <div className="border-4 border-[#22c55e] rounded-2xl p-10">
           <div className="text-6xl mb-4">🎯</div>
           <h1 className="text-2xl font-black text-[#22c55e] mb-2">
-            {lessonTitle || (lang === "ar" ? "������ �����" : lang === "nl" ? "Gratis Examen" : "Free Exam")}
+            {lessonTitle || (lang === "ar" ? "امتحان مجاني" : lang === "nl" ? "Gratis Examen" : "Free Exam")}
           </h1>
-          <p className="text-gray-500 mb-2">{questions.length} {lang === "ar" ? "����" : lang === "nl" ? "vragen" : "questions"}</p>
-          <p className="text-sm text-orange-600 font-bold mb-8">? {lang === "ar" ? "15 ����� ��� ����" : lang === "nl" ? "15 seconden per vraag" : "15 seconds per question"}</p>
-          {questions.length === 0
-            ? <p className="text-red-500 font-bold">{lang === "ar" ? "�� ���� �����" : "Geen vragen"}</p>
-            : <button onClick={() => { unlockAudio(); setStarted(true); }}
-                className="px-10 py-4 font-black text-white text-lg rounded-xl hover:scale-105 active:scale-95 transition-all"
-                style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
-                {lang === "ar" ? "���� ��������" : lang === "nl" ? "Start Examen" : "Start Exam"} 🚀
-              </button>
-          }
+          <p className="text-gray-500 mb-2">
+            {questions.length} {lang === "ar" ? "سؤال" : lang === "nl" ? "vragen" : "questions"}
+          </p>
+          <p className="text-sm text-orange-600 font-bold mb-8">
+            ⏱ {lang === "ar" ? "15 ثانية لكل سؤال" : lang === "nl" ? "15 seconden per vraag" : "15 seconds per question"}
+          </p>
+          <button
+            onClick={() => { unlockAudio(); setStarted(true); }}
+            className="px-10 py-4 font-black text-white text-lg rounded-xl hover:scale-105 active:scale-95 transition-all"
+            style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}
+          >
+            {lang === "ar" ? "ابدأ الامتحان" : lang === "nl" ? "Start Examen" : "Start Exam"} 🚀
+          </button>
         </div>
       </div>
     </div>
   );
 
+  // ── Results screen ───────────────────────────────────────────────────────────
   if (finished) {
     const pct = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
     const passed = pct >= 60;
@@ -243,7 +258,9 @@ function GratisExamContent() {
           <div className={`rounded-2xl p-8 mb-6 text-center border-4 ${passed ? "border-green-400 bg-green-50" : "border-red-400 bg-red-50"}`}>
             <div className="text-6xl mb-3">{passed ? "🎉" : "😔"}</div>
             <h1 className="text-2xl font-black mb-1" style={{ color: passed ? "#16a34a" : "#dc2626" }}>
-              {passed ? (lang === "ar" ? "مبروك! نجحت" : lang === "nl" ? "Geslaagd!" : "Passed!") : (lang === "ar" ? "لم تنجح هذه المرة" : lang === "nl" ? "Helaas niet geslaagd" : "Not passed")}
+              {passed
+                ? (lang === "ar" ? "مبروك! نجحت" : lang === "nl" ? "Geslaagd!" : "Passed!")
+                : (lang === "ar" ? "لم تنجح هذه المرة" : lang === "nl" ? "Helaas niet geslaagd" : "Not passed")}
             </h1>
             <div className="flex items-center justify-center gap-4 mt-4 flex-wrap">
               {[
@@ -261,7 +278,6 @@ function GratisExamContent() {
             </div>
           </div>
 
-          {/* الأسئلة الخاطئة */}
           {questions.some((q, i) => answers[i] !== q.correctAnswer) && (
             <div className="mb-6">
               <h2 className="text-lg font-black text-gray-800 mb-3 flex items-center gap-2">
@@ -277,10 +293,14 @@ function GratisExamContent() {
                       <div className="px-4 py-2 flex items-center gap-2" style={{ background: "#fef2f2" }}>
                         <span className="w-6 h-6 rounded-full bg-red-500 text-white text-xs font-black flex items-center justify-center">{i + 1}</span>
                         {q.points === 5 && <span className="text-xs font-black px-1.5 py-0.5 rounded-full" style={{ background: "rgba(239,68,68,0.15)", color: "#dc2626" }}>⭐ 5 pts</span>}
-                        {(userAns === null || userAns === undefined) && <span className="text-xs font-black text-orange-500">⏰ {lang === "ar" ? "انتهى الوقت" : "Tijd verlopen"}</span>}
+                        {(userAns === null || userAns === undefined) && (
+                          <span className="text-xs font-black text-orange-500">
+                            ⏰ {lang === "ar" ? "انتهى الوقت" : "Tijd verlopen"}
+                          </span>
+                        )}
                       </div>
                       {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
-                        <div className={`flex gap-1 p-1 bg-gray-100 items-stretch`}>
+                        <div className="flex gap-1 p-1 bg-gray-100 items-stretch">
                           {q.videoUrls.filter(Boolean).map((url: string, idx: number) => (
                             <WatermarkedImage key={idx} src={url} alt="" />
                           ))}
@@ -315,13 +335,17 @@ function GratisExamContent() {
           )}
 
           <div className="flex gap-3">
-            <button onClick={() => { unlockAudio(); setStarted(false); setFinished(false); setCurrentIndex(0); setAnswers({}); setLocked(false); }}
+            <button
+              onClick={() => { unlockAudio(); setStarted(false); setFinished(false); setCurrentIndex(0); setAnswers({}); setLocked(false); }}
               className="flex-1 py-3 font-black text-white rounded-xl hover:opacity-90 active:scale-95"
-              style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
+              style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}
+            >
               🔄 {lang === "ar" ? "إعادة" : lang === "nl" ? "Opnieuw" : "Retry"}
             </button>
-            <button onClick={() => router.back()}
-              className="flex-1 py-3 font-black border-2 border-gray-300 text-gray-600 rounded-xl hover:bg-gray-50 active:scale-95">
+            <button
+              onClick={() => router.back()}
+              className="flex-1 py-3 font-black border-2 border-gray-300 text-gray-600 rounded-xl hover:bg-gray-50 active:scale-95"
+            >
               ← {lang === "ar" ? "رجوع" : lang === "nl" ? "Terug" : "Back"}
             </button>
           </div>
@@ -330,6 +354,7 @@ function GratisExamContent() {
     );
   }
 
+  // ── Question screen ──────────────────────────────────────────────────────────
   const userAnswer = answers[currentIndex];
   const isAnswered = userAnswer !== undefined;
 
@@ -342,7 +367,9 @@ function GratisExamContent() {
           <div className="absolute inset-0 bg-green-500 opacity-10" />
           <div style={{ animation: "checkPop 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards" }}>
             <div className="w-32 h-32 rounded-full flex items-center justify-center" style={{ background: "rgba(34,197,94,0.95)", boxShadow: "0 0 60px rgba(34,197,94,0.7)" }}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-16 h-16"><path d="M20 6L9 17l-5-5" /></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-16 h-16">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
             </div>
           </div>
           <style>{`@keyframes checkPop { 0% { transform: scale(0) rotate(-10deg); opacity: 0; } 60% { transform: scale(1.15) rotate(3deg); opacity: 1; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }`}</style>
@@ -351,7 +378,7 @@ function GratisExamContent() {
 
       {showWrong && (
         <div className="fixed inset-0 z-[9999] pointer-events-none">
-          <div className="absolute inset-0 bg-red-500 opacity-20 animate-pulse"></div>
+          <div className="absolute inset-0 bg-red-500 opacity-20 animate-pulse" />
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-8xl" style={{ animation: "wrongBounce 0.3s ease-in-out 3" }}>❌</div>
           </div>
@@ -362,28 +389,45 @@ function GratisExamContent() {
       <div className="max-w-2xl mx-auto px-4 py-6">
         {q && (
           <div className="rounded-2xl overflow-hidden shadow-xl border border-gray-100">
+            {/* Header */}
             <div className="px-5 py-3 flex items-center justify-between" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
               <div className="flex items-center gap-2">
                 <span className="text-white font-black text-sm">{currentIndex + 1} / {questions.length}</span>
                 {q.points === 5 && (
-                  <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(239,68,68,0.85)", color: "white", border: "1.5px solid rgba(255,255,255,0.4)" }}>⭐ 5 pts</span>
+                  <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(239,68,68,0.85)", color: "white", border: "1.5px solid rgba(255,255,255,0.4)" }}>
+                    ⭐ 5 pts
+                  </span>
                 )}
               </div>
-              <div className={`flex items-center gap-2 px-3 py-1 rounded-full font-black text-sm border-2 transition-all ${locked ? "bg-white/20 border-white/40 text-white" : !readingDone ? "bg-blue-500 border-blue-300 text-white animate-pulse" : timeLeft <= 5 ? "bg-red-500 border-red-300 text-white animate-pulse" : timeLeft <= 10 ? "bg-orange-500 border-orange-300 text-white" : "bg-green-500 border-green-300 text-white"}`}>
+              <div className={`flex items-center gap-2 px-3 py-1 rounded-full font-black text-sm border-2 transition-all ${
+                locked ? "bg-white/20 border-white/40 text-white"
+                : !readingDone ? "bg-blue-500 border-blue-300 text-white animate-pulse"
+                : timeLeft <= 5 ? "bg-red-500 border-red-300 text-white animate-pulse"
+                : timeLeft <= 10 ? "bg-orange-500 border-orange-300 text-white"
+                : "bg-green-500 border-green-300 text-white"
+              }`}>
                 <span>{!readingDone && !locked ? "🔊" : "⏱"}</span>
-                <span>{locked ? (isAnswered && userAnswer !== null ? (userAnswer === q.correctAnswer ? "✓" : "✗") : "⏰") : !readingDone ? (lang === "ar" ? "يقرأ..." : "Lezen...") : timeLeft}</span>
+                <span>
+                  {locked
+                    ? (isAnswered && userAnswer !== null ? (userAnswer === q.correctAnswer ? "✓" : "✗") : "⏰")
+                    : !readingDone
+                    ? (lang === "ar" ? "يقرأ..." : "Lezen...")
+                    : timeLeft}
+                </span>
                 {!locked && readingDone && <span className="text-xs opacity-80">s</span>}
               </div>
             </div>
 
+            {/* Images */}
             {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
-              <div className={`flex gap-1 p-2 bg-gray-100 items-stretch`}>
+              <div className="flex gap-1 p-2 bg-gray-100 items-stretch">
                 {q.videoUrls.filter(Boolean).map((url: string, i: number) => (
                   <WatermarkedImage key={i} src={url} alt="" />
                 ))}
               </div>
             )}
 
+            {/* Question + Answers */}
             <div className="px-5 py-4 bg-white">
               <p className={`text-lg font-bold text-gray-900 leading-relaxed mb-4 ${isRtl ? "text-right" : "text-left"}`}>
                 {translatedTexts[0] || q.textNL || q.text}
@@ -401,12 +445,22 @@ function GratisExamContent() {
                       if (isCorrect) style = "bg-green-50 border-2 border-green-500 text-green-800";
                       else if (isSelected) style = "bg-red-50 border-2 border-red-500 text-red-800";
                       else style = "bg-gray-50 border-2 border-gray-200 text-gray-500";
-                    } else { style = "bg-gray-50 border-2 border-gray-200 text-gray-400 opacity-60"; }
+                    } else {
+                      style = "bg-gray-50 border-2 border-gray-200 text-gray-400 opacity-60";
+                    }
                   }
                   return (
-                    <button key={num} onClick={() => handleAnswer(num)} disabled={isAnswered || locked}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${style} ${!isAnswered && !locked ? "cursor-pointer active:scale-95" : "cursor-default"}`}>
-                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0 ${isAnswered && userAnswer !== null ? isCorrect ? "bg-green-500 text-white" : isSelected ? "bg-red-500 text-white" : "bg-gray-200 text-gray-500" : locked ? "bg-gray-200 text-gray-400" : "bg-[#22c55e] text-white"}`}>
+                    <button
+                      key={num}
+                      onClick={() => handleAnswer(num)}
+                      disabled={isAnswered || locked}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${style} ${!isAnswered && !locked ? "cursor-pointer active:scale-95" : "cursor-default"}`}
+                    >
+                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0 ${
+                        isAnswered && userAnswer !== null
+                          ? isCorrect ? "bg-green-500 text-white" : isSelected ? "bg-red-500 text-white" : "bg-gray-200 text-gray-500"
+                          : locked ? "bg-gray-200 text-gray-400" : "bg-[#22c55e] text-white"
+                      }`}>
                         {isAnswered && userAnswer !== null ? (isCorrect ? "✓" : isSelected ? "✗" : label) : label}
                       </span>
                       <span className={isRtl ? "text-right flex-1" : "text-left flex-1"}>{ansText}</span>
@@ -414,9 +468,16 @@ function GratisExamContent() {
                   );
                 })}
               </div>
+
               {(isAnswered || locked) && (
-                <button onClick={handleNext} className="w-full mt-5 py-3 font-black text-white rounded-xl hover:opacity-90 active:scale-95" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
-                  {currentIndex + 1 >= questions.length ? (lang === "ar" ? "عرض النتائج 🏆" : lang === "nl" ? "Resultaat 🏆" : "Result 🏆") : (lang === "ar" ? "التالي ➤" : lang === "nl" ? "Volgende ➤" : "Next ➤")}
+                <button
+                  onClick={handleNext}
+                  className="w-full mt-5 py-3 font-black text-white rounded-xl hover:opacity-90 active:scale-95"
+                  style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}
+                >
+                  {currentIndex + 1 >= questions.length
+                    ? (lang === "ar" ? "عرض النتائج 🏆" : lang === "nl" ? "Resultaat 🏆" : "Result 🏆")
+                    : (lang === "ar" ? "التالي ➤" : lang === "nl" ? "Volgende ➤" : "Next ➤")}
                 </button>
               )}
             </div>
@@ -430,12 +491,12 @@ function GratisExamContent() {
 
 export default function GratisExamPage() {
   return (
-    <Suspense fallback={<div className="flex justify-center py-16"><div className="w-10 h-10 border-4 border-[#22c55e] border-t-transparent rounded-full animate-spin"></div></div>}>
+    <Suspense fallback={
+      <div className="flex justify-center py-16">
+        <div className="w-10 h-10 border-4 border-[#22c55e] border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
       <GratisExamContent />
     </Suspense>
   );
 }
-
-
-
-
