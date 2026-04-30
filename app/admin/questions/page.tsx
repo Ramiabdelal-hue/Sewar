@@ -190,13 +190,17 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
 
+  const ADMIN_TOKEN = process.env.NEXT_PUBLIC_ADMIN_TOKEN || "";
+
   const fetchLessons = async (cat: string) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/lessons?category=${cat}`);
+      const res = await fetch(`/api/admin/lessons?category=${cat}`);
+      if (!res.ok) { console.error("fetchLessons HTTP error:", res.status); return; }
       const data = await res.json();
       if (data.success) setLessons(data.lessons);
-    } catch (e) { console.error(e); }
+      else console.error("fetchLessons error:", data.message);
+    } catch (e) { console.error("fetchLessons exception:", e); }
     finally { setLoading(false); }
   };
 
@@ -206,51 +210,56 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
     if (!newTitle.trim()) return alert("أدخل عنوان الدرس");
     setSaving(true);
     try {
-      const res = await fetch("/api/lessons", {
+      const res = await fetch("/api/admin/lessons", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-admin-token": ADMIN_TOKEN },
-        body: JSON.stringify({ title: newTitle, description: newDescription, category }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: newTitle.trim(), description: newDescription.trim() || null, category }),
       });
-      const data = await res.json();
+      const text = await res.text();
+      let data: any;
+      try { data = JSON.parse(text); } catch { data = { success: false, message: `HTTP ${res.status}: ${text.slice(0, 200)}` }; }
       if (data.success) { setNewTitle(""); setNewDescription(""); fetchLessons(category); }
-      else alert(data.message || "خطأ في الإضافة");
-    } catch (e) { alert("خطأ في الاتصال"); }
+      else alert("❌ " + (data.message || "خطأ في الإضافة"));
+    } catch (e) { alert("❌ خطأ في الاتصال: " + String(e)); }
     finally { setSaving(false); }
   };
 
   const deleteLesson = async (id: number) => {
     if (!confirm("هل تريد حذف هذا الدرس؟ سيتم حذف جميع أسئلته أيضاً!")) return;
     try {
-      const res = await fetch(`/api/lessons?id=${id}&category=${category}`, {
+      const res = await fetch(`/api/admin/lessons?id=${id}&category=${category}`, {
         method: "DELETE",
-        headers: { "x-admin-token": ADMIN_TOKEN },
       });
-      const data = await res.json();
+      const text = await res.text();
+      let data: any;
+      try { data = JSON.parse(text); } catch { data = { success: false, message: `HTTP ${res.status}: ${text.slice(0, 200)}` }; }
       if (data.success) fetchLessons(category);
-      else alert(data.message || "خطأ في الحذف");
-    } catch (e) { alert("خطأ في الاتصال"); }
+      else alert("❌ " + (data.message || "خطأ في الحذف"));
+    } catch (e) { alert("❌ خطأ في الاتصال: " + String(e)); }
   };
 
   const updateLesson = async (id: number) => {
     if (!editTitle.trim()) return alert("العنوان لا يمكن أن يكون فارغاً");
     try {
-      const res = await fetch("/api/lessons", {
+      const res = await fetch("/api/admin/lessons", {
         method: "PUT",
-        headers: { "Content-Type": "application/json", "x-admin-token": ADMIN_TOKEN },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, title: editTitle.trim(), description: editDescription.trim() || null, category }),
       });
-      const data = await res.json();
-      if (data.success) { 
-        setEditingId(null); 
-        setEditTitle(""); 
-        setEditDescription(""); 
-        fetchLessons(category); 
+      const text = await res.text();
+      let data: any;
+      try { data = JSON.parse(text); } catch { data = { success: false, message: `HTTP ${res.status}: ${text.slice(0, 200)}` }; }
+      if (data.success) {
+        setEditingId(null);
+        setEditTitle("");
+        setEditDescription("");
+        fetchLessons(category);
         alert("✅ تم حفظ التعديل بنجاح");
-      } else { 
-        alert("❌ " + (data.message || "خطأ في التعديل")); 
+      } else {
+        alert("❌ " + (data.message || "خطأ في التعديل"));
       }
-    } catch (e) { 
-      alert("❌ خطأ في الاتصال: " + String(e)); 
+    } catch (e) {
+      alert("❌ خطأ في الاتصال: " + String(e));
     }
   };
 

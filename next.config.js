@@ -41,19 +41,14 @@ const nextConfig = {
           { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
         ],
       },
-      // cache للـ API responses
+      // cache للـ API responses - GET فقط
       {
         source: '/api/settings',
         headers: [
           { key: 'Cache-Control', value: 'public, s-maxage=300, stale-while-revalidate=600' },
         ],
       },
-      {
-        source: '/api/lessons',
-        headers: [
-          { key: 'Cache-Control', value: 'public, s-maxage=300, stale-while-revalidate=600' },
-        ],
-      },
+      // لا نضع cache على /api/lessons لأن POST/DELETE/PUT يجب أن تصل للسيرفر
       {
         source: '/api/exam-questions',
         headers: [

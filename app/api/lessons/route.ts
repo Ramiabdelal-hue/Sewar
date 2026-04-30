@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { unstable_cache } from "next/cache";
+import { revalidateTag, unstable_cache } from "next/cache";
 
 // Cache دالة جلب الدروس - تتجدد كل 5 دقائق
 const getCachedLessons = unstable_cache(
@@ -41,13 +41,15 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: true, lessons });
 
   } catch (error) {
+    console.error("GET /api/lessons error:", error);
     return NextResponse.json({ success: false, message: "Error fetching lessons", error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const { title, description, category } = await request.json();
+    const body = await request.json();
+    const { title, description, category } = body;
     if (!title || !category) return NextResponse.json({ success: false, message: "title and category required" }, { status: 400 });
 
     const cat = category.toUpperCase();
@@ -57,8 +59,12 @@ export async function POST(request: NextRequest) {
     else if (cat === "C") lesson = await prisma.lessonC.create({ data: { title, description: description || null } });
     else return NextResponse.json({ success: false, message: "Invalid category" }, { status: 400 });
 
+    // تحديث الـ cache بعد الإضافة
+    revalidateTag("lessons");
+
     return NextResponse.json({ success: true, lesson });
   } catch (error) {
+    console.error("POST /api/lessons error:", error);
     return NextResponse.json({ success: false, message: "Error creating lesson", error: String(error) }, { status: 500 });
   }
 }
@@ -76,8 +82,12 @@ export async function DELETE(request: NextRequest) {
     else if (category === "C") await prisma.lessonC.delete({ where: { id } });
     else return NextResponse.json({ success: false, message: "Invalid category" }, { status: 400 });
 
+    // تحديث الـ cache بعد الحذف
+    revalidateTag("lessons");
+
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error("DELETE /api/lessons error:", error);
     return NextResponse.json({ success: false, message: "Error deleting lesson", error: String(error) }, { status: 500 });
   }
 }
@@ -97,8 +107,12 @@ export async function PUT(request: NextRequest) {
     else if (cat === "C") lesson = await prisma.lessonC.update({ where: { id }, data: { title, description: description || null } });
     else return NextResponse.json({ success: false, message: "Invalid category" }, { status: 400 });
 
+    // تحديث الـ cache بعد التعديل
+    revalidateTag("lessons");
+
     return NextResponse.json({ success: true, lesson });
   } catch (error) {
+    console.error("PUT /api/lessons error:", error);
     return NextResponse.json({ success: false, message: "Error updating lesson", error: String(error) }, { status: 500 });
   }
 }
