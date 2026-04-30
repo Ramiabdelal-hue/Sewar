@@ -1,18 +1,33 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
+
+const EXCLUDED_PATHS = ['/', '/admin'];
+const SCHOOL_NAME = 'Sewar Rijbewijsonline';
 
 export default function Watermark() {
   const [text, setText] = useState('');
+  const pathname = usePathname();
+
+  const isExcluded =
+    pathname === '/' || pathname.startsWith('/admin');
 
   useEffect(() => {
-    const email = localStorage.getItem('userEmail') || 'unknown';
+    if (isExcluded) return;
+
+    const email = localStorage.getItem('userEmail') || '';
+    const label = email ? `${SCHOOL_NAME} | ${email}` : SCHOOL_NAME;
+
     const interval = setInterval(() => {
-      const now = new Date().toLocaleTimeString();
-      setText(`${email} | ${now}`);
+      const now = new Date().toLocaleTimeString('nl-BE');
+      setText(`${label} | ${now}`);
     }, 1000);
+
     return () => clearInterval(interval);
-  }, []);
+  }, [isExcluded]);
+
+  if (isExcluded || !text) return null;
 
   return (
     <div
@@ -20,15 +35,19 @@ export default function Watermark() {
         position: 'fixed',
         inset: 0,
         pointerEvents: 'none',
-        opacity: 0.1,
+        opacity: 0.08,
         transform: 'rotate(-25deg)',
         display: 'flex',
         flexWrap: 'wrap',
+        alignContent: 'flex-start',
         zIndex: 9999,
+        userSelect: 'none',
       }}
     >
       {Array.from({ length: 40 }).map((_, i) => (
-        <span key={i} style={{ margin: 20 }}>{text}</span>
+        <span key={i} style={{ margin: '18px 24px', fontSize: '13px', fontWeight: 700, whiteSpace: 'nowrap' }}>
+          {text}
+        </span>
       ))}
     </div>
   );
