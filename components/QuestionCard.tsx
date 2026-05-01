@@ -122,10 +122,6 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
                 draggable={false}
                 onContextMenu={e => e.preventDefault()}
               />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/watermark.jpeg" alt="" className="absolute pointer-events-none"
-                style={{ width: "40%", top: "50%", left: "50%", transform: "translate(-50%,-50%) rotate(-15deg)", opacity: 0.8, mixBlendMode: "multiply" }}
-                draggable={false} />
             </div>
           ) : (
             /* صورتان - جنباً إلى جنب بنفس الارتفاع */
@@ -140,10 +136,6 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
                     draggable={false}
                     onContextMenu={e => e.preventDefault()}
                   />
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/watermark.jpeg" alt="" className="absolute pointer-events-none"
-                    style={{ width: "50%", top: "50%", left: "50%", transform: "translate(-50%,-50%) rotate(-15deg)", opacity: 0.8, mixBlendMode: "multiply" }}
-                    draggable={false} />
                 </div>
               ))}
             </div>

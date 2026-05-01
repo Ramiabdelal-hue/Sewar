@@ -83,26 +83,9 @@ export default function WatermarkedImage({ src, alt = "", className, style, prio
         onLoad={() => setImageLoading(false)}
       />
 
-      {/* علامة مائية + footer */}
-      {!imageLoading && !imageError && (
+      {/* علامة مائية نصية فقط */}
+          {!imageLoading && !imageError && (
         <>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/watermark.jpeg"
-            alt=""
-            loading="lazy"
-            decoding="async"
-            className="absolute pointer-events-none"
-            style={{
-              width: "50%",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%) rotate(-15deg)",
-              opacity: 0.8,
-              mixBlendMode: "multiply",
-            }}
-            draggable={false}
-          />
           <div
             className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-3 py-1 pointer-events-none select-none"
             style={{
