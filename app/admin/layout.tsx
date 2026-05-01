@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { LangProvider } from "@/context/LangContext";
 import ScreenProtection from "@/components/ScreenProtection";
 import "../globals.css";

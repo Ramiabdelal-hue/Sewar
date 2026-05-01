@@ -1,4 +1,4 @@
-﻿import nodemailer from "nodemailer";
+import nodemailer from "nodemailer";
 
 // ننشئ transporter داخل كل دالة لضمان قراءة env vars في وقت التشغيل
 function createTransporter() {
