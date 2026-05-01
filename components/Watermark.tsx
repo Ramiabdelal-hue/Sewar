@@ -16,12 +16,9 @@ export default function Watermark() {
   useEffect(() => {
     if (isExcluded) return;
 
-    const email = localStorage.getItem('userEmail') || '';
-    const label = email ? `${SCHOOL_NAME} | ${email}` : SCHOOL_NAME;
-
     const interval = setInterval(() => {
       const now = new Date().toLocaleTimeString('nl-BE');
-      setText(`${label} | ${now}`);
+      setText(`${SCHOOL_NAME} | ${now}`);
     }, 1000);
 
     return () => clearInterval(interval);
