@@ -61,7 +61,7 @@ export function speak(text: string, options: SpeakOptions = {}): void {
   const speechLang = SPEECH_LANG_MAP[lang] || "nl-NL";
   const u = new SpeechSynthesisUtterance(text);
   u.lang   = speechLang;
-  u.rate   = 0.2;   // بطيء — درجة أبطأ من الأصلي 0.3
+  u.rate   = 0.3;   // بطيء — درجة أبطأ من الأصلي 0.3
   u.pitch  = 1.2;   // نبرة أنثى
   u.volume = 1;
 
