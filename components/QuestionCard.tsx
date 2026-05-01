@@ -161,7 +161,13 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
       {expText && (
         <div className="px-5 py-4 bg-white">
           {translating && <span className="text-xs text-gray-400 animate-pulse">...</span>}
-          {expText.includes('\n') ? (
+          {/* إذا كان النص يحتوي HTML (من RichTextEditor) نعرضه مباشرة */}
+          {/<[a-z][\s\S]*>/i.test(expText) ? (
+            <div
+              className={`text-sm text-gray-800 leading-relaxed rich-content ${isRtl ? "text-right" : "text-left"}`}
+              dangerouslySetInnerHTML={{ __html: expText }}
+            />
+          ) : expText.includes('\n') ? (
             <div className="space-y-1.5">
               {expText.split('\n').filter(line => line.trim()).map((line, i) => (
                 <p key={i} className={`text-sm text-gray-800 leading-relaxed ${isRtl ? "text-right" : "text-left"}`}>

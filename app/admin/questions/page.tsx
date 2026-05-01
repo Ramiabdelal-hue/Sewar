@@ -5,6 +5,7 @@ import { useLang } from "@/context/LangContext";
 import adminTranslations from "@/locales/admin.json";
 import FileUploader from "@/components/FileUploader";
 import AdminManifest from "@/components/AdminManifest";
+import RichTextEditor from "@/components/RichTextEditor";
 
 interface Question {
   id: number;
@@ -1464,12 +1465,11 @@ export default function AdminQuestionsPage() {
                   </div>
                   <div>
                     <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">🇳🇱 الشرح (Nederlands)</label>
-                    <textarea
-                      placeholder="Uitleg in het Nederlands..."
-                      className="w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-700 focus:outline-none transition-all"
-                      style={{ background: "#eff6ff", border: "1.5px solid #bfdbfe", resize: "vertical", minHeight: "96px" }}
+                    <RichTextEditor
                       value={newQuestion.explanationNL}
-                      onChange={(e) => setNewQuestion({ ...newQuestion, explanationNL: e.target.value })}
+                      onChange={(html) => setNewQuestion({ ...newQuestion, explanationNL: html })}
+                      placeholder="Uitleg in het Nederlands..."
+                      minHeight="120px"
                     />
                   </div>
                 </div>
@@ -1874,9 +1874,12 @@ export default function AdminQuestionsPage() {
                           </div>
                           <div>
                             <label className="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1.5">🇳🇱 الشرح (Nederlands)</label>
-                            <textarea value={editForm.explanationNL} onChange={(e) => setEditForm({ ...editForm, explanationNL: e.target.value })}
-                              className="w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-700 focus:outline-none"
-                              style={{ background: "#eff6ff", border: "1.5px solid #bfdbfe", resize: "vertical", minHeight: "96px" }} />
+                            <RichTextEditor
+                              value={editForm.explanationNL}
+                              onChange={(html) => setEditForm({ ...editForm, explanationNL: html })}
+                              placeholder="Uitleg in het Nederlands..."
+                              minHeight="120px"
+                            />
                           </div>
                         </div>
                       ) : (
