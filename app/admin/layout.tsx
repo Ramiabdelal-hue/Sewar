@@ -1,11 +1,11 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { LangProvider } from "@/context/LangContext";
 import ScreenProtection from "@/components/ScreenProtection";
 import "../globals.css";
 
 export const metadata: Metadata = {
   title: "Sewar Admin",
-  description: "Sewar RijbewijsOnline - Admin Panel",
+  description: "Sewar Rijbewijs Online - Admin Panel",
   manifest: "/manifest-admin.json",
   appleWebApp: {
     capable: true,

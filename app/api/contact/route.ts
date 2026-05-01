@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { checkRateLimit, getClientIp, sanitizeString, isValidEmail } from "@/lib/adminAuth";
 
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     });
 
     await transporter.sendMail({
-      from: `"Sewar RijbewijsOnline" <${smtpUser}>`,
+      from: `"Sewar Rijbewijs Online" <${smtpUser}>`,
       to: process.env.CONTACT_EMAIL || "sewarrijbewijs@gmail.com",
       replyTo: email,
       subject: `📩 رسالة جديدة من ${name}${subject ? ` - ${subject}` : ""}`,

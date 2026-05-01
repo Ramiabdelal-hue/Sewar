@@ -84,10 +84,10 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
   };
 
   const ft: Record<string, { left: string; right: string }> = {
-    nl: { left: "\u00A9 Alle rechten voorbehouden \u00B7 SewarRijbewijsOnline", right: "\uD83D\uDEE1 Origineel educatief materiaal \u00B7 Wettelijk beschermd" },
-    fr: { left: "\u00A9 Tous droits r\u00E9serv\u00E9s \u00B7 SewarRijbewijsOnline", right: "\uD83D\uDEE1 Contenu \u00E9ducatif original \u00B7 Prot\u00E9g\u00E9 l\u00E9galement" },
-    ar: { left: "\u00A9 \u062C\u0645\u064A\u0639 \u0627\u0644\u062D\u0642\u0648\u0642 \u0645\u062D\u0641\u0648\u0638\u0629 \u00B7 SewarRijbewijsOnline", right: "\uD83D\uDEE1 \u0645\u062D\u062A\u0648\u0649 \u062A\u0639\u0644\u064A\u0645\u064A \u0623\u0635\u0644\u064A \u0645\u062D\u0645\u064A \u0642\u0627\u0646\u0648\u0646\u064A\u0627\u064B" },
-    en: { left: "\u00A9 All rights reserved \u00B7 SewarRijbewijsOnline", right: "\uD83D\uDEE1 Original educational content \u00B7 Legally protected" },
+    nl: { left: "\u00A9 Alle rechten voorbehouden \u00B7 Sewar Rijbewijs Online", right: "\uD83D\uDEE1 Origineel educatief materiaal \u00B7 Wettelijk beschermd" },
+    fr: { left: "\u00A9 Tous droits r\u00E9serv\u00E9s \u00B7 Sewar Rijbewijs Online", right: "\uD83D\uDEE1 Contenu \u00E9ducatif original \u00B7 Prot\u00E9g\u00E9 l\u00E9galement" },
+    ar: { left: "\u00A9 \u062C\u0645\u064A\u0639 \u0627\u0644\u062D\u0642\u0648\u0642 \u0645\u062D\u0641\u0648\u0638\u0629 \u00B7 Sewar Rijbewijs Online", right: "\uD83D\uDEE1 \u0645\u062D\u062A\u0648\u0649 \u062A\u0639\u0644\u064A\u0645\u064A \u0623\u0635\u0644\u064A \u0645\u062D\u0645\u064A \u0642\u0627\u0646\u0648\u0646\u064A\u0627\u064B" },
+    en: { left: "\u00A9 All rights reserved \u00B7 Sewar Rijbewijs Online", right: "\uD83D\uDEE1 Original educational content \u00B7 Legally protected" },
   };
   const text = ft[lang] || ft.nl;
 

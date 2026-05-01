@@ -1,7 +1,7 @@
-{
+﻿{
   "name": "Sewar Admin Panel",
   "short_name": "Sewar Admin",
-  "description": "Sewar RijbewijsOnline - Admin Panel",
+  "description": "Sewar Rijbewijs Online - Admin Panel",
   "start_url": "/admin/questions",
   "scope": "/admin/",
   "display": "standalone",

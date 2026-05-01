@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 
@@ -111,7 +111,7 @@ export default function WatermarkedImage({ src, alt = "", className, style, prio
             }}
           >
             <span className="text-white text-[9px] font-bold tracking-wide">
-              © Alle rechten voorbehouden · SewarRijbewijsOnline
+              © Alle rechten voorbehouden · Sewar Rijbewijs Online
             </span>
             <span className="text-white/80 text-[9px] font-medium flex items-center gap-1">
               <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

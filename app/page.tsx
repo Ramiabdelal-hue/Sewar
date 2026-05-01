@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
@@ -48,7 +48,7 @@ export default function HomePage() {
 
             {/* حقوق النشر — مخفي على الموبايل */}
             <p className="text-[10px] text-center hidden md:block" style={{ color: "#9ca3af" }}>
-              © {new Date().getFullYear()} Sewar Rijbewijsonline.{" "}
+              © {new Date().getFullYear()} Sewar Rijbewijs Online.{" "}
               {t.gratis === "مجاني" ? "جميع الحقوق محفوظة" :
                lang === "nl" ? "Alle rechten voorbehouden" :
                lang === "fr" ? "Tous droits réservés" :

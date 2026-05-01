@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+﻿import nodemailer from "nodemailer";
 
 // ننشئ transporter داخل كل دالة لضمان قراءة env vars في وقت التشغيل
 function createTransporter() {
@@ -29,7 +29,7 @@ export async function sendScreenshotWarningEmail(
   try {
     const transporter = createTransporter();
 
-    const subject = `⚠️ Sewar RijbewijsOnline – Waarschuwing schermafbeelding / تحذير لقطة شاشة`;
+    const subject = `⚠️ Sewar Rijbewijs Online – Waarschuwing schermafbeelding / تحذير لقطة شاشة`;
 
     const html = `
 <!DOCTYPE html>
@@ -42,7 +42,7 @@ export async function sendScreenshotWarningEmail(
         <tr>
           <td style="background:linear-gradient(135deg,#dc2626,#b91c1c);padding:32px 40px;text-align:center;">
             <div style="font-size:48px;margin-bottom:12px;">⚠️</div>
-            <h1 style="color:#fff;margin:0;font-size:24px;font-weight:900;">Sewar RijbewijsOnline</h1>
+            <h1 style="color:#fff;margin:0;font-size:24px;font-weight:900;">Sewar Rijbewijs Online</h1>
             <p style="color:rgba(255,255,255,0.85);margin:8px 0 0;font-size:14px;">Beveiligingswaarschuwing / تحذير أمني</p>
           </td>
         </tr>
@@ -92,7 +92,7 @@ export async function sendScreenshotWarningEmail(
         <tr>
           <td style="background:#f9fafb;padding:20px 40px;text-align:center;border-top:1px solid #e5e7eb;">
             <p style="color:#9ca3af;font-size:12px;margin:0;">
-              © ${new Date().getFullYear()} Sewar RijbewijsOnline ·
+              © ${new Date().getFullYear()} Sewar Rijbewijs Online ·
               <a href="mailto:sewarrijbewijs@gmail.com" style="color:#6b7280;">sewarrijbewijs@gmail.com</a>
             </p>
           </td>
@@ -104,7 +104,7 @@ export async function sendScreenshotWarningEmail(
 </html>`;
 
     await transporter.sendMail({
-      from: `"Sewar RijbewijsOnline" <${process.env.SMTP_USER}>`,
+      from: `"Sewar Rijbewijs Online" <${process.env.SMTP_USER}>`,
       to: toEmail,
       subject,
       html,
@@ -129,7 +129,7 @@ export async function sendSuspensionEmail(
   try {
     const transporter = createTransporter();
 
-    const subject = `🔒 Sewar RijbewijsOnline – Abonnement opgeschort / تم تعليق اشتراكك`;
+    const subject = `🔒 Sewar Rijbewijs Online – Abonnement opgeschort / تم تعليق اشتراكك`;
 
     const html = `
 <!DOCTYPE html>
@@ -142,7 +142,7 @@ export async function sendSuspensionEmail(
         <tr>
           <td style="background:linear-gradient(135deg,#7c3aed,#5b21b6);padding:32px 40px;text-align:center;">
             <div style="font-size:48px;margin-bottom:12px;">🔒</div>
-            <h1 style="color:#fff;margin:0;font-size:24px;font-weight:900;">Sewar RijbewijsOnline</h1>
+            <h1 style="color:#fff;margin:0;font-size:24px;font-weight:900;">Sewar Rijbewijs Online</h1>
             <p style="color:rgba(255,255,255,0.85);margin:8px 0 0;font-size:14px;">Abonnement opgeschort / تعليق الاشتراك</p>
           </td>
         </tr>
@@ -175,7 +175,7 @@ export async function sendSuspensionEmail(
         </tr>
         <tr>
           <td style="background:#f9fafb;padding:20px 40px;text-align:center;border-top:1px solid #e5e7eb;">
-            <p style="color:#9ca3af;font-size:12px;margin:0;">© ${new Date().getFullYear()} Sewar RijbewijsOnline</p>
+            <p style="color:#9ca3af;font-size:12px;margin:0;">© ${new Date().getFullYear()} Sewar Rijbewijs Online</p>
           </td>
         </tr>
       </table>
@@ -185,7 +185,7 @@ export async function sendSuspensionEmail(
 </html>`;
 
     await transporter.sendMail({
-      from: `"Sewar RijbewijsOnline" <${process.env.SMTP_USER}>`,
+      from: `"Sewar Rijbewijs Online" <${process.env.SMTP_USER}>`,
       to: toEmail,
       subject,
       html,
@@ -254,7 +254,7 @@ export async function sendSubscriptionConfirmationEmail(params: {
     const today = new Date().toLocaleDateString("nl-BE", { day: "2-digit", month: "2-digit", year: "numeric" });
     const todayAR = new Date().toLocaleDateString("ar-EG", { day: "2-digit", month: "2-digit", year: "numeric" });
 
-    const subject = `✅ Bevestiging abonnement – Sewar RijbewijsOnline | تأكيد الاشتراك`;
+    const subject = `✅ Bevestiging abonnement – Sewar Rijbewijs Online | تأكيد الاشتراك`;
 
     const html = `
 <!DOCTYPE html>
@@ -269,7 +269,7 @@ export async function sendSubscriptionConfirmationEmail(params: {
       <tr>
         <td style="background:linear-gradient(135deg,#003399,#0055cc);padding:32px 40px;text-align:center;">
           <div style="font-size:48px;margin-bottom:12px;">🎉</div>
-          <h1 style="color:#fff;margin:0;font-size:24px;font-weight:900;">Sewar RijbewijsOnline</h1>
+          <h1 style="color:#fff;margin:0;font-size:24px;font-weight:900;">Sewar Rijbewijs Online</h1>
           <p style="color:rgba(255,255,255,0.85);margin:8px 0 0;font-size:14px;">Abonnement bevestigd / تم تأكيد الاشتراك</p>
         </td>
       </tr>
@@ -412,7 +412,7 @@ export async function sendSubscriptionConfirmationEmail(params: {
       <!-- Footer -->
       <tr>
         <td style="background:#f9fafb;padding:20px 40px;text-align:center;border-top:1px solid #e5e7eb;">
-          <p style="color:#9ca3af;font-size:12px;margin:0;">© ${new Date().getFullYear()} Sewar RijbewijsOnline · sewarrijbewijs@gmail.com</p>
+          <p style="color:#9ca3af;font-size:12px;margin:0;">© ${new Date().getFullYear()} Sewar Rijbewijs Online · sewarrijbewijs@gmail.com</p>
           <p style="color:#d1d5db;font-size:11px;margin:4px 0 0;">BTW-nummer: BE0XXX.XXX.XXX</p>
         </td>
       </tr>
@@ -424,7 +424,7 @@ export async function sendSubscriptionConfirmationEmail(params: {
 </html>`;
 
     await transporter.sendMail({
-      from: `"Sewar RijbewijsOnline" <${process.env.SMTP_USER}>`,
+      from: `"Sewar Rijbewijs Online" <${process.env.SMTP_USER}>`,
       to: toEmail,
       subject,
       html,

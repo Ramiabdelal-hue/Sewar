@@ -1,7 +1,7 @@
-{
-  "name": "Sewar Rijbewijsonline",
+﻿{
+  "name": "Sewar Rijbewijs Online",
   "short_name": "Sewar",
-  "description": "Leer rijden met Sewar Rijbewijsonline",
+  "description": "Leer rijden met Sewar Rijbewijs Online",
   "start_url": "https://sewar-1q112.vercel.app/",
   "id": "https://sewar-1q112.vercel.app/",
   "scope": "/",

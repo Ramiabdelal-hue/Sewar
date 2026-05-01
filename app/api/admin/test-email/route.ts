@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
 // GET - اختبار إرسال إيميل وعرض تشخيص كامل
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     await transporter.sendMail({
       from: `"Sewar Test" <${smtpUser}>`,
       to: smtpUser, // إرسال لنفس الحساب
-      subject: "✅ Test Email - Sewar RijbewijsOnline",
+      subject: "✅ Test Email - Sewar Rijbewijs Online",
       text: `SMTP is working correctly!\n\nDebug info:\n${JSON.stringify(debug, null, 2)}`,
     });
 

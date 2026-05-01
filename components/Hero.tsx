@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -84,7 +84,7 @@ export default function Hero({ onSelect }: HeroProps) {
         style={{ background: "#ffffff", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", maxWidth: "672px" }}>
 
         <div className="mb-2">
-          <Image src="/Logo.jpeg" alt="Sewar Rijbewijsonline"
+          <Image src="/Logo.jpeg" alt="Sewar Rijbewijs Online"
             width={150} height={150}
             className="rounded-full object-cover"
             style={{ width: '150px', height: '150px', border: "3px solid #f3f4f6" }} />

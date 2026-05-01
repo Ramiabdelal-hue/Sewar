@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useLang } from "@/context/LangContext";
 
@@ -29,7 +29,7 @@ export default function Footer() {
           </div>
           <div className="text-center">
             <p className="text-white/60 text-sm font-medium">
-              © {new Date().getFullYear()} Sewar Rijbewijsonline.{" "}
+              © {new Date().getFullYear()} Sewar Rijbewijs Online.{" "}
               {rights[lang as keyof typeof rights] || rights.nl}
             </p>
           </div>
