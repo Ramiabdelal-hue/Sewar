@@ -59,17 +59,17 @@ function ExamenTestContent() {
     window.speechSynthesis.speak(u);
   };
 
-  // iOS Safari fix: speechSynthesis يتوقف بعد ~15 ثانية — resume() يمنع ذلك
+  // iOS Safari fix: speechSynthesis يتوقف بعد ~15 ثانية
+  // الحل: resume() كل 14 ثانية فقط (وليس كل 250ms لتجنب التقطع)
   const startIosResume = () => {
     if (iosResumeRef.current) clearInterval(iosResumeRef.current);
     iosResumeRef.current = setInterval(() => {
       if (window.speechSynthesis?.speaking) {
-        window.speechSynthesis.pause();
         window.speechSynthesis.resume();
       } else {
         if (iosResumeRef.current) { clearInterval(iosResumeRef.current); iosResumeRef.current = null; }
       }
-    }, 250);
+    }, 14000);
   };
 
   const speakQuestion = (q: any, translated: string[]) => {
@@ -95,7 +95,7 @@ function ExamenTestContent() {
       if (!isValid()) { setReadingDone(true); return; }
       if (!text) { if (onEnd) onEnd(); else setReadingDone(true); return; }
       const u = new SpeechSynthesisUtterance(text);
-      u.lang = speechLang; u.rate = 0.3; u.pitch = 1.2; u.volume = 1;
+      u.lang = speechLang; u.rate = 0.7; u.pitch = 1.1; u.volume = 1;
       if (voice) u.voice = voice;
       u.onstart = () => startIosResume();
       u.onend = () => { if (isValid()) { if (onEnd) onEnd(); else setReadingDone(true); } else setReadingDone(true); };
