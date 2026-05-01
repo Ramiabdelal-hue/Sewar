@@ -30,7 +30,6 @@ export default function Watermark() {
       aria-hidden="true"
       style={{
         position: 'fixed',
-        // نوسّع المساحة بكثير لتغطية كل الشاشة بعد الـ rotate
         top: '-50%',
         left: '-50%',
         width: '200%',
@@ -43,17 +42,17 @@ export default function Watermark() {
         flexWrap: 'wrap',
         alignContent: 'flex-start',
         overflow: 'hidden',
-        opacity: 0.08,
+        opacity: 0.13,
       }}
     >
-      {Array.from({ length: 200 }).map((_, i) => (
+      {Array.from({ length: 300 }).map((_, i) => (
         <span
           key={i}
           style={{
             fontSize: '13px',
             fontWeight: 700,
             whiteSpace: 'nowrap',
-            padding: '18px 20px',
+            padding: '14px 16px',
             color: '#000',
           }}
         >
