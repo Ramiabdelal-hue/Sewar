@@ -37,11 +37,17 @@ function GratisExamContent() {
   const translatedRef = useRef<string[]>(["", "", "", ""]);
   const isRtl = lang === "ar";
 
+  const iosResumeRef = useRef<NodeJS.Timeout | null>(null);
+
   const killTts = () => {
     stopTtsRef.current = true;
     ttsSessionRef.current += 1;
     if (ttsRef.current) { clearTimeout(ttsRef.current); ttsRef.current = null; }
-    stopSpeech();
+    if (iosResumeRef.current) { clearInterval(iosResumeRef.current); iosResumeRef.current = null; }
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.pause();
+      window.speechSynthesis.cancel();
+    }
   };
 
   const unlockAudio = () => {
@@ -49,6 +55,18 @@ function GratisExamContent() {
     const u = new SpeechSynthesisUtterance("");
     u.volume = 0; u.rate = 1;
     window.speechSynthesis.speak(u);
+  };
+
+  const startIosResume = () => {
+    if (iosResumeRef.current) clearInterval(iosResumeRef.current);
+    iosResumeRef.current = setInterval(() => {
+      if (window.speechSynthesis?.speaking) {
+        window.speechSynthesis.pause();
+        window.speechSynthesis.resume();
+      } else {
+        if (iosResumeRef.current) { clearInterval(iosResumeRef.current); iosResumeRef.current = null; }
+      }
+    }, 250);
   };
 
   const speakQuestion = (q: any, translated: string[]) => {
@@ -76,6 +94,7 @@ function GratisExamContent() {
       const u = new SpeechSynthesisUtterance(text);
       u.lang = speechLang; u.rate = 0.3; u.pitch = 1.2; u.volume = 1;
       if (voice) u.voice = voice;
+      u.onstart = () => startIosResume();
       u.onend = () => { if (isValid()) { if (onEnd) onEnd(); else setReadingDone(true); } else setReadingDone(true); };
       u.onerror = () => { if (isValid() && onEnd) onEnd(); else setReadingDone(true); };
       window.speechSynthesis.speak(u);
