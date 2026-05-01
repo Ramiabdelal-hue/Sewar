@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar";
 import WatermarkedImage from "@/components/WatermarkedImage";
 import Footer from "@/components/Footer";
 import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
+import { speak as ttsSpeak, stopSpeech, whenVoicesReady } from "@/lib/tts";
 
 function GratisExamContent() {
   const searchParams = useSearchParams();
@@ -39,10 +40,7 @@ function GratisExamContent() {
     stopTtsRef.current = true;
     ttsSessionRef.current += 1;
     if (ttsRef.current) { clearTimeout(ttsRef.current); ttsRef.current = null; }
-    if (typeof window !== "undefined" && window.speechSynthesis) {
-      window.speechSynthesis.pause();
-      window.speechSynthesis.cancel();
-    }
+    stopSpeech();
   };
 
   const unlockAudio = () => {
@@ -58,25 +56,21 @@ function GratisExamContent() {
     const session = ttsSessionRef.current;
     window.speechSynthesis.cancel();
     setReadingDone(false);
-    const langMap: Record<string, string> = { nl: "nl-NL", fr: "fr-FR", ar: "ar-SA", en: "en-US" };
-    const speechLang = langMap[lang] || "nl-NL";
-    const getVoice = () => {
-      const voices = window.speechSynthesis.getVoices();
-      if (!voices.length) return null;
-      return voices.find(v => v.lang === speechLang) || voices.find(v => v.lang.startsWith(speechLang.split("-")[0])) || null;
-    };
+
     const isValid = () => ttsSessionRef.current === session && !stopTtsRef.current;
-    const speak = (text: string, onEnd?: () => void) => {
+
+    const sayText = (text: string, onEnd?: () => void) => {
       if (!isValid()) { setReadingDone(true); return; }
       if (!text) { if (onEnd) onEnd(); else setReadingDone(true); return; }
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = speechLang; u.rate = 0.3; u.pitch = 1;
-      const v = getVoice(); if (v) u.voice = v;
-      if (onEnd) { u.onend = () => { if (isValid()) onEnd(); else setReadingDone(true); }; }
-      else { u.onend = () => setReadingDone(true); }
-      u.onerror = () => { if (isValid() && onEnd) onEnd(); else setReadingDone(true); };
-      window.speechSynthesis.speak(u);
+      ttsSpeak(text, {
+        lang,
+        rate: 0.9,
+        pitch: 1.1,
+        onEnd: () => { if (isValid()) { if (onEnd) onEnd(); else setReadingDone(true); } else setReadingDone(true); },
+        onError: () => { if (isValid() && onEnd) onEnd(); else setReadingDone(true); },
+      });
     };
+
     const questionText = translated[0] || q.textNL || q.text || "";
     const ans = [translated[1] || q.answer1, translated[2] || q.answer2, translated[3] || q.answer3].filter(Boolean);
     const labels = lang === "ar"
@@ -84,21 +78,23 @@ function GratisExamContent() {
       : lang === "fr"
       ? ["R\u00e9ponse A:", "R\u00e9ponse B:", "R\u00e9ponse C:"]
       : ["Antwoord A:", "Antwoord B:", "Antwoord C:"];
+
     if (!questionText) { setReadingDone(true); return; }
-    speak(questionText, () => {
+
+    sayText(questionText, () => {
       if (!isValid()) { setReadingDone(true); return; }
       let i = 0;
       const readNext = () => {
         if (!isValid()) { setReadingDone(true); return; }
         if (i >= ans.length) { setReadingDone(true); return; }
-        speak(`${labels[i]} ${ans[i]}`, () => {
+        sayText(`${labels[i]} ${ans[i]}`, () => {
           i++;
           if (i >= ans.length) { setReadingDone(true); }
-          else { ttsRef.current = setTimeout(() => { if (isValid()) readNext(); else setReadingDone(true); }, 400); }
+          else { ttsRef.current = setTimeout(() => { if (isValid()) readNext(); else setReadingDone(true); }, 300); }
         });
       };
       if (ans.length === 0) { setReadingDone(true); }
-      else { ttsRef.current = setTimeout(() => { if (isValid()) readNext(); else setReadingDone(true); }, 600); }
+      else { ttsRef.current = setTimeout(() => { if (isValid()) readNext(); else setReadingDone(true); }, 500); }
     });
   };
 
@@ -113,15 +109,8 @@ function GratisExamContent() {
       const texts = lang === "nl"
         ? [q.textNL || q.text || "", q.answer1 || "", q.answer2 || "", q.answer3 || ""]
         : translatedRef.current;
-      const voices = window.speechSynthesis.getVoices();
-      if (voices.length > 0) { speakQuestion(q, texts); }
-      else {
-        let done = false;
-        const start = () => { if (done || stopTtsRef.current) return; done = true; window.speechSynthesis.onvoiceschanged = null; speakQuestion(q, texts); };
-        window.speechSynthesis.onvoiceschanged = start;
-        setTimeout(start, 1000);
-      }
-    }, 1000);
+      whenVoicesReady(() => { if (!stopTtsRef.current) speakQuestion(q, texts); });
+    }, 800);
     return () => { killTts(); };
   }, [currentIndex, started, finished]);
 
