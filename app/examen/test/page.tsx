@@ -63,16 +63,27 @@ function ExamenTestContent() {
     window.speechSynthesis.cancel();
     setReadingDone(false);
 
+    const speechLang = ({ nl: "nl-NL", fr: "fr-FR", ar: "ar-SA", en: "en-US" } as Record<string,string>)[lang] || "nl-NL";
+    const voices = window.speechSynthesis.getVoices();
+    const femaleKw = ["female","woman","girl","fiona","samantha","anna","sara","emma","ellen","nora","zira","lotte","lea","zeina","joanna","salli","kendra","kimberly","ivy","olivia","aria"];
+    const isFemale = (v: SpeechSynthesisVoice) => femaleKw.some(k => v.name.toLowerCase().includes(k));
+    const voice = voices.find(v => v.lang === speechLang && isFemale(v))
+      || voices.find(v => v.lang.startsWith(speechLang.split("-")[0]) && isFemale(v))
+      || voices.find(v => v.lang === speechLang)
+      || voices.find(v => v.lang.startsWith(speechLang.split("-")[0]))
+      || null;
+
     const isValid = () => ttsSessionRef.current === session && !stopTtsRef.current;
 
     const sayText = (text: string, onEnd?: () => void) => {
       if (!isValid()) { setReadingDone(true); return; }
       if (!text) { if (onEnd) onEnd(); else setReadingDone(true); return; }
-      ttsSpeak(text, {
-        lang,
-        onEnd: () => { if (isValid()) { if (onEnd) onEnd(); else setReadingDone(true); } else setReadingDone(true); },
-        onError: () => { if (isValid() && onEnd) onEnd(); else setReadingDone(true); },
-      });
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = speechLang; u.rate = 0.3; u.pitch = 1.2; u.volume = 1;
+      if (voice) u.voice = voice;
+      u.onend = () => { if (isValid()) { if (onEnd) onEnd(); else setReadingDone(true); } else setReadingDone(true); };
+      u.onerror = () => { if (isValid() && onEnd) onEnd(); else setReadingDone(true); };
+      window.speechSynthesis.speak(u);
     };
 
     const questionText = translated[0] || q.textNL || q.text || "";
