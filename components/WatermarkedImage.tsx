@@ -7,33 +7,30 @@ interface Props {
   alt?: string;
   className?: string;
   style?: React.CSSProperties;
+  priority?: boolean; // للصور المهمة التي تظهر فوق الطية
 }
 
-export default function WatermarkedImage({ src, alt = "", className, style }: Props) {
+/**
+ * يحوّل رابط Cloudinary ليستخدم:
+ * - f_auto: أفضل format (webp/avif)
+ * - q_auto: ضغط تلقائي
+ * - w_1200: عرض مناسب
+ * - c_limit: لا يكبّر الصورة
+ * هذا يجعل Cloudinary CDN يـ cache الصورة بـ URL ثابت
+ */
+function optimizeCloudinaryUrl(url: string): string {
+  if (!url) return url;
+  if (!url.includes("res.cloudinary.com") || !url.includes("/upload/")) return url;
+  // إذا فيه transformations بالفعل لا نضيف مرة ثانية
+  if (url.includes("/upload/f_auto")) return url;
+  return url.replace("/upload/", "/upload/f_auto,q_auto,w_1200,c_limit/");
+}
+
+export default function WatermarkedImage({ src, alt = "", className, style, priority = false }: Props) {
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
 
-  const handleImageError = () => {
-    setImageError(true);
-    setImageLoading(false);
-  };
-
-  const handleImageLoad = () => {
-    setImageLoading(false);
-  };
-
-  // تحسين رابط الصورة - تجنب التكرار
-  // تحسين رابط الصورة بدون تغيير الحجم
-  const optimizeImageUrl = (url: string) => {
-    if (!url) return url;
-    if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
-      if (url.includes('/upload/f_auto')) return url;
-      return url.replace('/upload/', '/upload/f_auto,q_auto/');
-    }
-    return url;
-  };
-
-  const optimizedSrc = optimizeImageUrl(src);
+  const optimizedSrc = optimizeCloudinaryUrl(src);
 
   return (
     <div
@@ -45,8 +42,8 @@ export default function WatermarkedImage({ src, alt = "", className, style }: Pr
       {imageLoading && !imageError && (
         <div className="w-full bg-gray-100 animate-pulse flex items-center justify-center rounded flex-1" style={{ minHeight: "120px" }}>
           <svg className="w-8 h-8 text-gray-300 animate-spin" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
           </svg>
         </div>
       )}
@@ -61,11 +58,17 @@ export default function WatermarkedImage({ src, alt = "", className, style }: Pr
         </div>
       )}
 
-      {/* الصورة - تمتد لتأخذ نفس ارتفاع الصورة الأكبر */}
+      {/* الصورة الرئيسية */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={optimizedSrc}
         alt={alt}
+        // lazy loading للصور خارج الشاشة — يقلل الطلبات الأولية
+        loading={priority ? "eager" : "lazy"}
+        // async decoding لا يعطل الـ main thread
+        decoding="async"
+        // fetchpriority للصور المهمة
+        {...(priority ? { fetchPriority: "high" } : {})}
         className={`block ${imageLoading || imageError ? "hidden" : ""}`}
         style={{
           width: "100%",
@@ -76,17 +79,19 @@ export default function WatermarkedImage({ src, alt = "", className, style }: Pr
         }}
         draggable={false}
         onContextMenu={e => e.preventDefault()}
-        onError={handleImageError}
-        onLoad={handleImageLoad}
+        onError={() => { setImageError(true); setImageLoading(false); }}
+        onLoad={() => setImageLoading(false)}
       />
 
-      {/* علامة مائية */}
+      {/* علامة مائية + footer */}
       {!imageLoading && !imageError && (
         <>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/watermark.jpeg"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="absolute pointer-events-none"
             style={{
               width: "50%",

@@ -16,7 +16,8 @@ const nextConfig = {
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 3600,
+    // cache الصور لمدة 7 أيام في Next.js image optimizer
+    minimumCacheTTL: 60 * 60 * 24 * 7,
     remotePatterns: [
       { protocol: 'https', hostname: 'www.gratisrijbewijsonline.be' },
       { protocol: 'https', hostname: 'res.cloudinary.com' },
@@ -39,6 +40,13 @@ const nextConfig = {
         source: '/uploads/:path*',
         headers: [
           { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      // cache الصور الثابتة في public/
+      {
+        source: '/:file(.*\\.(?:jpg|jpeg|png|gif|webp|svg|ico|avif))',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' },
         ],
       },
       // cache للـ API responses - GET فقط
