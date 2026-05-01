@@ -69,8 +69,6 @@ function ExamenTestContent() {
       if (!text) { if (onEnd) onEnd(); else setReadingDone(true); return; }
       ttsSpeak(text, {
         lang,
-        rate: 0.9,
-        pitch: 1.1,
         onEnd: () => { if (isValid()) { if (onEnd) onEnd(); else setReadingDone(true); } else setReadingDone(true); },
         onError: () => { if (isValid() && onEnd) onEnd(); else setReadingDone(true); },
       });

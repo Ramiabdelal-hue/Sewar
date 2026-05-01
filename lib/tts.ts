@@ -1,40 +1,48 @@
 /**
- * TTS Helper — صوت أنثى طبيعي
- * يستخدم Google Translate TTS (مجاني، صوت طبيعي جداً)
- * مع Web Speech API كـ fallback
+ * TTS Helper — صوت بنت واضح مجاني عبر Puter.js (Amazon Polly Neural)
+ * بدون API key أو تسجيل
+ * https://developer.puter.com/tutorials/free-unlimited-text-to-speech-api/
  */
 
-const LANG_MAP: Record<string, string> = {
-  nl: "nl",
-  fr: "fr",
-  ar: "ar",
-  en: "en",
+// أصوات أنثى لكل لغة في Amazon Polly
+const POLLY_VOICES: Record<string, string> = {
+  nl: "Lotte",   // هولندي — أنثى
+  fr: "Lea",     // فرنسي — أنثى
+  ar: "Zeina",   // عربي — أنثى
+  en: "Joanna",  // إنجليزي — أنثى
 };
 
-const SPEECH_LANG_MAP: Record<string, string> = {
+const POLLY_LANG: Record<string, string> = {
   nl: "nl-NL",
   fr: "fr-FR",
-  ar: "ar-SA",
+  ar: "arb",
   en: "en-US",
 };
 
-// cache الـ audio objects لتجنب إعادة التحميل
-const audioCache = new Map<string, HTMLAudioElement>();
+let currentAudio: HTMLAudioElement | null = null;
+let puterReady = false;
 
-/**
- * ينطق النص عبر Google Translate TTS (صوت أنثى طبيعي)
- * مع fallback لـ Web Speech API
- */
+// تحميل Puter.js مرة واحدة
+function loadPuter(): Promise<void> {
+  return new Promise((resolve) => {
+    if (puterReady || (window as any).puter) {
+      puterReady = true;
+      resolve();
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://js.puter.com/v2/";
+    script.onload = () => { puterReady = true; resolve(); };
+    script.onerror = () => resolve(); // fallback
+    document.head.appendChild(script);
+  });
+}
+
 export interface SpeakOptions {
   lang?: string;
-  rate?: number;
-  pitch?: number;
-  volume?: number;
   onEnd?: () => void;
   onError?: () => void;
 }
-
-let currentAudio: HTMLAudioElement | null = null;
 
 /**
  * يوقف القراءة الحالية
@@ -51,119 +59,76 @@ export function stopSpeech(): void {
 }
 
 /**
- * ينطق النص بصوت أنثى طبيعي عبر Google TTS
+ * ينطق النص بصوت بنت واضح عبر Puter.js
  */
-export function speak(text: string, options: SpeakOptions = {}): void {
+export async function speak(text: string, options: SpeakOptions = {}): Promise<void> {
   const { lang = "nl", onEnd, onError } = options;
 
-  if (!text?.trim()) {
-    onEnd?.();
-    return;
-  }
+  if (!text?.trim()) { onEnd?.(); return; }
 
   stopSpeech();
 
-  const langCode = LANG_MAP[lang] || "nl";
-  // Google Translate TTS endpoint — صوت طبيعي جداً
-  const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${langCode}&client=tw-ob`;
+  try {
+    await loadPuter();
+    const puter = (window as any).puter;
 
-  const cacheKey = `${langCode}:${text}`;
-  let audio = audioCache.get(cacheKey);
+    if (puter?.ai?.txt2speech) {
+      const voice  = POLLY_VOICES[lang] || "Joanna";
+      const langCode = POLLY_LANG[lang] || "nl-NL";
 
-  if (!audio) {
-    audio = new Audio(url);
-    audio.crossOrigin = "anonymous";
-    // cache فقط النصوص القصيرة
-    if (text.length < 200) audioCache.set(cacheKey, audio);
-  } else {
-    audio.currentTime = 0;
+      const audio: HTMLAudioElement = await puter.ai.txt2speech(text, {
+        voice,
+        engine: "neural",
+        language: langCode,
+      });
+
+      currentAudio = audio;
+      audio.onended = () => { currentAudio = null; onEnd?.(); };
+      audio.onerror = () => { currentAudio = null; speakFallback(text, options); };
+      await audio.play();
+      return;
+    }
+  } catch {
+    // fallback
   }
 
-  currentAudio = audio;
-
-  audio.onended = () => {
-    currentAudio = null;
-    onEnd?.();
-  };
-
-  audio.onerror = () => {
-    currentAudio = null;
-    // fallback لـ Web Speech API
-    speakFallback(text, options);
-  };
-
-  audio.play().catch(() => {
-    // fallback إذا فشل التشغيل (CORS أو غيره)
-    speakFallback(text, options);
-  });
+  speakFallback(text, options);
 }
 
 /**
- * Fallback: Web Speech API مع أفضل صوت أنثى متاح
+ * Fallback: Web Speech API
  */
 function speakFallback(text: string, options: SpeakOptions = {}): void {
-  const { lang = "nl", rate = 0.9, pitch = 1.1, volume = 1, onEnd, onError } = options;
+  const { lang = "nl", onEnd, onError } = options;
+  if (typeof window === "undefined" || !window.speechSynthesis) { onEnd?.(); return; }
 
-  if (!window.speechSynthesis) { onEnd?.(); return; }
-
-  const speechLang = SPEECH_LANG_MAP[lang] || "nl-NL";
+  const LANG_MAP: Record<string, string> = { nl: "nl-NL", fr: "fr-FR", ar: "ar-SA", en: "en-US" };
   const u = new SpeechSynthesisUtterance(text);
-  u.lang   = speechLang;
-  u.rate   = rate;
-  u.pitch  = pitch;
-  u.volume = volume;
+  u.lang  = LANG_MAP[lang] || "nl-NL";
+  u.rate  = 0.9;
+  u.pitch = 1.1;
 
-  const voice = getFemaleVoice(lang);
-  if (voice) u.voice = voice;
+  const voices = window.speechSynthesis.getVoices();
+  const female = voices.find(v =>
+    v.lang.startsWith(u.lang.split("-")[0]) &&
+    ["female","woman","girl","fiona","samantha","anna","sara","emma","ellen","nora","zira"]
+      .some(k => v.name.toLowerCase().includes(k))
+  ) || voices.find(v => v.lang.startsWith(u.lang.split("-")[0]));
+  if (female) u.voice = female;
 
   u.onend   = () => onEnd?.();
-  u.onerror = () => { onError?.() || onEnd?.(); };
-
+  u.onerror = () => onEnd?.();
   window.speechSynthesis.speak(u);
 }
 
 /**
- * يجلب أفضل صوت أنثى متاح
- */
-export function getFemaleVoice(lang: string): SpeechSynthesisVoice | null {
-  if (typeof window === "undefined") return null;
-  const voices = window.speechSynthesis.getVoices();
-  if (!voices.length) return null;
-
-  const speechLang = SPEECH_LANG_MAP[lang] || "nl-NL";
-  const langCode   = speechLang.split("-")[0];
-
-  const femaleKeywords = ["female","woman","girl","fiona","samantha","victoria","karen",
-    "moira","tessa","veena","anna","sara","emma","sophie","claire","julie",
-    "amelie","alice","marie","ellen","nora","zira","hazel","susan","linda","laura"];
-
-  const isFemale = (v: SpeechSynthesisVoice) =>
-    femaleKeywords.some(k => v.name.toLowerCase().includes(k));
-
-  return (
-    voices.find(v => v.localService && v.lang === speechLang && isFemale(v)) ||
-    voices.find(v => v.lang === speechLang && isFemale(v)) ||
-    voices.find(v => v.lang.startsWith(langCode) && isFemale(v)) ||
-    voices.find(v => v.lang === speechLang) ||
-    voices.find(v => v.lang.startsWith(langCode)) ||
-    null
-  );
-}
-
-/**
- * ينتظر تحميل الأصوات ثم ينفذ callback
+ * ينتظر جاهزية الأصوات
  */
 export function whenVoicesReady(callback: () => void): void {
-  if (typeof window === "undefined") return;
-  const voices = window.speechSynthesis?.getVoices();
-  if (voices?.length > 0) { callback(); return; }
-  let done = false;
-  const handler = () => {
-    if (done) return;
-    done = true;
-    if (window.speechSynthesis) window.speechSynthesis.onvoiceschanged = null;
-    callback();
-  };
-  if (window.speechSynthesis) window.speechSynthesis.onvoiceschanged = handler;
-  setTimeout(handler, 1000);
+  // مع Puter.js لا نحتاج انتظار الأصوات
+  callback();
+}
+
+export function getFemaleVoice(lang: string): SpeechSynthesisVoice | null {
+  return null; // غير مستخدم مع Puter.js
 }
