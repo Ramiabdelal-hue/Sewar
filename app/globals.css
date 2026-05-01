@@ -44,6 +44,8 @@ img, video {
   .lessons-table {
     display: block;
     width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
   .lessons-table thead {
     display: none;

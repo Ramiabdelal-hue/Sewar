@@ -131,7 +131,7 @@ function GratisContent() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col" dir={isRtl ? "rtl" : "ltr"} style={{ background: "#f0f0f0", overflowX: "hidden" }}>
+    <div className="min-h-screen flex flex-col" dir={isRtl ? "rtl" : "ltr"} style={{ background: "#f0f0f0", overflowX: "hidden", maxWidth: "100vw" }}>
       <Navbar />
 
       {/* Header */}
@@ -186,6 +186,7 @@ function GratisContent() {
             </p>
           </div>
         ) : (
+          <div className="w-full overflow-x-hidden">
           <table className="w-full border-collapse lessons-table" style={{ tableLayout: "fixed" }}>
             <colgroup>
               <col style={{ width: "60%" }} />
@@ -254,6 +255,7 @@ function GratisContent() {
               })}
             </tbody>
           </table>
+          </div>
         )}
 
         {/* زر الاشتراك */}
