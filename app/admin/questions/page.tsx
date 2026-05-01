@@ -195,7 +195,9 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
   const fetchLessons = async (cat: string) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/lessons?category=${cat}`);
+      const res = await fetch(`/api/admin/lessons?category=${cat}`, {
+        headers: { "x-admin-token": ADMIN_TOKEN },
+      });
       if (!res.ok) { console.error("fetchLessons HTTP error:", res.status); return; }
       const data = await res.json();
       if (data.success) setLessons(data.lessons);
@@ -212,7 +214,7 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
     try {
       const res = await fetch("/api/admin/lessons", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-admin-token": ADMIN_TOKEN },
         body: JSON.stringify({ title: newTitle.trim(), description: newDescription.trim() || null, category }),
       });
       const text = await res.text();
@@ -229,6 +231,7 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
     try {
       const res = await fetch(`/api/admin/lessons?id=${id}&category=${category}`, {
         method: "DELETE",
+        headers: { "x-admin-token": ADMIN_TOKEN },
       });
       const text = await res.text();
       let data: any;
@@ -243,7 +246,7 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
     try {
       const res = await fetch("/api/admin/lessons", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-admin-token": ADMIN_TOKEN },
         body: JSON.stringify({ id, title: editTitle.trim(), description: editDescription.trim() || null, category }),
       });
       const text = await res.text();
