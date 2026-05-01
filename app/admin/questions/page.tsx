@@ -1651,19 +1651,6 @@ export default function AdminQuestionsPage() {
                               </div>
                             </div>
                           ))}
-                              <button
-                                onClick={() => {
-                                  setNewQuestion({
-                                    ...newQuestion,
-                                    videoUrls: newQuestion.videoUrls.filter((_, i) => i !== idx),
-                                  });
-                                }}
-                                className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full hover:bg-red-600 font-bold"
-                              >
-                                ×
-                              </button>
-                            </div>
-                          ))}
                         </div>
                       </div>
                     )}
