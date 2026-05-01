@@ -43,12 +43,14 @@ img, video {
 @media (max-width: 640px) {
   .lessons-table {
     display: block;
+    width: 100%;
   }
   .lessons-table thead {
     display: none;
   }
   .lessons-table tbody {
     display: block;
+    width: 100%;
   }
   .lessons-table tr {
     display: flex;
@@ -58,18 +60,36 @@ img, video {
     border-bottom: 1px solid #cce0ff;
     padding: 10px 12px;
     gap: 8px;
+    width: 100%;
   }
   .lessons-table td {
     display: block;
     border: none !important;
     padding: 0 !important;
   }
+  /* عنوان الدرس */
   .lessons-table td:first-child {
     flex: 1;
     font-size: 14px;
+    min-width: 0;
+    word-break: break-word;
   }
-  .lessons-table td:last-child {
+  /* أزرار Les / Exam */
+  .lessons-table td:not(:first-child) {
     flex-shrink: 0;
+    width: 68px;
+  }
+  /* زر يمتد على عمودين (colSpan=2) */
+  .lessons-table td[colspan="2"] {
+    flex-shrink: 0;
+    width: 140px;
+  }
+  /* حجم الأزرار على الموبايل */
+  .lessons-table td button {
+    width: 100%;
+    padding: 6px 4px !important;
+    font-size: 11px !important;
+    white-space: nowrap;
   }
 }
 
