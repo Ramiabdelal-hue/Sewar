@@ -6,6 +6,7 @@ import adminTranslations from "@/locales/admin.json";
 import FileUploader from "@/components/FileUploader";
 import AdminManifest from "@/components/AdminManifest";
 import RichTextEditor from "@/components/RichTextEditor";
+import ImageEditor from "@/components/ImageEditor";
 
 interface Question {
   id: number;
@@ -436,6 +437,7 @@ export default function AdminQuestionsPage() {
   const [filterFivePoints, setFilterFivePoints] = useState(false);
   const [filterGratis, setFilterGratis] = useState(false);
   const [fixingPoints, setFixingPoints] = useState(false);
+  const [editingImage, setEditingImage] = useState<{ url: string; index: number; source: "new" | "edit" } | null>(null);
 
   const ADMIN_TOKEN = process.env.NEXT_PUBLIC_ADMIN_TOKEN || "";
 
@@ -1633,6 +1635,22 @@ export default function AdminQuestionsPage() {
                           {newQuestion.videoUrls.map((url, idx) => (
                             <div key={idx} className="relative group">
                               <img src={url} alt={`صورة ${idx + 1}`} className="w-full h-24 object-cover rounded-lg" />
+                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setEditingImage({ url, index: idx, source: "new" })}
+                                  className="w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold shadow"
+                                  title="تعديل الصورة"
+                                >✏️</button>
+                                <button
+                                  type="button"
+                                  onClick={() => setNewQuestion({ ...newQuestion, videoUrls: newQuestion.videoUrls.filter((_, i) => i !== idx) })}
+                                  className="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold shadow"
+                                  title="حذف"
+                                >✕</button>
+                              </div>
+                            </div>
+                          ))}
                               <button
                                 onClick={() => {
                                   setNewQuestion({
@@ -1944,9 +1962,15 @@ export default function AdminQuestionsPage() {
                                     onClick={() => setEditForm(prev => ({ ...prev, videoUrls: prev.videoUrls.filter((_, i) => i !== idx) }))}
                                     className="absolute top-1 right-1 w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
                                     title="حذف"
-                                  >
-                                    ×
-                                  </button>
+                                  >×</button>
+                                  {/* زر التعديل */}
+                                  {questionType !== "Praktijk" && (
+                                    <button
+                                      onClick={() => setEditingImage({ url, index: idx, source: "edit" })}
+                                      className="absolute bottom-1 right-1 w-7 h-7 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center text-xs shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                      title="تعديل الصورة"
+                                    >✏️</button>
+                                  )}
                                   {/* زر التحميل */}
                                   <a
                                     href={url}
@@ -2310,6 +2334,28 @@ export default function AdminQuestionsPage() {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Image Editor Modal */}
+      {editingImage && (
+        <ImageEditor
+          src={editingImage.url}
+          onSave={(newUrl) => {
+            if (editingImage.source === "new") {
+              setNewQuestion(prev => ({
+                ...prev,
+                videoUrls: prev.videoUrls.map((u, i) => i === editingImage.index ? newUrl : u),
+              }));
+            } else {
+              setEditForm(prev => ({
+                ...prev,
+                videoUrls: prev.videoUrls.map((u, i) => i === editingImage.index ? newUrl : u),
+              }));
+            }
+            setEditingImage(null);
+          }}
+          onClose={() => setEditingImage(null)}
+        />
       )}
     </div>
   );
