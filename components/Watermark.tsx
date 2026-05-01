@@ -1,32 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
 const SCHOOL_NAME = 'Sewar Rijbewijs Online';
 
 export default function Watermark() {
-  const [time, setTime] = useState('');
   const pathname = usePathname();
 
   const isExcluded =
     pathname === '/' || pathname.startsWith('/admin');
 
-  useEffect(() => {
-    if (isExcluded) return;
+  if (isExcluded) return null;
 
-    const update = () => {
-      const now = new Date().toLocaleTimeString('nl-BE');
-      setTime(now);
-    };
-    update();
-    const interval = setInterval(update, 1000);
-    return () => clearInterval(interval);
-  }, [isExcluded]);
-
-  if (isExcluded || !time) return null;
-
-  const text = `${SCHOOL_NAME} | ${time}`;
+  const text = SCHOOL_NAME;
 
   // عدد الصفوف والأعمدة لتغطية كامل الشاشة
   const cols = 5;
