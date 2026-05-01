@@ -101,7 +101,7 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
           {index + 1}
         </div>
         {(question.textNL || question.text) && (
-          <p className={`text-sm font-black text-white leading-snug flex-1 ${isRtl ? "text-right" : "text-left"}`}>
+          <p className={`text-base font-bold text-white leading-snug flex-1 ${isRtl ? "text-right" : "text-left"}`}>
             {qText || question.textNL || question.text}
           </p>
         )}
@@ -164,19 +164,19 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
           {/* إذا كان النص يحتوي HTML (من RichTextEditor) نعرضه مباشرة */}
           {/<[a-z][\s\S]*>/i.test(expText) ? (
             <div
-              className={`text-sm text-gray-800 leading-relaxed rich-content ${isRtl ? "text-right" : "text-left"}`}
+              className={`text-base font-bold text-gray-800 leading-relaxed rich-content ${isRtl ? "text-right" : "text-left"}`}
               dangerouslySetInnerHTML={{ __html: expText }}
             />
           ) : expText.includes('\n') ? (
             <div className="space-y-1.5">
               {expText.split('\n').filter(line => line.trim()).map((line, i) => (
-                <p key={i} className={`text-sm text-gray-800 leading-relaxed ${isRtl ? "text-right" : "text-left"}`}>
+                <p key={i} className={`text-base font-bold text-gray-800 leading-relaxed ${isRtl ? "text-right" : "text-left"}`}>
                   {renderTextWithLinks(line.trim())}
                 </p>
               ))}
             </div>
           ) : (
-            <p className={`text-sm text-gray-800 leading-relaxed ${isRtl ? "text-right" : "text-left"}`}>{renderTextWithLinks(expText)}</p>
+            <p className={`text-base font-bold text-gray-800 leading-relaxed ${isRtl ? "text-right" : "text-left"}`}>{renderTextWithLinks(expText)}</p>
           )}
         </div>
       )}
