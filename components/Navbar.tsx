@@ -407,7 +407,8 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
   const navLinks = [
     { label: t.home, href: "/", icon: <FaHome /> },
     { label: t.theorie, href: "/theorie", icon: <FaBook />, onClick: onTheorieClick },
-    ...(userCategory !== "A" ? [{ label: t.praktical, href: "/praktical", icon: <FaCar /> }] : []),
+    // HIDDEN TEMPORARILY: praktijk
+    // ...(userCategory !== "A" ? [{ label: t.praktical, href: "/praktical", icon: <FaCar /> }] : []),
     ...(!isLoggedIn ? [{ label: t.gratis, href: "/gratis", icon: <FaCheckCircle /> }] : []),
     { label: t.contact, href: "/contact", icon: <FaEnvelope /> },
   ];
