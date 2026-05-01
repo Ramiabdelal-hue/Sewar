@@ -1,94 +1,114 @@
 /**
- * TTS Helper — صوت أنثى مجاني عبر Web Speech API
- * يختار أفضل صوت أنثى متاح حسب اللغة
+ * TTS Helper — صوت أنثى طبيعي
+ * يستخدم Google Translate TTS (مجاني، صوت طبيعي جداً)
+ * مع Web Speech API كـ fallback
  */
 
 const LANG_MAP: Record<string, string> = {
+  nl: "nl",
+  fr: "fr",
+  ar: "ar",
+  en: "en",
+};
+
+const SPEECH_LANG_MAP: Record<string, string> = {
   nl: "nl-NL",
   fr: "fr-FR",
   ar: "ar-SA",
   en: "en-US",
 };
 
+// cache الـ audio objects لتجنب إعادة التحميل
+const audioCache = new Map<string, HTMLAudioElement>();
+
 /**
- * يجلب أفضل صوت أنثى متاح للغة المطلوبة
- * الأولوية: صوت أنثى محلي → صوت أنثى أي → أول صوت للغة
+ * ينطق النص عبر Google Translate TTS (صوت أنثى طبيعي)
+ * مع fallback لـ Web Speech API
  */
-export function getFemaleVoice(lang: string): SpeechSynthesisVoice | null {
-  const voices = window.speechSynthesis.getVoices();
-  if (!voices.length) return null;
-
-  const speechLang = LANG_MAP[lang] || "nl-NL";
-  const langCode   = speechLang.split("-")[0];
-
-  // أسماء أصوات أنثى معروفة
-  const femaleNames = [
-    "female", "woman", "girl", "fiona", "samantha", "victoria", "karen",
-    "moira", "tessa", "veena", "ioana", "joana", "paulina", "amelie",
-    "alice", "marie", "anna", "sara", "lekha", "zira", "hazel", "susan",
-    "linda", "laura", "emma", "sophie", "claire", "julie", "isabelle",
-    "nora", "ellen", "xander", "google.*female",
-    // هولندي
-    "xander", "ellen", "fiona",
-    // عربي
-    "laila", "maged", "tarik",
-    // فرنسي
-    "amelie", "thomas",
-  ];
-
-  const isFemale = (v: SpeechSynthesisVoice) =>
-    femaleNames.some(n => v.name.toLowerCase().includes(n));
-
-  // 1. صوت أنثى محلي (localService) باللغة المطلوبة
-  const localFemale = voices.find(
-    v => v.localService && v.lang === speechLang && isFemale(v)
-  );
-  if (localFemale) return localFemale;
-
-  // 2. صوت أنثى باللغة المطلوبة (غير محلي)
-  const remoteFemale = voices.find(
-    v => v.lang === speechLang && isFemale(v)
-  );
-  if (remoteFemale) return remoteFemale;
-
-  // 3. أي صوت أنثى بنفس اللغة (مثلاً nl-BE بدل nl-NL)
-  const anyFemale = voices.find(
-    v => v.lang.startsWith(langCode) && isFemale(v)
-  );
-  if (anyFemale) return anyFemale;
-
-  // 4. أول صوت باللغة المطلوبة
-  const anyLang = voices.find(v => v.lang === speechLang)
-    || voices.find(v => v.lang.startsWith(langCode));
-  if (anyLang) return anyLang;
-
-  return null;
-}
-
 export interface SpeakOptions {
   lang?: string;
-  rate?: number;   // 0.5–2.0 (1.0 = طبيعي)
-  pitch?: number;  // 0.5–2.0 (1.1 = أنثى أوضح)
-  volume?: number; // 0–1
+  rate?: number;
+  pitch?: number;
+  volume?: number;
   onEnd?: () => void;
   onError?: () => void;
 }
 
-/**
- * ينطق النص بصوت أنثى
- */
-export function speak(text: string, options: SpeakOptions = {}): SpeechSynthesisUtterance {
-  const {
-    lang    = "nl",
-    rate    = 0.9,
-    pitch   = 1.1,
-    volume  = 1,
-    onEnd,
-    onError,
-  } = options;
+let currentAudio: HTMLAudioElement | null = null;
 
+/**
+ * يوقف القراءة الحالية
+ */
+export function stopSpeech(): void {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+  if (typeof window !== "undefined" && window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+  }
+}
+
+/**
+ * ينطق النص بصوت أنثى طبيعي عبر Google TTS
+ */
+export function speak(text: string, options: SpeakOptions = {}): void {
+  const { lang = "nl", onEnd, onError } = options;
+
+  if (!text?.trim()) {
+    onEnd?.();
+    return;
+  }
+
+  stopSpeech();
+
+  const langCode = LANG_MAP[lang] || "nl";
+  // Google Translate TTS endpoint — صوت طبيعي جداً
+  const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${langCode}&client=tw-ob`;
+
+  const cacheKey = `${langCode}:${text}`;
+  let audio = audioCache.get(cacheKey);
+
+  if (!audio) {
+    audio = new Audio(url);
+    audio.crossOrigin = "anonymous";
+    // cache فقط النصوص القصيرة
+    if (text.length < 200) audioCache.set(cacheKey, audio);
+  } else {
+    audio.currentTime = 0;
+  }
+
+  currentAudio = audio;
+
+  audio.onended = () => {
+    currentAudio = null;
+    onEnd?.();
+  };
+
+  audio.onerror = () => {
+    currentAudio = null;
+    // fallback لـ Web Speech API
+    speakFallback(text, options);
+  };
+
+  audio.play().catch(() => {
+    // fallback إذا فشل التشغيل (CORS أو غيره)
+    speakFallback(text, options);
+  });
+}
+
+/**
+ * Fallback: Web Speech API مع أفضل صوت أنثى متاح
+ */
+function speakFallback(text: string, options: SpeakOptions = {}): void {
+  const { lang = "nl", rate = 0.9, pitch = 1.1, volume = 1, onEnd, onError } = options;
+
+  if (!window.speechSynthesis) { onEnd?.(); return; }
+
+  const speechLang = SPEECH_LANG_MAP[lang] || "nl-NL";
   const u = new SpeechSynthesisUtterance(text);
-  u.lang   = LANG_MAP[lang] || "nl-NL";
+  u.lang   = speechLang;
   u.rate   = rate;
   u.pitch  = pitch;
   u.volume = volume;
@@ -96,39 +116,54 @@ export function speak(text: string, options: SpeakOptions = {}): SpeechSynthesis
   const voice = getFemaleVoice(lang);
   if (voice) u.voice = voice;
 
-  if (onEnd)   u.onend   = onEnd;
-  if (onError) u.onerror = onError;
+  u.onend   = () => onEnd?.();
+  u.onerror = () => { onError?.() || onEnd?.(); };
 
   window.speechSynthesis.speak(u);
-  return u;
 }
 
 /**
- * يوقف القراءة
+ * يجلب أفضل صوت أنثى متاح
  */
-export function stopSpeech(): void {
-  if (typeof window !== "undefined" && window.speechSynthesis) {
-    window.speechSynthesis.pause();
-    window.speechSynthesis.cancel();
-  }
+export function getFemaleVoice(lang: string): SpeechSynthesisVoice | null {
+  if (typeof window === "undefined") return null;
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices.length) return null;
+
+  const speechLang = SPEECH_LANG_MAP[lang] || "nl-NL";
+  const langCode   = speechLang.split("-")[0];
+
+  const femaleKeywords = ["female","woman","girl","fiona","samantha","victoria","karen",
+    "moira","tessa","veena","anna","sara","emma","sophie","claire","julie",
+    "amelie","alice","marie","ellen","nora","zira","hazel","susan","linda","laura"];
+
+  const isFemale = (v: SpeechSynthesisVoice) =>
+    femaleKeywords.some(k => v.name.toLowerCase().includes(k));
+
+  return (
+    voices.find(v => v.localService && v.lang === speechLang && isFemale(v)) ||
+    voices.find(v => v.lang === speechLang && isFemale(v)) ||
+    voices.find(v => v.lang.startsWith(langCode) && isFemale(v)) ||
+    voices.find(v => v.lang === speechLang) ||
+    voices.find(v => v.lang.startsWith(langCode)) ||
+    null
+  );
 }
 
 /**
  * ينتظر تحميل الأصوات ثم ينفذ callback
  */
 export function whenVoicesReady(callback: () => void): void {
-  const voices = window.speechSynthesis.getVoices();
-  if (voices.length > 0) {
-    callback();
-    return;
-  }
+  if (typeof window === "undefined") return;
+  const voices = window.speechSynthesis?.getVoices();
+  if (voices?.length > 0) { callback(); return; }
   let done = false;
   const handler = () => {
     if (done) return;
     done = true;
-    window.speechSynthesis.onvoiceschanged = null;
+    if (window.speechSynthesis) window.speechSynthesis.onvoiceschanged = null;
     callback();
   };
-  window.speechSynthesis.onvoiceschanged = handler;
-  setTimeout(handler, 1500); // fallback
+  if (window.speechSynthesis) window.speechSynthesis.onvoiceschanged = handler;
+  setTimeout(handler, 1000);
 }
