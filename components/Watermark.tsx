@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
-const EXCLUDED_PATHS = ['/', '/admin'];
 const SCHOOL_NAME = 'Sewar Rijbewijs Online';
 
 export default function Watermark() {
@@ -28,34 +27,34 @@ export default function Watermark() {
 
   return (
     <div
+      aria-hidden="true"
       style={{
         position: 'fixed',
-        inset: 0,
+        // نوسّع المساحة بكثير لتغطية كل الشاشة بعد الـ rotate
+        top: '-50%',
+        left: '-50%',
+        width: '200%',
+        height: '200%',
         pointerEvents: 'none',
-        opacity: 0.08,
-        transform: 'rotate(-25deg)',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        alignContent: 'space-around',
         zIndex: 9999,
         userSelect: 'none',
+        transform: 'rotate(-25deg)',
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignContent: 'flex-start',
         overflow: 'hidden',
-        // نوسّع المساحة لتغطي كل الشاشة حتى بعد الـ rotate
-        width: '150vw',
-        height: '150vh',
-        top: '-25vh',
-        left: '-25vw',
+        opacity: 0.08,
       }}
     >
-      {Array.from({ length: 60 }).map((_, i) => (
+      {Array.from({ length: 200 }).map((_, i) => (
         <span
           key={i}
           style={{
             fontSize: '13px',
             fontWeight: 700,
             whiteSpace: 'nowrap',
-            textAlign: 'center',
-            padding: '16px 8px',
+            padding: '18px 20px',
+            color: '#000',
           }}
         >
           {text}
