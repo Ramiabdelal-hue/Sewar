@@ -34,6 +34,7 @@ function ExamenTestContent() {
   const [readingDone, setReadingDone] = useState(false);
   const [showCorrect, setShowCorrect] = useState(false);
   const [showWrong, setShowWrong] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(true); // اختيار الصوت
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const ttsRef = useRef<NodeJS.Timeout | null>(null);
   const stopTtsRef = useRef(false);
@@ -100,6 +101,13 @@ function ExamenTestContent() {
   useEffect(() => {
     if (!started || finished) return;
     killTts();
+
+    // إذا الصوت مطفي — ابدأ العد مباشرة
+    if (!voiceEnabled) {
+      setReadingDone(true);
+      return;
+    }
+
     setReadingDone(false);
     ttsRef.current = setTimeout(() => {
       stopTtsRef.current = false;
@@ -111,7 +119,7 @@ function ExamenTestContent() {
       whenVoicesReady(() => { if (!stopTtsRef.current) speakQuestion(q, texts); });
     }, 800);
     return () => { killTts(); };
-  }, [currentIndex, started, finished]);
+  }, [currentIndex, started, finished, voiceEnabled]);
 
   useEffect(() => {
     if (!started || finished || locked || !readingDone) return;
@@ -210,10 +218,41 @@ function ExamenTestContent() {
           <div className="text-6xl mb-4">🎯</div>
           <h1 className="text-2xl font-black text-[#16a34a] mb-2">{lessonName || `Examen ${category}`}</h1>
           <p className="text-gray-500 mb-2">{questions.length} {lang === "ar" ? "سؤال" : lang === "nl" ? "vragen" : "questions"}</p>
-          <p className="text-sm text-orange-600 font-bold mb-8">⏱ {lang === "ar" ? "15 ثانية لكل سؤال" : lang === "nl" ? "15 seconden per vraag" : "15 seconds per question"}</p>
+          <p className="text-sm text-orange-600 font-bold mb-6">⏱ {lang === "ar" ? "15 ثانية لكل سؤال" : lang === "nl" ? "15 seconden per vraag" : "15 seconds per question"}</p>
+
+          {/* اختيار الصوت */}
+          <div className="flex gap-3 justify-center mb-8">
+            <button
+              onClick={() => setVoiceEnabled(true)}
+              className="flex-1 max-w-[160px] flex flex-col items-center gap-2 py-4 rounded-2xl font-black text-sm transition-all hover:scale-105 active:scale-95"
+              style={{
+                background: voiceEnabled ? "linear-gradient(135deg,#003399,#0055cc)" : "#f1f5f9",
+                color: voiceEnabled ? "white" : "#6b7280",
+                border: voiceEnabled ? "2px solid #003399" : "2px solid #e2e8f0",
+                boxShadow: voiceEnabled ? "0 4px 14px rgba(0,51,153,0.3)" : "none",
+              }}
+            >
+              <span className="text-2xl">🔊</span>
+              <span>{lang === "ar" ? "مع صوت" : lang === "nl" ? "Met geluid" : "With sound"}</span>
+            </button>
+            <button
+              onClick={() => setVoiceEnabled(false)}
+              className="flex-1 max-w-[160px] flex flex-col items-center gap-2 py-4 rounded-2xl font-black text-sm transition-all hover:scale-105 active:scale-95"
+              style={{
+                background: !voiceEnabled ? "linear-gradient(135deg,#6b7280,#4b5563)" : "#f1f5f9",
+                color: !voiceEnabled ? "white" : "#6b7280",
+                border: !voiceEnabled ? "2px solid #6b7280" : "2px solid #e2e8f0",
+                boxShadow: !voiceEnabled ? "0 4px 14px rgba(107,114,128,0.3)" : "none",
+              }}
+            >
+              <span className="text-2xl">🔇</span>
+              <span>{lang === "ar" ? "بدون صوت" : lang === "nl" ? "Zonder geluid" : "No sound"}</span>
+            </button>
+          </div>
+
           {questions.length === 0
             ? <p className="text-red-500 font-bold">{lang === "ar" ? "لا توجد أسئلة" : "Geen vragen"}</p>
-            : <button onClick={() => { unlockAudio(); setStarted(true); }}
+            : <button onClick={() => { if (voiceEnabled) unlockAudio(); setStarted(true); }}
                 className="px-10 py-4 font-black text-white text-lg rounded-xl hover:scale-105 active:scale-95 transition-all"
                 style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
                 {lang === "ar" ? "ابدأ الامتحان" : lang === "nl" ? "Start Examen" : "Start Exam"}
@@ -372,7 +411,7 @@ function ExamenTestContent() {
                 )}
               </div>
               <div className={`flex items-center gap-2 px-3 py-1 rounded-full font-black text-sm border-2 transition-all ${locked ? "bg-white/20 border-white/40 text-white" : !readingDone ? "bg-blue-500 border-blue-300 text-white animate-pulse" : timeLeft <= 5 ? "bg-red-500 border-red-300 text-white animate-pulse" : timeLeft <= 10 ? "bg-orange-500 border-orange-300 text-white" : "bg-green-500 border-green-300 text-white"}`}>
-                <span>{!readingDone && !locked ? "🔊" : "⏱"}</span>
+                <span>{!voiceEnabled ? "⏱" : !readingDone && !locked ? "🔊" : "⏱"}</span>
                 <span>{locked ? (isAnswered && userAnswer !== null ? (userAnswer === q.correctAnswer ? (
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 inline"><path d="M20 6L9 17l-5-5"/></svg>
                   ) : (
