@@ -180,76 +180,82 @@ function GratisContent() {
             <div className="w-10 h-10 border-3 border-[#003399] border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : lessons.length === 0 ? (
-          <div className="border border-yellow-300 bg-yellow-50 p-6 text-center rounded-xl">
-            <p className="font-bold text-gray-700">
+          <div className="border border-yellow-300 bg-yellow-50 p-4 text-center rounded-xl">
+            <p className="font-bold text-gray-700 text-sm">
               {lang === "ar" ? "لا توجد دروس مجانية متاحة" : lang === "nl" ? "Geen gratis lessen beschikbaar" : "Aucune leçon gratuite disponible"}
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
-            {lessons.map((lesson, i) => {
-              const isFirstWithQuestions = i === 0 && lesson.hasQuestions;
-              return (
-                <div
-                  key={lesson.id}
-                  className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
-                  style={{ borderLeft: `4px solid ${i % 2 === 0 ? "#22c55e" : "#3b82f6"}` }}
-                >
-                  {/* اسم الدرس */}
-                  <div className="px-4 pt-3 pb-2">
-                    <div className="flex items-start gap-2">
-                      <span
-                        className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-black text-white mt-0.5"
-                        style={{ background: i % 2 === 0 ? "#22c55e" : "#3b82f6" }}
-                      >
-                        {i + 1}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-[#003399] text-sm leading-snug break-words">
-                          {translatedTitles[i] || lesson.title}
-                        </p>
+          <div className="w-full overflow-x-hidden rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+            <table className="w-full border-collapse" style={{ tableLayout: "fixed" }}>
+              <colgroup>
+                <col style={{ width: "58%" }} />
+                <col style={{ width: "21%" }} />
+                <col style={{ width: "21%" }} />
+              </colgroup>
+              <thead>
+                <tr style={{ backgroundColor: "#22c55e" }}>
+                  <th className="text-left px-3 py-2 font-black uppercase text-xs text-white border-b border-[#16a34a]">
+                    {lang === "ar" ? "الدرس" : lang === "nl" ? "LES" : lang === "fr" ? "LEÇON" : "LESSON"}
+                  </th>
+                  <th className="px-2 py-2 font-black uppercase text-xs text-white border-b border-[#16a34a] text-center">
+                    {lang === "ar" ? "فتح" : lang === "nl" ? "OPEN" : lang === "fr" ? "OUVRIR" : "OPEN"}
+                  </th>
+                  <th className="px-2 py-2 font-black uppercase text-xs text-white border-b border-[#16a34a] text-center">
+                    EXAM
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {lessons.map((lesson, i) => {
+                  const isFirstWithQuestions = i === 0 && lesson.hasQuestions;
+                  return (
+                    <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#f8f9fa" }}>
+                      <td className="px-3 py-2 border-b border-gray-100">
+                        <div className="font-bold text-[#003399] text-xs leading-snug" style={{ wordBreak: "break-word", whiteSpace: "normal" }}>
+                          {i + 1}. {translatedTitles[i] || lesson.title}
+                        </div>
                         {lesson.description && (
-                          <div className="flex items-center gap-1.5 mt-1">
-                            <span className="w-1 h-3 rounded-full bg-[#3399ff] flex-shrink-0"></span>
-                            <span className="text-xs font-semibold text-[#3399ff]">{lesson.description}</span>
+                          <div className="flex items-center gap-1 mt-0.5">
+                            <span className="w-1 h-2.5 rounded-full bg-[#3399ff] flex-shrink-0"></span>
+                            <span className="text-[10px] font-semibold text-[#3399ff] leading-tight">{lesson.description}</span>
                           </div>
                         )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* أزرار الإجراءات */}
-                  <div className="px-4 pb-3">
-                    {isFirstWithQuestions ? (
-                      <button
-                        onClick={() => router.push(`/gratis/lesson?lessonId=${lesson.id}&category=${selectedCat}&lesson=${encodeURIComponent(lesson.title)}`)}
-                        className="w-full py-2.5 rounded-xl text-sm font-black text-white transition-all active:scale-95"
-                        style={{ background: "linear-gradient(135deg, #7c3aed, #5b21b6)" }}
-                      >
-                        ✔ {lang === "ar" ? "ابدأ الآن" : lang === "nl" ? "Start nu" : lang === "fr" ? "Commencer" : "Start now"}
-                      </button>
-                    ) : (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => router.push(`/gratis/lesson?lessonId=${lesson.id}&category=${selectedCat}&lesson=${encodeURIComponent(lesson.title)}`)}
-                          className="flex-1 py-2.5 rounded-xl text-sm font-black text-white transition-all active:scale-95"
-                          style={{ background: "linear-gradient(135deg, #3b82f6, #2563eb)" }}
-                        >
-                          📖 {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
-                        </button>
-                        <button
-                          onClick={() => router.push(`/gratis/exam?category=${selectedCat}&lessonId=${lesson.id}&lesson=${encodeURIComponent(lesson.title)}`)}
-                          className="flex-1 py-2.5 rounded-xl text-sm font-black text-white transition-all active:scale-95"
-                          style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}
-                        >
-                          🎯 EXAM
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                      </td>
+                      {isFirstWithQuestions ? (
+                        <td colSpan={2} className="px-2 py-2 border-b border-gray-100 text-center">
+                          <button
+                            onClick={() => router.push(`/gratis/lesson?lessonId=${lesson.id}&category=${selectedCat}&lesson=${encodeURIComponent(lesson.title)}`)}
+                            className="w-full py-1.5 rounded-lg text-xs font-black text-white transition-all active:scale-95"
+                            style={{ background: "linear-gradient(135deg, #7c3aed, #5b21b6)" }}>
+                            ✔ {lang === "ar" ? "ابدأ" : lang === "nl" ? "Start" : "Start"}
+                          </button>
+                        </td>
+                      ) : (
+                        <>
+                          <td className="px-2 py-2 border-b border-gray-100 text-center">
+                            <button
+                              onClick={() => router.push(`/gratis/lesson?lessonId=${lesson.id}&category=${selectedCat}&lesson=${encodeURIComponent(lesson.title)}`)}
+                              className="w-full py-1.5 rounded-lg text-xs font-black text-white transition-all active:scale-95"
+                              style={{ background: "linear-gradient(135deg, #3b82f6, #2563eb)" }}>
+                              {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Les"}
+                            </button>
+                          </td>
+                          <td className="px-2 py-2 border-b border-gray-100 text-center">
+                            <button
+                              onClick={() => router.push(`/gratis/exam?category=${selectedCat}&lessonId=${lesson.id}&lesson=${encodeURIComponent(lesson.title)}`)}
+                              className="w-full py-1.5 rounded-lg text-xs font-black text-white transition-all active:scale-95"
+                              style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
+                              Exam
+                            </button>
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         )}
 
