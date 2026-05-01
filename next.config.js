@@ -48,19 +48,8 @@ const nextConfig = {
           { key: 'Cache-Control', value: 'public, s-maxage=300, stale-while-revalidate=600' },
         ],
       },
-      // لا نضع cache على /api/lessons لأن POST/DELETE/PUT يجب أن تصل للسيرفر
-      {
-        source: '/api/exam-questions',
-        headers: [
-          { key: 'Cache-Control', value: 'public, s-maxage=600, stale-while-revalidate=1200' },
-        ],
-      },
-      {
-        source: '/api/free-content',
-        headers: [
-          { key: 'Cache-Control', value: 'public, s-maxage=3600, stale-while-revalidate=7200' },
-        ],
-      },
+      // لا نضع CDN cache على exam-questions أو free-content لأن المحتوى يتغير
+      // Next.js unstable_cache يتولى الـ caching داخلياً
     ];
   },
 };

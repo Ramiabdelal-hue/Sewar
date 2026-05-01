@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
 const EXCLUDED_PATHS = ['/', '/admin'];
-const SCHOOL_NAME = 'Sewar Rijbewijsonline';
+const SCHOOL_NAME = 'Sewar Rijbewijs Online';
 
 export default function Watermark() {
   const [text, setText] = useState('');
