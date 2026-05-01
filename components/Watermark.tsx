@@ -34,15 +34,30 @@ export default function Watermark() {
         pointerEvents: 'none',
         opacity: 0.08,
         transform: 'rotate(-25deg)',
-        display: 'flex',
-        flexWrap: 'wrap',
-        alignContent: 'flex-start',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        alignContent: 'space-around',
         zIndex: 9999,
         userSelect: 'none',
+        overflow: 'hidden',
+        // نوسّع المساحة لتغطي كل الشاشة حتى بعد الـ rotate
+        width: '150vw',
+        height: '150vh',
+        top: '-25vh',
+        left: '-25vw',
       }}
     >
-      {Array.from({ length: 40 }).map((_, i) => (
-        <span key={i} style={{ margin: '18px 24px', fontSize: '13px', fontWeight: 700, whiteSpace: 'nowrap' }}>
+      {Array.from({ length: 60 }).map((_, i) => (
+        <span
+          key={i}
+          style={{
+            fontSize: '13px',
+            fontWeight: 700,
+            whiteSpace: 'nowrap',
+            textAlign: 'center',
+            padding: '16px 8px',
+          }}
+        >
           {text}
         </span>
       ))}
