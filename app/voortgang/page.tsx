@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useLang } from "@/context/LangContext";
+import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
 
 interface LessonProgress {
   id: string;
@@ -53,6 +54,9 @@ export default function VoortgangPage() {
 
   const completedCount = lessons.filter(l => l.completedAt).length;
   const pct = lessons.length > 0 ? Math.round((completedCount / lessons.length) * 100) : 0;
+
+  // ترجمة عناوين الدروس تلقائياً
+  const translatedTitles = useAutoTranslateList(lessons.map(l => l.title), lang);
 
   const saveNote = (id: string) => {
     const notes: Record<string, string> = JSON.parse(localStorage.getItem("lessonNotes") || "{}");
@@ -171,6 +175,7 @@ export default function VoortgangPage() {
               const isDone = !!lesson.completedAt;
               const isEditing = editingId === lesson.id;
               const wasSaved = savedId === lesson.id;
+              const displayTitle = translatedTitles[i] || lesson.title;
 
               return (
                 <div
@@ -211,7 +216,7 @@ export default function VoortgangPage() {
                         style={{ color: isDone ? "#15803d" : "#003399", wordBreak: "break-word" }}
                       >
                         {!isDone && <span className="text-gray-400 mr-1">{i + 1}.</span>}
-                        {lesson.title}
+                        {displayTitle}
                       </p>
                       {isDone && lesson.completedAt && (
                         <p className="text-[10px] text-green-500 font-semibold mt-0.5">
