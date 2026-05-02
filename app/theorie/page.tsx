@@ -292,6 +292,13 @@ export default function TheoriePage() {
               <span className="px-3 py-1.5 rounded-xl text-xs font-black" style={{ background: "rgba(255,204,0,0.15)", color: "#ffcc00", border: "1px solid rgba(255,204,0,0.3)" }}>
                 {lessons.length} {lang === "ar" ? "درس" : lang === "nl" ? "lessen" : "leçons"}
               </span>
+              <button
+                onClick={() => router.push("/voortgang")}
+                className="px-3 py-1.5 rounded-xl text-xs font-black transition-all active:scale-95"
+                style={{ background: "rgba(255,255,255,0.15)", color: "white", border: "1px solid rgba(255,255,255,0.3)" }}
+              >
+                📊 {lang === "ar" ? "تقدمي" : lang === "nl" ? "Voortgang" : "Progrès"}
+              </button>
             </div>
           </div>
         </div>

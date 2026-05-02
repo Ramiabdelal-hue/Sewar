@@ -12,6 +12,71 @@ import QuestionCard from "@/components/QuestionCard";
 import { useAutoTranslate, useAutoTranslateList } from "@/hooks/useAutoTranslate";
 import Footer from "@/components/Footer";
 
+// ── مكون زر إنهاء الدرس ──────────────────────────────────────────────────────
+function LessonCompleteButton({ lessonId, lessonTitle, lang }: { lessonId: string; lessonTitle: string; lang: string }) {
+  const router = useRouter();
+  const [done, setDone] = useState(false);
+  const [justDone, setJustDone] = useState(false);
+
+  useEffect(() => {
+    if (!lessonId) return;
+    const saved = JSON.parse(localStorage.getItem("completedLessons") || "{}");
+    if (saved[lessonId]) setDone(true);
+  }, [lessonId]);
+
+  const handleComplete = () => {
+    if (!lessonId) return;
+    const saved = JSON.parse(localStorage.getItem("completedLessons") || "{}");
+    saved[lessonId] = { title: lessonTitle, completedAt: new Date().toISOString() };
+    localStorage.setItem("completedLessons", JSON.stringify(saved));
+    setDone(true);
+    setJustDone(true);
+    setTimeout(() => setJustDone(false), 3000);
+  };
+
+  return (
+    <div className="mt-6 mb-2">
+      {done ? (
+        <div className="flex flex-col gap-3">
+          <div
+            className="w-full py-3 rounded-xl font-black text-sm flex items-center justify-center gap-2"
+            style={{ background: "linear-gradient(135deg,#dcfce7,#bbf7d0)", color: "#15803d", border: "2px solid #86efac" }}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            {justDone
+              ? (lang === "ar" ? "🎉 أحسنت! تم تسجيل إنجاز الدرس" : lang === "nl" ? "🎉 Goed gedaan! Les voltooid" : "🎉 Well done! Lesson completed")
+              : (lang === "ar" ? "✅ أنهيت هذا الدرس" : lang === "nl" ? "✅ Les voltooid" : "✅ Lesson completed")}
+          </div>
+          <button
+            onClick={() => router.push("/voortgang")}
+            className="w-full py-2.5 rounded-xl font-black text-sm transition-all active:scale-95 flex items-center justify-center gap-2"
+            style={{ background: "linear-gradient(135deg,#7c3aed,#5b21b6)", color: "white" }}
+          >
+            📊 {lang === "ar" ? "عرض تقدمي" : lang === "nl" ? "Mijn voortgang" : "My progress"}
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={handleComplete}
+          className="w-full py-4 rounded-xl font-black text-base transition-all active:scale-95 hover:scale-[1.01] flex items-center justify-center gap-2"
+          style={{
+            background: "linear-gradient(135deg, #22c55e, #16a34a)",
+            color: "white",
+            boxShadow: "0 6px 20px rgba(34,197,94,0.35)",
+          }}
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          {lang === "ar" ? "أنهيت هذا الدرس ✓" : lang === "nl" ? "Les voltooid ✓" : lang === "fr" ? "Leçon terminée ✓" : "Lesson completed ✓"}
+        </button>
+      )}
+    </div>
+  );
+}
+
 interface Question {
   id: number;
   text: string;
@@ -255,6 +320,13 @@ function TheorieLessonContent() {
               />
             ))}
           </div>
+
+          {/* ── زر "أنهيت هذا الدرس" ── */}
+          <LessonCompleteButton
+            lessonId={lessonId || ""}
+            lessonTitle={lesson || ""}
+            lang={lang}
+          />
 
           {/* زر العودة في الأسفل */}
           <div className="mt-6 pb-4">
