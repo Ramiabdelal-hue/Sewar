@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -24,33 +24,69 @@ export default function VoortgangPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draftNote, setDraftNote] = useState("");
   const [savedId, setSavedId] = useState<string | null>(null);
+  const [savingNote, setSavingNote] = useState(false);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const email = localStorage.getItem("userEmail");
-    const category = localStorage.getItem("userCategory");
+  const email = typeof window !== "undefined" ? localStorage.getItem("userEmail") || "" : "";
+  const category = typeof window !== "undefined" ? localStorage.getItem("userCategory") || "" : "";
+
+  // ── جلب البيانات من السيرفر + دمجها مع localStorage ──────────────────────
+  const loadData = useCallback(async () => {
     if (!email || !category) { setLoading(false); return; }
 
-    const completed: Record<string, { title: string; completedAt: string }> =
-      JSON.parse(localStorage.getItem("completedLessons") || "{}");
-    const notes: Record<string, string> =
-      JSON.parse(localStorage.getItem("lessonNotes") || "{}");
+    // جلب الدروس والتقدم بالتوازي
+    const [lessonsRes, progressRes] = await Promise.allSettled([
+      fetch(`/api/lessons?category=${category}`),
+      fetch(`/api/lesson-progress?email=${encodeURIComponent(email)}&category=${category}`),
+    ]);
 
-    fetch(`/api/lessons?category=${category}`)
-      .then(r => r.json())
-      .then(d => {
-        if (d.success) {
-          const list: LessonProgress[] = d.lessons.map((l: any) => ({
+    let serverCompleted: Record<string, string> = {};
+    let serverNotes: Record<string, string> = {};
+
+    if (progressRes.status === "fulfilled") {
+      try {
+        const pd = await progressRes.value.json();
+        if (pd.success) {
+          serverCompleted = pd.completed || {};
+          serverNotes = pd.notes || {};
+          // مزامنة localStorage مع السيرفر
+          const localCompleted: Record<string, any> = {};
+          for (const [id, date] of Object.entries(serverCompleted)) {
+            localCompleted[id] = { completedAt: date };
+          }
+          localStorage.setItem("completedLessons", JSON.stringify(localCompleted));
+          localStorage.setItem("lessonNotes", JSON.stringify(serverNotes));
+        }
+      } catch {}
+    } else {
+      // fallback: استخدم localStorage
+      const lc = JSON.parse(localStorage.getItem("completedLessons") || "{}");
+      const ln = JSON.parse(localStorage.getItem("lessonNotes") || "{}");
+      for (const [id, val] of Object.entries(lc) as any) {
+        serverCompleted[id] = val?.completedAt || null;
+      }
+      serverNotes = ln;
+    }
+
+    if (lessonsRes.status === "fulfilled") {
+      try {
+        const ld = await lessonsRes.value.json();
+        if (ld.success) {
+          const list: LessonProgress[] = ld.lessons.map((l: any) => ({
             id: String(l.id),
             title: l.title,
-            completedAt: completed[String(l.id)]?.completedAt || null,
-            note: notes[String(l.id)] || "",
+            completedAt: serverCompleted[String(l.id)] || null,
+            note: serverNotes[String(l.id)] || "",
           }));
           setLessons(list);
         }
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
+      } catch {}
+    }
+
+    setLoading(false);
+  }, [email, category]);
+
+  useEffect(() => { loadData(); }, [loadData]);
 
   const completedCount = lessons.filter(l => l.completedAt).length;
   const pct = lessons.length > 0 ? Math.round((completedCount / lessons.length) * 100) : 0;
@@ -58,27 +94,64 @@ export default function VoortgangPage() {
   // ترجمة عناوين الدروس تلقائياً
   const translatedTitles = useAutoTranslateList(lessons.map(l => l.title), lang);
 
-  const saveNote = (id: string) => {
-    const notes: Record<string, string> = JSON.parse(localStorage.getItem("lessonNotes") || "{}");
-    notes[id] = draftNote;
-    localStorage.setItem("lessonNotes", JSON.stringify(notes));
-    setLessons(prev => prev.map(l => l.id === id ? { ...l, note: draftNote } : l));
+  // ── حفظ الملاحظة ─────────────────────────────────────────────────────────
+  const saveNote = async (id: string) => {
+    setSavingNote(true);
+    const content = draftNote;
+
+    // تحديث الـ UI فوراً
+    setLessons(prev => prev.map(l => l.id === id ? { ...l, note: content } : l));
     setEditingId(null);
     setSavedId(id);
-    setTimeout(() => setSavedId(null), 2000);
+    setTimeout(() => setSavedId(null), 2500);
+
+    // حفظ في localStorage
+    const notes: Record<string, string> = JSON.parse(localStorage.getItem("lessonNotes") || "{}");
+    notes[id] = content;
+    localStorage.setItem("lessonNotes", JSON.stringify(notes));
+
+    // حفظ في السيرفر
+    if (email) {
+      try {
+        await fetch("/api/lesson-progress", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, lessonId: Number(id), category, action: "note", note: content }),
+        });
+      } catch {}
+    }
+    setSavingNote(false);
   };
 
-  const toggleComplete = (id: string, title: string) => {
+  // ── تبديل حالة الإنجاز ───────────────────────────────────────────────────
+  const toggleComplete = async (id: string, title: string) => {
+    setTogglingId(id);
+    const lesson = lessons.find(l => l.id === id);
+    const isDone = !!lesson?.completedAt;
+    const newDate = isDone ? null : new Date().toISOString();
+
+    // تحديث الـ UI فوراً
+    setLessons(prev => prev.map(l => l.id === id ? { ...l, completedAt: newDate } : l));
+
+    // حفظ في localStorage
     const saved: Record<string, any> = JSON.parse(localStorage.getItem("completedLessons") || "{}");
-    if (saved[id]) {
-      delete saved[id];
-    } else {
-      saved[id] = { title, completedAt: new Date().toISOString() };
-    }
+    if (isDone) { delete saved[id]; } else { saved[id] = { title, completedAt: newDate }; }
     localStorage.setItem("completedLessons", JSON.stringify(saved));
-    setLessons(prev => prev.map(l =>
-      l.id === id ? { ...l, completedAt: saved[id]?.completedAt || null } : l
-    ));
+
+    // حفظ في السيرفر
+    if (email) {
+      try {
+        await fetch("/api/lesson-progress", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email, lessonId: Number(id), category,
+            action: isDone ? "uncomplete" : "complete",
+          }),
+        });
+      } catch {}
+    }
+    setTogglingId(null);
   };
 
   const formatDate = (iso: string) => {
@@ -87,10 +160,6 @@ export default function VoortgangPage() {
       day: "2-digit", month: "short", year: "numeric",
     });
   };
-
-  const isLoggedIn = typeof window !== "undefined"
-    ? !!localStorage.getItem("userEmail")
-    : false;
 
   return (
     <div className="min-h-screen flex flex-col" dir={isRtl ? "rtl" : "ltr"} style={{ background: "#f0f0f0" }}>
@@ -151,7 +220,7 @@ export default function VoortgangPage() {
           <div className="flex justify-center py-16">
             <div className="w-10 h-10 border-3 border-[#7c3aed] border-t-transparent rounded-full animate-spin" />
           </div>
-        ) : !isLoggedIn ? (
+        ) : !email ? (
           <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100">
             <div className="text-4xl mb-3">🔒</div>
             <p className="font-bold text-gray-700 mb-4">
@@ -175,6 +244,7 @@ export default function VoortgangPage() {
               const isDone = !!lesson.completedAt;
               const isEditing = editingId === lesson.id;
               const wasSaved = savedId === lesson.id;
+              const isToggling = togglingId === lesson.id;
               const displayTitle = translatedTitles[i] || lesson.title;
 
               return (
@@ -188,10 +258,11 @@ export default function VoortgangPage() {
                 >
                   {/* صف الدرس */}
                   <div className="flex items-center gap-3 px-4 py-3">
-                    {/* رقم + علامة الإنجاز */}
+                    {/* دائرة الإنجاز */}
                     <button
                       onClick={() => toggleComplete(lesson.id, lesson.title)}
-                      className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-90"
+                      disabled={isToggling}
+                      className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-90 disabled:opacity-60"
                       style={{
                         background: isDone ? "linear-gradient(135deg,#22c55e,#16a34a)" : "#f3f4f6",
                         border: isDone ? "none" : "2px solid #d1d5db",
@@ -200,7 +271,9 @@ export default function VoortgangPage() {
                         ? (lang === "ar" ? "إلغاء الإنجاز" : "Markeer als niet voltooid")
                         : (lang === "ar" ? "تحديد كمنجز" : "Markeer als voltooid")}
                     >
-                      {isDone ? (
+                      {isToggling ? (
+                        <div className="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                      ) : isDone ? (
                         <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
@@ -228,12 +301,8 @@ export default function VoortgangPage() {
                     {/* زر الملاحظات */}
                     <button
                       onClick={() => {
-                        if (isEditing) {
-                          setEditingId(null);
-                        } else {
-                          setEditingId(lesson.id);
-                          setDraftNote(lesson.note);
-                        }
+                        if (isEditing) { setEditingId(null); }
+                        else { setEditingId(lesson.id); setDraftNote(lesson.note); }
                       }}
                       className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all active:scale-95"
                       style={{
@@ -251,45 +320,39 @@ export default function VoortgangPage() {
                     </button>
                   </div>
 
-                  {/* خانة الملاحظات */}
+                  {/* خانة كتابة الملاحظة */}
                   {isEditing && (
                     <div className="px-4 pb-3 border-t border-gray-100" style={{ background: "#fafafa" }}>
                       <p className="text-xs font-bold text-gray-500 mt-2 mb-1.5">
-                        {lang === "ar"
-                          ? "✏️ ملاحظاتك وتلخيصك للدرس:"
-                          : lang === "nl"
-                          ? "✏️ Jouw notities en samenvatting:"
-                          : "✏️ Vos notes et résumé:"}
+                        {lang === "ar" ? "✏️ ملاحظاتك وتلخيصك للدرس:" : lang === "nl" ? "✏️ Jouw notities en samenvatting:" : "✏️ Vos notes et résumé:"}
                       </p>
                       <textarea
                         value={draftNote}
                         onChange={e => setDraftNote(e.target.value)}
                         placeholder={
-                          lang === "ar"
-                            ? "اكتب ملاحظاتك أو تلخيصك للدرس هنا..."
-                            : lang === "nl"
-                            ? "Schrijf hier je notities of samenvatting..."
-                            : "Écrivez vos notes ou résumé ici..."
+                          lang === "ar" ? "اكتب ملاحظاتك أو تلخيصك للدرس هنا..."
+                          : lang === "nl" ? "Schrijf hier je notities of samenvatting..."
+                          : "Écrivez vos notes ou résumé ici..."
                         }
                         rows={4}
                         className="w-full text-sm rounded-xl px-3 py-2.5 resize-none focus:outline-none transition-all"
-                        style={{
-                          border: "1.5px solid #e5e7eb",
-                          background: "white",
-                          color: "#1a1a1a",
-                          fontFamily: "inherit",
-                          lineHeight: "1.6",
-                        }}
+                        style={{ border: "1.5px solid #e5e7eb", background: "white", color: "#1a1a1a", fontFamily: "inherit", lineHeight: "1.6" }}
                         dir={isRtl ? "rtl" : "ltr"}
                         autoFocus
                       />
                       <div className="flex gap-2 mt-2">
                         <button
                           onClick={() => saveNote(lesson.id)}
-                          className="flex-1 py-2 rounded-xl font-black text-xs text-white transition-all active:scale-95"
+                          disabled={savingNote}
+                          className="flex-1 py-2 rounded-xl font-black text-xs text-white transition-all active:scale-95 disabled:opacity-60 flex items-center justify-center gap-1.5"
                           style={{ background: "linear-gradient(135deg,#7c3aed,#5b21b6)" }}
                         >
-                          {lang === "ar" ? "💾 حفظ" : lang === "nl" ? "💾 Opslaan" : "💾 Enregistrer"}
+                          {savingNote ? (
+                            <><div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            {lang === "ar" ? "جاري الحفظ..." : "Opslaan..."}</>
+                          ) : (
+                            lang === "ar" ? "💾 حفظ" : lang === "nl" ? "💾 Opslaan" : "💾 Enregistrer"
+                          )}
                         </button>
                         <button
                           onClick={() => setEditingId(null)}
@@ -303,21 +366,18 @@ export default function VoortgangPage() {
 
                   {/* عرض الملاحظة المحفوظة */}
                   {!isEditing && lesson.note && (
-                    <div
-                      className="px-4 pb-3 border-t"
-                      style={{ background: "rgba(124,58,237,0.03)", borderColor: "rgba(124,58,237,0.1)" }}
-                    >
+                    <div className="px-4 pb-3 border-t" style={{ background: "rgba(124,58,237,0.03)", borderColor: "rgba(124,58,237,0.1)" }}>
                       <p className="text-xs text-gray-400 font-bold mt-2 mb-1">
                         {lang === "ar" ? "📝 ملاحظاتك:" : lang === "nl" ? "📝 Jouw notities:" : "📝 Vos notes:"}
                       </p>
-                      <p
-                        className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap"
-                        dir={isRtl ? "rtl" : "ltr"}
-                      >
+                      <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap" dir={isRtl ? "rtl" : "ltr"}>
                         {lesson.note}
                       </p>
                       {wasSaved && (
-                        <p className="text-xs text-green-500 font-bold mt-1">✓ {lang === "ar" ? "تم الحفظ" : "Opgeslagen"}</p>
+                        <p className="text-xs text-green-500 font-bold mt-1 flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                          {lang === "ar" ? "تم الحفظ في السيرفر" : lang === "nl" ? "Opgeslagen op server" : "Enregistré sur le serveur"}
+                        </p>
                       )}
                     </div>
                   )}
@@ -327,28 +387,13 @@ export default function VoortgangPage() {
           </div>
         )}
 
-        {/* ملخص في الأسفل */}
+        {/* ملخص */}
         {!loading && lessons.length > 0 && (
           <div className="mt-4 grid grid-cols-3 gap-3">
             {[
-              {
-                label: lang === "ar" ? "مكتمل" : lang === "nl" ? "Voltooid" : "Terminé",
-                value: completedCount,
-                color: "#22c55e",
-                bg: "#f0fdf4",
-              },
-              {
-                label: lang === "ar" ? "متبقي" : lang === "nl" ? "Resterend" : "Restant",
-                value: lessons.length - completedCount,
-                color: "#f97316",
-                bg: "#fff7ed",
-              },
-              {
-                label: lang === "ar" ? "ملاحظات" : lang === "nl" ? "Notities" : "Notes",
-                value: lessons.filter(l => l.note).length,
-                color: "#7c3aed",
-                bg: "#f5f3ff",
-              },
+              { label: lang === "ar" ? "مكتمل" : lang === "nl" ? "Voltooid" : "Terminé", value: completedCount, color: "#22c55e", bg: "#f0fdf4" },
+              { label: lang === "ar" ? "متبقي" : lang === "nl" ? "Resterend" : "Restant", value: lessons.length - completedCount, color: "#f97316", bg: "#fff7ed" },
+              { label: lang === "ar" ? "ملاحظات" : lang === "nl" ? "Notities" : "Notes", value: lessons.filter(l => l.note).length, color: "#7c3aed", bg: "#f5f3ff" },
             ].map((s, i) => (
               <div key={i} className="rounded-xl py-3 text-center" style={{ background: s.bg, border: `1px solid ${s.color}22` }}>
                 <p className="text-2xl font-black" style={{ color: s.color }}>{s.value}</p>

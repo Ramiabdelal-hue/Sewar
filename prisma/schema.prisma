@@ -263,3 +263,30 @@ model Setting {
   value     String
   updatedAt DateTime @updatedAt
 }
+
+model LessonProgress {
+  id          Int       @id @default(autoincrement())
+  userEmail   String
+  lessonId    Int
+  category    String
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([userEmail, lessonId, category])
+  @@index([userEmail])
+  @@index([category])
+}
+
+model LessonNote {
+  id        Int      @id @default(autoincrement())
+  userEmail String
+  lessonId  Int
+  category  String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userEmail, lessonId, category])
+  @@index([userEmail])
+}

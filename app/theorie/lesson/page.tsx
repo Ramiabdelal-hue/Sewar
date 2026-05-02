@@ -17,21 +17,49 @@ function LessonCompleteButton({ lessonId, lessonTitle, lang }: { lessonId: strin
   const router = useRouter();
   const [done, setDone] = useState(false);
   const [justDone, setJustDone] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!lessonId) return;
+    // تحقق من localStorage أولاً (سريع)
     const saved = JSON.parse(localStorage.getItem("completedLessons") || "{}");
-    if (saved[lessonId]) setDone(true);
+    if (saved[lessonId]) { setDone(true); return; }
+    // ثم تحقق من السيرفر
+    const email = localStorage.getItem("userEmail");
+    const category = localStorage.getItem("userCategory");
+    if (!email || !category) return;
+    fetch(`/api/lesson-progress?email=${encodeURIComponent(email)}&category=${category}`)
+      .then(r => r.json())
+      .then(d => { if (d.success && d.completed?.[lessonId]) setDone(true); })
+      .catch(() => {});
   }, [lessonId]);
 
-  const handleComplete = () => {
-    if (!lessonId) return;
+  const handleComplete = async () => {
+    if (!lessonId || saving) return;
+    setSaving(true);
+
+    const email = localStorage.getItem("userEmail") || "";
+    const category = localStorage.getItem("userCategory") || "";
+
+    // حفظ في localStorage فوراً
     const saved = JSON.parse(localStorage.getItem("completedLessons") || "{}");
     saved[lessonId] = { title: lessonTitle, completedAt: new Date().toISOString() };
     localStorage.setItem("completedLessons", JSON.stringify(saved));
     setDone(true);
     setJustDone(true);
     setTimeout(() => setJustDone(false), 3000);
+
+    // حفظ في السيرفر
+    if (email && category) {
+      try {
+        await fetch("/api/lesson-progress", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, lessonId: Number(lessonId), category, action: "complete" }),
+        });
+      } catch {}
+    }
+    setSaving(false);
   };
 
   return (
@@ -60,17 +88,25 @@ function LessonCompleteButton({ lessonId, lessonTitle, lang }: { lessonId: strin
       ) : (
         <button
           onClick={handleComplete}
-          className="w-full py-4 rounded-xl font-black text-base transition-all active:scale-95 hover:scale-[1.01] flex items-center justify-center gap-2"
+          disabled={saving}
+          className="w-full py-4 rounded-xl font-black text-base transition-all active:scale-95 hover:scale-[1.01] flex items-center justify-center gap-2 disabled:opacity-70"
           style={{
             background: "linear-gradient(135deg, #22c55e, #16a34a)",
             color: "white",
             boxShadow: "0 6px 20px rgba(34,197,94,0.35)",
           }}
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
-          {lang === "ar" ? "أنهيت هذا الدرس ✓" : lang === "nl" ? "Les voltooid ✓" : lang === "fr" ? "Leçon terminée ✓" : "Lesson completed ✓"}
+          {saving ? (
+            <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            {lang === "ar" ? "جاري الحفظ..." : "Opslaan..."}</>
+          ) : (
+            <>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              {lang === "ar" ? "أنهيت هذا الدرس ✓" : lang === "nl" ? "Les voltooid ✓" : lang === "fr" ? "Leçon terminée ✓" : "Lesson completed ✓"}
+            </>
+          )}
         </button>
       )}
     </div>
