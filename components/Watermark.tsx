@@ -2,21 +2,25 @@
 
 import { usePathname } from 'next/navigation';
 
-const SCHOOL_NAME = 'Sewar Rijbewijs Online';
+const SCHOOL_NAME = 'Sewar Rijbewijs';
+
+// الصفحات التي تظهر فيها الـ watermark فقط
+const ALLOWED_PATHS = [
+  '/theorie/lesson',
+  '/gratis/lesson',
+  '/gratis/exam',
+  '/examen',
+  '/praktical/lesson',
+  '/praktical/exam',
+  '/lessons/view',
+  '/lesson',
+];
 
 export default function Watermark() {
   const pathname = usePathname();
 
-  const isExcluded =
-    pathname === '/' || pathname.startsWith('/admin');
-
-  if (isExcluded) return null;
-
-  const text = SCHOOL_NAME;
-
-  // عدد الصفوف والأعمدة لتغطية كامل الشاشة
-  const cols = 5;
-  const rows = 12;
+  const isAllowed = ALLOWED_PATHS.some(p => pathname.startsWith(p));
+  if (!isAllowed) return null;
 
   return (
     <div
@@ -32,56 +36,60 @@ export default function Watermark() {
         overflow: 'hidden',
       }}
     >
-      {/* طبقة SVG بخطوط مائلة جميلة */}
       <svg
-        style={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-        }}
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
+          {/* Pattern: نص مائل + أيقونة دائرية — مثل Shutterstock */}
           <pattern
-            id="watermark-pattern"
+            id="wm-pattern"
             x="0"
             y="0"
-            width="320"
-            height="120"
+            width="260"
+            height="160"
             patternUnits="userSpaceOnUse"
-            patternTransform="rotate(-30)"
+            patternTransform="rotate(-28)"
           >
-            {/* خط زخرفي فوق النص */}
-            <line
-              x1="0" y1="30"
-              x2="320" y2="30"
-              stroke="rgba(0,0,0,0.08)"
-              strokeWidth="0.5"
-            />
-            {/* النص الرئيسي */}
+            {/* ── النص الكبير ── */}
             <text
-              x="160"
-              y="65"
+              x="130"
+              y="72"
               textAnchor="middle"
-              fontFamily="Arial, sans-serif"
-              fontSize="13"
-              fontWeight="bold"
-              fill="rgba(0, 0, 0, 0.28)"
-              letterSpacing="1.5"
+              fontFamily="Arial, Helvetica, sans-serif"
+              fontSize="15"
+              fontWeight="700"
+              fill="rgba(255,255,255,0.55)"
+              letterSpacing="1.2"
             >
-              {text}
+              {SCHOOL_NAME}
             </text>
-            {/* خط زخرفي تحت النص */}
-            <line
-              x1="0" y1="90"
-              x2="320" y2="90"
-              stroke="rgba(0,0,0,0.08)"
-              strokeWidth="0.5"
+
+            {/* ── أيقونة دائرية (مثل أيقونة الكاميرا في Shutterstock) ── */}
+            {/* دائرة خارجية */}
+            <circle
+              cx="130"
+              cy="118"
+              r="11"
+              fill="none"
+              stroke="rgba(255,255,255,0.45)"
+              strokeWidth="1.5"
             />
+            {/* حرف S داخل الدائرة */}
+            <text
+              x="130"
+              y="123"
+              textAnchor="middle"
+              fontFamily="Arial, Helvetica, sans-serif"
+              fontSize="11"
+              fontWeight="900"
+              fill="rgba(255,255,255,0.45)"
+            >
+              S
+            </text>
           </pattern>
         </defs>
-        <rect width="100%" height="100%" fill="url(#watermark-pattern)" />
+        <rect width="100%" height="100%" fill="url(#wm-pattern)" />
       </svg>
     </div>
   );
