@@ -297,7 +297,7 @@ export default function TheoriePage() {
                 className="px-3 py-1.5 rounded-xl text-xs font-black transition-all active:scale-95"
                 style={{ background: "rgba(255,255,255,0.15)", color: "white", border: "1px solid rgba(255,255,255,0.3)" }}
               >
-                📊 {lang === "ar" ? "تقدمي" : lang === "nl" ? "Voortgang" : "Progrès"}
+                📊 {lang === "ar" ? "ملخصاتي" : lang === "nl" ? "Mijn samenvatting" : lang === "fr" ? "Mon résumé" : "My summary"}
               </button>
             </div>
           </div>

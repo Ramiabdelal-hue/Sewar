@@ -174,10 +174,10 @@ export default function VoortgangPage() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-white/50 text-xs font-bold uppercase tracking-wider mb-0.5">
-                {lang === "ar" ? "متابعة التقدم" : lang === "nl" ? "Mijn Voortgang" : "Ma Progression"}
+                {lang === "ar" ? "ملخصاتي" : lang === "nl" ? "Mijn samenvatting" : "Mon résumé"}
               </p>
               <h1 className="text-xl font-black text-white">
-                {lang === "ar" ? "📊 تقدمي في الدروس" : lang === "nl" ? "📊 Lesvoortgang" : "📊 Progression des leçons"}
+                {lang === "ar" ? "📝 ملخصات الدروس" : lang === "nl" ? "📝 Mijn samenvatting" : "📝 Mes résumés"}
               </h1>
             </div>
             <button
