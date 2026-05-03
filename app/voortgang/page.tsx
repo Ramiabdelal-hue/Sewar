@@ -324,7 +324,7 @@ export default function VoortgangPage() {
                   {isEditing && (
                     <div className="px-4 pb-3 border-t border-gray-100" style={{ background: "#fafafa" }}>
                       <p className="text-xs font-bold text-gray-500 mt-2 mb-1.5">
-                        {lang === "ar" ? "✏️ ملاحظاتك وتلخيصك للدرس:" : lang === "nl" ? "✏️ Jouw notities en samenvatting:" : "✏️ Vos notes et résumé:"}
+                        {lang === "ar" ? "✏️ تلخيصك للدرس:" : lang === "nl" ? "✏️ Jouw samenvatting:" : "✏️ Votre résumé:"}
                       </p>
                       <textarea
                         value={draftNote}
@@ -368,7 +368,7 @@ export default function VoortgangPage() {
                   {!isEditing && lesson.note && (
                     <div className="px-4 pb-3 border-t" style={{ background: "rgba(124,58,237,0.03)", borderColor: "rgba(124,58,237,0.1)" }}>
                       <p className="text-xs text-gray-400 font-bold mt-2 mb-1">
-                        {lang === "ar" ? "📝 ملاحظاتك:" : lang === "nl" ? "📝 Jouw notities:" : "📝 Vos notes:"}
+                        {lang === "ar" ? "📝 تلخيصك:" : lang === "nl" ? "📝 Jouw samenvatting:" : "📝 Votre résumé:"}
                       </p>
                       <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap" dir={isRtl ? "rtl" : "ltr"}>
                         {lesson.note}
