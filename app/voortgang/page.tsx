@@ -324,15 +324,16 @@ export default function VoortgangPage() {
                   {isEditing && (
                     <div className="px-4 pb-3 border-t border-gray-100" style={{ background: "#fafafa" }}>
                       <p className="text-xs font-bold text-gray-500 mt-2 mb-1.5">
-                        {lang === "ar" ? "✏️ تلخيصك للدرس:" : lang === "nl" ? "✏️ Jouw samenvatting:" : "✏️ Votre résumé:"}
+                        {lang === "ar" ? "✏️ تلخيصك للدرس:" : lang === "nl" ? "✏️ Jouw samenvatting:" : lang === "fr" ? "✏️ Votre résumé:" : "✏️ Your summary:"}
                       </p>
                       <textarea
                         value={draftNote}
                         onChange={e => setDraftNote(e.target.value)}
                         placeholder={
-                          lang === "ar" ? "اكتب ملاحظاتك أو تلخيصك للدرس هنا..."
-                          : lang === "nl" ? "Schrijf hier je notities of samenvatting..."
-                          : "Écrivez vos notes ou résumé ici..."
+                          lang === "ar" ? "اكتب تلخيصك للدرس هنا..."
+                          : lang === "nl" ? "Schrijf hier je samenvatting..."
+                          : lang === "fr" ? "Écrivez votre résumé ici..."
+                          : "Write your summary here..."
                         }
                         rows={4}
                         className="w-full text-sm rounded-xl px-3 py-2.5 resize-none focus:outline-none transition-all"
@@ -349,16 +350,16 @@ export default function VoortgangPage() {
                         >
                           {savingNote ? (
                             <><div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            {lang === "ar" ? "جاري الحفظ..." : "Opslaan..."}</>
+                            lang === "ar" ? "جاري الحفظ..." : lang === "nl" ? "Opslaan..." : lang === "fr" ? "Enregistrement..." : "Saving..."</>
                           ) : (
-                            lang === "ar" ? "💾 حفظ" : lang === "nl" ? "💾 Opslaan" : "💾 Enregistrer"
+                            lang === "ar" ? "💾 حفظ" : lang === "nl" ? "💾 Opslaan" : lang === "fr" ? "💾 Enregistrer" : "💾 Save"
                           )}
                         </button>
                         <button
                           onClick={() => setEditingId(null)}
                           className="px-4 py-2 rounded-xl font-black text-xs text-gray-500 bg-gray-100 transition-all active:scale-95"
                         >
-                          {lang === "ar" ? "إلغاء" : lang === "nl" ? "Annuleren" : "Annuler"}
+                          {lang === "ar" ? "إلغاء" : lang === "nl" ? "Annuleren" : lang === "fr" ? "Annuler" : "Cancel"}
                         </button>
                       </div>
                     </div>
@@ -368,7 +369,7 @@ export default function VoortgangPage() {
                   {!isEditing && lesson.note && (
                     <div className="px-4 pb-3 border-t" style={{ background: "rgba(124,58,237,0.03)", borderColor: "rgba(124,58,237,0.1)" }}>
                       <p className="text-xs text-gray-400 font-bold mt-2 mb-1">
-                        {lang === "ar" ? "📝 تلخيصك:" : lang === "nl" ? "📝 Jouw samenvatting:" : "📝 Votre résumé:"}
+                        {lang === "ar" ? "📝 تلخيصك:" : lang === "nl" ? "📝 Jouw samenvatting:" : lang === "fr" ? "📝 Votre résumé:" : "📝 Your summary:"}
                       </p>
                       <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap" dir={isRtl ? "rtl" : "ltr"}>
                         {lesson.note}
