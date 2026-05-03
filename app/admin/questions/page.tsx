@@ -415,6 +415,23 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
 export default function AdminQuestionsPage() {
   const { lang, setLang } = useLang();
   const t = adminTranslations[lang as keyof typeof adminTranslations];
+
+  // ── fetch مع timeout تلقائي + retry ──────────────────────────────────────
+  const fetchWithTimeout = async (url: string, options: RequestInit, timeoutMs = 20000): Promise<Response> => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const res = await fetch(url, { ...options, signal: controller.signal });
+      clearTimeout(timer);
+      return res;
+    } catch (err: any) {
+      clearTimeout(timer);
+      if (err.name === "AbortError") throw new Error("انتهت مهلة الاتصال — حاول مرة أخرى");
+      throw err;
+    }
+  };
+
+  const [saving, setSaving] = useState(false);
   
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
@@ -858,11 +875,10 @@ export default function AdminQuestionsPage() {
 
       const payload: any = {
         lessonId: parseInt(lessonId),
-        category: category, // مهم لتجنب تعارض IDs بين الفئات
+        category: category,
       };
       
       if (questionType === "Examen") {
-        // للامتحانات: حفظ في ExamQuestion
         payload.textNL = newQuestion.textNL;
         payload.answer1 = newQuestion.answer1;
         payload.answer2 = newQuestion.answer2;
@@ -873,7 +889,6 @@ export default function AdminQuestionsPage() {
         payload.isFree = newQuestion.isFree;
         payload.points = newQuestion.points || 1;
       } else {
-        // للدروس و Praktijk: حفظ في Question أو PraktijkQuestion
         payload.text = newQuestion.explanationNL || "";
         payload.textNL = newQuestion.textNL || null;
         payload.explanationNL = newQuestion.explanationNL;
@@ -888,8 +903,9 @@ export default function AdminQuestionsPage() {
         payload.answer3 = newQuestion.answer3;
         payload.correctAnswer = newQuestion.correctAnswer;
       }
-      
-      const res = await fetch(apiUrl, {
+
+      setSaving(true);
+      const res = await fetchWithTimeout(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-admin-token": ADMIN_TOKEN },
         body: JSON.stringify(payload),
@@ -901,7 +917,6 @@ export default function AdminQuestionsPage() {
       if (!res.ok) {
         const text = await res.text();
         console.error("❌ API Error Response:", text);
-        console.error("❌ Status Code:", res.status);
         alert(`خطأ من السيرفر: ${text}`);
         return;
       }
@@ -910,12 +925,10 @@ export default function AdminQuestionsPage() {
       console.log("📦 Response data:", data);
       
       if (!data.success) {
-        console.error("❌ Save failed:", data.message);
         alert(`فشل حفظ السؤال: ${data.message}`);
         return;
       }
 
-      console.log("✅ Question saved successfully!");
       alert("✅ تم حفظ السؤال بنجاح!");
       fetchQuestions();
       setNewQuestion({ 
@@ -936,9 +949,11 @@ export default function AdminQuestionsPage() {
         points: 1,
         freeGroup: null,
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error("خطأ عند حفظ السؤال:", err);
-      alert("فشل الاتصال بالسيرفر");
+      alert(`❌ ${err.message || "فشل الاتصال بالسيرفر — حاول مرة أخرى"}`);
+    } finally {
+      setSaving(false);
     }
   };
   const handleEditQuestion = async (questionId: number) => {
@@ -965,12 +980,13 @@ export default function AdminQuestionsPage() {
 
       console.log("📤 Sending videoUrls:", form.videoUrls);
 
-      const res = await fetch(apiUrl, {
+      setSaving(true);
+      const res = await fetchWithTimeout(apiUrl, {
         method: "PUT",
         headers: { "Content-Type": "application/json", "x-admin-token": ADMIN_TOKEN },
         body: JSON.stringify({
           id: questionId,
-          category: category, // مهم لتجنب تعارض IDs
+          category: category,
           text: form.textNL || form.textFR || form.textAR || "",
           textNL: form.textNL,
           textFR: form.textFR,
@@ -997,9 +1013,11 @@ export default function AdminQuestionsPage() {
       } else {
         alert(data.message || "فشل تعديل السؤال");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("خطأ في التعديل:", error);
-      alert("فشل الاتصال بالسيرفر");
+      alert(`❌ ${error.message || "فشل الاتصال بالسيرفر — حاول مرة أخرى"}`);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -1745,11 +1763,14 @@ export default function AdminQuestionsPage() {
                 </label>
               )}
               <button
-                className="w-full py-3 rounded-xl font-black text-sm transition-all hover:scale-[1.01] active:scale-95"
+                className="w-full py-3 rounded-xl font-black text-sm transition-all hover:scale-[1.01] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100 flex items-center justify-center gap-2"
                 style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white", boxShadow: "0 4px 14px rgba(34,197,94,0.35)" }}
                 onClick={handleAddQuestion}
+                disabled={saving}
               >
-                💾 حفظ السؤال
+                {saving ? (
+                  <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> جاري الحفظ...</>
+                ) : "💾 حفظ السؤال"}
               </button>
             </div>
           </div>
@@ -2065,10 +2086,14 @@ export default function AdminQuestionsPage() {
                         </div>
                       )}
                       <div className="flex gap-3">
-                        <button onClick={() => handleEditQuestion(q.id)} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black transition-all hover:scale-[1.02] active:scale-95" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white", boxShadow: "0 4px 14px rgba(34,197,94,0.35)" }}>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                          حفظ التعديلات
-                        </button>                        <button onClick={() => setEditingQuestion(null)} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black transition-all hover:scale-[1.02] active:scale-95" style={{ background: "#f1f5f9", color: "#64748b", border: "1.5px solid #e2e8f0" }}>
+                        <button onClick={() => handleEditQuestion(q.id)} disabled={saving} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white", boxShadow: "0 4px 14px rgba(34,197,94,0.35)" }}>
+                          {saving ? (
+                            <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> جاري الحفظ...</>
+                          ) : (
+                            <><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>حفظ التعديلات</>
+                          )}
+                        </button>
+                        <button onClick={() => setEditingQuestion(null)} disabled={saving} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-40" style={{ background: "#f1f5f9", color: "#64748b", border: "1.5px solid #e2e8f0" }}>
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                           إلغاء
                         </button>
