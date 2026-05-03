@@ -98,10 +98,13 @@ export default function Hero({ onSelect }: HeroProps) {
           className="group relative flex items-center justify-center px-6 py-3 rounded-full font-bold text-sm md:text-base transition-all hover:scale-105 active:scale-95 mb-3 w-full"
           style={{ background: "linear-gradient(135deg, #d4af37, #f0d060, #d4af37)", color: "#0a0a0a", boxShadow: "0 4px 16px rgba(212,175,55,0.4)" }}>
           {isLoggedIn ? (
-            <span>✔ Start nu</span>
+            <span>✔ {lang === "ar" ? "ابدأ الآن" : lang === "nl" ? "Start nu" : lang === "fr" ? "Commencer" : "Start now"}</span>
           ) : (
             <span className="text-center leading-tight">
-              Start vandaag met<br />je rijbewijs B
+              {lang === "ar" ? "ابدأ اليوم برخصة القيادة B" :
+               lang === "nl" ? <>Start vandaag met<br />je rijbewijs B</> :
+               lang === "fr" ? <>Commencez aujourd'hui<br />votre permis B</> :
+               <>Start today with<br />your driving licence B</>}
             </span>
           )}
           <svg className="absolute w-4 h-4 group-hover:translate-x-1 transition-transform" style={{ [lang === "ar" ? "left" : "right"]: "1.25rem" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
