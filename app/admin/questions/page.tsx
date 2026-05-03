@@ -882,6 +882,11 @@ export default function AdminQuestionsPage() {
         payload.videoUrls = newQuestion.videoUrls;
         payload.audioUrl = newQuestion.audioUrl;
         payload.isFree = newQuestion.isFree;
+        payload.points = newQuestion.points || 1;
+        payload.answer1 = newQuestion.answer1;
+        payload.answer2 = newQuestion.answer2;
+        payload.answer3 = newQuestion.answer3;
+        payload.correctAnswer = newQuestion.correctAnswer;
       }
       
       const res = await fetch(apiUrl, {
@@ -927,6 +932,9 @@ export default function AdminQuestionsPage() {
         correctAnswer: 0,
         videoUrls: [],
         audioUrl: "",
+        isFree: false,
+        points: 1,
+        freeGroup: null,
       });
     } catch (err) {
       console.error("خطأ عند حفظ السؤال:", err);
