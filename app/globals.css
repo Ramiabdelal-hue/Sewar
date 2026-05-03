@@ -133,7 +133,12 @@ img, video {
 .rich-content b, .rich-content strong { font-weight: 700; }
 .rich-content i, .rich-content em { font-style: italic; }
 .rich-content u { text-decoration: underline; }
-.rich-content ul { list-style: disc; padding-right: 1.25rem; padding-left: 1.25rem; margin: 0.5rem 0; }
-.rich-content ol { list-style: decimal; padding-right: 1.25rem; padding-left: 1.25rem; margin: 0.5rem 0; }
-.rich-content li { margin: 0.25rem 0; }
+.rich-content ul { list-style: disc; padding-inline-start: 1.5rem; margin: 0.5rem 0; }
+.rich-content ol { list-style: decimal; padding-inline-start: 1.5rem; margin: 0.5rem 0; }
+.rich-content li { margin: 0.3rem 0; line-height: 1.6; }
+.rich-content li::marker { color: #7c3aed; font-weight: 700; }
 .rich-content span { display: inline; }
+.rich-content p { margin: 0.25rem 0; }
+/* RTL: النقاط تبقى على اليمين */
+[dir="rtl"] .rich-content ul,
+[dir="rtl"] .rich-content ol { padding-inline-start: 1.5rem; }

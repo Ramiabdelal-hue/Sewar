@@ -4,7 +4,8 @@ import { checkRateLimit, getClientIp } from "@/lib/adminAuth";
 // cache في الذاكرة لتجنب طلبات متكررة
 const memCache: Record<string, string> = {};
 
-async function translateText(text: string, target: string): Promise<string> {
+// ── ترجمة نص عادي (بدون HTML) ────────────────────────────────────────────────
+async function translatePlain(text: string, target: string): Promise<string> {
   if (!text?.trim()) return text;
   const cacheKey = `${target}::${text}`;
   if (memCache[cacheKey]) return memCache[cacheKey];
@@ -20,9 +21,56 @@ async function translateText(text: string, target: string): Promise<string> {
   }
   if (!translated) return text;
 
-  translated = translated.replace(/<[^>]*>/g, "").replace(/[ \t]+/g, " ").trim();
+  // تنظيف مسافات فقط — لا نحذف HTML هنا
+  translated = translated.replace(/[ \t]+/g, " ").trim();
   memCache[cacheKey] = translated;
   return translated;
+}
+
+// ── ترجمة HTML مع الحفاظ على التنسيق ────────────────────────────────────────
+async function translateHtml(html: string, target: string): Promise<string> {
+  if (!html?.trim()) return html;
+  const cacheKey = `${target}::HTML::${html}`;
+  if (memCache[cacheKey]) return memCache[cacheKey];
+
+  // استخراج النصوص من داخل الـ tags فقط
+  // نستبدل كل نص داخل tag بـ placeholder ونترجمه
+  const textNodes: string[] = [];
+  const placeholder = html.replace(/>([^<]+)</g, (match, textContent) => {
+    const trimmed = textContent.trim();
+    if (!trimmed) return match;
+    textNodes.push(trimmed);
+    return `>__T${textNodes.length - 1}__<`;
+  });
+
+  if (textNodes.length === 0) return html;
+
+  // ترجمة كل النصوص دفعة واحدة
+  const translated = await Promise.all(
+    textNodes.map(t => translatePlain(t, target).catch(() => t))
+  );
+
+  // إعادة تجميع HTML مع النصوص المترجمة
+  let result = placeholder;
+  translated.forEach((t, i) => {
+    result = result.replace(`>__T${i}__<`, `>${t}<`);
+  });
+
+  memCache[cacheKey] = result;
+  return result;
+}
+
+// ── الدالة الرئيسية للترجمة ───────────────────────────────────────────────────
+async function translateText(text: string, target: string): Promise<string> {
+  if (!text?.trim()) return text;
+
+  // إذا يحتوي HTML — احفظ التنسيق
+  if (/<[a-z][\s\S]*>/i.test(text)) {
+    return translateHtml(text, target);
+  }
+
+  // نص عادي
+  return translatePlain(text, target);
 }
 
 export async function POST(req: NextRequest) {
@@ -37,7 +85,6 @@ export async function POST(req: NextRequest) {
     const { targetLang } = body;
 
     if (!targetLang || targetLang === "nl") {
-      // إذا batch
       if (Array.isArray(body.texts)) {
         return NextResponse.json({ success: true, translated: body.texts });
       }

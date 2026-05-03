@@ -22,6 +22,7 @@ async function translateOne(text: string, lang: string): Promise<string> {
     const res = await fetch("/api/translate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      // نرسل النص كاملاً مع HTML إذا وُجد
       body: JSON.stringify({ text, targetLang: lang }),
     });
     const data = await res.json();
