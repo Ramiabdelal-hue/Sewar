@@ -2166,9 +2166,16 @@ export default function AdminQuestionsPage() {
                           <p className="text-xs font-black text-gray-400 uppercase tracking-wider mb-2">الشرح</p>
                           <div className="px-4 py-3 rounded-xl" style={{ background: "#eff6ff", border: "1px solid #bfdbfe" }}>
                             <span className="text-[10px] font-black text-blue-400 uppercase tracking-wider">🇳🇱 Nederlands</span>
-                            <p className="text-sm text-gray-700 mt-1 leading-relaxed">
-                              {q.explanationNL || "—"}
-                            </p>
+                            {/<[a-z][\s\S]*>/i.test(q.explanationNL || "") ? (
+                              <div
+                                className="text-sm text-gray-700 mt-1 leading-relaxed rich-content"
+                                dangerouslySetInnerHTML={{ __html: q.explanationNL || "" }}
+                              />
+                            ) : (
+                              <p className="text-sm text-gray-700 mt-1 leading-relaxed whitespace-pre-wrap">
+                                {q.explanationNL || "—"}
+                              </p>
+                            )}
                           </div>
                         </div>
                       )}
