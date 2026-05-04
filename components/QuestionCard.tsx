@@ -228,19 +228,26 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
               />
             </div>
           ) : (
-            /* صورتان أو أكثر — كل صورتين في صف، بدون قص */
+            /* صورتان أو أكثر — كل صورتين في صف بنفس الارتفاع بدون قص */
             <div className="bg-gray-100 p-1 flex flex-col gap-1">
               {Array.from({ length: Math.ceil(question.videoUrls.filter(Boolean).length / 2) }).map((_, rowIdx) => {
                 const rowUrls = question.videoUrls!.filter(Boolean).slice(rowIdx * 2, rowIdx * 2 + 2);
                 return (
-                  <div key={rowIdx} className={`flex gap-1 ${rowUrls.length === 1 ? '' : ''}`}>
+                  <div key={rowIdx} className="flex gap-1">
                     {rowUrls.map((url, i) => (
-                      <div key={i} className="relative select-none flex-1 bg-white">
+                      <div key={i} className="relative select-none flex-1 bg-black"
+                        style={{ aspectRatio: "4/3" }}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={url}
                           alt=""
-                          style={{ width: "100%", height: "auto", display: "block" }}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            display: "block",
+                            objectFit: "contain",
+                            objectPosition: "center",
+                          }}
                           draggable={false}
                           onContextMenu={e => e.preventDefault()}
                         />
