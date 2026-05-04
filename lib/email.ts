@@ -129,77 +129,138 @@ export async function sendAutoSuspendEmail(
   try {
     const transporter = createTransporter();
 
-    const subject = `🔒 Sewar Rijbewijs Online – Account opgeschort wegens misbruik / تم تعليق حسابك تلقائياً`;
+    const subject = `🔒 Sewar Rijbewijs Online – Account opgeschort / تم تعليق حسابك / Compte suspendu / Account suspended`;
+
+    const today = new Date();
+    const dateNL = today.toLocaleDateString("nl-BE");
+    const dateAR = today.toLocaleDateString("ar-EG");
+    const dateFR = today.toLocaleDateString("fr-BE");
+    const dateEN = today.toLocaleDateString("en-GB");
+
+    const sections = [
+      // ── هولندي ──
+      {
+        dir: "ltr",
+        lang: "nl",
+        greeting: `Beste <strong>${userName}</strong>,`,
+        title: "⛔ Uw account is automatisch opgeschort",
+        body: `Er zijn <strong>${attemptCount} pogingen</strong> gedetecteerd om beschermde inhoud te fotograferen. Uw account is <strong>onmiddellijk opgeschort</strong>.`,
+        bullets: [
+          "Het kopiëren van beschermd lesmateriaal is <strong>illegaal</strong>",
+          "Uw gegevens zijn geregistreerd (IP-adres, tijdstip, pagina)",
+          "Wij behouden ons het recht voor om <strong>juridische stappen</strong> te ondernemen",
+          "Dit valt onder de <strong>Belgische wet op het auteursrecht (art. 80 WER)</strong>",
+        ],
+        dataLabel: "📋 Geregistreerde gegevens:",
+        dataLine: `E-mail: ${toEmail} | Pogingen: ${attemptCount} | Datum: ${dateNL}`,
+        contactLabel: "Bezwaar?",
+        paddingDir: "padding-left:20px",
+      },
+      // ── فرنسي ──
+      {
+        dir: "ltr",
+        lang: "fr",
+        greeting: `Cher(e) <strong>${userName}</strong>,`,
+        title: "⛔ Votre compte a été automatiquement suspendu",
+        body: `<strong>${attemptCount} tentatives</strong> de capture d'écran de contenu protégé ont été détectées. Votre compte est <strong>immédiatement suspendu</strong>.`,
+        bullets: [
+          "La copie de matériel pédagogique protégé est <strong>illégale</strong>",
+          "Vos données ont été enregistrées (adresse IP, heure, page)",
+          "Nous nous réservons le droit d'engager des <strong>poursuites judiciaires</strong>",
+          "Cela relève de la <strong>loi belge sur le droit d'auteur (art. 80 CDE)</strong>",
+        ],
+        dataLabel: "📋 Données enregistrées:",
+        dataLine: `E-mail: ${toEmail} | Tentatives: ${attemptCount} | Date: ${dateFR}`,
+        contactLabel: "Contestation?",
+        paddingDir: "padding-left:20px",
+      },
+      // ── إنجليزي ──
+      {
+        dir: "ltr",
+        lang: "en",
+        greeting: `Dear <strong>${userName}</strong>,`,
+        title: "⛔ Your account has been automatically suspended",
+        body: `<strong>${attemptCount} attempts</strong> to capture screenshots of protected content have been detected. Your account is <strong>immediately suspended</strong>.`,
+        bullets: [
+          "Copying protected educational material is <strong>illegal</strong>",
+          "Your data has been recorded (IP address, time, page)",
+          "We reserve the right to take <strong>legal action</strong> against you",
+          "This falls under <strong>Belgian intellectual property law (art. 80)</strong>",
+        ],
+        dataLabel: "📋 Recorded data:",
+        dataLine: `Email: ${toEmail} | Attempts: ${attemptCount} | Date: ${dateEN}`,
+        contactLabel: "Appeal?",
+        paddingDir: "padding-left:20px",
+      },
+      // ── عربي ──
+      {
+        dir: "rtl",
+        lang: "ar",
+        greeting: `عزيزي <strong>${userName}</strong>،`,
+        title: "⛔ تم تعليق حسابك تلقائياً",
+        body: `تم رصد <strong>${attemptCount} محاولة</strong> لتصوير المحتوى المحمي. تم <strong>تعليق حسابك فوراً</strong>.`,
+        bullets: [
+          "نسخ المواد التعليمية المحمية <strong>مخالف للقانون</strong>",
+          "تم تسجيل بياناتك (عنوان IP، الوقت، الصفحة)",
+          "نحتفظ بحقنا في <strong>اتخاذ إجراءات قانونية</strong> بحقك",
+          "يخضع ذلك لـ <strong>قانون حقوق الملكية الفكرية البلجيكي (المادة 80)</strong>",
+        ],
+        dataLabel: "📋 البيانات المسجلة:",
+        dataLine: `البريد: ${toEmail} | المحاولات: ${attemptCount} | التاريخ: ${dateAR}`,
+        contactLabel: "للاعتراض:",
+        paddingDir: "padding-right:20px",
+      },
+    ];
+
+    const sectionsHtml = sections.map((s, idx) => `
+      ${idx > 0 ? '<tr><td style="padding:0 40px;"><hr style="border:none;border-top:3px dashed #e5e7eb;margin:0;"/></td></tr>' : ""}
+      <tr>
+        <td style="padding:28px 40px;" dir="${s.dir}">
+          <p style="color:#374151;font-size:16px;margin:0 0 14px;">${s.greeting}</p>
+          <div style="background:#fef2f2;border:2px solid #fecaca;border-radius:12px;padding:20px;margin-bottom:16px;">
+            <p style="color:#991b1b;font-size:15px;font-weight:900;margin:0 0 10px;">${s.title}</p>
+            <p style="color:#7f1d1d;font-size:14px;line-height:1.7;margin:0 0 10px;">${s.body}</p>
+            <ul style="color:#7f1d1d;font-size:14px;margin:0;${s.paddingDir};line-height:1.9;">
+              ${s.bullets.map(b => `<li>${b}</li>`).join("")}
+            </ul>
+          </div>
+          <div style="background:#fffbeb;border:2px solid #fde68a;border-radius:10px;padding:14px;margin-bottom:16px;">
+            <p style="color:#92400e;font-size:13px;font-weight:700;margin:0 0 4px;">${s.dataLabel}</p>
+            <p style="color:#78350f;font-size:13px;margin:0;">${s.dataLine}</p>
+          </div>
+          <p style="color:#6b7280;font-size:13px;margin:0;">
+            ${s.contactLabel} <a href="mailto:sewarrijbewijs@gmail.com" style="color:#2563eb;">sewarrijbewijs@gmail.com</a>
+          </p>
+        </td>
+      </tr>
+    `).join("");
 
     const html = `
 <!DOCTYPE html>
-<html dir="ltr" lang="nl">
+<html lang="nl">
 <head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head>
 <body style="margin:0;padding:0;background:#f4f6fb;font-family:Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6fb;padding:32px 0;">
     <tr><td align="center">
       <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);max-width:600px;width:100%;">
         <tr>
-          <td style="background:linear-gradient(135deg,#7c3aed,#4c1d95);padding:32px 40px;text-align:center;">
-            <div style="font-size:48px;margin-bottom:12px;">🔒</div>
-            <h1 style="color:#fff;margin:0;font-size:24px;font-weight:900;">Sewar Rijbewijs Online</h1>
-            <p style="color:rgba(255,255,255,0.85);margin:8px 0 0;font-size:14px;">Account opgeschort / تم تعليق الحساب</p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:36px 40px 24px;">
-            <p style="color:#374151;font-size:16px;margin:0 0 16px;">Beste <strong>${userName}</strong>,</p>
-            <div style="background:#fef2f2;border:2px solid #fecaca;border-radius:12px;padding:20px;margin-bottom:20px;">
-              <p style="color:#991b1b;font-size:15px;font-weight:900;margin:0 0 12px;">⛔ Uw account is automatisch opgeschort</p>
-              <p style="color:#7f1d1d;font-size:14px;line-height:1.7;margin:0 0 12px;">
-                Er zijn <strong>${attemptCount} pogingen</strong> gedetecteerd om beschermde inhoud te fotograferen.
-                Uw account is <strong>onmiddellijk opgeschort</strong>.
-              </p>
-              <ul style="color:#7f1d1d;font-size:14px;margin:0;padding-left:20px;line-height:1.9;">
-                <li>Het kopiëren van beschermd lesmateriaal is <strong>illegaal</strong></li>
-                <li>Uw gegevens zijn geregistreerd (IP-adres, tijdstip, pagina)</li>
-                <li>Wij behouden ons het recht voor om <strong>juridische stappen</strong> te ondernemen</li>
-                <li>Dit valt onder de <strong>Belgische wet op het auteursrecht (art. 80 WER)</strong></li>
-              </ul>
-            </div>
-            <div style="background:#fffbeb;border:2px solid #fde68a;border-radius:12px;padding:16px;margin-bottom:20px;">
-              <p style="color:#92400e;font-size:14px;font-weight:700;margin:0 0 6px;">📋 Geregistreerde gegevens:</p>
-              <p style="color:#78350f;font-size:13px;margin:0;">E-mail: ${toEmail} | Pogingen: ${attemptCount} | Datum: ${new Date().toLocaleDateString("nl-BE")}</p>
-            </div>
-            <p style="color:#6b7280;font-size:14px;margin:0;">
-              Bezwaar? <a href="mailto:sewarrijbewijs@gmail.com" style="color:#2563eb;">sewarrijbewijs@gmail.com</a>
+          <td style="background:linear-gradient(135deg,#7c3aed,#4c1d95);padding:28px 40px;text-align:center;">
+            <div style="font-size:44px;margin-bottom:10px;">🔒</div>
+            <h1 style="color:#fff;margin:0;font-size:22px;font-weight:900;">Sewar Rijbewijs Online</h1>
+            <p style="color:rgba(255,255,255,0.8);margin:6px 0 0;font-size:13px;">
+              Account opgeschort · Compte suspendu · Account suspended · تم تعليق الحساب
             </p>
           </td>
         </tr>
-        <tr><td style="padding:0 40px;"><hr style="border:none;border-top:3px dashed #e5e7eb;margin:0;"/></td></tr>
+        ${sectionsHtml}
         <tr>
-          <td style="padding:24px 40px 36px;" dir="rtl">
-            <p style="color:#374151;font-size:16px;margin:0 0 16px;">عزيزي <strong>${userName}</strong>،</p>
-            <div style="background:#fef2f2;border:2px solid #fecaca;border-radius:12px;padding:20px;margin-bottom:20px;">
-              <p style="color:#991b1b;font-size:15px;font-weight:900;margin:0 0 12px;">⛔ تم تعليق حسابك تلقائياً</p>
-              <p style="color:#7f1d1d;font-size:14px;line-height:1.7;margin:0 0 12px;">
-                تم رصد <strong>${attemptCount} محاولة</strong> لتصوير المحتوى المحمي.
-                تم <strong>تعليق حسابك فوراً</strong>.
-              </p>
-              <ul style="color:#7f1d1d;font-size:14px;margin:0;padding-right:20px;line-height:1.9;">
-                <li>نسخ المواد التعليمية المحمية <strong>مخالف للقانون</strong></li>
-                <li>تم تسجيل بياناتك (عنوان IP، الوقت، الصفحة)</li>
-                <li>نحتفظ بحقنا في <strong>اتخاذ إجراءات قانونية</strong> بحقك</li>
-                <li>يخضع ذلك لـ <strong>قانون حقوق الملكية الفكرية البلجيكي (المادة 80)</strong></li>
-              </ul>
+          <td style="background:#f9fafb;padding:18px 40px;text-align:center;border-top:1px solid #e5e7eb;">
+            <div style="display:inline-flex;gap:0;border-radius:6px;overflow:hidden;margin-bottom:8px;">
+              <div style="width:20px;height:4px;background:#1a1a1a;"></div>
+              <div style="width:20px;height:4px;background:#f5a623;"></div>
+              <div style="width:20px;height:4px;background:#e63946;"></div>
             </div>
-            <div style="background:#fffbeb;border:2px solid #fde68a;border-radius:12px;padding:16px;margin-bottom:20px;">
-              <p style="color:#92400e;font-size:14px;font-weight:700;margin:0 0 6px;">📋 البيانات المسجلة:</p>
-              <p style="color:#78350f;font-size:13px;margin:0;">البريد: ${toEmail} | المحاولات: ${attemptCount} | التاريخ: ${new Date().toLocaleDateString("ar-EG")}</p>
-            </div>
-            <p style="color:#6b7280;font-size:14px;margin:0;">
-              للاعتراض: <a href="mailto:sewarrijbewijs@gmail.com" style="color:#2563eb;">sewarrijbewijs@gmail.com</a>
-            </p>
-          </td>
-        </tr>
-        <tr>
-          <td style="background:#f9fafb;padding:20px 40px;text-align:center;border-top:1px solid #e5e7eb;">
-            <p style="color:#9ca3af;font-size:12px;margin:0;">© ${new Date().getFullYear()} Sewar Rijbewijs Online · sewarrijbewijs@gmail.com</p>
+            <p style="color:#9ca3af;font-size:11px;margin:0;">© ${new Date().getFullYear()} Sewar Rijbewijs Online · sewarrijbewijs@gmail.com</p>
           </td>
         </tr>
       </table>
