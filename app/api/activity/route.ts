@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { sendScreenshotWarningEmail } from "@/lib/email";
+import { sendScreenshotWarningEmail, sendAutoSuspendEmail } from "@/lib/email";
 import { verifyAdminToken, unauthorizedResponse, checkRateLimit, getClientIp, isValidEmail } from "@/lib/adminAuth";
 import { runAutoBanCheck } from "@/lib/security/autoBan";
 
-// الحد: إرسال إيميل عند المحاولة رقم 3 بالضبط، ثم كل 3 محاولات (6، 9، ...)
+// الحد: إرسال إيميل تحذير عند المحاولة رقم 3
 const EMAIL_WARNING_THRESHOLD = 3;
+// الحد: تعليق تلقائي عند المحاولة رقم 6
+const AUTO_SUSPEND_THRESHOLD = 6;
 
 // POST - تسجيل نشاط
 export async function POST(request: NextRequest) {
@@ -62,23 +64,39 @@ export async function POST(request: NextRequest) {
         where: { userEmail, eventType: "screenshot_attempt" },
       });
 
-      // أرسل عند المحاولة رقم 3، ثم 6، 9، 12 ...
-      if (totalAttempts >= EMAIL_WARNING_THRESHOLD && totalAttempts % EMAIL_WARNING_THRESHOLD === 0) {
-        const user = await prisma.user.findUnique({
+      const user = await prisma.user.findUnique({
+        where: { email: userEmail },
+        select: { name: true, email: true, status: true },
+      });
+
+      // ── تعليق تلقائي عند 6+ محاولات ─────────────────────────────────────
+      if (totalAttempts >= AUTO_SUSPEND_THRESHOLD && user && user.status !== "suspended") {
+        // تعليق الحساب فوراً + إلغاء الـ session
+        await prisma.user.update({
           where: { email: userEmail },
-          select: { name: true, email: true },
+          data: { status: "suspended", sessionToken: null },
         });
-        if (user) {
-          try {
-            const result = await sendScreenshotWarningEmail(user.email, user.name, totalAttempts);
-            if (result.success) {
-              console.log(`📧 Auto warning email sent to ${user.email} (${totalAttempts} attempts)`);
-            } else {
-              console.error(`❌ Auto warning email FAILED for ${user.email}: ${result.error}`);
-            }
-          } catch (emailErr: any) {
-            console.error(`❌ Email exception for ${user.email}:`, emailErr.message);
+        // إرسال إيميل التعليق التلقائي
+        try {
+          await sendAutoSuspendEmail(user.email, user.name, totalAttempts);
+          console.log(`🔒 Auto-suspended ${userEmail} after ${totalAttempts} screenshot attempts`);
+        } catch (e: any) {
+          console.error(`❌ Auto-suspend email failed: ${e.message}`);
+        }
+        return NextResponse.json({ success: true, totalAttempts, autoSuspended: true });
+      }
+
+      // ── إرسال إيميل تحذير عند 3 محاولات ─────────────────────────────────
+      if (totalAttempts === EMAIL_WARNING_THRESHOLD && user) {
+        try {
+          const result = await sendScreenshotWarningEmail(user.email, user.name, totalAttempts);
+          if (result.success) {
+            console.log(`📧 Warning email sent to ${user.email} (${totalAttempts} attempts)`);
+          } else {
+            console.error(`❌ Warning email FAILED for ${user.email}: ${result.error}`);
           }
+        } catch (emailErr: any) {
+          console.error(`❌ Email exception for ${user.email}:`, emailErr.message);
         }
       }
 

@@ -32,8 +32,11 @@ async function reportScreenshot(reason: string): Promise<number> {
         page: window.location.pathname + '?reason=' + reason,
       }),
     });
-    // جلب العدد الكلي من السيرفر إذا أمكن
     const data = await res.json().catch(() => ({}));
+    // إذا تم التعليق التلقائي — أعد تحميل الصفحة لإظهار رسالة التعليق
+    if (data.autoSuspended) {
+      setTimeout(() => window.location.reload(), 2000);
+    }
     return data.totalAttempts || ++sessionScreenshotCount;
   } catch {
     return ++sessionScreenshotCount;

@@ -119,6 +119,111 @@ export async function sendScreenshotWarningEmail(
 }
 
 /**
+ * إرسال إيميل تحذير شديد + إشعار تعليق تلقائي بعد 6+ محاولات screenshot
+ */
+export async function sendAutoSuspendEmail(
+  toEmail: string,
+  userName: string,
+  attemptCount: number
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const transporter = createTransporter();
+
+    const subject = `🔒 Sewar Rijbewijs Online – Account opgeschort wegens misbruik / تم تعليق حسابك تلقائياً`;
+
+    const html = `
+<!DOCTYPE html>
+<html dir="ltr" lang="nl">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head>
+<body style="margin:0;padding:0;background:#f4f6fb;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6fb;padding:32px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);max-width:600px;width:100%;">
+        <tr>
+          <td style="background:linear-gradient(135deg,#7c3aed,#4c1d95);padding:32px 40px;text-align:center;">
+            <div style="font-size:48px;margin-bottom:12px;">🔒</div>
+            <h1 style="color:#fff;margin:0;font-size:24px;font-weight:900;">Sewar Rijbewijs Online</h1>
+            <p style="color:rgba(255,255,255,0.85);margin:8px 0 0;font-size:14px;">Account opgeschort / تم تعليق الحساب</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:36px 40px 24px;">
+            <p style="color:#374151;font-size:16px;margin:0 0 16px;">Beste <strong>${userName}</strong>,</p>
+            <div style="background:#fef2f2;border:2px solid #fecaca;border-radius:12px;padding:20px;margin-bottom:20px;">
+              <p style="color:#991b1b;font-size:15px;font-weight:900;margin:0 0 12px;">⛔ Uw account is automatisch opgeschort</p>
+              <p style="color:#7f1d1d;font-size:14px;line-height:1.7;margin:0 0 12px;">
+                Er zijn <strong>${attemptCount} pogingen</strong> gedetecteerd om beschermde inhoud te fotograferen.
+                Uw account is <strong>onmiddellijk opgeschort</strong>.
+              </p>
+              <ul style="color:#7f1d1d;font-size:14px;margin:0;padding-left:20px;line-height:1.9;">
+                <li>Het kopiëren van beschermd lesmateriaal is <strong>illegaal</strong></li>
+                <li>Uw gegevens zijn geregistreerd (IP-adres, tijdstip, pagina)</li>
+                <li>Wij behouden ons het recht voor om <strong>juridische stappen</strong> te ondernemen</li>
+                <li>Dit valt onder de <strong>Belgische wet op het auteursrecht (art. 80 WER)</strong></li>
+              </ul>
+            </div>
+            <div style="background:#fffbeb;border:2px solid #fde68a;border-radius:12px;padding:16px;margin-bottom:20px;">
+              <p style="color:#92400e;font-size:14px;font-weight:700;margin:0 0 6px;">📋 Geregistreerde gegevens:</p>
+              <p style="color:#78350f;font-size:13px;margin:0;">E-mail: ${toEmail} | Pogingen: ${attemptCount} | Datum: ${new Date().toLocaleDateString("nl-BE")}</p>
+            </div>
+            <p style="color:#6b7280;font-size:14px;margin:0;">
+              Bezwaar? <a href="mailto:sewarrijbewijs@gmail.com" style="color:#2563eb;">sewarrijbewijs@gmail.com</a>
+            </p>
+          </td>
+        </tr>
+        <tr><td style="padding:0 40px;"><hr style="border:none;border-top:3px dashed #e5e7eb;margin:0;"/></td></tr>
+        <tr>
+          <td style="padding:24px 40px 36px;" dir="rtl">
+            <p style="color:#374151;font-size:16px;margin:0 0 16px;">عزيزي <strong>${userName}</strong>،</p>
+            <div style="background:#fef2f2;border:2px solid #fecaca;border-radius:12px;padding:20px;margin-bottom:20px;">
+              <p style="color:#991b1b;font-size:15px;font-weight:900;margin:0 0 12px;">⛔ تم تعليق حسابك تلقائياً</p>
+              <p style="color:#7f1d1d;font-size:14px;line-height:1.7;margin:0 0 12px;">
+                تم رصد <strong>${attemptCount} محاولة</strong> لتصوير المحتوى المحمي.
+                تم <strong>تعليق حسابك فوراً</strong>.
+              </p>
+              <ul style="color:#7f1d1d;font-size:14px;margin:0;padding-right:20px;line-height:1.9;">
+                <li>نسخ المواد التعليمية المحمية <strong>مخالف للقانون</strong></li>
+                <li>تم تسجيل بياناتك (عنوان IP، الوقت، الصفحة)</li>
+                <li>نحتفظ بحقنا في <strong>اتخاذ إجراءات قانونية</strong> بحقك</li>
+                <li>يخضع ذلك لـ <strong>قانون حقوق الملكية الفكرية البلجيكي (المادة 80)</strong></li>
+              </ul>
+            </div>
+            <div style="background:#fffbeb;border:2px solid #fde68a;border-radius:12px;padding:16px;margin-bottom:20px;">
+              <p style="color:#92400e;font-size:14px;font-weight:700;margin:0 0 6px;">📋 البيانات المسجلة:</p>
+              <p style="color:#78350f;font-size:13px;margin:0;">البريد: ${toEmail} | المحاولات: ${attemptCount} | التاريخ: ${new Date().toLocaleDateString("ar-EG")}</p>
+            </div>
+            <p style="color:#6b7280;font-size:14px;margin:0;">
+              للاعتراض: <a href="mailto:sewarrijbewijs@gmail.com" style="color:#2563eb;">sewarrijbewijs@gmail.com</a>
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#f9fafb;padding:20px 40px;text-align:center;border-top:1px solid #e5e7eb;">
+            <p style="color:#9ca3af;font-size:12px;margin:0;">© ${new Date().getFullYear()} Sewar Rijbewijs Online · sewarrijbewijs@gmail.com</p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+    await transporter.sendMail({
+      from: `"Sewar Rijbewijs Online" <${process.env.SMTP_USER}>`,
+      to: toEmail,
+      subject,
+      html,
+    });
+
+    console.log(`✅ Auto-suspend email sent to ${toEmail} (${attemptCount} attempts)`);
+    return { success: true };
+  } catch (error: any) {
+    console.error(`❌ Auto-suspend email failed to ${toEmail}:`, error.message);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
  * إرسال إيميل إشعار تعليق الاشتراك
  */
 export async function sendSuspensionEmail(
