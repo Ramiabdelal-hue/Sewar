@@ -62,54 +62,50 @@ interface Props {
 }
 
 /** مكون يعرض صورتين أو أكثر في grid متساوي.
- *  يحسب أكبر نسبة ارتفاع/عرض بين الصور ويجعل كل الخلايا بنفس الارتفاع
- *  حتى لا تُقص أي صورة وتبدو كلها بنفس الحجم. */
+ *  كل صورة تملأ خليتها بالكامل بدون قص ولا فراغات.
+ *  الارتفاع الموحد = أكبر ارتفاع طبيعي بين الصور بعد تحجيمها لعرض الخلية. */
 function MultiImageGrid({ urls }: { urls: string[] }) {
   const [cellHeight, setCellHeight] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!urls.length) return;
-    let loaded = 0;
-    let maxRatio = 0; // أكبر نسبة (height / width)
 
-    urls.forEach((url) => {
-      const img = new Image();
-      img.onload = () => {
-        const ratio = img.naturalHeight / img.naturalWidth;
-        if (ratio > maxRatio) maxRatio = ratio;
-        loaded++;
-        if (loaded === urls.length && containerRef.current) {
-          // عرض كل خلية = نصف عرض الـ container (مع مراعاة الـ gap والـ padding)
-          const containerWidth = containerRef.current.offsetWidth;
-          const gap = 4; // 1 * 4px (gap-1)
-          const padding = 8; // p-1 * 2
-          const cellWidth = (containerWidth - padding - gap) / 2;
-          setCellHeight(Math.round(cellWidth * maxRatio));
-        }
-      };
-      img.onerror = () => {
-        loaded++;
-        if (loaded === urls.length && !cellHeight) {
-          setCellHeight(200); // fallback
-        }
-      };
-      img.src = url;
+    const loadImage = (url: string): Promise<{ w: number; h: number }> =>
+      new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
+        img.onerror = () => resolve({ w: 1, h: 1 });
+        img.src = url;
+      });
+
+    Promise.all(urls.map(loadImage)).then((dims) => {
+      if (!containerRef.current) return;
+      const containerWidth = containerRef.current.offsetWidth;
+      // عرض كل خلية = نصف عرض الـ container (بدون gap أو padding)
+      const cellWidth = containerWidth / 2;
+      // نحسب الارتفاع الذي ستأخذه كل صورة بعد تمددها لعرض الخلية
+      const heights = dims.map(({ w, h }) => (h / w) * cellWidth);
+      // نأخذ أكبر ارتفاع
+      const maxHeight = Math.max(...heights);
+      setCellHeight(Math.round(maxHeight));
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urls.join(",")]);
 
   return (
-    <div ref={containerRef} className="bg-black p-1 grid gap-1" style={{ gridTemplateColumns: "1fr 1fr" }}>
+    <div
+      ref={containerRef}
+      style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}
+    >
       {urls.map((url, i) => (
         <div
           key={i}
-          className="relative select-none"
+          className="select-none"
           style={{
-            height: cellHeight ? `${cellHeight}px` : "auto",
-            minHeight: cellHeight ? undefined : "150px",
-            background: "#000",
+            height: cellHeight ? `${cellHeight}px` : "200px",
             overflow: "hidden",
+            background: "#fff",
           }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -117,12 +113,9 @@ function MultiImageGrid({ urls }: { urls: string[] }) {
             src={url}
             alt=""
             style={{
-              position: "absolute",
-              inset: 0,
               width: "100%",
               height: "100%",
-              objectFit: "contain",
-              objectPosition: "center",
+              objectFit: "fill", // يمدد الصورة لتملأ الخلية بالكامل بدون قص ولا فراغ
             }}
             draggable={false}
             onContextMenu={e => e.preventDefault()}
