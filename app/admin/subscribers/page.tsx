@@ -59,12 +59,33 @@ export default function AdminSubscribersPage() {
     } catch {} finally { setLoading(false); }
   }, [search, filterCat, filterType, ADMIN_TOKEN]);
 
+  // ── polling سريع للـ screenshots فقط (كل 5 ثوانٍ) ──────────────────────
+  const fetchScreenshotsOnly = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/admin/subscribers?screenshotsOnly=1`, { headers: { "x-admin-token": ADMIN_TOKEN } });
+      const d = await res.json();
+      if (d.success && d.data?.allScreenshots) {
+        setAllScreenshots(d.data.allScreenshots);
+        // تحديث عدد screenshots في كل مشترك
+        setSubs(prev => prev.map(sub => {
+          const shots = d.data.allScreenshots.filter((s: any) => s.userEmail === sub.email);
+          return shots.length !== (sub.screenshotDetails?.count || 0)
+            ? { ...sub, screenshotDetails: { count: shots.length, attempts: shots.map((s: any) => ({ date: s.date, page: s.page, ip: s.ip })) } }
+            : sub;
+        }));
+      }
+    } catch {}
+  }, [ADMIN_TOKEN]);
+
   useEffect(() => {
     if (!isLogged) return;
     fetchSubs();
-    const interval = setInterval(fetchSubs, 30000);
-    return () => clearInterval(interval);
-  }, [isLogged, fetchSubs]);
+    // تحديث كامل كل 30 ثانية
+    const fullInterval = setInterval(fetchSubs, 30000);
+    // تحديث screenshots كل 5 ثوانٍ
+    const fastInterval = setInterval(fetchScreenshotsOnly, 5000);
+    return () => { clearInterval(fullInterval); clearInterval(fastInterval); };
+  }, [isLogged, fetchSubs, fetchScreenshotsOnly]);
 
   const handleLogin = () => {
     const u = process.env.NEXT_PUBLIC_ADMIN_USER || "sewar"; const p = process.env.NEXT_PUBLIC_ADMIN_PASS || "70709090";

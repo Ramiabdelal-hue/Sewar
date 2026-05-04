@@ -10,7 +10,29 @@ export async function GET(request: NextRequest) {
     const searchMonth = searchParams.get("month");
     const searchCategory = searchParams.get("category");
     const searchType = searchParams.get("type");
-    const getNames = searchParams.get("getNames"); // للحصول على قائمة الأسماء
+    const getNames = searchParams.get("getNames");
+    const screenshotsOnly = searchParams.get("screenshotsOnly"); // ── جديد: سريع
+
+    // ── endpoint سريع: screenshots فقط ──────────────────────────────────────
+    if (screenshotsOnly === "1") {
+      const allScreenshots = await prisma.activityLog.findMany({
+        where: { eventType: "screenshot_attempt" },
+        orderBy: { createdAt: "desc" },
+        take: 200, // آخر 200 فقط
+        select: { userEmail: true, page: true, ip: true, createdAt: true },
+      });
+      return NextResponse.json({
+        success: true,
+        data: {
+          allScreenshots: allScreenshots.map(s => ({
+            userEmail: s.userEmail,
+            page: s.page,
+            ip: s.ip,
+            date: s.createdAt,
+          })),
+        },
+      });
+    }
 
     console.log("📥 Received search params:", {
       name: searchName,
