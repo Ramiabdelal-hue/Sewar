@@ -47,8 +47,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, errors: validation.errors }, { status: 400 });
     }
 
-    const { title, description, category } = validation.data;
-    const lesson = await createLesson(category as "A" | "B" | "C", title, description);
+    const { title, description, examLabel, category } = validation.data;
+    const lesson = await createLesson(category as "A" | "B" | "C", title, description, examLabel);
     return NextResponse.json({ success: true, lesson }, { headers: NO_CACHE });
   } catch (error) {
     console.error("POST /api/admin/lessons:", error);
@@ -71,8 +71,8 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ success: false, errors: validation.errors }, { status: 400 });
     }
 
-    const { id, title, description, category } = validation.data;
-    const lesson = await updateLesson(category as "A" | "B" | "C", id, title, description);
+    const { id, title, description, examLabel, category } = validation.data;
+    const lesson = await updateLesson(category as "A" | "B" | "C", id, title, description, examLabel);
     return NextResponse.json({ success: true, lesson }, { headers: NO_CACHE });
   } catch (error) {
     console.error("PUT /api/admin/lessons:", error);

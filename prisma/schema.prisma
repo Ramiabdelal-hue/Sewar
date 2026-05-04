@@ -134,6 +134,7 @@ model LessonA {
   title        String
   questionType String?
   description  String?
+  examLabel    String?
   videoUrl     String?
   createdAt    DateTime    @default(now())
   questions    QuestionA[]
@@ -145,6 +146,7 @@ model LessonB {
   title        String
   questionType String?
   description  String?
+  examLabel    String?
   videoUrl     String?
   createdAt    DateTime    @default(now())
   questions    QuestionB[]
@@ -156,6 +158,7 @@ model LessonC {
   title        String
   questionType String?
   description  String?
+  examLabel    String?
   videoUrl     String?
   createdAt    DateTime    @default(now())
   questions    QuestionC[]

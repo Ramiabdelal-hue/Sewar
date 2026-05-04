@@ -6,6 +6,7 @@
 export interface LessonInput {
   title: string;
   description?: string | null;
+  examLabel?: string | null;
   category: string;
 }
 
@@ -46,6 +47,14 @@ export function validateLesson(data: unknown): { valid: true; data: LessonInput 
     }
   }
 
+  if (d.examLabel !== undefined && d.examLabel !== null) {
+    if (typeof d.examLabel !== "string") {
+      errors.push({ field: "examLabel", message: "اسم زر الامتحان يجب أن يكون نصاً" });
+    } else if (d.examLabel.length > 100) {
+      errors.push({ field: "examLabel", message: "اسم زر الامتحان طويل جداً (100 حرف كحد أقصى)" });
+    }
+  }
+
   if (errors.length > 0) return { valid: false, errors };
 
   return {
@@ -53,6 +62,7 @@ export function validateLesson(data: unknown): { valid: true; data: LessonInput 
     data: {
       title: (d.title as string).trim(),
       description: d.description ? (d.description as string).trim() : null,
+      examLabel: d.examLabel ? (d.examLabel as string).trim() : null,
       category: (d.category as string).toUpperCase(),
     },
   };

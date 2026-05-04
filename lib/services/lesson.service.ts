@@ -19,18 +19,18 @@ export async function getLessons(category: Category, questionType?: string) {
   return getModel(category).findMany({ where, orderBy: { id: "asc" } });
 }
 
-export async function createLesson(category: Category, title: string, description?: string | null) {
+export async function createLesson(category: Category, title: string, description?: string | null, examLabel?: string | null) {
   const lesson = await getModel(category).create({
-    data: { title, description: description || null },
+    data: { title, description: description || null, examLabel: examLabel || null },
   });
   revalidateTag("lessons");
   return lesson;
 }
 
-export async function updateLesson(category: Category, id: number, title: string, description?: string | null) {
+export async function updateLesson(category: Category, id: number, title: string, description?: string | null, examLabel?: string | null) {
   const lesson = await getModel(category).update({
     where: { id },
-    data: { title, description: description || null },
+    data: { title, description: description || null, examLabel: examLabel || null },
   });
   revalidateTag("lessons");
   return lesson;

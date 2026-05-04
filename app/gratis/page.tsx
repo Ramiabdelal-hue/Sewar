@@ -40,12 +40,12 @@ function GratisContent() {
           const lessonMap = new Map<number, any>();
           for (const q of d.questions) {
             if (q.lesson && q.lessonId && !lessonMap.has(q.lessonId)) {
-              lessonMap.set(q.lessonId, { id: q.lessonId, title: q.lesson.title, description: q.lesson.description });
+              lessonMap.set(q.lessonId, { id: q.lessonId, title: q.lesson.title, description: q.lesson.description, examLabel: q.lesson.examLabel });
             }
           }
           for (const q of (d.examQuestions || [])) {
             if (q.lesson && q.lessonId && !lessonMap.has(q.lessonId)) {
-              lessonMap.set(q.lessonId, { id: q.lessonId, title: q.lesson.title, description: q.lesson.description });
+              lessonMap.set(q.lessonId, { id: q.lessonId, title: q.lesson.title, description: q.lesson.description, examLabel: q.lesson.examLabel });
             }
           }
           const sorted = Array.from(lessonMap.values()).sort((a, b) => a.id - b.id);
@@ -178,7 +178,7 @@ function GratisContent() {
                             onClick={() => router.push(`/gratis/exam?category=${selectedCat}&lessonId=${lesson.id}&lesson=${encodeURIComponent(lesson.title)}`)}
                             className="border-2 px-4 py-1 text-sm font-bold transition-colors w-full"
                             style={{ background: "#22c55e", borderColor: "#16a34a", color: "white" }}>
-                            EXAM
+                            {lesson.examLabel || "EXAM"}
                           </button>
                         </td>
                       </>

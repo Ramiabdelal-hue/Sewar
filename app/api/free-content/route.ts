@@ -12,29 +12,29 @@ export async function GET(request: NextRequest) {
     if (category === "A") {
       questions = await prisma.questionA.findMany({
         where: { isFree: true }, orderBy: [{ lessonId: "asc" }, { createdAt: "asc" }],
-        include: { lesson: { select: { title: true, description: true } } }
+        include: { lesson: { select: { title: true, description: true, examLabel: true } } }
       });
       examQuestions = await prisma.examQuestionA.findMany({
         where: { isFree: true }, orderBy: [{ freeGroup: "asc" }, { createdAt: "asc" }],
-        include: { lesson: { select: { title: true } } }
+        include: { lesson: { select: { title: true, examLabel: true } } }
       });
     } else if (category === "B") {
       questions = await prisma.questionB.findMany({
         where: { isFree: true }, orderBy: [{ lessonId: "asc" }, { createdAt: "asc" }],
-        include: { lesson: { select: { title: true, description: true } } }
+        include: { lesson: { select: { title: true, description: true, examLabel: true } } }
       });
       examQuestions = await prisma.examQuestionB.findMany({
         where: { isFree: true }, orderBy: [{ freeGroup: "asc" }, { createdAt: "asc" }],
-        include: { lesson: { select: { title: true } } }
+        include: { lesson: { select: { title: true, examLabel: true } } }
       });
     } else if (category === "C") {
       questions = await prisma.questionC.findMany({
         where: { isFree: true }, orderBy: [{ lessonId: "asc" }, { createdAt: "asc" }],
-        include: { lesson: { select: { title: true, description: true } } }
+        include: { lesson: { select: { title: true, description: true, examLabel: true } } }
       });
       examQuestions = await prisma.examQuestionC.findMany({
         where: { isFree: true }, orderBy: [{ freeGroup: "asc" }, { createdAt: "asc" }],
-        include: { lesson: { select: { title: true } } }
+        include: { lesson: { select: { title: true, examLabel: true } } }
       });
     }
 

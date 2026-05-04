@@ -186,11 +186,13 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
   const [lessons, setLessons] = useState<any[]>([]);
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
+  const [newExamLabel, setNewExamLabel] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
+  const [editExamLabel, setEditExamLabel] = useState("");
 
   const ADMIN_TOKEN = process.env.NEXT_PUBLIC_ADMIN_TOKEN || "";
 
@@ -217,12 +219,12 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
       const res = await fetch("/api/admin/lessons", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-admin-token": ADMIN_TOKEN },
-        body: JSON.stringify({ title: newTitle.trim(), description: newDescription.trim() || null, category }),
+        body: JSON.stringify({ title: newTitle.trim(), description: newDescription.trim() || null, examLabel: newExamLabel.trim() || null, category }),
       });
       const text = await res.text();
       let data: any;
       try { data = JSON.parse(text); } catch { data = { success: false, message: `HTTP ${res.status}: ${text.slice(0, 200)}` }; }
-      if (data.success) { setNewTitle(""); setNewDescription(""); fetchLessons(category); }
+      if (data.success) { setNewTitle(""); setNewDescription(""); setNewExamLabel(""); fetchLessons(category); }
       else alert("❌ " + (data.message || "خطأ في الإضافة"));
     } catch (e) { alert("❌ خطأ في الاتصال: " + String(e)); }
     finally { setSaving(false); }
@@ -249,7 +251,7 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
       const res = await fetch("/api/admin/lessons", {
         method: "PUT",
         headers: { "Content-Type": "application/json", "x-admin-token": ADMIN_TOKEN },
-        body: JSON.stringify({ id, title: editTitle.trim(), description: editDescription.trim() || null, category }),
+        body: JSON.stringify({ id, title: editTitle.trim(), description: editDescription.trim() || null, examLabel: editExamLabel.trim() || null, category }),
       });
       const text = await res.text();
       let data: any;
@@ -258,6 +260,7 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
         setEditingId(null);
         setEditTitle("");
         setEditDescription("");
+        setEditExamLabel("");
         fetchLessons(category);
         alert("✅ تم حفظ التعديل بنجاح");
       } else {
@@ -320,9 +323,17 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
               type="text"
               value={newDescription}
               onChange={e => setNewDescription(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && addLesson()}
               placeholder="عنوان فرعي (اختياري)..."
               className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#003399] focus:outline-none text-sm font-medium text-gray-500"
+            />
+            <input
+              type="text"
+              value={newExamLabel}
+              onChange={e => setNewExamLabel(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && addLesson()}
+              placeholder="🎯 اسم زر EXAM (اختياري، مثال: Examen 1)..."
+              className="w-full px-4 py-3 border-2 border-green-200 rounded-xl focus:border-green-500 focus:outline-none text-sm font-medium"
+              style={{ background: "#f0fdf4" }}
             />
             <button onClick={addLesson} disabled={saving}
               className="w-full px-6 py-3 rounded-xl font-black text-sm text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
@@ -359,9 +370,17 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
                         type="text"
                         value={editDescription}
                         onChange={e => setEditDescription(e.target.value)}
-                        onKeyDown={e => e.key === "Enter" && updateLesson(lesson.id)}
                         placeholder="العنوان الفرعي (اختياري)..."
                         className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg text-sm text-gray-500 focus:outline-none"
+                      />
+                      <input
+                        type="text"
+                        value={editExamLabel}
+                        onChange={e => setEditExamLabel(e.target.value)}
+                        onKeyDown={e => e.key === "Enter" && updateLesson(lesson.id)}
+                        placeholder="🎯 اسم زر EXAM (اختياري)..."
+                        className="w-full px-3 py-2 border-2 border-green-200 rounded-lg text-sm focus:outline-none"
+                        style={{ background: "#f0fdf4" }}
                       />
                       <div className="flex gap-2">
                         <button onClick={() => updateLesson(lesson.id)}
@@ -369,7 +388,7 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
                           style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
                           ✓ حفظ
                         </button>
-                        <button onClick={() => { setEditingId(null); setEditTitle(""); setEditDescription(""); }}
+                        <button onClick={() => { setEditingId(null); setEditTitle(""); setEditDescription(""); setEditExamLabel(""); }}
                           className="px-3 py-2 rounded-lg text-xs font-black bg-gray-200 text-gray-600 hover:bg-gray-300">
                           ✕
                         </button>
@@ -384,10 +403,11 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
                         <div>
                           <p className="text-sm font-bold text-gray-800">{lesson.title}</p>
                           {lesson.description && <p className="text-xs text-gray-400 mt-0.5">{lesson.description}</p>}
+                          {lesson.examLabel && <p className="text-xs font-bold mt-0.5" style={{ color: "#16a34a" }}>🎯 EXAM: {lesson.examLabel}</p>}
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
-                        <button onClick={() => { setEditingId(lesson.id); setEditTitle(lesson.title); setEditDescription(lesson.description || ""); }}
+                        <button onClick={() => { setEditingId(lesson.id); setEditTitle(lesson.title); setEditDescription(lesson.description || ""); setEditExamLabel(lesson.examLabel || ""); }}
                           className="w-8 h-8 rounded-lg flex items-center justify-center text-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-colors">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
