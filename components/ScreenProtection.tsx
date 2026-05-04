@@ -224,8 +224,7 @@ export default function ScreenProtection() {
       }
     };
 
-    // ── 6. منع تحديد النص ────────────────────────────────────────────────────
-    const onSelectStart = (e: Event) => {
+    // ── 6. منع تحديد النص ────────────────────────────────────────────────────    const onSelectStart = (e: Event) => {
       const target = e.target as HTMLElement;
       const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
       if (!isInput) e.preventDefault();
@@ -237,7 +236,6 @@ export default function ScreenProtection() {
     document.addEventListener('visibilitychange', onVisibility);
     document.addEventListener('contextmenu', onContextMenu);
     document.addEventListener('selectstart', onSelectStart);
-    const devToolsInterval = setInterval(checkDevTools, 3000);
 
     return () => {
       document.removeEventListener('copy', onCopy);
@@ -246,7 +244,6 @@ export default function ScreenProtection() {
       document.removeEventListener('visibilitychange', onVisibility);
       document.removeEventListener('contextmenu', onContextMenu);
       document.removeEventListener('selectstart', onSelectStart);
-      clearInterval(devToolsInterval);
     };
   }, [pathname, isAdmin]);
 
