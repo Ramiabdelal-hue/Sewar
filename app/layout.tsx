@@ -4,7 +4,6 @@ import ScreenProtection from '@/components/ScreenProtection';
 import Watermark from '@/components/Watermark';
 import ActivityTracker from '@/components/ActivityTracker';
 import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
-import NewsTicker from '@/components/NewsTicker';
 
 export const metadata = {
   title: 'Sewar Rijbewijs Online',
@@ -60,8 +59,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ActivityTracker />
           {/* ⚙️ Service Worker */}
           <ServiceWorkerRegister />
-          {/* 📰 شريط أخباري */}
-          <NewsTicker />
           {children}
         </LangProvider>
       </body>

@@ -15,6 +15,8 @@ interface NavbarProps {
   onTheorieClick?: () => void;
 }
 
+import NewsTicker from "@/components/NewsTicker";
+
 // ── PWA Install Guide Modal ──────────────────────────────────────────────────
 const PWA_TEXT: Record<string, {
   title: string; subtitle: string; or: string; tip: string;
@@ -626,6 +628,9 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
           </button>
         </div>
       )}
+
+      {/* 📰 شريط أخباري — تحت الـ Navbar مباشرة */}
+      <NewsTicker />
     </>
   );
 }
