@@ -181,6 +181,16 @@ function TheorieLessonContent() {
         let data: any = {};
         try { data = await response.json(); } catch {}
         if (data.expired) { setIsExpired(true); setLoading(false); }
+        // إذا كان الحساب معلقاً — أعامله كمنتهي ويُعاد التوجيه
+        if (data.suspended) {
+          localStorage.removeItem("userEmail");
+          localStorage.removeItem("userCategory");
+          localStorage.removeItem("sessionToken");
+          localStorage.removeItem("userName");
+          setIsExpired(true);
+          setLoading(false);
+          setTimeout(() => { window.location.href = "/"; }, 1500);
+        }
       } catch {
         // عند خطأ شبكة - لا نعتبره منتهياً
       } finally {

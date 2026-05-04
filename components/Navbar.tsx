@@ -349,6 +349,15 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
 
         if (data.suspended) {
           setIsSuspended(true);
+          // مسح الجلسة فوراً + إعادة توجيه للصفحة الرئيسية
+          localStorage.removeItem("userEmail");
+          localStorage.removeItem("userCategory");
+          localStorage.removeItem("userExpiry");
+          localStorage.removeItem("sessionToken");
+          localStorage.removeItem("userName");
+          setIsLoggedIn(false);
+          // إعادة توجيه بعد 3 ثوانٍ لإظهار رسالة التعليق أولاً
+          setTimeout(() => { window.location.href = "/"; }, 3000);
           return;
         }
         setIsSuspended(false);
@@ -390,7 +399,7 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
     };
 
     check();
-    const interval = setInterval(check, 60 * 60 * 1000);
+    const interval = setInterval(check, 60 * 1000); // كل دقيقة
 
     const onLogin = () => {
       hasCheckedRef.current = false;
