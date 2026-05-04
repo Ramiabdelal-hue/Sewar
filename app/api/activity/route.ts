@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { sendScreenshotWarningEmail, sendAutoSuspendEmail } from "@/lib/email";
+import { sendScreenshotWarningEmail, sendAutoSuspendEmail, sendAdminAlertEmail } from "@/lib/email";
 import { verifyAdminToken, unauthorizedResponse, checkRateLimit, getClientIp, isValidEmail } from "@/lib/adminAuth";
 import { runAutoBanCheck } from "@/lib/security/autoBan";
 
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
 
       const user = await prisma.user.findUnique({
         where: { email: userEmail },
-        select: { name: true, email: true, status: true },
+        select: { name: true, email: true, status: true, phone: true },
       });
 
       // ── تعليق تلقائي عند 6+ محاولات ─────────────────────────────────────
@@ -76,12 +76,21 @@ export async function POST(request: NextRequest) {
           where: { email: userEmail },
           data: { status: "suspended", sessionToken: null },
         });
-        // إرسال إيميل التعليق التلقائي
+        // إرسال إيميل التعليق للمشترك + تنبيه الأدمن بالتوازي
         try {
-          await sendAutoSuspendEmail(user.email, user.name, totalAttempts);
+          await Promise.allSettled([
+            sendAutoSuspendEmail(user.email, user.name, totalAttempts),
+            sendAdminAlertEmail({
+              userName: user.name,
+              userEmail: user.email,
+              userPhone: user.phone || null,
+              attemptCount: totalAttempts,
+              page: page ? String(page) : "/",
+            }),
+          ]);
           console.log(`🔒 Auto-suspended ${userEmail} after ${totalAttempts} screenshot attempts`);
         } catch (e: any) {
-          console.error(`❌ Auto-suspend email failed: ${e.message}`);
+          console.error(`❌ Auto-suspend emails failed: ${e.message}`);
         }
         return NextResponse.json({ success: true, totalAttempts, autoSuspended: true });
       }

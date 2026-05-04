@@ -154,6 +154,7 @@ export async function sendAutoSuspendEmail(
         dataLabel: "📋 Geregistreerde gegevens:",
         dataLine: `E-mail: ${toEmail} | Pogingen: ${attemptCount} | Datum: ${dateNL}`,
         contactLabel: "Bezwaar?",
+        whatsapp: "📱 Neem contact op met Sewar Achour via WhatsApp om uw account te herstellen: <a href='https://wa.me/32470813725' style='color:#25d366;font-weight:700;'>+32 470 81 37 25</a>",
         paddingDir: "padding-left:20px",
       },
       // ── فرنسي ──
@@ -172,6 +173,7 @@ export async function sendAutoSuspendEmail(
         dataLabel: "📋 Données enregistrées:",
         dataLine: `E-mail: ${toEmail} | Tentatives: ${attemptCount} | Date: ${dateFR}`,
         contactLabel: "Contestation?",
+        whatsapp: "📱 Contactez Sewar Achour via WhatsApp pour récupérer votre compte: <a href='https://wa.me/32470813725' style='color:#25d366;font-weight:700;'>+32 470 81 37 25</a>",
         paddingDir: "padding-left:20px",
       },
       // ── إنجليزي ──
@@ -190,6 +192,7 @@ export async function sendAutoSuspendEmail(
         dataLabel: "📋 Recorded data:",
         dataLine: `Email: ${toEmail} | Attempts: ${attemptCount} | Date: ${dateEN}`,
         contactLabel: "Appeal?",
+        whatsapp: "📱 Contact Sewar Achour via WhatsApp to restore your account: <a href='https://wa.me/32470813725' style='color:#25d366;font-weight:700;'>+32 470 81 37 25</a>",
         paddingDir: "padding-left:20px",
       },
       // ── عربي ──
@@ -208,6 +211,7 @@ export async function sendAutoSuspendEmail(
         dataLabel: "📋 البيانات المسجلة:",
         dataLine: `البريد: ${toEmail} | المحاولات: ${attemptCount} | التاريخ: ${dateAR}`,
         contactLabel: "للاعتراض:",
+        whatsapp: "📱 يجب التواصل مع سوار عاشور عبر واتساب لإعادة حسابك على الرقم: <a href='https://wa.me/32470813725' style='color:#25d366;font-weight:700;'>0470 81 37 25</a>",
         paddingDir: "padding-right:20px",
       },
     ];
@@ -224,9 +228,12 @@ export async function sendAutoSuspendEmail(
               ${s.bullets.map(b => `<li>${b}</li>`).join("")}
             </ul>
           </div>
-          <div style="background:#fffbeb;border:2px solid #fde68a;border-radius:10px;padding:14px;margin-bottom:16px;">
+          <div style="background:#fffbeb;border:2px solid #fde68a;border-radius:10px;padding:14px;margin-bottom:14px;">
             <p style="color:#92400e;font-size:13px;font-weight:700;margin:0 0 4px;">${s.dataLabel}</p>
             <p style="color:#78350f;font-size:13px;margin:0;">${s.dataLine}</p>
+          </div>
+          <div style="background:#f0fdf4;border:2px solid #bbf7d0;border-radius:10px;padding:14px;margin-bottom:14px;">
+            <p style="color:#166534;font-size:13px;margin:0;">${s.whatsapp}</p>
           </div>
           <p style="color:#6b7280;font-size:13px;margin:0;">
             ${s.contactLabel} <a href="mailto:sewarrijbewijs@gmail.com" style="color:#2563eb;">sewarrijbewijs@gmail.com</a>
@@ -280,6 +287,198 @@ export async function sendAutoSuspendEmail(
     return { success: true };
   } catch (error: any) {
     console.error(`❌ Auto-suspend email failed to ${toEmail}:`, error.message);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * إرسال إيميل تنبيه للأدمن عند تعليق مشترك تلقائياً
+ */
+export async function sendAdminAlertEmail(params: {
+  userName: string;
+  userEmail: string;
+  userPhone: string | null;
+  attemptCount: number;
+  page: string;
+}): Promise<{ success: boolean; error?: string }> {
+  try {
+    const transporter = createTransporter();
+    const { userName, userEmail, userPhone, attemptCount, page } = params;
+
+    // استخراج اسم القسم من الـ URL
+    const sectionMap: Record<string, string> = {
+      "/theorie": "Theorie / النظرية",
+      "/examen": "Examen / الامتحانات",
+      "/gratis": "Gratis / مجاني",
+      "/praktical": "Praktijk / العملي",
+      "/lessons": "Lessen / الدروس",
+    };
+    const section = Object.entries(sectionMap).find(([k]) => page.includes(k))?.[1] || page;
+
+    const dateNL = new Date().toLocaleDateString("nl-BE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+    const dateAR = new Date().toLocaleDateString("ar-EG", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+
+    const subject = `🚨 Sewar Admin Alert – ${userName} opgeschort wegens ${attemptCount} screenshots / تم تعليق ${userName}`;
+
+    const html = `
+<!DOCTYPE html>
+<html lang="nl">
+<head><meta charset="UTF-8"/></head>
+<body style="margin:0;padding:0;background:#f4f6fb;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6fb;padding:24px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);max-width:600px;width:100%;">
+
+        <!-- Header -->
+        <tr>
+          <td style="background:linear-gradient(135deg,#dc2626,#991b1b);padding:24px 36px;text-align:center;">
+            <div style="font-size:40px;margin-bottom:8px;">🚨</div>
+            <h1 style="color:#fff;margin:0;font-size:20px;font-weight:900;">Admin Beveiligingsalert</h1>
+            <p style="color:rgba(255,255,255,0.8);margin:6px 0 0;font-size:13px;">Sewar Rijbewijs Online — Automatische opschorting</p>
+          </td>
+        </tr>
+
+        <!-- NL Section -->
+        <tr>
+          <td style="padding:28px 36px 20px;" dir="ltr">
+            <p style="color:#374151;font-size:15px;margin:0 0 16px;">Beste <strong>Sewar</strong>,</p>
+            <p style="color:#374151;font-size:14px;line-height:1.7;margin:0 0 16px;">
+              Een abonnee heeft <strong style="color:#dc2626;">${attemptCount} pogingen</strong> gedaan om schermafbeeldingen te maken van beschermde inhoud.
+              Het account is <strong>automatisch opgeschort</strong>.
+            </p>
+
+            <!-- Subscriber Info Box -->
+            <div style="background:#fef2f2;border:2px solid #fecaca;border-radius:12px;padding:20px;margin-bottom:16px;">
+              <p style="color:#991b1b;font-size:14px;font-weight:900;margin:0 0 12px;">👤 Abonneegegevens:</p>
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="color:#6b7280;font-size:13px;padding:4px 0;width:120px;">Naam:</td>
+                  <td style="color:#111827;font-size:13px;font-weight:700;">${userName}</td>
+                </tr>
+                <tr>
+                  <td style="color:#6b7280;font-size:13px;padding:4px 0;">E-mail:</td>
+                  <td style="color:#2563eb;font-size:13px;font-weight:700;">
+                    <a href="mailto:${userEmail}" style="color:#2563eb;">${userEmail}</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="color:#6b7280;font-size:13px;padding:4px 0;">Telefoon:</td>
+                  <td style="color:#111827;font-size:13px;font-weight:700;">${userPhone || "Niet opgegeven"}</td>
+                </tr>
+                <tr>
+                  <td style="color:#6b7280;font-size:13px;padding:4px 0;">Sectie:</td>
+                  <td style="color:#dc2626;font-size:13px;font-weight:700;">${section}</td>
+                </tr>
+                <tr>
+                  <td style="color:#6b7280;font-size:13px;padding:4px 0;">Pogingen:</td>
+                  <td style="color:#dc2626;font-size:14px;font-weight:900;">${attemptCount} ×</td>
+                </tr>
+                <tr>
+                  <td style="color:#6b7280;font-size:13px;padding:4px 0;">Datum/tijd:</td>
+                  <td style="color:#111827;font-size:13px;">${dateNL}</td>
+                </tr>
+              </table>
+            </div>
+
+            <div style="background:#eff6ff;border:2px solid #bfdbfe;border-radius:10px;padding:14px;margin-bottom:16px;">
+              <p style="color:#1d4ed8;font-size:13px;font-weight:700;margin:0 0 4px;">✅ Automatisch uitgevoerde acties:</p>
+              <ul style="color:#1e40af;font-size:13px;margin:0;padding-left:18px;line-height:1.8;">
+                <li>Account opgeschort (status = suspended)</li>
+                <li>Sessietoken verwijderd</li>
+                <li>Waarschuwings-e-mail verzonden naar abonnee (4 talen)</li>
+              </ul>
+            </div>
+
+            <p style="color:#6b7280;font-size:13px;margin:0;">
+              Beheer: <a href="https://www.sewarrijbewijsonline.be/admin/subscribers" style="color:#2563eb;">Admin Dashboard</a>
+            </p>
+          </td>
+        </tr>
+
+        <!-- Divider -->
+        <tr><td style="padding:0 36px;"><hr style="border:none;border-top:3px dashed #e5e7eb;margin:0;"/></td></tr>
+
+        <!-- AR Section -->
+        <tr>
+          <td style="padding:28px 36px 20px;" dir="rtl">
+            <p style="color:#374151;font-size:15px;margin:0 0 16px;">مرحباً <strong>سوار</strong>،</p>
+            <p style="color:#374151;font-size:14px;line-height:1.7;margin:0 0 16px;">
+              قام أحد المشتركين بـ <strong style="color:#dc2626;">${attemptCount} محاولة</strong> لتصوير المحتوى المحمي.
+              تم <strong>تعليق حسابه تلقائياً</strong>.
+            </p>
+
+            <!-- بيانات المشترك -->
+            <div style="background:#fef2f2;border:2px solid #fecaca;border-radius:12px;padding:20px;margin-bottom:16px;">
+              <p style="color:#991b1b;font-size:14px;font-weight:900;margin:0 0 12px;">👤 بيانات المشترك:</p>
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="color:#6b7280;font-size:13px;padding:4px 0;width:120px;">الاسم:</td>
+                  <td style="color:#111827;font-size:13px;font-weight:700;">${userName}</td>
+                </tr>
+                <tr>
+                  <td style="color:#6b7280;font-size:13px;padding:4px 0;">البريد:</td>
+                  <td style="color:#2563eb;font-size:13px;font-weight:700;">
+                    <a href="mailto:${userEmail}" style="color:#2563eb;">${userEmail}</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="color:#6b7280;font-size:13px;padding:4px 0;">الهاتف:</td>
+                  <td style="color:#111827;font-size:13px;font-weight:700;">${userPhone || "غير محدد"}</td>
+                </tr>
+                <tr>
+                  <td style="color:#6b7280;font-size:13px;padding:4px 0;">القسم:</td>
+                  <td style="color:#dc2626;font-size:13px;font-weight:700;">${section}</td>
+                </tr>
+                <tr>
+                  <td style="color:#6b7280;font-size:13px;padding:4px 0;">المحاولات:</td>
+                  <td style="color:#dc2626;font-size:14px;font-weight:900;">${attemptCount} ×</td>
+                </tr>
+                <tr>
+                  <td style="color:#6b7280;font-size:13px;padding:4px 0;">التاريخ:</td>
+                  <td style="color:#111827;font-size:13px;">${dateAR}</td>
+                </tr>
+              </table>
+            </div>
+
+            <div style="background:#eff6ff;border:2px solid #bfdbfe;border-radius:10px;padding:14px;margin-bottom:16px;">
+              <p style="color:#1d4ed8;font-size:13px;font-weight:700;margin:0 0 4px;">✅ الإجراءات المنفذة تلقائياً:</p>
+              <ul style="color:#1e40af;font-size:13px;margin:0;padding-right:18px;line-height:1.8;">
+                <li>تم تعليق الحساب (status = suspended)</li>
+                <li>تم حذف رمز الجلسة</li>
+                <li>تم إرسال إيميل تحذير للمشترك (4 لغات)</li>
+              </ul>
+            </div>
+
+            <p style="color:#6b7280;font-size:13px;margin:0;">
+              لوحة التحكم: <a href="https://www.sewarrijbewijsonline.be/admin/subscribers" style="color:#2563eb;">Admin Dashboard</a>
+            </p>
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="background:#f9fafb;padding:16px 36px;text-align:center;border-top:1px solid #e5e7eb;">
+            <p style="color:#9ca3af;font-size:11px;margin:0;">© ${new Date().getFullYear()} Sewar Rijbewijs Online — Automatisch gegenereerd bericht</p>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+    await transporter.sendMail({
+      from: `"Sewar Rijbewijs Online – Alert" <${process.env.SMTP_USER}>`,
+      to: "sewarrijbewijs@gmail.com",
+      subject,
+      html,
+    });
+
+    console.log(`✅ Admin alert email sent for ${userEmail}`);
+    return { success: true };
+  } catch (error: any) {
+    console.error(`❌ Admin alert email failed:`, error.message);
     return { success: false, error: error.message };
   }
 }
