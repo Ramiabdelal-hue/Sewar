@@ -86,8 +86,8 @@ function MultiImageGrid({ urls }: { urls: string[] }) {
       const cellWidth = containerWidth / 2;
       // نحسب الارتفاع الذي ستأخذه كل صورة بعد تمددها لعرض الخلية
       const heights = dims.map(({ w, h }) => (h / w) * cellWidth);
-      // نأخذ أكبر ارتفاع مع تصغير 25%
-      const maxHeight = Math.max(...heights) * 0.75;
+      // نأخذ أكبر ارتفاع مع تصغير 25% ثم تكبير 20% في الطول
+      const maxHeight = Math.max(...heights) * 0.75 * 1.20;
       setCellHeight(Math.round(maxHeight));
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
