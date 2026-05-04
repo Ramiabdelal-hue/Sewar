@@ -69,7 +69,6 @@ export async function POST(request: NextRequest) {
           select: { name: true, email: true },
         });
         if (user) {
-          // إرسال synchronous حتى نرى الخطأ في logs
           try {
             const result = await sendScreenshotWarningEmail(user.email, user.name, totalAttempts);
             if (result.success) {
@@ -82,6 +81,9 @@ export async function POST(request: NextRequest) {
           }
         }
       }
+
+      // إرجاع العدد الكلي للفرونت لإظهار التحذير
+      return NextResponse.json({ success: true, totalAttempts });
     }
 
     return NextResponse.json({ success: true });

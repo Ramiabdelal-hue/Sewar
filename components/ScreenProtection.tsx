@@ -1,63 +1,181 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { useLang } from '@/context/LangContext';
 
-// دائماً يقرأ من localStorage في لحظة الاستدعاء (ليس عند التعريف)
 function getEmail(): string | null {
   try { return localStorage.getItem('userEmail'); } catch { return null; }
 }
 
-function reportScreenshot(reason: string) {
-  // يقرأ الـ email في لحظة الإرسال — ليس عند تعريف الدالة
-  const email = getEmail();
-  fetch('/api/activity', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      userEmail: email || null,
-      eventType: 'screenshot_attempt',
-      page: window.location.pathname + '?reason=' + reason,
-    }),
-  }).catch(() => {});
-}
+// عداد محلي للـ screenshots في هذه الجلسة
+let sessionScreenshotCount = 0;
 
-// منع التسجيل المتكرر لنفس السبب في فترة قصيرة
+// منع التسجيل المتكرر
 const recentReports: Record<string, number> = {};
-function reportOnce(reason: string, cooldownMs = 3000) {
+function reportOnce(reason: string, cooldownMs = 3000): boolean {
   const now = Date.now();
-  if (recentReports[reason] && now - recentReports[reason] < cooldownMs) return;
+  if (recentReports[reason] && now - recentReports[reason] < cooldownMs) return false;
   recentReports[reason] = now;
-  reportScreenshot(reason);
+  return true;
 }
 
+async function reportScreenshot(reason: string): Promise<number> {
+  const email = getEmail();
+  try {
+    const res = await fetch('/api/activity', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userEmail: email || null,
+        eventType: 'screenshot_attempt',
+        page: window.location.pathname + '?reason=' + reason,
+      }),
+    });
+    // جلب العدد الكلي من السيرفر إذا أمكن
+    const data = await res.json().catch(() => ({}));
+    return data.totalAttempts || ++sessionScreenshotCount;
+  } catch {
+    return ++sessionScreenshotCount;
+  }
+}
+
+// ── مكون رسالة التحذير ───────────────────────────────────────────────────────
+function WarningOverlay({ lang, onClose }: { lang: string; onClose: () => void }) {
+  const isRtl = lang === 'ar';
+
+  const messages: Record<string, { title: string; body: string; btn: string }> = {
+    ar: {
+      title: '⚠️ تحذير أمني',
+      body: 'تم رصد محاولات تصوير الشاشة على حسابك.\n\nأنت تحت المراقبة الكاملة. الاستمرار في تصوير المحتوى المحمي سيؤدي إلى:\n• تعليق حسابك فوراً\n• ملاحقتك قانونياً بموجب قوانين حقوق الملكية الفكرية البلجيكية',
+      btn: 'فهمت — لن أكرر ذلك',
+    },
+    nl: {
+      title: '⚠️ Beveiligingswaarschuwing',
+      body: 'Er zijn schermafbeeldingspogingen gedetecteerd op uw account.\n\nU staat onder volledige bewaking. Doorgaan met het fotograferen van beschermde inhoud leidt tot:\n• Onmiddellijke opschorting van uw account\n• Juridische vervolging op grond van Belgische auteursrechtwetten',
+      btn: 'Begrepen — ik stop hiermee',
+    },
+    fr: {
+      title: '⚠️ Avertissement de sécurité',
+      body: 'Des tentatives de capture d\'écran ont été détectées sur votre compte.\n\nVous êtes sous surveillance complète. Continuer à photographier le contenu protégé entraînera:\n• La suspension immédiate de votre compte\n• Des poursuites judiciaires en vertu des lois belges sur le droit d\'auteur',
+      btn: 'Compris — j\'arrête',
+    },
+    en: {
+      title: '⚠️ Security Warning',
+      body: 'Screenshot attempts have been detected on your account.\n\nYou are under full surveillance. Continuing to capture protected content will result in:\n• Immediate account suspension\n• Legal prosecution under Belgian intellectual property laws',
+      btn: 'Understood — I will stop',
+    },
+  };
+
+  const m = messages[lang] || messages.nl;
+
+  return (
+    <div
+      className="fixed inset-0 z-[99999] flex items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(6px)' }}
+      dir={isRtl ? 'rtl' : 'ltr'}
+    >
+      {/* بطاقة التحذير */}
+      <div
+        className="w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl"
+        style={{ background: 'white', border: '3px solid #ef4444' }}
+      >
+        {/* شريط أحمر علوي */}
+        <div
+          className="px-5 py-4 flex items-center gap-3"
+          style={{ background: 'linear-gradient(135deg, #dc2626, #991b1b)' }}
+        >
+          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 text-2xl">
+            🚨
+          </div>
+          <h2 className="text-white font-black text-base">{m.title}</h2>
+        </div>
+
+        {/* المحتوى */}
+        <div className="px-5 py-4">
+          {m.body.split('\n').map((line, i) => (
+            <p
+              key={i}
+              className={`text-sm leading-relaxed ${
+                line.startsWith('•')
+                  ? 'text-red-700 font-bold mt-1 ml-2'
+                  : line === ''
+                  ? 'mt-2'
+                  : 'text-gray-800 font-medium'
+              }`}
+            >
+              {line}
+            </p>
+          ))}
+
+          {/* شريط ألوان بلجيكي */}
+          <div className="flex mt-4 rounded-full overflow-hidden h-1">
+            <div className="flex-1" style={{ background: '#1a1a1a' }} />
+            <div className="flex-1" style={{ background: '#f5a623' }} />
+            <div className="flex-1" style={{ background: '#e63946' }} />
+          </div>
+
+          <p className="text-[10px] text-gray-400 text-center mt-2 font-medium">
+            © Sewar Rijbewijs Online — Alle rechten voorbehouden
+          </p>
+        </div>
+
+        {/* زر الإغلاق */}
+        <div className="px-5 pb-5">
+          <button
+            onClick={onClose}
+            className="w-full py-3 rounded-xl font-black text-sm text-white transition-all active:scale-95"
+            style={{ background: 'linear-gradient(135deg, #dc2626, #991b1b)' }}
+          >
+            {m.btn}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── المكون الرئيسي ────────────────────────────────────────────────────────────
 export default function ScreenProtection() {
   const pathname = usePathname();
+  const { lang } = useLang();
   const isAdmin = pathname.startsWith('/admin');
+  const [showWarning, setShowWarning] = useState(false);
 
   useEffect(() => {
     if (isAdmin) return;
 
-    // ── 1. منع النسخ ─────────────────────────────────────────────────────────
+    const WARN_THRESHOLD = 3; // أظهر التحذير بعد 3 محاولات
+
+    async function handleScreenshot(reason: string, cooldown = 3000) {
+      if (!reportOnce(reason, cooldown)) return;
+      const total = await reportScreenshot(reason);
+      sessionScreenshotCount = total;
+      if (total >= WARN_THRESHOLD) {
+        setShowWarning(true);
+      }
+    }
+
+    // ── Copy ──────────────────────────────────────────────────────────────────
     const onCopy = (e: ClipboardEvent) => {
       e.preventDefault();
-      reportOnce('copy-attempt');
+      handleScreenshot('copy-attempt');
     };
 
     const onCut = (e: ClipboardEvent) => {
       e.preventDefault();
     };
 
-    // ── 2. اختصارات لوحة المفاتيح ────────────────────────────────────────────
+    // ── Keyboard ──────────────────────────────────────────────────────────────
     const onKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
         e.preventDefault();
-        reportOnce('print');
+        handleScreenshot('print');
         return;
       }
       if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
         e.preventDefault();
-        reportOnce('copy-keyboard');
+        handleScreenshot('copy-keyboard');
         return;
       }
       if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
@@ -66,39 +184,38 @@ export default function ScreenProtection() {
       }
       if (e.key === 'PrintScreen') {
         e.preventDefault();
-        reportOnce('printscreen');
+        handleScreenshot('printscreen');
         return;
       }
       if (e.shiftKey && e.key === 'S' && (e.metaKey || (e.getModifierState && e.getModifierState('OS')))) {
-        reportOnce('snipping');
+        handleScreenshot('snipping');
         return;
       }
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 's') {
-        reportOnce('ctrl-shift-s');
+        handleScreenshot('ctrl-shift-s');
         return;
       }
     };
 
-    // ── 3. visibilitychange — فقط في الصفحات المحمية وبـ cooldown ────────────
+    // ── Visibility (iOS/Android screenshot) ───────────────────────────────────
     const protectedPaths = ['/theorie/lesson', '/gratis/lesson', '/gratis/exam', '/examen', '/praktical'];
     const isProtected = protectedPaths.some(p => pathname.startsWith(p));
 
     const onVisibility = () => {
       if (document.visibilityState === 'hidden' && isProtected) {
-        // cooldown 10 ثوانٍ لتجنب التسجيل عند تبديل التطبيقات
-        reportOnce('visibility-hidden', 10000);
+        handleScreenshot('visibility-hidden', 10000);
       }
     };
 
-    // ── 4. Right-click في الصفحات المحمية ────────────────────────────────────
+    // ── Right-click ───────────────────────────────────────────────────────────
     const onContextMenu = (e: MouseEvent) => {
       if (isProtected) {
         e.preventDefault();
-        reportOnce('right-click', 5000);
+        handleScreenshot('right-click', 5000);
       }
     };
 
-    // ── 5. كشف DevTools ───────────────────────────────────────────────────────
+    // ── DevTools ──────────────────────────────────────────────────────────────
     let devtoolsOpen = false;
     const checkDevTools = () => {
       const threshold = 160;
@@ -107,13 +224,13 @@ export default function ScreenProtection() {
         window.outerHeight - window.innerHeight > threshold;
       if (isOpen && !devtoolsOpen) {
         devtoolsOpen = true;
-        reportOnce('devtools-open', 30000);
+        handleScreenshot('devtools-open', 30000);
       } else if (!isOpen) {
         devtoolsOpen = false;
       }
     };
 
-    // ── 6. منع تحديد النص ────────────────────────────────────────────────────
+    // ── Select ────────────────────────────────────────────────────────────────
     const onSelectStart = (e: Event) => {
       const target = e.target as HTMLElement;
       const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
@@ -139,5 +256,11 @@ export default function ScreenProtection() {
     };
   }, [pathname, isAdmin]);
 
-  return null;
+  return (
+    <>
+      {showWarning && (
+        <WarningOverlay lang={lang} onClose={() => setShowWarning(false)} />
+      )}
+    </>
+  );
 }
