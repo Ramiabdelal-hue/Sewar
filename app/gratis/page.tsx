@@ -20,20 +20,6 @@ function GratisContent() {
   const t = translations[lang];
   const isRtl = lang === "ar";
 
-  const [isUnlocked, setIsUnlocked] = useState(false);
-  const [loginUser, setLoginUser] = useState("");
-  const [loginPass, setLoginPass] = useState("");
-  const [loginError, setLoginError] = useState(false);
-
-  const handleUnlock = () => {
-    if (loginUser === "sewar" && loginPass === "70709090") {
-      setIsUnlocked(true);
-      setLoginError(false);
-    } else {
-      setLoginError(true);
-    }
-  };
-
   const catParam = searchParams.get("cat")?.toUpperCase() || "B";
   const [selectedCat, setSelectedCat] = useState(catParam);
   const [lessons, setLessons] = useState<any[]>([]);
@@ -77,70 +63,6 @@ function GratisContent() {
   }, [selectedCat]);
 
   const translatedTitles = useAutoTranslateList(lessons.map(l => l.title), lang);
-
-  if (!isUnlocked) {
-    return (
-      <div className="min-h-screen flex flex-col" style={{ background: "#f0f0f0", overflowX: "hidden", maxWidth: "100vw" }}>
-        <Navbar />
-        <div className="flex-1 flex items-center justify-center px-4 py-6">
-          <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm text-center">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3"
-              style={{ background: "linear-gradient(135deg, #f97316, #ea580c)" }}>
-              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-              </svg>
-            </div>
-            <div className="mb-2 px-3 py-1 rounded-full inline-block" style={{ background: "#fff7ed", border: "1.5px solid #fed7aa" }}>
-              <span className="text-xs font-black uppercase tracking-widest" style={{ color: "#ea580c" }}>
-                {lang === "ar" ? "إشعار مؤقت" : lang === "nl" ? "Tijdelijke melding" : lang === "fr" ? "Avis temporaire" : "Temporary notice"}
-              </span>
-            </div>
-            <h2 className="text-xl font-black mb-2" style={{ color: "#1a1a1a" }}>
-              {lang === "ar" ? "🚧 قيد المعالجة مؤقتاً 🚧" : lang === "nl" ? "🚧 Tijdelijk in behandeling 🚧" : lang === "fr" ? "🚧 Temporairement en traitement 🚧" : "🚧 Temporarily Under Maintenance 🚧"}
-            </h2>
-            <p className="text-gray-500 text-sm mb-1">
-              {lang === "ar" ? "نعمل على تحسين هذه الصفحة وستعود قريباً." : lang === "nl" ? "We werken aan verbetering van deze pagina. Ze komt binnenkort terug." : lang === "fr" ? "Nous travaillons à l'amélioration de cette page. Elle reviendra bientôt." : "We are improving this page. It will be back soon."}
-            </p>
-            <p className="text-xs font-bold mb-4" style={{ color: "#ea580c" }}>
-              {lang === "ar" ? "نعتذر عن الإزعاج 🙏" : lang === "nl" ? "Onze excuses voor het ongemak 🙏" : lang === "fr" ? "Nous nous excusons pour la gêne 🙏" : "We apologize for the inconvenience 🙏"}
-            </p>
-            <div className="space-y-3">
-              <input
-                type="text"
-                value={loginUser}
-                onChange={e => setLoginUser(e.target.value)}
-                placeholder="Username"
-                autoComplete="username"
-                className="w-full px-4 py-3 rounded-xl text-base font-medium focus:outline-none"
-                style={{ border: "1.5px solid #e5e7eb", background: "#f9fafb", fontSize: "16px" }}
-              />
-              <input
-                type="password"
-                value={loginPass}
-                onChange={e => setLoginPass(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && handleUnlock()}
-                placeholder="Password"
-                autoComplete="current-password"
-                className="w-full px-4 py-3 rounded-xl text-base font-medium focus:outline-none"
-                style={{ border: loginError ? "1.5px solid #ef4444" : "1.5px solid #e5e7eb", background: "#f9fafb", fontSize: "16px" }}
-              />
-              {loginError && (
-                <p className="text-red-500 text-xs font-bold">
-                  {lang === "ar" ? "بيانات خاطئة" : lang === "nl" ? "Onjuiste gegevens" : "Incorrect credentials"}
-                </p>
-              )}
-              <button onClick={handleUnlock}
-                className="w-full py-3 rounded-xl font-black text-white text-sm transition-all active:scale-95"
-                style={{ background: "linear-gradient(135deg, #7c3aed, #5b21b6)" }}>
-                {lang === "ar" ? "دخول" : lang === "nl" ? "Inloggen" : "Login"}
-              </button>
-            </div>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex flex-col" dir={isRtl ? "rtl" : "ltr"} style={{ background: "#f0f0f0", overflowX: "hidden", maxWidth: "100vw" }}>
