@@ -3,125 +3,121 @@
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 
-function getEmail() {
+// دائماً يقرأ من localStorage في لحظة الاستدعاء (ليس عند التعريف)
+function getEmail(): string | null {
   try { return localStorage.getItem('userEmail'); } catch { return null; }
 }
 
 function reportScreenshot(reason: string) {
+  // يقرأ الـ email في لحظة الإرسال — ليس عند تعريف الدالة
   const email = getEmail();
   fetch('/api/activity', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      userEmail: email,
+      userEmail: email || null,
       eventType: 'screenshot_attempt',
       page: window.location.pathname + '?reason=' + reason,
     }),
   }).catch(() => {});
 }
 
+// منع التسجيل المتكرر لنفس السبب في فترة قصيرة
+const recentReports: Record<string, number> = {};
+function reportOnce(reason: string, cooldownMs = 3000) {
+  const now = Date.now();
+  if (recentReports[reason] && now - recentReports[reason] < cooldownMs) return;
+  recentReports[reason] = now;
+  reportScreenshot(reason);
+}
+
 export default function ScreenProtection() {
   const pathname = usePathname();
-
-  // الأدمن مستثنى من كل الحماية
   const isAdmin = pathname.startsWith('/admin');
 
   useEffect(() => {
     if (isAdmin) return;
 
-    // ── 1. منع النسخ (Copy) في كل الصفحات ──────────────────────────────────
+    // ── 1. منع النسخ ─────────────────────────────────────────────────────────
     const onCopy = (e: ClipboardEvent) => {
       e.preventDefault();
-      reportScreenshot('copy-attempt');
+      reportOnce('copy-attempt');
     };
 
-    // ── 2. منع القص (Cut) ────────────────────────────────────────────────────
     const onCut = (e: ClipboardEvent) => {
       e.preventDefault();
     };
 
-    // ── 3. منع الطباعة + تسجيل ──────────────────────────────────────────────
+    // ── 2. اختصارات لوحة المفاتيح ────────────────────────────────────────────
     const onKeyDown = (e: KeyboardEvent) => {
-      // Ctrl+P أو Cmd+P (طباعة)
       if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
         e.preventDefault();
-        reportScreenshot('print');
+        reportOnce('print');
         return;
       }
-      // Ctrl+C أو Cmd+C (نسخ)
       if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
         e.preventDefault();
-        reportScreenshot('copy-keyboard');
+        reportOnce('copy-keyboard');
         return;
       }
-      // Ctrl+A أو Cmd+A (تحديد الكل)
       if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
         e.preventDefault();
         return;
       }
-      // PrintScreen
       if (e.key === 'PrintScreen') {
         e.preventDefault();
-        reportScreenshot('printscreen');
+        reportOnce('printscreen');
         return;
       }
-      // Windows Snipping Tool: Win+Shift+S
       if (e.shiftKey && e.key === 'S' && (e.metaKey || (e.getModifierState && e.getModifierState('OS')))) {
-        reportScreenshot('snipping');
+        reportOnce('snipping');
         return;
       }
-      // Ctrl+Shift+S
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 's') {
-        reportScreenshot('ctrl-shift-s');
+        reportOnce('ctrl-shift-s');
         return;
       }
     };
 
-    // ── 4. كشف screenshot عبر visibilitychange (iOS/Android) ────────────────
-    const onVisibility = () => {
-      if (document.visibilityState === 'hidden') {
-        const protectedPaths = ['/theorie/lesson', '/gratis/lesson', '/gratis/exam', '/examen', '/praktical'];
-        const isProtected = protectedPaths.some(p => pathname.startsWith(p));
-        if (isProtected) {
-          reportScreenshot('visibility-hidden');
-        }
-      }
-    };
-
-    // ── 5. منع Right-click على الصفحات المحمية ──────────────────────────────
+    // ── 3. visibilitychange — فقط في الصفحات المحمية وبـ cooldown ────────────
     const protectedPaths = ['/theorie/lesson', '/gratis/lesson', '/gratis/exam', '/examen', '/praktical'];
     const isProtected = protectedPaths.some(p => pathname.startsWith(p));
 
-    const onContextMenu = (e: MouseEvent) => {
-      if (isProtected) {
-        e.preventDefault();
-        reportScreenshot('right-click');
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden' && isProtected) {
+        // cooldown 10 ثوانٍ لتجنب التسجيل عند تبديل التطبيقات
+        reportOnce('visibility-hidden', 10000);
       }
     };
 
-    // ── 6. كشف DevTools ──────────────────────────────────────────────────────
+    // ── 4. Right-click في الصفحات المحمية ────────────────────────────────────
+    const onContextMenu = (e: MouseEvent) => {
+      if (isProtected) {
+        e.preventDefault();
+        reportOnce('right-click', 5000);
+      }
+    };
+
+    // ── 5. كشف DevTools ───────────────────────────────────────────────────────
     let devtoolsOpen = false;
     const checkDevTools = () => {
       const threshold = 160;
-      const widthDiff = window.outerWidth - window.innerWidth;
-      const heightDiff = window.outerHeight - window.innerHeight;
-      const isOpen = widthDiff > threshold || heightDiff > threshold;
+      const isOpen =
+        window.outerWidth - window.innerWidth > threshold ||
+        window.outerHeight - window.innerHeight > threshold;
       if (isOpen && !devtoolsOpen) {
         devtoolsOpen = true;
-        reportScreenshot('devtools-open');
+        reportOnce('devtools-open', 30000);
       } else if (!isOpen) {
         devtoolsOpen = false;
       }
     };
 
-    // ── 7. منع تحديد النص بالماوس ────────────────────────────────────────────
+    // ── 6. منع تحديد النص ────────────────────────────────────────────────────
     const onSelectStart = (e: Event) => {
-      // السماح بالتحديد في حقول الإدخال فقط
       const target = e.target as HTMLElement;
       const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
-      if (!isInput) {
-        e.preventDefault();
-      }
+      if (!isInput) e.preventDefault();
     };
 
     document.addEventListener('copy', onCopy);
