@@ -5,7 +5,7 @@ import { useLang } from "@/context/LangContext";
 const messages: Record<string, string[]> = {
   nl: [
     "🌐 Sewar Rijbewijs Online — Officiële leerplatform voor rijbewijstheorie in België",
-    "👤 Eigenaar: Sewar Rijbewijs Online",
+    "Eigenaar: Sewar Rijbewijs Online",
     "💻 Ontworpen & ontwikkeld door: Rami Abdelal",
     "⚠️ Waarschuwing: Bij 3 of meer schermafbeeldingen wordt uw abonnement automatisch en onmiddellijk opgeschort",
     "⚖️ Juridische gevolgen: Verspreiding van beschermde inhoud leidt tot juridische vervolging op grond van Belgische auteursrechtwetten",
@@ -15,7 +15,7 @@ const messages: Record<string, string[]> = {
   ],
   fr: [
     "🌐 Sewar Rijbewijs Online — Plateforme officielle d'apprentissage du code de la route en Belgique",
-    "👤 Propriétaire: Sewar Rijbewijs Online",
+    "Propriétaire: Sewar Rijbewijs Online",
     "💻 Conçu & développé par: Rami Abdelal",
     "⚠️ Avertissement: Après 3 captures d'écran ou plus, votre abonnement sera automatiquement et immédiatement suspendu",
     "⚖️ Conséquences juridiques: La diffusion de contenu protégé entraîne des poursuites judiciaires selon les lois belges sur le droit d'auteur",
@@ -25,7 +25,7 @@ const messages: Record<string, string[]> = {
   ],
   ar: [
     "🌐 Sewar Rijbewijs Online — المنصة الرسمية لتعليم نظرية رخصة القيادة في بلجيكا",
-    "👤 مالك الموقع: Sewar Rijbewijs Online",
+    "مالك الموقع: Sewar Rijbewijs Online",
     "💻 تصميم وتطوير: رامي عبد العال",
     "⚠️ تحذير: عند التقاط 3 لقطات شاشة أو أكثر سيتم إيقاف اشتراكك تلقائياً وفوراً بدون إنذار",
     "⚖️ العقوبات القانونية: نشر أو توزيع المحتوى المحمي يُعرّضك للملاحقة القضائية بموجب قوانين حقوق الملكية الفكرية البلجيكية",
@@ -35,7 +35,7 @@ const messages: Record<string, string[]> = {
   ],
   en: [
     "🌐 Sewar Rijbewijs Online — Official driving theory learning platform in Belgium",
-    "👤 Owner: Sewar Rijbewijs Online",
+    "Owner: Sewar Rijbewijs Online",
     "💻 Designed & developed by: Rami Abdelal",
     "⚠️ Warning: After 3 or more screenshot attempts, your subscription will be automatically and immediately suspended",
     "⚖️ Legal consequences: Distributing protected content leads to legal prosecution under Belgian intellectual property laws",

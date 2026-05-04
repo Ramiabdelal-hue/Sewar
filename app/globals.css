@@ -151,24 +151,17 @@ img, video {
 
 .ticker-wrapper {
   overflow: hidden;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  height: 34px;
-  min-height: 34px;
   background: linear-gradient(135deg, #0a1628, #0d2d5e);
   border-bottom: 2px solid #f5a623;
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
+  padding: 6px 0;
 }
 
 .ticker-track {
   display: inline-flex;
+  flex-wrap: nowrap;
   white-space: nowrap;
   animation: ticker-scroll 10s linear infinite;
   will-change: transform;
-  align-items: center;
-  flex-shrink: 0;
 }
 
 .ticker-track:hover {
@@ -176,19 +169,19 @@ img, video {
 }
 
 .ticker-item {
-  font-size: 12px !important;
+  display: inline-block;
+  white-space: nowrap;
+  font-size: 12px;
   font-weight: 700;
   color: #ffffff;
-  padding: 0 16px;
+  padding: 0 20px;
   flex-shrink: 0;
-  line-height: 34px;
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
+  line-height: 1.4;
 }
 
 .ticker-sep {
+  display: inline-block;
   color: #f5a623;
-  margin: 0 8px;
-  font-size: 9px !important;
-  line-height: 34px;
+  font-size: 8px;
+  vertical-align: middle;
 }
