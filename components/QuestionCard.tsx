@@ -216,6 +216,7 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
       {question.videoUrls && question.videoUrls.filter(Boolean).length > 0 && (
         <div>
           {question.videoUrls.filter(Boolean).length === 1 ? (
+            /* صورة واحدة — عرض كامل بحجمها الطبيعي */
             <div className="relative select-none bg-gray-100">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -227,14 +228,15 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
               />
             </div>
           ) : (
-            <div className="grid bg-gray-100 p-1 gap-1" style={{ gridTemplateColumns: "1fr 1fr" }}>
+            /* صورتان أو أكثر — كل صورة بحجمها الطبيعي بدون قص */
+            <div className="bg-gray-100 p-1 flex flex-col gap-1">
               {question.videoUrls.filter(Boolean).map((url, i) => (
-                <div key={i} className="relative select-none rounded overflow-hidden">
+                <div key={i} className="relative select-none">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={url}
                     alt=""
-                    style={{ width: "100%", height: "100%", display: "block", objectFit: "cover" }}
+                    style={{ width: "100%", height: "auto", display: "block" }}
                     draggable={false}
                     onContextMenu={e => e.preventDefault()}
                   />
