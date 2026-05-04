@@ -282,7 +282,7 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
         <div>
           {question.videoUrls.filter(Boolean).length === 1 ? (
             /* صورة واحدة — الصندوق بارتفاع محدود والصورة تملأه بالكامل */
-            <div className="relative select-none" style={{ height: "220px", overflow: "hidden" }}>
+            <div className="relative select-none" style={{ height: "253px", overflow: "hidden" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={question.videoUrls.filter(Boolean)[0]}
