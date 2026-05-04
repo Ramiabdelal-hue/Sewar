@@ -417,7 +417,7 @@ export default function AdminQuestionsPage() {
   const t = adminTranslations[lang as keyof typeof adminTranslations];
 
   // ── fetch مع timeout تلقائي + retry ──────────────────────────────────────
-  const fetchWithTimeout = async (url: string, options: RequestInit, timeoutMs = 20000): Promise<Response> => {
+  const fetchWithTimeout = async (url: string, options: RequestInit, timeoutMs = 30000): Promise<Response> => {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
@@ -426,7 +426,7 @@ export default function AdminQuestionsPage() {
       return res;
     } catch (err: any) {
       clearTimeout(timer);
-      if (err.name === "AbortError") throw new Error("انتهت مهلة الاتصال — حاول مرة أخرى");
+      if (err.name === "AbortError") throw new Error("انتهت مهلة الاتصال (30 ثانية) — حاول مرة أخرى");
       throw err;
     }
   };
