@@ -1195,45 +1195,89 @@ export default function AdminQuestionsPage() {
 
   // شاشة اختيار subtype لـ Theori
   if (questionType === "Theori" && !questionSubType) {
+    const isRtlAdmin = lang === "ar";
     return (
-      <div className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0a0a2e 0%, #001a6e 50%, #0a0a2e 100%)" }}>
+      <div className="min-h-screen flex items-center justify-center relative overflow-hidden" dir={isRtlAdmin ? "rtl" : "ltr"} style={{ background: "linear-gradient(160deg, #f8faff 0%, #eef2ff 50%, #f0f4ff 100%)" }}>
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full opacity-15 blur-3xl" style={{ background: "#22c55e" }}></div>
           <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full opacity-15 blur-3xl" style={{ background: "#f97316" }}></div>
+          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle, #7c3aed 1px, transparent 1px)", backgroundSize: "28px 28px" }}></div>
         </div>
+
+        {/* زرا اللغة */}
+        <div className="absolute top-4 right-4 flex gap-1.5 z-20">
+          {[{ code: "nl", label: "NL" }, { code: "ar", label: "AR" }].map(({ code, label }) => (
+            <button key={code} onClick={() => setLang(code as any)}
+              className="px-3 py-1.5 rounded-lg text-xs font-black transition-all"
+              style={lang === code
+                ? { background: "linear-gradient(135deg,#7c3aed,#5b21b6)", color: "white" }
+                : { background: "white", color: "#6b7280", border: "1.5px solid #e5e7eb" }}>
+              {label}
+            </button>
+          ))}
+        </div>
+
         <div className="relative z-10 w-full max-w-lg px-6">
-          <div className="text-center mb-10">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", boxShadow: "0 15px 40px rgba(34,197,94,0.4)" }}>
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="text-center mb-8">
+            <div className="w-14 h-14 mx-auto mb-4 rounded-2xl flex items-center justify-center shadow-xl"
+              style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", boxShadow: "0 12px 32px rgba(34,197,94,0.35)" }}>
+              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
             </div>
-            <h1 className="text-2xl font-black text-white mb-1">Theorie</h1>
-            <p className="text-white/40 text-sm">اختر نوع الأسئلة</p>
+            <h1 className="text-2xl font-black mb-1" style={{ color: "#1a1a1a" }}>
+              {lang === "ar" ? "النظرية" : "Theorie"}
+            </h1>
+            <p className="text-sm" style={{ color: "#9ca3af" }}>
+              {lang === "ar" ? "اختر نوع المحتوى" : "Kies het type inhoud"}
+            </p>
           </div>
+
           <div className="grid grid-cols-2 gap-4">
             {[
-              { label: "إضافة شرح الدروس", sub: "تظهر في صفحة الدرس", color: "#22c55e", icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13", onClick: () => setQuestionSubType("lessons") },
-              { label: "أسئلة الامتحانات", sub: "تظهر في زر Exam", color: "#f97316", icon: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138z", onClick: () => { setQuestionSubType("exam"); setQuestionType("Examen"); } },
+              {
+                label: lang === "ar" ? "شرح الدروس" : "Uitleg lessen",
+                sub: lang === "ar" ? "تظهر في صفحة الدرس" : "Verschijnt op de lespagina",
+                color: "#22c55e",
+                icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13",
+                onClick: () => setQuestionSubType("lessons"),
+              },
+              {
+                label: lang === "ar" ? "أسئلة الامتحانات" : "Examenvragen",
+                sub: lang === "ar" ? "تظهر في زر Exam" : "Verschijnt bij de Exam-knop",
+                color: "#f97316",
+                icon: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138z",
+                onClick: () => { setQuestionSubType("exam"); setQuestionType("Examen"); },
+              },
             ].map(({ label, sub, color, icon, onClick }) => (
               <button key={label} onClick={onClick}
-                className="group relative overflow-hidden rounded-2xl p-6 text-center transition-all duration-300 hover:scale-105 active:scale-95"
-                style={{ background: `${color}12`, border: `1.5px solid ${color}40` }}>
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" style={{ background: `radial-gradient(circle at center, ${color}20, transparent)` }}></div>
+                className="group relative overflow-hidden rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-xl active:scale-95"
+                style={{ background: "white", border: `1.5px solid ${color}30`, boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+                <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl" style={{ background: `linear-gradient(90deg, ${color}, ${color}88)` }}></div>
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"
+                  style={{ background: `radial-gradient(circle at center, ${color}10, transparent)` }}></div>
                 <div className="relative z-10">
-                  <div className="w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${color}, ${color}cc)`, boxShadow: `0 8px 20px ${color}40` }}>
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} /></svg>
+                  <div className="w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center"
+                    style={{ background: `linear-gradient(135deg, ${color}20, ${color}10)`, border: `1.5px solid ${color}30` }}>
+                    <svg className="w-6 h-6" style={{ color }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
+                    </svg>
                   </div>
-                  <p className="text-sm font-black text-white mb-0.5">{label}</p>
-                  <p className="text-xs text-white/40">{sub}</p>
+                  <p className="text-sm font-black mb-0.5" style={{ color: "#1a1a1a" }}>{label}</p>
+                  <p className="text-xs" style={{ color: "#9ca3af" }}>{sub}</p>
                 </div>
               </button>
             ))}
           </div>
+
           <div className="mt-8 text-center">
-            <button onClick={() => setQuestionType("")} className="inline-flex items-center gap-2 text-white/40 hover:text-white/70 text-sm transition-colors">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-              رجوع
+            <button onClick={() => setQuestionType("")}
+              className="inline-flex items-center gap-2 text-sm font-bold transition-colors px-4 py-2 rounded-lg hover:bg-gray-100"
+              style={{ color: "#6b7280" }}>
+              {isRtlAdmin
+                ? <><svg className="w-4 h-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>{lang === "ar" ? "رجوع" : "Terug"}</>
+                : <><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>{lang === "ar" ? "رجوع" : "Terug"}</>
+              }
             </button>
           </div>
         </div>
@@ -1243,42 +1287,55 @@ export default function AdminQuestionsPage() {
 
   // شاشة اختيار نوع الأسئلة
   if (!questionType) {
+    const isRtlAdmin = lang === "ar";
     const menuItems = [
       {
-        type: "Theori", label: t.theori, sub: t.theoryQuestions,
+        type: "Theori",
+        label: t.theori,
+        sub: t.theoryQuestions,
         color: "#22c55e", glow: "rgba(34,197,94,0.25)",
         icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253",
-        badge: "نظري"
+        badge: lang === "ar" ? "نظري" : "Theorie",
       },
       {
-        type: "Praktijk", label: t.praktijk, sub: t.practicalQuestions,
+        type: "Praktijk",
+        label: t.praktijk,
+        sub: t.practicalQuestions,
         color: "#3b82f6", glow: "rgba(59,130,246,0.25)",
         icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
-        badge: "عملي"
+        badge: lang === "ar" ? "عملي" : "Praktijk",
       },
       {
-        type: "Examen", label: "Gratis", sub: t.examQuestions,
+        type: "Examen",
+        label: "Gratis",
+        sub: t.examQuestions,
         color: "#f97316", glow: "rgba(249,115,22,0.25)",
         icon: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z",
-        badge: "Gratis"
+        badge: "Gratis",
       },
       {
-        type: "lessons-manager", label: "عناوين الدروس", sub: "إضافة وحذف عناوين الدروس",
+        type: "lessons-manager",
+        label: lang === "ar" ? "عناوين الدروس" : "Lessen beheren",
+        sub: lang === "ar" ? "إضافة وحذف عناوين الدروس" : "Lestitels toevoegen en verwijderen",
         color: "#14b8a6", glow: "rgba(20,184,166,0.25)",
         icon: "M4 6h16M4 10h16M4 14h16M4 18h16",
-        badge: "إدارة"
+        badge: lang === "ar" ? "إدارة" : "Beheer",
       },
       {
-        type: "subscribers", label: "المشتركون", sub: "عرض قائمة المشتركين",
+        type: "subscribers",
+        label: lang === "ar" ? "المشتركون" : "Abonnees",
+        sub: lang === "ar" ? "عرض قائمة المشتركين" : "Lijst van abonnees bekijken",
         color: "#a855f7", glow: "rgba(168,85,247,0.25)",
         icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z",
-        badge: "مستخدمون"
+        badge: lang === "ar" ? "مستخدمون" : "Gebruikers",
       },
       {
-        type: "prices", label: "الأسعار", sub: "تعديل أسعار الاشتراكات",
+        type: "prices",
+        label: lang === "ar" ? "الأسعار" : "Prijzen",
+        sub: lang === "ar" ? "تعديل أسعار الاشتراكات" : "Abonnementsprijzen aanpassen",
         color: "#f59e0b", glow: "rgba(245,158,11,0.25)",
         icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
-        badge: "إعدادات"
+        badge: lang === "ar" ? "إعدادات" : "Instellingen",
       },
     ];
 
@@ -1319,7 +1376,7 @@ export default function AdminQuestionsPage() {
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-4 text-xs font-bold"
               style={{ background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.25)", color: "#7c3aed" }}>
               <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#7c3aed" }}></span>
-              لوحة التحكم
+              {lang === "ar" ? "لوحة التحكم" : "Beheerpaneel"}
             </div>
             <h1 className="text-2xl md:text-3xl font-black mb-2" style={{ color: "#1a1a1a" }}>{t.chooseQuestionType}</h1>
             <p className="text-sm" style={{ color: "#9ca3af" }}>{t.selectType}</p>
@@ -1374,8 +1431,8 @@ export default function AdminQuestionsPage() {
 
                   {/* سهم */}
                   <div className="mt-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    <span className="text-xs font-bold" style={{ color }}>فتح</span>
-                    <svg className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" style={{ color }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <span className="text-xs font-bold" style={{ color }}>{lang === "ar" ? "فتح" : "Openen"}</span>
+                    <svg className={`w-3 h-3 transition-transform ${isRtlAdmin ? "group-hover:-translate-x-0.5 rotate-180" : "group-hover:translate-x-0.5"}`} style={{ color }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                   </div>
