@@ -9,7 +9,6 @@ function getEmail() {
 
 function reportScreenshot(reason: string) {
   const email = getEmail();
-  // سجّل دائماً حتى بدون email
   fetch('/api/activity', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -24,13 +23,40 @@ function reportScreenshot(reason: string) {
 export default function ScreenProtection() {
   const pathname = usePathname();
 
+  // الأدمن مستثنى من كل الحماية
+  const isAdmin = pathname.startsWith('/admin');
+
   useEffect(() => {
-    // ── 1. منع الطباعة + تسجيل ──────────────────────────────────────────────
+    if (isAdmin) return;
+
+    // ── 1. منع النسخ (Copy) في كل الصفحات ──────────────────────────────────
+    const onCopy = (e: ClipboardEvent) => {
+      e.preventDefault();
+      reportScreenshot('copy-attempt');
+    };
+
+    // ── 2. منع القص (Cut) ────────────────────────────────────────────────────
+    const onCut = (e: ClipboardEvent) => {
+      e.preventDefault();
+    };
+
+    // ── 3. منع الطباعة + تسجيل ──────────────────────────────────────────────
     const onKeyDown = (e: KeyboardEvent) => {
       // Ctrl+P أو Cmd+P (طباعة)
       if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
         e.preventDefault();
         reportScreenshot('print');
+        return;
+      }
+      // Ctrl+C أو Cmd+C (نسخ)
+      if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+        e.preventDefault();
+        reportScreenshot('copy-keyboard');
+        return;
+      }
+      // Ctrl+A أو Cmd+A (تحديد الكل)
+      if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+        e.preventDefault();
         return;
       }
       // PrintScreen
@@ -44,18 +70,16 @@ export default function ScreenProtection() {
         reportScreenshot('snipping');
         return;
       }
-      // Ctrl+Shift+S (بعض أدوات الـ screenshot)
+      // Ctrl+Shift+S
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 's') {
         reportScreenshot('ctrl-shift-s');
         return;
       }
     };
 
-    // ── 2. كشف screenshot عبر visibilitychange (iOS/Android) ────────────────
+    // ── 4. كشف screenshot عبر visibilitychange (iOS/Android) ────────────────
     const onVisibility = () => {
       if (document.visibilityState === 'hidden') {
-        // على iOS عند أخذ screenshot تختفي الصفحة لثانية
-        // نسجّل فقط إذا كان المستخدم في صفحة محتوى
         const protectedPaths = ['/theorie/lesson', '/gratis/lesson', '/gratis/exam', '/examen', '/praktical'];
         const isProtected = protectedPaths.some(p => pathname.startsWith(p));
         if (isProtected) {
@@ -64,7 +88,7 @@ export default function ScreenProtection() {
       }
     };
 
-    // ── 3. منع Right-click على الصفحات المحمية ──────────────────────────────
+    // ── 5. منع Right-click على الصفحات المحمية ──────────────────────────────
     const protectedPaths = ['/theorie/lesson', '/gratis/lesson', '/gratis/exam', '/examen', '/praktical'];
     const isProtected = protectedPaths.some(p => pathname.startsWith(p));
 
@@ -75,7 +99,7 @@ export default function ScreenProtection() {
       }
     };
 
-    // ── 4. كشف DevTools (تغيير حجم النافذة المفاجئ) ─────────────────────────
+    // ── 6. كشف DevTools ──────────────────────────────────────────────────────
     let devtoolsOpen = false;
     const checkDevTools = () => {
       const threshold = 160;
@@ -90,18 +114,34 @@ export default function ScreenProtection() {
       }
     };
 
+    // ── 7. منع تحديد النص بالماوس ────────────────────────────────────────────
+    const onSelectStart = (e: Event) => {
+      // السماح بالتحديد في حقول الإدخال فقط
+      const target = e.target as HTMLElement;
+      const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+      if (!isInput) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener('copy', onCopy);
+    document.addEventListener('cut', onCut);
     document.addEventListener('keydown', onKeyDown);
     document.addEventListener('visibilitychange', onVisibility);
     document.addEventListener('contextmenu', onContextMenu);
+    document.addEventListener('selectstart', onSelectStart);
     const devToolsInterval = setInterval(checkDevTools, 3000);
 
     return () => {
+      document.removeEventListener('copy', onCopy);
+      document.removeEventListener('cut', onCut);
       document.removeEventListener('keydown', onKeyDown);
       document.removeEventListener('visibilitychange', onVisibility);
       document.removeEventListener('contextmenu', onContextMenu);
+      document.removeEventListener('selectstart', onSelectStart);
       clearInterval(devToolsInterval);
     };
-  }, [pathname]);
+  }, [pathname, isAdmin]);
 
   return null;
 }
