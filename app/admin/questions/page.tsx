@@ -1086,39 +1086,50 @@ export default function AdminQuestionsPage() {
 
   if (!isLogged) {
     return (
-      <div className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0a0a2e 0%, #001a6e 50%, #0a0a2e 100%)" }}>
+      <div className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{ background: "linear-gradient(160deg, #f8faff 0%, #eef2ff 50%, #f0f4ff 100%)" }}>
         {/* خلفية زخرفية */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full opacity-20 blur-3xl" style={{ background: "#ffcc00" }}></div>
+          <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full opacity-20 blur-3xl" style={{ background: "#7c3aed" }}></div>
           <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-20 blur-3xl" style={{ background: "#003399" }}></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-5 blur-3xl" style={{ background: "#ffffff" }}></div>
+          <div className="absolute top-1/3 right-1/4 w-64 h-64 rounded-full opacity-10 blur-3xl" style={{ background: "#f5a623" }}></div>
+          {/* شبكة نقاط */}
+          <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "radial-gradient(circle, #7c3aed 1px, transparent 1px)", backgroundSize: "28px 28px" }}></div>
         </div>
 
         <div className="relative z-10 w-full max-w-sm mx-auto px-6">
           {/* لوغو */}
           <div className="text-center mb-8">
-            <div className="w-20 h-20 mx-auto mb-5 rounded-2xl flex items-center justify-center shadow-2xl" style={{ background: "linear-gradient(135deg, #ffcc00, #ff9900)", boxShadow: "0 20px 60px rgba(255,204,0,0.4)" }}>
-              <svg className="w-10 h-10" style={{ color: "#003399" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {/* اسم الموقع بألوان العلم البلجيكي */}
+            <div className="mb-5">
+              <span className="text-2xl md:text-3xl font-black tracking-wide uppercase">
+                <span style={{ color: '#1a1a1a' }}>SEWAR </span>
+                <span style={{ color: '#f5a623' }}>RIJBEWIJS</span>
+                <span style={{ color: '#e63946' }}>ONLINE</span>
+              </span>
+            </div>
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center shadow-xl"
+              style={{ background: "linear-gradient(135deg, #7c3aed, #5b21b6)", boxShadow: "0 16px 40px rgba(124,58,237,0.35)" }}>
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
-            <h1 className="text-2xl font-black text-white mb-1">{t.adminLogin}</h1>
-            <p className="text-white/40 text-sm">{t.manageQuestions}</p>
+            <h1 className="text-xl font-black mb-1" style={{ color: "#1a1a1a" }}>{t.adminLogin}</h1>
+            <p className="text-sm" style={{ color: "#9ca3af" }}>{t.manageQuestions}</p>
           </div>
 
           {/* بطاقة اللوجين */}
-          <div className="rounded-2xl p-6 space-y-4" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(20px)" }}>
+          <div className="rounded-2xl p-6 space-y-4 shadow-xl" style={{ background: "white", border: "1px solid #e5e7eb" }}>
             <div className="relative">
               <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                <svg className="w-4 h-4 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" style={{ color: "#9ca3af" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </div>
               <input
                 type="text"
                 placeholder={t.username}
-                className="w-full pl-10 pr-4 py-3 rounded-xl text-sm font-medium text-white placeholder-white/30 focus:outline-none transition-all"
-                style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)" }}
+                className="w-full pl-10 pr-4 py-3 rounded-xl text-sm font-medium focus:outline-none transition-all"
+                style={{ background: "#f9fafb", border: "1.5px solid #e5e7eb", color: "#1a1a1a", fontSize: "16px" }}
                 value={user}
                 onChange={(e) => setUser(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
@@ -1126,15 +1137,15 @@ export default function AdminQuestionsPage() {
             </div>
             <div className="relative">
               <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                <svg className="w-4 h-4 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" style={{ color: "#9ca3af" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                 </svg>
               </div>
               <input
                 type="password"
                 placeholder={t.password}
-                className="w-full pl-10 pr-4 py-3 rounded-xl text-sm font-medium text-white placeholder-white/30 focus:outline-none transition-all"
-                style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)" }}
+                className="w-full pl-10 pr-4 py-3 rounded-xl text-sm font-medium focus:outline-none transition-all"
+                style={{ background: "#f9fafb", border: "1.5px solid #e5e7eb", color: "#1a1a1a", fontSize: "16px" }}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
@@ -1142,11 +1153,18 @@ export default function AdminQuestionsPage() {
             </div>
             <button
               className="w-full py-3 rounded-xl font-black text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-lg"
-              style={{ background: "linear-gradient(135deg, #ffcc00, #ff9900)", color: "#003399", boxShadow: "0 8px 30px rgba(255,204,0,0.35)" }}
+              style={{ background: "linear-gradient(135deg, #7c3aed, #5b21b6)", color: "white", boxShadow: "0 8px 24px rgba(124,58,237,0.35)" }}
               onClick={handleLogin}
             >
               {t.login} →
             </button>
+          </div>
+
+          {/* شريط ألوان بلجيكي */}
+          <div className="flex mt-6 rounded-full overflow-hidden h-1 mx-auto w-32">
+            <div className="flex-1" style={{ background: "#1a1a1a" }} />
+            <div className="flex-1" style={{ background: "#f5a623" }} />
+            <div className="flex-1" style={{ background: "#e63946" }} />
           </div>
         </div>
       </div>
@@ -1253,34 +1271,42 @@ export default function AdminQuestionsPage() {
     ];
 
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden" style={{ background: "linear-gradient(160deg, #060818 0%, #0d1b4b 45%, #060818 100%)" }}>
+      <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden" style={{ background: "linear-gradient(160deg, #f8faff 0%, #eef2ff 50%, #f0f4ff 100%)" }}>
         {/* خلفية زخرفية */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full opacity-[0.07] blur-[100px]" style={{ background: "#ffcc00" }}></div>
-          <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full opacity-[0.07] blur-[100px]" style={{ background: "#3b82f6" }}></div>
-          {/* شبكة نقاط */}
-          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle, #ffffff 1px, transparent 1px)", backgroundSize: "32px 32px" }}></div>
+          <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full opacity-[0.08] blur-[80px]" style={{ background: "#7c3aed" }}></div>
+          <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full opacity-[0.08] blur-[80px]" style={{ background: "#003399" }}></div>
+          <div className="absolute top-1/2 left-0 w-[300px] h-[300px] rounded-full opacity-[0.06] blur-[60px]" style={{ background: "#f5a623" }}></div>
+          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle, #7c3aed 1px, transparent 1px)", backgroundSize: "28px 28px" }}></div>
         </div>
 
-        <div className="relative z-10 w-full max-w-3xl px-6 py-12">
+        <div className="relative z-10 w-full max-w-4xl px-4 py-8">
           {/* Header */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-5 text-xs font-bold" style={{ background: "rgba(255,204,0,0.1)", border: "1px solid rgba(255,204,0,0.25)", color: "#ffcc00" }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse"></span>
+          <div className="text-center mb-10">
+            {/* اسم الموقع */}
+            <div className="mb-3">
+              <span className="text-2xl md:text-3xl font-black tracking-wide uppercase">
+                <span style={{ color: '#1a1a1a' }}>SEWAR </span>
+                <span style={{ color: '#f5a623' }}>RIJBEWIJS</span>
+                <span style={{ color: '#e63946' }}>ONLINE</span>
+              </span>
+            </div>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-4 text-xs font-bold"
+              style={{ background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.25)", color: "#7c3aed" }}>
+              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#7c3aed" }}></span>
               لوحة التحكم
             </div>
-            <h1 className="text-3xl font-black text-white mb-2 tracking-tight">{t.chooseQuestionType}</h1>
-            <p className="text-white/35 text-sm">{t.selectType}</p>
+            <h1 className="text-2xl md:text-3xl font-black mb-2" style={{ color: "#1a1a1a" }}>{t.chooseQuestionType}</h1>
+            <p className="text-sm" style={{ color: "#9ca3af" }}>{t.selectType}</p>
           </div>
 
           {/* الكروت */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
             {menuItems.map(({ type, label, sub, color, glow, icon, badge }) => (
               <button
                 key={type}
                 onClick={() => {
                   if (type === "subscribers") {
-                    // حفظ حالة الـ login حتى لا تطلب مرة أخرى
                     localStorage.setItem("adminSubsLogged", "true");
                     window.open("/admin/subscribers", "_blank");
                   }
@@ -1288,39 +1314,43 @@ export default function AdminQuestionsPage() {
                   else if (type === "prices") setQuestionType("prices" as any);
                   else setQuestionType(type as any);
                 }}
-                className="group relative overflow-hidden rounded-2xl text-left transition-all duration-300 hover:-translate-y-1 active:scale-95"
+                className="group relative overflow-hidden rounded-2xl text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-xl active:scale-95"
                 style={{
-                  background: "rgba(255,255,255,0.03)",
-                  border: `1px solid rgba(255,255,255,0.08)`,
-                  backdropFilter: "blur(10px)",
+                  background: "white",
+                  border: `1.5px solid #e5e7eb`,
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
                 }}
               >
                 {/* توهج عند hover */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" style={{ background: `radial-gradient(ellipse at top left, ${glow}, transparent 70%)` }}></div>
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"
+                  style={{ background: `radial-gradient(ellipse at top left, ${color}12, transparent 70%)` }}></div>
                 {/* خط علوي ملون */}
-                <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl opacity-60 group-hover:opacity-100 transition-opacity" style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }}></div>
+                <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl"
+                  style={{ background: `linear-gradient(90deg, ${color}, ${color}88)` }}></div>
 
-                <div className="relative z-10 p-6">
+                <div className="relative z-10 p-4 md:p-5">
                   {/* أيقونة + badge */}
-                  <div className="flex items-start justify-between mb-5">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3" style={{ background: `linear-gradient(135deg, ${color}22, ${color}11)`, border: `1px solid ${color}40` }}>
-                      <svg className="w-6 h-6" style={{ color }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d={icon} />
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-11 h-11 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
+                      style={{ background: `linear-gradient(135deg, ${color}20, ${color}10)`, border: `1.5px solid ${color}30` }}>
+                      <svg className="w-5 h-5" style={{ color }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
                       </svg>
                     </div>
-                    <span className="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider" style={{ background: `${color}18`, color, border: `1px solid ${color}30` }}>
+                    <span className="px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider"
+                      style={{ background: `${color}15`, color, border: `1px solid ${color}25` }}>
                       {badge}
                     </span>
                   </div>
 
                   {/* النص */}
-                  <h3 className="text-base font-black text-white mb-1.5 group-hover:text-white transition-colors">{label}</h3>
-                  <p className="text-xs text-white/35 leading-relaxed">{sub}</p>
+                  <h3 className="text-sm font-black mb-1" style={{ color: "#1a1a1a" }}>{label}</h3>
+                  <p className="text-xs leading-relaxed" style={{ color: "#9ca3af" }}>{sub}</p>
 
                   {/* سهم */}
-                  <div className="mt-5 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-[-4px] group-hover:translate-x-0">
+                  <div className="mt-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300">
                     <span className="text-xs font-bold" style={{ color }}>فتح</span>
-                    <svg className="w-3.5 h-3.5" style={{ color }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" style={{ color }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                   </div>
@@ -1329,8 +1359,16 @@ export default function AdminQuestionsPage() {
             ))}
           </div>
 
-          <div className="mt-10 text-center">
-            <button onClick={() => { localStorage.removeItem("adminQuestionsLogged"); setIsLogged(false); }} className="inline-flex items-center gap-2 text-white/25 hover:text-white/50 text-xs transition-colors">
+          {/* شريط سفلي */}
+          <div className="mt-8 flex items-center justify-between">
+            <div className="flex h-1 rounded-full overflow-hidden w-20">
+              <div className="flex-1" style={{ background: "#1a1a1a" }} />
+              <div className="flex-1" style={{ background: "#f5a623" }} />
+              <div className="flex-1" style={{ background: "#e63946" }} />
+            </div>
+            <button onClick={() => { localStorage.removeItem("adminQuestionsLogged"); setIsLogged(false); }}
+              className="inline-flex items-center gap-2 text-xs font-bold transition-colors px-3 py-1.5 rounded-lg hover:bg-red-50"
+              style={{ color: "#ef4444" }}>
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
               {t.backToLogin}
             </button>
