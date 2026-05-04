@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     }
 
     const percentage = (score / totalQuestions) * 100;
-    const passed = percentage >= 70;
+    const passed = score >= 41;
 
     const user = await prisma.user.findUnique({ where: { email: userEmail } });
     if (!user) {

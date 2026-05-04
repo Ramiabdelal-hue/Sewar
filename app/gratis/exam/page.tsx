@@ -302,7 +302,7 @@ function GratisExamContent() {
   // ── Results screen ───────────────────────────────────────────────────────────
   if (finished) {
     const pct = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
-    const passed = pct >= 60;
+    const passed = score >= 41;
     const correctCount = questions.filter((q, i) => answers[i] === q.correctAnswer).length;
     return (
       <div className="min-h-screen bg-gray-50" dir={isRtl ? "rtl" : "ltr"}>
