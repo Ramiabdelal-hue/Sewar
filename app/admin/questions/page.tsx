@@ -1085,21 +1085,33 @@ export default function AdminQuestionsPage() {
   }).sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
 
   if (!isLogged) {
+    const isRtlAdmin = lang === "ar";
     return (
-      <div className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{ background: "linear-gradient(160deg, #f8faff 0%, #eef2ff 50%, #f0f4ff 100%)" }}>
+      <div className="min-h-screen flex items-center justify-center relative overflow-hidden" dir={isRtlAdmin ? "rtl" : "ltr"} style={{ background: "linear-gradient(160deg, #f8faff 0%, #eef2ff 50%, #f0f4ff 100%)" }}>
         {/* خلفية زخرفية */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full opacity-20 blur-3xl" style={{ background: "#7c3aed" }}></div>
           <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-20 blur-3xl" style={{ background: "#003399" }}></div>
           <div className="absolute top-1/3 right-1/4 w-64 h-64 rounded-full opacity-10 blur-3xl" style={{ background: "#f5a623" }}></div>
-          {/* شبكة نقاط */}
           <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "radial-gradient(circle, #7c3aed 1px, transparent 1px)", backgroundSize: "28px 28px" }}></div>
+        </div>
+
+        {/* زرا اللغة — أعلى اليمين */}
+        <div className="absolute top-4 right-4 flex gap-1.5 z-20">
+          {[{ code: "nl", label: "NL" }, { code: "ar", label: "AR" }].map(({ code, label }) => (
+            <button key={code} onClick={() => setLang(code as any)}
+              className="px-3 py-1.5 rounded-lg text-xs font-black transition-all"
+              style={lang === code
+                ? { background: "linear-gradient(135deg,#7c3aed,#5b21b6)", color: "white" }
+                : { background: "white", color: "#6b7280", border: "1.5px solid #e5e7eb" }}>
+              {label}
+            </button>
+          ))}
         </div>
 
         <div className="relative z-10 w-full max-w-sm mx-auto px-6">
           {/* لوغو */}
           <div className="text-center mb-8">
-            {/* اسم الموقع بألوان العلم البلجيكي */}
             <div className="mb-5">
               <span className="text-2xl md:text-3xl font-black tracking-wide uppercase">
                 <span style={{ color: '#1a1a1a' }}>SEWAR </span>
@@ -1120,7 +1132,7 @@ export default function AdminQuestionsPage() {
           {/* بطاقة اللوجين */}
           <div className="rounded-2xl p-6 space-y-4 shadow-xl" style={{ background: "white", border: "1px solid #e5e7eb" }}>
             <div className="relative">
-              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+              <div className={`absolute inset-y-0 ${isRtlAdmin ? "right-3" : "left-3"} flex items-center pointer-events-none`}>
                 <svg className="w-4 h-4" style={{ color: "#9ca3af" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
@@ -1128,7 +1140,7 @@ export default function AdminQuestionsPage() {
               <input
                 type="text"
                 placeholder={t.username}
-                className="w-full pl-10 pr-4 py-3 rounded-xl text-sm font-medium focus:outline-none transition-all"
+                className={`w-full ${isRtlAdmin ? "pr-10 pl-4" : "pl-10 pr-4"} py-3 rounded-xl text-sm font-medium focus:outline-none transition-all`}
                 style={{ background: "#f9fafb", border: "1.5px solid #e5e7eb", color: "#1a1a1a", fontSize: "16px" }}
                 value={user}
                 onChange={(e) => setUser(e.target.value)}
@@ -1136,7 +1148,7 @@ export default function AdminQuestionsPage() {
               />
             </div>
             <div className="relative">
-              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+              <div className={`absolute inset-y-0 ${isRtlAdmin ? "right-3" : "left-3"} flex items-center pointer-events-none`}>
                 <svg className="w-4 h-4" style={{ color: "#9ca3af" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                 </svg>
@@ -1144,7 +1156,7 @@ export default function AdminQuestionsPage() {
               <input
                 type="password"
                 placeholder={t.password}
-                className="w-full pl-10 pr-4 py-3 rounded-xl text-sm font-medium focus:outline-none transition-all"
+                className={`w-full ${isRtlAdmin ? "pr-10 pl-4" : "pl-10 pr-4"} py-3 rounded-xl text-sm font-medium focus:outline-none transition-all`}
                 style={{ background: "#f9fafb", border: "1.5px solid #e5e7eb", color: "#1a1a1a", fontSize: "16px" }}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -1156,7 +1168,7 @@ export default function AdminQuestionsPage() {
               style={{ background: "linear-gradient(135deg, #7c3aed, #5b21b6)", color: "white", boxShadow: "0 8px 24px rgba(124,58,237,0.35)" }}
               onClick={handleLogin}
             >
-              {t.login} →
+              {t.login} {isRtlAdmin ? "←" : "→"}
             </button>
           </div>
 
@@ -1280,7 +1292,20 @@ export default function AdminQuestionsPage() {
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle, #7c3aed 1px, transparent 1px)", backgroundSize: "28px 28px" }}></div>
         </div>
 
-        <div className="relative z-10 w-full max-w-4xl px-4 py-8">
+        {/* زرا اللغة — أعلى اليمين */}
+        <div className="absolute top-4 right-4 flex gap-1.5 z-20">
+          {[{ code: "nl", label: "NL" }, { code: "ar", label: "AR" }].map(({ code, label }) => (
+            <button key={code} onClick={() => setLang(code as any)}
+              className="px-3 py-1.5 rounded-lg text-xs font-black transition-all"
+              style={lang === code
+                ? { background: "linear-gradient(135deg,#7c3aed,#5b21b6)", color: "white" }
+                : { background: "white", color: "#6b7280", border: "1.5px solid #e5e7eb" }}>
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <div className="relative z-10 w-full max-w-4xl px-4 py-8" dir={lang === "ar" ? "rtl" : "ltr"}>
           {/* Header */}
           <div className="text-center mb-10">
             {/* اسم الموقع */}
