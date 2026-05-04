@@ -171,7 +171,8 @@ function GratisExamContent() {
       .then(d => {
         if (d.success) {
           const filtered = d.examQuestions.filter((q: any) => q.lessonId === Number(lessonId));
-          setQuestions(filtered);
+          // خلط الأسئلة عشوائياً في كل مرة
+          setQuestions(filtered.sort(() => Math.random() - 0.5));
         }
       })
       .catch(() => {})
