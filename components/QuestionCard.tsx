@@ -228,39 +228,28 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
               />
             </div>
           ) : (
-            /* صورتان أو أكثر — كل صورتين في صف بنفس العرض والارتفاع بدون قص */
-            <div className="bg-black p-1 flex flex-col gap-1">
-              {Array.from({ length: Math.ceil(question.videoUrls.filter(Boolean).length / 2) }).map((_, rowIdx) => {
-                const rowUrls = question.videoUrls!.filter(Boolean).slice(rowIdx * 2, rowIdx * 2 + 2);
-                return (
-                  <div key={rowIdx} className="flex gap-1">
-                    {rowUrls.map((url, i) => (
-                      <div key={i} className="relative select-none"
-                        style={{ flex: "1 1 0%", aspectRatio: "4/3", background: "#000", overflow: "hidden" }}>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={url}
-                          alt=""
-                          style={{
-                            position: "absolute",
-                            inset: 0,
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "contain",
-                            objectPosition: "center",
-                          }}
-                          draggable={false}
-                          onContextMenu={e => e.preventDefault()}
-                        />
-                      </div>
-                    ))}
-                    {/* إذا صف فيه صورة واحدة فقط، أضف placeholder بنفس الحجم */}
-                    {rowUrls.length === 1 && (
-                      <div style={{ flex: "1 1 0%", aspectRatio: "4/3", background: "#000" }} />
-                    )}
-                  </div>
-                );
-              })}
+            /* صورتان أو أكثر — grid 2×2 مربعات متساوية بدون قص */
+            <div className="bg-black p-1 grid gap-1" style={{ gridTemplateColumns: "1fr 1fr" }}>
+              {question.videoUrls.filter(Boolean).map((url, i) => (
+                <div key={i} className="relative select-none"
+                  style={{ aspectRatio: "1/1", background: "#000", overflow: "hidden" }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={url}
+                    alt=""
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                      objectPosition: "center",
+                    }}
+                    draggable={false}
+                    onContextMenu={e => e.preventDefault()}
+                  />
+                </div>
+              ))}
             </div>
           )}
           <div className="flex items-center justify-between px-3 py-1.5"
