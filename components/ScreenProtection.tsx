@@ -189,23 +189,13 @@ export default function ScreenProtection() {
     };
 
     // ── 3. Visibility — موبايل فقط (iOS/Android) ────────────────────────────
-    // على الكمبيوتر: PrintScreen يُطلق visibilitychange فيُسجَّل مرتين
-    // نتحقق من نوع الجهاز: إذا كان موبايل فقط نُفعّل هذا
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     const protectedPaths = ['/theorie/lesson', '/gratis/lesson', '/gratis/exam', '/examen', '/praktical'];
     const isProtected = protectedPaths.some(p => pathname.startsWith(p));
-
-    const onVisibility = () => {
-      if (document.visibilityState === 'hidden' && isProtected && isMobile) {
-        handleScreenshot('mobile-screenshot', 15000);
-      }
-    };
 
     // ── 4. Right-click — نمنعه فقط في الصفحات المحمية بدون تسجيل ─────────────
     const onContextMenu = (e: MouseEvent) => {
       if (isProtected) {
         e.preventDefault();
-        // لا نُسجّل right-click كـ screenshot — ليس screenshot حقيقي
       }
     };
 
@@ -233,7 +223,6 @@ export default function ScreenProtection() {
     document.addEventListener('copy', onCopy);
     document.addEventListener('cut', onCut);
     document.addEventListener('keydown', onKeyDown);
-    document.addEventListener('visibilitychange', onVisibility);
     document.addEventListener('contextmenu', onContextMenu);
     document.addEventListener('selectstart', onSelectStart);
 
@@ -241,7 +230,6 @@ export default function ScreenProtection() {
       document.removeEventListener('copy', onCopy);
       document.removeEventListener('cut', onCut);
       document.removeEventListener('keydown', onKeyDown);
-      document.removeEventListener('visibilitychange', onVisibility);
       document.removeEventListener('contextmenu', onContextMenu);
       document.removeEventListener('selectstart', onSelectStart);
     };
