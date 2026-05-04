@@ -281,13 +281,13 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
       {question.videoUrls && question.videoUrls.filter(Boolean).length > 0 && (
         <div>
           {question.videoUrls.filter(Boolean).length === 1 ? (
-            /* صورة واحدة — عرض كامل بحجمها الطبيعي */
-            <div className="relative select-none bg-gray-100">
+            /* صورة واحدة — مصغرة 50% من عرضها الطبيعي */
+            <div className="relative select-none bg-gray-100 flex justify-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={question.videoUrls.filter(Boolean)[0]}
                 alt=""
-                style={{ width: "100%", height: "auto", display: "block" }}
+                style={{ width: "50%", height: "auto", display: "block" }}
                 draggable={false}
                 onContextMenu={e => e.preventDefault()}
               />
