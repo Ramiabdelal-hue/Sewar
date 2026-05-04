@@ -303,7 +303,7 @@ function GratisExamContent() {
   // ── Results screen ───────────────────────────────────────────────────────────
   if (finished) {
     const pct = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
-    const passed = score >= 41;
+    const passed = score >= Math.ceil(questions.length / 2);
     const correctCount = questions.filter((q, i) => answers[i] === q.correctAnswer).length;
     return (
       <div className="min-h-screen bg-gray-50" dir={isRtl ? "rtl" : "ltr"}>
@@ -320,8 +320,8 @@ function GratisExamContent() {
             <div className="mt-3 mb-2 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold"
               style={{ background: passed ? "rgba(22,163,74,0.12)" : "rgba(220,38,38,0.10)", color: passed ? "#16a34a" : "#dc2626", border: `1.5px solid ${passed ? "#86efac" : "#fca5a5"}` }}>
               {passed
-                ? (lang === "ar" ? "✅ حصلت على 41 نقطة أو أكثر — ناجح" : lang === "nl" ? "✅ 41 punten of meer behaald — Geslaagd" : lang === "fr" ? "✅ 41 points ou plus — Réussi" : "✅ 41 points or more — Passed")
-                : (lang === "ar" ? "❌ حاول مرة أخرى — تحتاج 41 نقطة للنجاح" : lang === "nl" ? "❌ Probeer opnieuw — Je hebt 41 punten nodig" : lang === "fr" ? "❌ Réessayez — Il faut 41 points pour réussir" : "❌ Try again — You need 41 points to pass")}
+                ? (lang === "ar" ? `✅ أجبت على ${correctCount} من ${questions.length} — ناجح` : lang === "nl" ? `✅ ${correctCount} van ${questions.length} correct — Geslaagd` : lang === "fr" ? `✅ ${correctCount} sur ${questions.length} — Réussi` : `✅ ${correctCount} of ${questions.length} correct — Passed`)
+                : (lang === "ar" ? `❌ حاول مرة أخرى — تحتاج نصف الأسئلة للنجاح` : lang === "nl" ? `❌ Probeer opnieuw — Je hebt de helft nodig om te slagen` : lang === "fr" ? `❌ Réessayez — Il faut la moitié des questions pour réussir` : `❌ Try again — You need half the questions to pass`)}
             </div>
             <div className="flex items-center justify-center gap-4 mt-4 flex-wrap">
               {[
@@ -394,6 +394,17 @@ function GratisExamContent() {
               </div>
             </div>
           )}
+
+          {/* زر الاشتراك */}
+          <div className="mt-4 mb-2">
+            <button
+              onClick={() => router.push("/theorie")}
+              className="w-full py-4 rounded-2xl font-black text-base transition-all active:scale-95 hover:scale-[1.02]"
+              style={{ background: "linear-gradient(135deg, #d4af37, #f0d060, #d4af37)", color: "#0a0a0a", boxShadow: "0 8px 30px rgba(212,175,55,0.35)" }}
+            >
+              🔓 {lang === "ar" ? "اشترك للوصول لكل الدروس والامتحانات" : lang === "nl" ? "Inschrijven voor alle lessen & examens" : lang === "fr" ? "S'inscrire pour toutes les leçons & examens" : "Subscribe for all lessons & exams"}
+            </button>
+          </div>
 
           <div className="flex gap-3">
             <button
