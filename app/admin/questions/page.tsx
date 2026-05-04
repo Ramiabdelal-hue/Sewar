@@ -1307,7 +1307,7 @@ export default function AdminQuestionsPage() {
       },
       {
         type: "Examen",
-        label: "Gratis",
+        label: lang === "ar" ? "مجاني (Gratis)" : "Gratis",
         sub: t.examQuestions,
         color: "#f97316", glow: "rgba(249,115,22,0.25)",
         icon: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z",
@@ -1503,66 +1503,82 @@ export default function AdminQuestionsPage() {
 
   return (
     <div className="min-h-screen" style={{ background: "#f0f4f8" }}>
-      {/* Header خرافي */}
-      <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0a0a2e 0%, #003399 60%, #0055cc 100%)" }}>
-        {/* خطوط زخرفية */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-96 h-96 rounded-full blur-3xl" style={{ background: "#ffcc00", transform: "translate(-50%, -50%)" }}></div>
-          <div className="absolute bottom-0 right-0 w-64 h-64 rounded-full blur-3xl" style={{ background: "#ff9900", transform: "translate(30%, 30%)" }}></div>
-        </div>
+      {/* Header */}
+      <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #f8faff 0%, #eef2ff 100%)", borderBottom: "1.5px solid #e5e7eb" }}>
+        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "radial-gradient(circle, #7c3aed 1px, transparent 1px)", backgroundSize: "24px 24px" }}></div>
 
-        <div className="relative max-w-7xl mx-auto px-6 py-5">
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            {/* اليسار: اللوغو + العنوان */}
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, #ffcc00, #ff9900)" }}>
-                <svg className="w-7 h-7 text-[#003399]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="relative max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            {/* اليسار: اسم الموقع + عنوان الصفحة */}
+            <div className="flex items-center gap-3">
+              {/* أيقونة ملونة حسب النوع */}
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm"
+                style={{
+                  background: questionType === "Examen"
+                    ? "linear-gradient(135deg,#f97316,#ea580c)"
+                    : questionType === "Praktijk"
+                    ? "linear-gradient(135deg,#3b82f6,#2563eb)"
+                    : "linear-gradient(135deg,#22c55e,#16a34a)",
+                }}>
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
               <div>
-                <h1 className="text-xl font-black text-white tracking-wide">إدارة وتنظيم الأسئلة</h1>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="px-2 py-0.5 rounded-full text-xs font-bold" style={{ background: "rgba(255,204,0,0.2)", color: "#ffcc00", border: "1px solid rgba(255,204,0,0.4)" }}>
-                    {questionType}
-                  </span>
-                  <span className="text-white/40 text-xs">{t.systemManagement}</span>
-                </div>
+                {/* اسم الموقع صغير */}
+                <p className="text-[10px] font-black uppercase tracking-widest mb-0.5">
+                  <span style={{ color: '#1a1a1a' }}>SEWAR </span>
+                  <span style={{ color: '#f5a623' }}>RIJBEWIJS</span>
+                  <span style={{ color: '#e63946' }}>ONLINE</span>
+                </p>
+                {/* عنوان الصفحة الحالية */}
+                <h1 className="text-base font-black" style={{ color: "#1a1a1a" }}>
+                  {questionType === "Theori" || questionSubType === "lessons"
+                    ? (lang === "ar" ? "📖 إدخال شرح الدروس" : "📖 Uitleg lessen invoeren")
+                    : questionType === "Examen" || questionSubType === "exam"
+                    ? (lang === "ar" ? "🎯 إدخال أسئلة الامتحانات" : "🎯 Examenvragen invoeren")
+                    : questionType === "Praktijk"
+                    ? (lang === "ar" ? "🎬 إدخال محتوى عملي" : "🎬 Praktijkinhoud invoeren")
+                    : (lang === "ar" ? "إدارة الأسئلة" : "Vragen beheren")}
+                </h1>
               </div>
             </div>
 
             {/* اليمين: أزرار */}
             <div className="flex items-center gap-2 flex-wrap">
               {/* أزرار اللغة */}
-              <div className="flex gap-0.5 rounded-lg p-1" style={{ background: "rgba(255,255,255,0.08)" }}>
-                {[["nl","NL"],["fr","FR"],["ar","AR"]].map(([code, label]) => (
+              <div className="flex gap-1 rounded-lg p-1" style={{ background: "#f3f4f6" }}>
+                {[["nl","NL"],["ar","AR"]].map(([code, label]) => (
                   <button key={code} onClick={() => setLang(code as any)}
-                    className={`px-3 py-1.5 rounded-md text-xs font-black transition-all ${lang === code ? "bg-white text-[#003399] shadow-md" : "text-white/50 hover:text-white hover:bg-white/10"}`}>
+                    className="px-3 py-1.5 rounded-md text-xs font-black transition-all"
+                    style={lang === code
+                      ? { background: "linear-gradient(135deg,#7c3aed,#5b21b6)", color: "white" }
+                      : { color: "#6b7280" }}>
                     {label}
                   </button>
                 ))}
               </div>
 
-              {/* زر تغيير النوع */}
+              {/* زر رجوع للقائمة */}
               <button onClick={() => { setQuestionType(""); setQuestionSubType(""); }}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-black transition-all hover:scale-105 active:scale-95"
-                style={{ background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.8)", border: "1px solid rgba(255,255,255,0.15)" }}>
+                style={{ background: "white", color: "#374151", border: "1.5px solid #e5e7eb" }}>
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                {t.changeType}
+                {lang === "ar" ? "القائمة" : t.changeType}
               </button>
 
-              {/* زر تثبيت الأدمن */}
+              {/* زر تثبيت */}
               <button
                 onClick={() => setShowInstallGuide(true)}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-black transition-all hover:scale-105 active:scale-95"
-                style={{ background: "rgba(99,102,241,0.7)", color: "white", border: "1px solid rgba(99,102,241,0.4)" }}>
-                📲 تثبيت
+                style={{ background: "linear-gradient(135deg,#7c3aed,#5b21b6)", color: "white" }}>
+                📲 {lang === "ar" ? "تثبيت" : "Installeren"}
               </button>
 
               {/* زر الخروج */}
               <button onClick={() => { localStorage.removeItem("adminQuestionsLogged"); setIsLogged(false); }}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-black transition-all hover:scale-105 active:scale-95"
-                style={{ background: "rgba(239,68,68,0.7)", color: "white", border: "1px solid rgba(239,68,68,0.4)" }}>
+                style={{ background: "#fef2f2", color: "#ef4444", border: "1.5px solid #fecaca" }}>
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                 {t.logout}
               </button>
