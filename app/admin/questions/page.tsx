@@ -1384,7 +1384,55 @@ export default function AdminQuestionsPage() {
 
           {/* الكروت */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
-            {menuItems.map(({ type, label, sub, color, glow, icon, badge }) => (
+            {/* ── كارت Theorie الخاص — يحتوي على زرين مباشرة ── */}
+            <div
+              className="relative overflow-hidden rounded-2xl"
+              style={{
+                background: "white",
+                border: "1.5px solid #e5e7eb",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+              }}
+            >
+              <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl"
+                style={{ background: "linear-gradient(90deg, #22c55e, #22c55e88)" }}></div>
+              <div className="p-4 md:p-5">
+                {/* أيقونة + badge */}
+                <div className="flex items-start justify-between mb-3">
+                  <div className="w-11 h-11 rounded-xl flex items-center justify-center"
+                    style={{ background: "linear-gradient(135deg,#22c55e20,#22c55e10)", border: "1.5px solid #22c55e30" }}>
+                    <svg className="w-5 h-5" style={{ color: "#22c55e" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider"
+                    style={{ background: "#22c55e15", color: "#22c55e", border: "1px solid #22c55e25" }}>
+                    {lang === "ar" ? "نظري" : "Theorie"}
+                  </span>
+                </div>
+                <h3 className="text-sm font-black mb-1" style={{ color: "#1a1a1a" }}>{t.theori}</h3>
+                <p className="text-xs mb-3" style={{ color: "#9ca3af" }}>{t.theoryQuestions}</p>
+                {/* الزران */}
+                <div className="flex flex-col gap-2">
+                  <button
+                    onClick={() => { setQuestionType("Theori" as any); setQuestionSubType("lessons"); }}
+                    className="w-full py-2 rounded-xl text-xs font-black transition-all active:scale-95 hover:opacity-90"
+                    style={{ background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "white" }}
+                  >
+                    📖 {lang === "ar" ? "شرح الدروس" : "Uitleg lessen"}
+                  </button>
+                  <button
+                    onClick={() => { setQuestionType("Examen" as any); setQuestionSubType("exam"); }}
+                    className="w-full py-2 rounded-xl text-xs font-black transition-all active:scale-95 hover:opacity-90"
+                    style={{ background: "linear-gradient(135deg,#f97316,#ea580c)", color: "white" }}
+                  >
+                    🎯 {lang === "ar" ? "أسئلة الامتحانات" : "Examenvragen"}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* باقي الكروت */}
+            {menuItems.filter(m => m.type !== "Theori").map(({ type, label, sub, color, glow, icon, badge }) => (
               <button
                 key={type}
                 onClick={() => {
@@ -1403,15 +1451,12 @@ export default function AdminQuestionsPage() {
                   boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
                 }}
               >
-                {/* توهج عند hover */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"
                   style={{ background: `radial-gradient(ellipse at top left, ${color}12, transparent 70%)` }}></div>
-                {/* خط علوي ملون */}
                 <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl"
                   style={{ background: `linear-gradient(90deg, ${color}, ${color}88)` }}></div>
 
                 <div className="relative z-10 p-4 md:p-5">
-                  {/* أيقونة + badge */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="w-11 h-11 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
                       style={{ background: `linear-gradient(135deg, ${color}20, ${color}10)`, border: `1.5px solid ${color}30` }}>
@@ -1424,12 +1469,8 @@ export default function AdminQuestionsPage() {
                       {badge}
                     </span>
                   </div>
-
-                  {/* النص */}
                   <h3 className="text-sm font-black mb-1" style={{ color: "#1a1a1a" }}>{label}</h3>
                   <p className="text-xs leading-relaxed" style={{ color: "#9ca3af" }}>{sub}</p>
-
-                  {/* سهم */}
                   <div className="mt-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300">
                     <span className="text-xs font-bold" style={{ color }}>{lang === "ar" ? "فتح" : "Openen"}</span>
                     <svg className={`w-3 h-3 transition-transform ${isRtlAdmin ? "group-hover:-translate-x-0.5 rotate-180" : "group-hover:translate-x-0.5"}`} style={{ color }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
