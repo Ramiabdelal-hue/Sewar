@@ -67,7 +67,7 @@ export default function NewsTicker() {
         .ticker-track {
           display: flex;
           white-space: nowrap;
-          animation: ticker-scroll 60s linear infinite;
+          animation: ticker-scroll 30s linear infinite;
           will-change: transform;
         }
         .ticker-track:hover {
