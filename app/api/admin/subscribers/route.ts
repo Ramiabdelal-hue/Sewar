@@ -18,8 +18,8 @@ export async function GET(request: NextRequest) {
       const allScreenshots = await prisma.activityLog.findMany({
         where: { eventType: "screenshot_attempt" },
         orderBy: { createdAt: "desc" },
-        take: 200, // آخر 200 فقط
-        select: { userEmail: true, page: true, ip: true, createdAt: true },
+        take: 200,
+        select: { userEmail: true, page: true, ip: true, createdAt: true, userAgent: true },
       });
       return NextResponse.json({
         success: true,
@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
             page: s.page,
             ip: s.ip,
             date: s.createdAt,
+            userAgent: s.userAgent,
           })),
         },
       });
@@ -170,6 +171,7 @@ export async function GET(request: NextRequest) {
     const allScreenshots = await prisma.activityLog.findMany({
       where: { eventType: 'screenshot_attempt' },
       orderBy: { createdAt: 'desc' },
+      select: { userEmail: true, page: true, ip: true, createdAt: true, userAgent: true },
     });
 
     // تجميع محاولات Screenshot حسب البريد الإلكتروني
@@ -180,7 +182,8 @@ export async function GET(request: NextRequest) {
       screenshotsByEmail[key].push({
         date: log.createdAt,
         page: log.page || 'غير محدد',
-        ip: log.ip || 'unknown'
+        ip: log.ip || 'unknown',
+        userAgent: log.userAgent || null,
       });
     });
 
@@ -249,6 +252,7 @@ export async function GET(request: NextRequest) {
           page: s.page,
           ip: s.ip,
           date: s.createdAt,
+          userAgent: s.userAgent,
         })),
         stats: {
           totalSubscribers,

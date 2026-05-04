@@ -9,9 +9,42 @@ interface Sub {
   expiryDate: string; createdAt: string; isActive: boolean; userStatus?: string;
   lastSeen?: string | null;
   recentActivity?: { eventType: string; page: string; createdAt: string; ip: string }[];
-  screenshotDetails?: { count: number; attempts: { date: string; page: string; ip: string }[] };
+  screenshotDetails?: { count: number; attempts: { date: string; page: string; ip: string; userAgent?: string | null }[] };
 }
-interface AllScreenshot { userEmail: string | null; page: string; ip: string; date: string; }
+interface AllScreenshot { userEmail: string | null; page: string; ip: string; date: string; userAgent?: string | null; }
+
+const PKG: Record<string, string> = { theorie: "نظرية", examen: "امتحانات", "praktijk-lessons": "عملية-فيديو", "praktijk-exam": "عملية-خطر" };
+const PKG_COLOR: Record<string, string> = { theorie: "#3b82f6", examen: "#f97316", "praktijk-lessons": "#8b5cf6", "praktijk-exam": "#ec4899" };
+
+// استخراج نوع الجهاز من userAgent
+function parseDevice(ua: string | null | undefined): { icon: string; label: string } {
+  if (!ua) return { icon: "💻", label: "غير معروف" };
+  const u = ua.toLowerCase();
+  // iPhone
+  if (u.includes("iphone")) return { icon: "📱", label: "iPhone" };
+  // iPad
+  if (u.includes("ipad")) return { icon: "📱", label: "iPad" };
+  // Android phone
+  if (u.includes("android") && u.includes("mobile")) return { icon: "📱", label: "Android" };
+  // Android tablet
+  if (u.includes("android")) return { icon: "📱", label: "Android Tablet" };
+  // Windows
+  if (u.includes("windows")) {
+    if (u.includes("chrome")) return { icon: "💻", label: "Windows · Chrome" };
+    if (u.includes("firefox")) return { icon: "💻", label: "Windows · Firefox" };
+    if (u.includes("edg")) return { icon: "💻", label: "Windows · Edge" };
+    return { icon: "💻", label: "Windows" };
+  }
+  // Mac
+  if (u.includes("macintosh") || u.includes("mac os")) {
+    if (u.includes("safari") && !u.includes("chrome")) return { icon: "💻", label: "Mac · Safari" };
+    if (u.includes("chrome")) return { icon: "💻", label: "Mac · Chrome" };
+    return { icon: "💻", label: "Mac" };
+  }
+  // Linux
+  if (u.includes("linux")) return { icon: "💻", label: "Linux" };
+  return { icon: "🖥️", label: "غير معروف" };
+}
 
 const PKG: Record<string, string> = { theorie: "نظرية", examen: "امتحانات", "praktijk-lessons": "عملية-فيديو", "praktijk-exam": "عملية-خطر" };
 const PKG_COLOR: Record<string, string> = { theorie: "#3b82f6", examen: "#f97316", "praktijk-lessons": "#8b5cf6", "praktijk-exam": "#ec4899" };
@@ -70,7 +103,7 @@ export default function AdminSubscribersPage() {
         setSubs(prev => prev.map(sub => {
           const shots = d.data.allScreenshots.filter((s: any) => s.userEmail === sub.email);
           return shots.length !== (sub.screenshotDetails?.count || 0)
-            ? { ...sub, screenshotDetails: { count: shots.length, attempts: shots.map((s: any) => ({ date: s.date, page: s.page, ip: s.ip })) } }
+            ? { ...sub, screenshotDetails: { count: shots.length, attempts: shots.map((s: any) => ({ date: s.date, page: s.page, ip: s.ip, userAgent: s.userAgent })) } }
             : sub;
         }));
       }
@@ -208,18 +241,27 @@ export default function AdminSubscribersPage() {
               <div className="p-12 text-center"><div className="text-4xl mb-3">✅</div><p className="text-gray-500 font-bold">لا توجد محاولات</p></div>
             ) : (
               <div className="divide-y divide-gray-50">
-                {allScreenshots.map((s, i) => (
-                  <div key={i} className="flex items-center gap-3 px-4 py-3 hover:bg-orange-50 transition">
-                    <span className="text-2xl flex-shrink-0">📸</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-bold text-gray-800 text-sm truncate">
-                        {s.userEmail ? <span className="text-orange-600">{s.userEmail}</span> : <span className="text-gray-400 italic">زائر غير مسجل</span>}
-                      </p>
-                      <p className="text-gray-400 text-xs truncate">📄 {s.page} · 🌐 {s.ip}</p>
+                {allScreenshots.map((s, i) => {
+                  const device = parseDevice(s.userAgent);
+                  return (
+                    <div key={i} className="flex items-center gap-3 px-4 py-3 hover:bg-orange-50 transition">
+                      <span className="text-2xl flex-shrink-0">📸</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-gray-800 text-sm truncate">
+                          {s.userEmail ? <span className="text-orange-600">{s.userEmail}</span> : <span className="text-gray-400 italic">زائر غير مسجل</span>}
+                        </p>
+                        <p className="text-gray-400 text-xs truncate">📄 {s.page} · 🌐 {s.ip}</p>
+                        <p className="text-xs mt-0.5">
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md font-bold"
+                            style={{ background: "#f0fdf4", color: "#16a34a", border: "1px solid #bbf7d0" }}>
+                            {device.icon} {device.label}
+                          </span>
+                        </p>
+                      </div>
+                      <span className="text-gray-400 text-xs flex-shrink-0">{formatTime(s.date)}</span>
                     </div>
-                    <span className="text-gray-400 text-xs flex-shrink-0">{formatTime(s.date)}</span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -295,13 +337,23 @@ export default function AdminSubscribersPage() {
                             <div>
                               <h4 className="text-xs font-black text-red-600 mb-2">📸 محاولات Screenshot ({shots})</h4>
                               <div className="space-y-1.5 max-h-36 overflow-y-auto">
-                                {sub.screenshotDetails.attempts.map((a, i) => (
-                                  <div key={i} className="flex items-center gap-2 text-xs bg-red-50 rounded-lg px-3 py-2 border border-red-100">
-                                    <span className="text-base">📸</span>
-                                    <div className="flex-1 min-w-0"><span className="font-bold text-red-700 truncate block">{a.page}</span><span className="text-red-400">{a.ip}</span></div>
-                                    <span className="text-red-400 flex-shrink-0">{formatTime(a.date)}</span>
-                                  </div>
-                                ))}
+                                {sub.screenshotDetails.attempts.map((a, i) => {
+                                  const device = parseDevice(a.userAgent);
+                                  return (
+                                    <div key={i} className="flex items-start gap-2 text-xs bg-red-50 rounded-lg px-3 py-2 border border-red-100">
+                                      <span className="text-base flex-shrink-0">📸</span>
+                                      <div className="flex-1 min-w-0">
+                                        <span className="font-bold text-red-700 truncate block">{a.page}</span>
+                                        <span className="text-red-400">{a.ip}</span>
+                                        <span className="inline-flex items-center gap-1 mt-0.5 px-1.5 py-0.5 rounded-md font-bold text-[10px]"
+                                          style={{ background: "#f0fdf4", color: "#16a34a", border: "1px solid #bbf7d0" }}>
+                                          {device.icon} {device.label}
+                                        </span>
+                                      </div>
+                                      <span className="text-red-400 flex-shrink-0">{formatTime(a.date)}</span>
+                                    </div>
+                                  );
+                                })}
                               </div>
                             </div>
                           )}
