@@ -73,7 +73,7 @@ export default function NewsTicker() {
           fontWeight: 700,
           color: "#ffffff",
           lineHeight: "30px",
-          animation: "ticker-scroll 10s linear infinite",
+          animation: "ticker-scroll 20s linear infinite",
           willChange: "transform",
         }}
       >
