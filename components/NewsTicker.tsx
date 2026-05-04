@@ -48,7 +48,7 @@ const messages: Record<string, string[]> = {
 export default function NewsTicker() {
   const { lang } = useLang();
   const items = messages[lang] || messages.nl;
-  const repeated = [...items, ...items];
+  const repeated = [...items];
   const sep = "  ◆  ";
 
   // نجمع كل الرسائل في نص واحد طويل بدل عناصر منفصلة
