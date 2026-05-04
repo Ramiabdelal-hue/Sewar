@@ -48,19 +48,44 @@ const messages: Record<string, string[]> = {
 export default function NewsTicker() {
   const { lang } = useLang();
   const items = messages[lang] || messages.nl;
-  // نكرر مرتين فقط — الـ CSS يتكفل بالاستمرارية عبر translateX(-50%)
   const repeated = [...items, ...items];
+  const sep = "  ◆  ";
+
+  // نجمع كل الرسائل في نص واحد طويل بدل عناصر منفصلة
+  const fullText = repeated.map(m => m + sep).join("");
 
   return (
-    <div className="ticker-wrapper">
-      <div className="ticker-track">
-        {repeated.map((msg, i) => (
-          <span key={i} className="ticker-item">
-            {msg}
-            <span className="ticker-sep">◆</span>
-          </span>
-        ))}
+    <div
+      style={{
+        background: "linear-gradient(135deg, #0a1628, #0d2d5e)",
+        borderBottom: "2px solid #f5a623",
+        overflow: "hidden",
+        height: "30px",
+        display: "flex",
+        alignItems: "center",
+      }}
+    >
+      <div
+        style={{
+          display: "inline-block",
+          whiteSpace: "nowrap",
+          fontSize: "12px",
+          fontWeight: 700,
+          color: "#ffffff",
+          lineHeight: "30px",
+          animation: "ticker-scroll 10s linear infinite",
+          willChange: "transform",
+        }}
+      >
+        {fullText}
       </div>
+
+      <style>{`
+        @keyframes ticker-scroll {
+          0%   { transform: translateX(100vw); }
+          100% { transform: translateX(-100%); }
+        }
+      `}</style>
     </div>
   );
 }
