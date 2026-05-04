@@ -199,22 +199,8 @@ export default function ScreenProtection() {
       }
     };
 
-    // ── 5. DevTools — cooldown 60 ثانية ──────────────────────────────────────
-    let devtoolsOpen = false;
-    const checkDevTools = () => {
-      const threshold = 160;
-      const isOpen =
-        window.outerWidth - window.innerWidth > threshold ||
-        window.outerHeight - window.innerHeight > threshold;
-      if (isOpen && !devtoolsOpen) {
-        devtoolsOpen = true;
-        handleScreenshot('devtools-open', 60000);
-      } else if (!isOpen) {
-        devtoolsOpen = false;
-      }
-    };
-
-    // ── 6. منع تحديد النص ────────────────────────────────────────────────────    const onSelectStart = (e: Event) => {
+    // ── 5. منع تحديد النص ────────────────────────────────────────────────────
+    const onSelectStart = (e: Event) => {
       const target = e.target as HTMLElement;
       const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
       if (!isInput) e.preventDefault();
