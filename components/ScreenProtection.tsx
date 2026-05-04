@@ -11,12 +11,18 @@ function getEmail(): string | null {
 // عداد محلي للـ screenshots في هذه الجلسة
 let sessionScreenshotCount = 0;
 
-// منع التسجيل المتكرر
-const recentReports: Record<string, number> = {};
+// ── cooldown عام لمنع التسجيل المزدوج ──────────────────────────────────────
+// مفتاح واحد "any" يمنع أي تسجيل جديد لمدة cooldown بعد آخر تسجيل
+const globalCooldown: Record<string, number> = {};
+
 function reportOnce(reason: string, cooldownMs = 3000): boolean {
   const now = Date.now();
-  if (recentReports[reason] && now - recentReports[reason] < cooldownMs) return false;
-  recentReports[reason] = now;
+  // cooldown خاص بالسبب
+  if (globalCooldown[reason] && now - globalCooldown[reason] < cooldownMs) return false;
+  // cooldown عام: منع أي تسجيل آخر خلال 1.5 ثانية من آخر تسجيل بأي سبب
+  if (globalCooldown['__any__'] && now - globalCooldown['__any__'] < 1500) return false;
+  globalCooldown[reason] = now;
+  globalCooldown['__any__'] = now;
   return true;
 }
 
@@ -162,6 +168,9 @@ export default function ScreenProtection() {
     // ── Copy ──────────────────────────────────────────────────────────────────
     const onCopy = (e: ClipboardEvent) => {
       e.preventDefault();
+      // تجاهل copy إذا لم يكن هناك نص محدد (قد يكون ناتجاً عن PrintScreen)
+      const selection = window.getSelection()?.toString() || '';
+      if (selection.length === 0) return; // لا نص محدد = ليس copy حقيقي
       handleScreenshot('copy-attempt');
     };
 
@@ -178,7 +187,7 @@ export default function ScreenProtection() {
       }
       if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
         e.preventDefault();
-        handleScreenshot('copy-keyboard');
+        // لا نُسجّل هنا — onCopy سيُسجّل إذا كان هناك نص محدد
         return;
       }
       if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
