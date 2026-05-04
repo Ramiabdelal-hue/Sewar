@@ -61,6 +61,78 @@ interface Props {
   onPrev: () => void;
 }
 
+/** مكون يعرض صورتين أو أكثر في grid متساوي.
+ *  يحسب أكبر نسبة ارتفاع/عرض بين الصور ويجعل كل الخلايا بنفس الارتفاع
+ *  حتى لا تُقص أي صورة وتبدو كلها بنفس الحجم. */
+function MultiImageGrid({ urls }: { urls: string[] }) {
+  const [cellHeight, setCellHeight] = useState<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!urls.length) return;
+    let loaded = 0;
+    let maxRatio = 0; // أكبر نسبة (height / width)
+
+    urls.forEach((url) => {
+      const img = new Image();
+      img.onload = () => {
+        const ratio = img.naturalHeight / img.naturalWidth;
+        if (ratio > maxRatio) maxRatio = ratio;
+        loaded++;
+        if (loaded === urls.length && containerRef.current) {
+          // عرض كل خلية = نصف عرض الـ container (مع مراعاة الـ gap والـ padding)
+          const containerWidth = containerRef.current.offsetWidth;
+          const gap = 4; // 1 * 4px (gap-1)
+          const padding = 8; // p-1 * 2
+          const cellWidth = (containerWidth - padding - gap) / 2;
+          setCellHeight(Math.round(cellWidth * maxRatio));
+        }
+      };
+      img.onerror = () => {
+        loaded++;
+        if (loaded === urls.length && !cellHeight) {
+          setCellHeight(200); // fallback
+        }
+      };
+      img.src = url;
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urls.join(",")]);
+
+  return (
+    <div ref={containerRef} className="bg-black p-1 grid gap-1" style={{ gridTemplateColumns: "1fr 1fr" }}>
+      {urls.map((url, i) => (
+        <div
+          key={i}
+          className="relative select-none"
+          style={{
+            height: cellHeight ? `${cellHeight}px` : "auto",
+            minHeight: cellHeight ? undefined : "150px",
+            background: "#000",
+            overflow: "hidden",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={url}
+            alt=""
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              objectPosition: "center",
+            }}
+            draggable={false}
+            onContextMenu={e => e.preventDefault()}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function QuestionCard({ question, index, total, lang, onNext, onPrev }: Props) {
   // ── اختيار النص الأصلي حسب اللغة أولاً، ثم fallback للهولندية ──
   const getOriginalText = () => {
@@ -228,29 +300,8 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
               />
             </div>
           ) : (
-            /* صورتان أو أكثر — grid 2×2 مربعات متساوية بدون قص */
-            <div className="bg-black p-1 grid gap-1" style={{ gridTemplateColumns: "1fr 1fr" }}>
-              {question.videoUrls.filter(Boolean).map((url, i) => (
-                <div key={i} className="relative select-none"
-                  style={{ aspectRatio: "1/1", background: "#000", overflow: "hidden" }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={url}
-                    alt=""
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "contain",
-                      objectPosition: "center",
-                    }}
-                    draggable={false}
-                    onContextMenu={e => e.preventDefault()}
-                  />
-                </div>
-              ))}
-            </div>
+            /* صورتان أو أكثر — grid متساوي، الارتفاع يتكيف مع أكبر صورة */
+            <MultiImageGrid urls={question.videoUrls.filter(Boolean)} />
           )}
           <div className="flex items-center justify-between px-3 py-1.5"
             style={{ background: "linear-gradient(135deg, rgba(0,20,60,0.97), rgba(0,40,120,0.97))", fontSize: "9px", fontWeight: 700, direction: lang === "ar" ? "rtl" : "ltr" }}>
