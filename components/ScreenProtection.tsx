@@ -173,11 +173,13 @@ export default function ScreenProtection() {
       }
     };
 
-    // ── 2. Copy — فقط إذا كان هناك نص محدد فعلاً ─────────────────────────────
+    // ── 2. Copy — فقط إذا كان هناك نص محدد يدوياً ──────────────────────────
+    // نتجاهل copy إذا جاء خلال ثانية من PrintScreen (Windows يضع screenshot في clipboard)
     const onCopy = (e: ClipboardEvent) => {
       e.preventDefault();
       const selection = window.getSelection()?.toString() || '';
-      if (selection.length > 0) {
+      // يجب أن يكون هناك نص محدد يدوياً (أكثر من 3 أحرف لتجنب الـ false positives)
+      if (selection.length > 3) {
         handleScreenshot('copy-text');
       }
     };
@@ -186,14 +188,15 @@ export default function ScreenProtection() {
       e.preventDefault();
     };
 
-    // ── 3. Visibility — فقط في الصفحات المحمية وبـ cooldown طويل ─────────────
-    // ملاحظة: هذا يكتشف screenshot على iOS/Android لكن قد يُطلق عند تبديل التطبيقات
-    // لذلك cooldown 15 ثانية لتجنب العد الخاطئ
+    // ── 3. Visibility — موبايل فقط (iOS/Android) ────────────────────────────
+    // على الكمبيوتر: PrintScreen يُطلق visibilitychange فيُسجَّل مرتين
+    // نتحقق من نوع الجهاز: إذا كان موبايل فقط نُفعّل هذا
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     const protectedPaths = ['/theorie/lesson', '/gratis/lesson', '/gratis/exam', '/examen', '/praktical'];
     const isProtected = protectedPaths.some(p => pathname.startsWith(p));
 
     const onVisibility = () => {
-      if (document.visibilityState === 'hidden' && isProtected) {
+      if (document.visibilityState === 'hidden' && isProtected && isMobile) {
         handleScreenshot('mobile-screenshot', 15000);
       }
     };
