@@ -46,9 +46,6 @@ function parseDevice(ua: string | null | undefined): { icon: string; label: stri
   return { icon: "🖥️", label: "غير معروف" };
 }
 
-const PKG: Record<string, string> = { theorie: "نظرية", examen: "امتحانات", "praktijk-lessons": "عملية-فيديو", "praktijk-exam": "عملية-خطر" };
-const PKG_COLOR: Record<string, string> = { theorie: "#3b82f6", examen: "#f97316", "praktijk-lessons": "#8b5cf6", "praktijk-exam": "#ec4899" };
-
 function isOnline(lastSeen?: string | null) {
   if (!lastSeen) return false;
   return (Date.now() - new Date(lastSeen).getTime()) < 5 * 60 * 1000;
