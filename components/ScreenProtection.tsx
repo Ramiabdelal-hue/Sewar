@@ -192,24 +192,6 @@ export default function ScreenProtection() {
     const protectedPaths = ['/theorie/lesson', '/gratis/lesson', '/gratis/exam', '/examen', '/praktical'];
     const isProtected = protectedPaths.some(p => pathname.startsWith(p));
 
-    // ── 3. Visibility — موبايل فقط: screenshot يُخفي الشاشة ويعود خلال ثانيتين ──
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    let hiddenAt = 0;
-
-    const onVisibility = () => {
-      if (!isMobile || !isProtected) return;
-      if (document.visibilityState === 'hidden') {
-        hiddenAt = Date.now();
-      } else if (document.visibilityState === 'visible' && hiddenAt > 0) {
-        const elapsed = Date.now() - hiddenAt;
-        hiddenAt = 0;
-        // screenshot يعود خلال أقل من 2.5 ثانية — تبديل التطبيق يأخذ أكثر
-        if (elapsed < 2500) {
-          handleScreenshot('mobile-screenshot', 10000);
-        }
-      }
-    };
-
     // ── 4. Right-click — نمنعه فقط في الصفحات المحمية بدون تسجيل ─────────────
     const onContextMenu = (e: MouseEvent) => {
       if (isProtected) {
@@ -241,7 +223,6 @@ export default function ScreenProtection() {
     document.addEventListener('copy', onCopy);
     document.addEventListener('cut', onCut);
     document.addEventListener('keydown', onKeyDown);
-    document.addEventListener('visibilitychange', onVisibility);
     document.addEventListener('contextmenu', onContextMenu);
     document.addEventListener('selectstart', onSelectStart);
 
@@ -249,7 +230,6 @@ export default function ScreenProtection() {
       document.removeEventListener('copy', onCopy);
       document.removeEventListener('cut', onCut);
       document.removeEventListener('keydown', onKeyDown);
-      document.removeEventListener('visibilitychange', onVisibility);
       document.removeEventListener('contextmenu', onContextMenu);
       document.removeEventListener('selectstart', onSelectStart);
     };
