@@ -1507,82 +1507,77 @@ export default function AdminQuestionsPage() {
       <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #f8faff 0%, #eef2ff 100%)", borderBottom: "1.5px solid #e5e7eb" }}>
         <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "radial-gradient(circle, #7c3aed 1px, transparent 1px)", backgroundSize: "24px 24px" }}></div>
 
-        <div className="relative max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between gap-3 flex-wrap">
-            {/* اليسار: اسم الموقع + عنوان الصفحة */}
-            <div className="flex items-center gap-3">
-              {/* أيقونة ملونة حسب النوع */}
-              <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm"
-                style={{
-                  background: questionType === "Examen"
-                    ? "linear-gradient(135deg,#f97316,#ea580c)"
-                    : questionType === "Praktijk"
-                    ? "linear-gradient(135deg,#3b82f6,#2563eb)"
-                    : "linear-gradient(135deg,#22c55e,#16a34a)",
-                }}>
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-              </div>
-              <div>
-                {/* اسم الموقع صغير */}
-                <p className="text-[10px] font-black uppercase tracking-widest mb-0.5">
-                  <span style={{ color: '#1a1a1a' }}>SEWAR </span>
-                  <span style={{ color: '#f5a623' }}>RIJBEWIJS</span>
-                  <span style={{ color: '#e63946' }}>ONLINE</span>
-                </p>
-                {/* عنوان الصفحة الحالية */}
-                <h1 className="text-base font-black" style={{ color: "#1a1a1a" }}>
-                  {questionType === "Theori" || questionSubType === "lessons"
-                    ? (lang === "ar" ? "📖 إدخال شرح الدروس" : "📖 Uitleg lessen invoeren")
-                    : questionType === "Examen" || questionSubType === "exam"
-                    ? (lang === "ar" ? "🎯 إدخال أسئلة الامتحانات" : "🎯 Examenvragen invoeren")
-                    : questionType === "Praktijk"
-                    ? (lang === "ar" ? "🎬 إدخال محتوى عملي" : "🎬 Praktijkinhoud invoeren")
-                    : (lang === "ar" ? "إدارة الأسئلة" : "Vragen beheren")}
-                </h1>
-              </div>
+        <div className="relative max-w-7xl mx-auto px-4 py-3">
+          {/* صف 1: اسم الموقع + عنوان الصفحة */}
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm"
+              style={{
+                background: questionType === "Examen"
+                  ? "linear-gradient(135deg,#f97316,#ea580c)"
+                  : questionType === "Praktijk"
+                  ? "linear-gradient(135deg,#3b82f6,#2563eb)"
+                  : "linear-gradient(135deg,#22c55e,#16a34a)",
+              }}>
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+            </div>
+            <div className="min-w-0">
+              <p className="text-[9px] font-black uppercase tracking-widest leading-none mb-0.5">
+                <span style={{ color: '#1a1a1a' }}>SEWAR </span>
+                <span style={{ color: '#f5a623' }}>RIJBEWIJS</span>
+                <span style={{ color: '#e63946' }}>ONLINE</span>
+              </p>
+              <h1 className="text-sm font-black truncate" style={{ color: "#1a1a1a" }}>
+                {questionType === "Theori" || questionSubType === "lessons"
+                  ? (lang === "ar" ? "📖 إدخال شرح الدروس" : "📖 Uitleg lessen invoeren")
+                  : questionType === "Examen" || questionSubType === "exam"
+                  ? (lang === "ar" ? "🎯 إدخال أسئلة الامتحانات" : "🎯 Examenvragen invoeren")
+                  : questionType === "Praktijk"
+                  ? (lang === "ar" ? "🎬 إدخال محتوى عملي" : "🎬 Praktijkinhoud invoeren")
+                  : (lang === "ar" ? "إدارة الأسئلة" : "Vragen beheren")}
+              </h1>
+            </div>
+          </div>
+
+          {/* صف 2: الأزرار — كلها في سطر واحد بدون تكسر */}
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide pb-0.5">
+            {/* أزرار اللغة */}
+            <div className="flex gap-0.5 rounded-lg p-0.5 flex-shrink-0" style={{ background: "#f3f4f6" }}>
+              {[["nl","NL"],["ar","AR"]].map(([code, label]) => (
+                <button key={code} onClick={() => setLang(code as any)}
+                  className="px-2.5 py-1.5 rounded-md text-xs font-black transition-all flex-shrink-0"
+                  style={lang === code
+                    ? { background: "linear-gradient(135deg,#7c3aed,#5b21b6)", color: "white" }
+                    : { color: "#6b7280" }}>
+                  {label}
+                </button>
+              ))}
             </div>
 
-            {/* اليمين: أزرار */}
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* أزرار اللغة */}
-              <div className="flex gap-1 rounded-lg p-1" style={{ background: "#f3f4f6" }}>
-                {[["nl","NL"],["ar","AR"]].map(([code, label]) => (
-                  <button key={code} onClick={() => setLang(code as any)}
-                    className="px-3 py-1.5 rounded-md text-xs font-black transition-all"
-                    style={lang === code
-                      ? { background: "linear-gradient(135deg,#7c3aed,#5b21b6)", color: "white" }
-                      : { color: "#6b7280" }}>
-                    {label}
-                  </button>
-                ))}
-              </div>
+            {/* زر رجوع */}
+            <button onClick={() => { setQuestionType(""); setQuestionSubType(""); }}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-black transition-all active:scale-95 flex-shrink-0"
+              style={{ background: "white", color: "#374151", border: "1.5px solid #e5e7eb" }}>
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+              {lang === "ar" ? "القائمة" : "Menu"}
+            </button>
 
-              {/* زر رجوع للقائمة */}
-              <button onClick={() => { setQuestionType(""); setQuestionSubType(""); }}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-black transition-all hover:scale-105 active:scale-95"
-                style={{ background: "white", color: "#374151", border: "1.5px solid #e5e7eb" }}>
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                {lang === "ar" ? "القائمة" : t.changeType}
-              </button>
+            {/* زر تثبيت */}
+            <button
+              onClick={() => setShowInstallGuide(true)}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-black transition-all active:scale-95 flex-shrink-0"
+              style={{ background: "linear-gradient(135deg,#7c3aed,#5b21b6)", color: "white" }}>
+              📲 {lang === "ar" ? "تثبيت" : "App"}
+            </button>
 
-              {/* زر تثبيت */}
-              <button
-                onClick={() => setShowInstallGuide(true)}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-black transition-all hover:scale-105 active:scale-95"
-                style={{ background: "linear-gradient(135deg,#7c3aed,#5b21b6)", color: "white" }}>
-                📲 {lang === "ar" ? "تثبيت" : "Installeren"}
-              </button>
-
-              {/* زر الخروج */}
-              <button onClick={() => { localStorage.removeItem("adminQuestionsLogged"); setIsLogged(false); }}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-black transition-all hover:scale-105 active:scale-95"
-                style={{ background: "#fef2f2", color: "#ef4444", border: "1.5px solid #fecaca" }}>
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                {t.logout}
-              </button>
-            </div>
+            {/* زر الخروج */}
+            <button onClick={() => { localStorage.removeItem("adminQuestionsLogged"); setIsLogged(false); }}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-black transition-all active:scale-95 flex-shrink-0"
+              style={{ background: "#fef2f2", color: "#ef4444", border: "1.5px solid #fecaca" }}>
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+              {t.logout}
+            </button>
           </div>
         </div>
       </div>
