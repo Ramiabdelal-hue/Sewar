@@ -81,14 +81,8 @@ function MultiImageGrid({ urls }: { urls: string[] }) {
 
     Promise.all(urls.map(loadImage)).then((dims) => {
       if (!containerRef.current) return;
-      const containerWidth = containerRef.current.offsetWidth;
-      // عرض كل خلية = نصف عرض الـ container (بدون gap أو padding)
-      const cellWidth = containerWidth / 2;
-      // نحسب الارتفاع الذي ستأخذه كل صورة بعد تمددها لعرض الخلية
-      const heights = dims.map(({ w, h }) => (h / w) * cellWidth);
-      // نأخذ أكبر ارتفاع مع تصغير 25% ثم تكبير 20% في الطول
-      const maxHeight = Math.max(...heights) * 0.75 * 1.20;
-      setCellHeight(Math.round(maxHeight));
+      // ارتفاع ثابت 253px مطابق للصورة المنفردة
+      setCellHeight(253);
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urls.join(",")]);
