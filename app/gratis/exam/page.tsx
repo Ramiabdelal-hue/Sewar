@@ -315,6 +315,13 @@ function GratisExamContent() {
                 ? (lang === "ar" ? "مبروك! نجحت" : lang === "nl" ? "Geslaagd!" : "Passed!")
                 : (lang === "ar" ? "لم تنجح هذه المرة" : lang === "nl" ? "Helaas niet geslaagd" : "Not passed")}
             </h1>
+            {/* ملاحظة علامة النجاح */}
+            <div className="mt-3 mb-2 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold"
+              style={{ background: passed ? "rgba(22,163,74,0.12)" : "rgba(220,38,38,0.10)", color: passed ? "#16a34a" : "#dc2626", border: `1.5px solid ${passed ? "#86efac" : "#fca5a5"}` }}>
+              {passed
+                ? (lang === "ar" ? "✅ حصلت على 41 نقطة أو أكثر — ناجح" : lang === "nl" ? "✅ 41 punten of meer behaald — Geslaagd" : lang === "fr" ? "✅ 41 points ou plus — Réussi" : "✅ 41 points or more — Passed")
+                : (lang === "ar" ? "❌ حاول مرة أخرى — تحتاج 41 نقطة للنجاح" : lang === "nl" ? "❌ Probeer opnieuw — Je hebt 41 punten nodig" : lang === "fr" ? "❌ Réessayez — Il faut 41 points pour réussir" : "❌ Try again — You need 41 points to pass")}
+            </div>
             <div className="flex items-center justify-center gap-4 mt-4 flex-wrap">
               {[
                 { label: lang === "ar" ? "النقاط" : "Behaald", value: score, sub: `/ ${maxScore}`, color: "text-green-600" },
