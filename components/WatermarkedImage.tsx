@@ -14,7 +14,9 @@ function optimizeCloudinaryUrl(url: string): string {
   if (!url) return url;
   if (!url.includes("res.cloudinary.com") || !url.includes("/upload/")) return url;
   if (url.includes("/upload/f_auto")) return url;
-  return url.replace("/upload/", "/upload/f_auto,q_auto,w_1200,c_limit/");
+  // نستخدم w_auto بدل w_1200 ثابت — Cloudinary يختار العرض المناسب
+  // q_auto:low للصور العادية، f_auto للصيغة المثلى، c_limit لمنع التكبير
+  return url.replace("/upload/", "/upload/f_auto,q_auto:good,w_800,c_limit/");
 }
 
 export default function WatermarkedImage({ src, alt = "", className, style, priority = false }: Props) {
@@ -60,7 +62,7 @@ export default function WatermarkedImage({ src, alt = "", className, style, prio
       <img
         src={optimizedSrc}
         alt={alt}
-        loading={priority ? "eager" : "eager"}
+        loading={priority ? "eager" : "lazy"}
         decoding="async"
         className={`block w-full h-auto ${imageLoading || imageError ? "hidden" : ""}`}
         style={{ objectFit: "contain", objectPosition: "center" }}

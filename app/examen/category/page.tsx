@@ -397,7 +397,7 @@ function ExamenCategoryContent() {
     nextQ.videoUrls.filter(Boolean).forEach((url: string) => {
       const img = new Image();
       const optimized = url.includes('res.cloudinary.com') && !url.includes('/upload/f_auto')
-        ? url.replace('/upload/', '/upload/f_auto,q_auto,w_1200,c_limit/')
+        ? url.replace('/upload/', '/upload/f_auto,q_auto:good,w_800,c_limit/')
         : url;
       img.src = optimized;
     });

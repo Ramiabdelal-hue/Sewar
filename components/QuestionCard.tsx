@@ -2,6 +2,14 @@
 
 import { useState, useEffect, useRef } from "react";
 
+// ── تحسين روابط Cloudinary ──────────────────────────────────────────────────
+function optimizeUrl(url: string): string {
+  if (!url) return url;
+  if (!url.includes("res.cloudinary.com") || !url.includes("/upload/")) return url;
+  if (url.includes("/upload/f_auto")) return url;
+  return url.replace("/upload/", "/upload/f_auto,q_auto:good,w_800,c_limit/");
+}
+
 // Cache مشترك في الذاكرة + localStorage
 const memCache: Record<string, string> = {};
 if (typeof window !== "undefined") {
@@ -76,7 +84,7 @@ function MultiImageGrid({ urls }: { urls: string[] }) {
         const img = new Image();
         img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
         img.onerror = () => resolve({ w: 1, h: 1 });
-        img.src = url;
+        img.src = optimizeUrl(url);
       });
 
     Promise.all(urls.map(loadImage)).then((dims) => {
@@ -104,12 +112,14 @@ function MultiImageGrid({ urls }: { urls: string[] }) {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={url}
+            src={optimizeUrl(url)}
             alt=""
+            loading="lazy"
+            decoding="async"
             style={{
               width: "100%",
               height: "100%",
-              objectFit: "fill", // يمدد الصورة لتملأ الخلية بالكامل بدون قص ولا فراغ
+              objectFit: "fill",
             }}
             draggable={false}
             onContextMenu={e => e.preventDefault()}
@@ -279,8 +289,10 @@ export default function QuestionCard({ question, index, total, lang, onNext, onP
             <div className="relative select-none" style={{ height: "253px", overflow: "hidden" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={question.videoUrls.filter(Boolean)[0]}
+                src={optimizeUrl(question.videoUrls.filter(Boolean)[0])}
                 alt=""
+                loading="lazy"
+                decoding="async"
                 style={{ width: "100%", height: "100%", objectFit: "fill", display: "block" }}
                 draggable={false}
                 onContextMenu={e => e.preventDefault()}
