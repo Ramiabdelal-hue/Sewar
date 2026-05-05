@@ -44,11 +44,10 @@ const messages: Record<string, string[]> = {
 export default function NewsTicker() {
   const { lang } = useLang();
   const items = messages[lang] || messages.nl;
-  const repeated = [...items];
   const sep = "  ◆  ";
-
-  // نجمع كل الرسائل في نص واحد طويل بدل عناصر منفصلة
-  const fullText = repeated.map(m => m + sep).join("");
+  const singleText = items.map(m => m + sep).join("");
+  // نكرر النص مرتين — الـ animation تحرك 50% فقط فيبدو متواصلاً بلا انقطاع
+  const fullText = singleText + singleText;
 
   return (
     <div
@@ -69,7 +68,7 @@ export default function NewsTicker() {
           fontWeight: 700,
           color: "#ffffff",
           lineHeight: "30px",
-          animation: "ticker-scroll 20s linear infinite",
+          animation: "ticker-loop 30s linear infinite",
           willChange: "transform",
         }}
       >
@@ -77,9 +76,9 @@ export default function NewsTicker() {
       </div>
 
       <style>{`
-        @keyframes ticker-scroll {
-          0%   { transform: translateX(100vw); }
-          100% { transform: translateX(-100%); }
+        @keyframes ticker-loop {
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
         }
       `}</style>
     </div>
