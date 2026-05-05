@@ -83,9 +83,14 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  // 2. Strict rate limit on login (10 attempts / minute)
+  // 2. Strict rate limit on login (5 attempts / minute)
   if (pathname === '/api/login') {
-    if (isRateLimited(`login:${ip}`, 10, 60_000)) return jsonTooMany(60);
+    if (isRateLimited(`login:${ip}`, 5, 60_000)) return jsonTooMany(60);
+  }
+
+  // 2b. Strict rate limit on admin verify (5 attempts / minute)
+  if (pathname === '/api/admin/verify') {
+    if (isRateLimited(`admin-verify:${ip}`, 5, 60_000)) return jsonTooMany(60);
   }
 
   // 3. Rate limit all API routes (60 req / minute per IP per path)

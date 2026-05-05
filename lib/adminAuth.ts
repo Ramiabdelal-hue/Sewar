@@ -55,11 +55,17 @@ export function getClientIp(request: NextRequest): string {
 }
 
 /**
- * Sanitize string input — strip dangerous characters
+ * Sanitize string input — strip dangerous characters + HTML entities
  */
 export function sanitizeString(input: unknown, maxLength = 500): string {
   if (typeof input !== "string") return "";
-  return input.trim().slice(0, maxLength).replace(/[<>]/g, "");
+  return input
+    .trim()
+    .slice(0, maxLength)
+    .replace(/[<>"'`]/g, "")           // منع XSS
+    .replace(/javascript:/gi, "")       // منع javascript: URLs
+    .replace(/on\w+\s*=/gi, "")         // منع event handlers
+    .replace(/\0/g, "");                // منع null bytes
 }
 
 /**

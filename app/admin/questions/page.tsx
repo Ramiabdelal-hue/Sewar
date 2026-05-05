@@ -772,14 +772,22 @@ export default function AdminQuestionsPage() {
     }
   };
 
-  const handleLogin = () => {
-    const adminUser = process.env.NEXT_PUBLIC_ADMIN_USER || "sewar";
-    const adminPass = process.env.NEXT_PUBLIC_ADMIN_PASS || "70709090";
-    if (user === adminUser && password === adminPass) {
-      localStorage.setItem("adminQuestionsLogged", "true");
-      setIsLogged(true);
-    } else {
-      alert(t.incorrectCredentials);
+  const handleLogin = async () => {
+    try {
+      const res = await fetch("/api/admin/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user, pass: password }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        localStorage.setItem("adminQuestionsLogged", "true");
+        setIsLogged(true);
+      } else {
+        alert(data.message || t.incorrectCredentials);
+      }
+    } catch {
+      alert("خطأ في الاتصال");
     }
   };
 

@@ -117,10 +117,17 @@ export default function AdminSubscribersPage() {
     return () => { clearInterval(fullInterval); clearInterval(fastInterval); };
   }, [isLogged, fetchSubs, fetchScreenshotsOnly]);
 
-  const handleLogin = () => {
-    const u = process.env.NEXT_PUBLIC_ADMIN_USER || "sewar"; const p = process.env.NEXT_PUBLIC_ADMIN_PASS || "70709090";
-    if (user === u && pass === p) { localStorage.setItem("adminSubsLogged", "true"); setIsLogged(true); }
-    else alert("بيانات خاطئة");
+  const handleLogin = async () => {
+    try {
+      const res = await fetch("/api/admin/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user, pass }),
+      });
+      const data = await res.json();
+      if (data.success) { localStorage.setItem("adminSubsLogged", "true"); setIsLogged(true); }
+      else alert(data.message || "بيانات خاطئة");
+    } catch { alert("خطأ في الاتصال"); }
   };
 
   const suspendUser = async (email: string, action: "suspend" | "unsuspend") => {

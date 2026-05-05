@@ -16,7 +16,6 @@ const nextConfig = {
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    // cache الصور لمدة 7 أيام في Next.js image optimizer
     minimumCacheTTL: 60 * 60 * 24 * 7,
     remotePatterns: [
       { protocol: 'https', hostname: 'www.gratisrijbewijsonline.be' },
@@ -30,10 +29,29 @@ const nextConfig = {
         source: '/:path*',
         headers: [
           { key: 'X-DNS-Prefetch-Control', value: 'on' },
+          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
           { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'X-XSS-Protection', value: '1; mode=block' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=()' },
+          { key: 'X-Permitted-Cross-Domain-Policies', value: 'none' },
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://translate.googleapis.com https://translate.google.com",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' https://fonts.gstatic.com",
+              "img-src 'self' data: blob: https://res.cloudinary.com https://www.sewarrijbewijsonline.be https://www.gratisrijbewijsonline.be",
+              "connect-src 'self' https://api.mollie.com https://res.cloudinary.com",
+              "frame-src https://www.mollie.com https://checkout.mollie.com",
+              "media-src 'self' https://res.cloudinary.com",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self' https://www.mollie.com",
+            ].join('; '),
+          },
         ],
       },
       {
@@ -42,22 +60,18 @@ const nextConfig = {
           { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
         ],
       },
-      // cache الصور الثابتة في public/
       {
         source: '/:file(.*\\.(?:jpg|jpeg|png|gif|webp|svg|ico|avif))',
         headers: [
           { key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' },
         ],
       },
-      // cache للـ API responses - GET فقط
       {
         source: '/api/settings',
         headers: [
           { key: 'Cache-Control', value: 'public, s-maxage=300, stale-while-revalidate=600' },
         ],
       },
-      // لا نضع CDN cache على exam-questions أو free-content لأن المحتوى يتغير
-      // Next.js unstable_cache يتولى الـ caching داخلياً
     ];
   },
 };
