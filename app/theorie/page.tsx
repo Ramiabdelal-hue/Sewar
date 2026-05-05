@@ -220,31 +220,57 @@ export default function TheoriePage() {
                 🔒 {lang === "ar" ? "طرق الدفع الآمنة" : lang === "nl" ? "Veilige betaalmethoden" : lang === "fr" ? "Méthodes de paiement sécurisées" : "Secure payment methods"}
               </p>
             </div>
-            <div className="grid grid-cols-3 divide-x divide-gray-100">
-              {[
-                {
-                  icon: (<svg viewBox="0 0 48 48" className="w-10 h-7 mx-auto"><rect width="48" height="48" rx="6" fill="#005498"/><text x="24" y="22" textAnchor="middle" fill="white" fontSize="9" fontWeight="900" fontFamily="Arial">BANC</text><text x="24" y="33" textAnchor="middle" fill="#f5a623" fontSize="7" fontWeight="700" fontFamily="Arial">CONTACT</text></svg>),
-                  label: "Bancontact",
-                },
-                {
-                  icon: (
-                    <div className="flex gap-1 justify-center">
-                      <svg viewBox="0 0 32 20" className="w-8 h-5"><rect width="32" height="20" rx="3" fill="#1a1f71"/><text x="16" y="14" textAnchor="middle" fill="white" fontSize="8" fontWeight="900" fontFamily="Arial" fontStyle="italic">VISA</text></svg>
-                      <svg viewBox="0 0 32 20" className="w-8 h-5"><rect width="32" height="20" rx="3" fill="#252525"/><circle cx="12" cy="10" r="6" fill="#eb001b"/><circle cx="20" cy="10" r="6" fill="#f79e1b"/><path d="M16 5.5a6 6 0 010 9A6 6 0 0116 5.5z" fill="#ff5f00"/></svg>
-                    </div>
-                  ),
-                  label: "Visa / MC",
-                },
-                {
-                  icon: (<svg viewBox="0 0 32 32" className="w-8 h-8 mx-auto" fill="none"><rect x="2" y="2" width="10" height="10" rx="1.5" stroke="#f59e0b" strokeWidth="1.5"/><rect x="4" y="4" width="6" height="6" fill="#f59e0b"/><rect x="20" y="2" width="10" height="10" rx="1.5" stroke="#f59e0b" strokeWidth="1.5"/><rect x="22" y="4" width="6" height="6" fill="#f59e0b"/><rect x="2" y="20" width="10" height="10" rx="1.5" stroke="#f59e0b" strokeWidth="1.5"/><rect x="4" y="22" width="6" height="6" fill="#f59e0b"/><rect x="20" y="20" width="4" height="4" fill="#f59e0b"/><rect x="28" y="20" width="4" height="4" fill="#f59e0b"/><rect x="20" y="28" width="4" height="4" fill="#f59e0b"/><rect x="28" y="28" width="4" height="4" fill="#f59e0b"/></svg>),
-                  label: "QR Code",
-                },
-              ].map((m, i) => (
-                <div key={i} className="flex flex-col items-center gap-2 py-4 px-2">
-                  {m.icon}
-                  <p className="text-gray-600 text-xs font-black">{m.label}</p>
+            <div className="divide-y divide-gray-100">
+              {/* Bancontact */}
+              <div className="flex items-center gap-4 px-4 py-3.5">
+                <svg viewBox="0 0 56 32" className="w-12 h-7 flex-shrink-0">
+                  <rect width="56" height="32" rx="5" fill="#005498"/>
+                  <text x="28" y="14" textAnchor="middle" fill="white" fontSize="8" fontWeight="900" fontFamily="Arial">BANC</text>
+                  <text x="28" y="25" textAnchor="middle" fill="#f5a623" fontSize="6" fontWeight="700" fontFamily="Arial">CONTACT</text>
+                </svg>
+                <div>
+                  <p className="text-gray-900 font-black text-sm">Bancontact</p>
+                  <p className="text-gray-400 text-xs">{lang === "ar" ? "الدفع البلجيكي" : lang === "nl" ? "Belgische betaling" : lang === "fr" ? "Paiement belge" : "Belgian payment"}</p>
                 </div>
-              ))}
+              </div>
+              {/* Visa / Mastercard */}
+              <div className="flex items-center gap-4 px-4 py-3.5">
+                <div className="flex gap-1.5 flex-shrink-0">
+                  <svg viewBox="0 0 38 24" className="w-9 h-6">
+                    <rect width="38" height="24" rx="4" fill="#1a1f71"/>
+                    <text x="19" y="16" textAnchor="middle" fill="white" fontSize="9" fontWeight="900" fontFamily="Arial" fontStyle="italic">VISA</text>
+                  </svg>
+                  <svg viewBox="0 0 38 24" className="w-9 h-6">
+                    <rect width="38" height="24" rx="4" fill="#252525"/>
+                    <circle cx="15" cy="12" r="7" fill="#eb001b"/>
+                    <circle cx="23" cy="12" r="7" fill="#f79e1b"/>
+                    <path d="M19 6.8a7 7 0 010 10.4A7 7 0 0119 6.8z" fill="#ff5f00"/>
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-gray-900 font-black text-sm">Visa / Mastercard</p>
+                  <p className="text-gray-400 text-xs">{lang === "ar" ? "بطاقة ائتمان" : lang === "nl" ? "Kredietkaart" : lang === "fr" ? "Carte de crédit" : "Credit card"}</p>
+                </div>
+              </div>
+              {/* QR Code */}
+              <div className="flex items-center gap-4 px-4 py-3.5">
+                <svg viewBox="0 0 32 32" className="w-8 h-8 flex-shrink-0" fill="none">
+                  <rect x="2" y="2" width="10" height="10" rx="1.5" stroke="#f59e0b" strokeWidth="1.5"/>
+                  <rect x="4" y="4" width="6" height="6" fill="#f59e0b"/>
+                  <rect x="20" y="2" width="10" height="10" rx="1.5" stroke="#f59e0b" strokeWidth="1.5"/>
+                  <rect x="22" y="4" width="6" height="6" fill="#f59e0b"/>
+                  <rect x="2" y="20" width="10" height="10" rx="1.5" stroke="#f59e0b" strokeWidth="1.5"/>
+                  <rect x="4" y="22" width="6" height="6" fill="#f59e0b"/>
+                  <rect x="20" y="20" width="4" height="4" fill="#f59e0b"/>
+                  <rect x="28" y="20" width="4" height="4" fill="#f59e0b"/>
+                  <rect x="20" y="28" width="4" height="4" fill="#f59e0b"/>
+                  <rect x="28" y="28" width="4" height="4" fill="#f59e0b"/>
+                </svg>
+                <div>
+                  <p className="text-gray-900 font-black text-sm">QR Code</p>
+                  <p className="text-gray-400 text-xs">{lang === "ar" ? "امسح للدفع" : lang === "nl" ? "Scan om te betalen" : lang === "fr" ? "Scanner pour payer" : "Scan to pay"}</p>
+                </div>
+              </div>
             </div>
             <div className="px-5 py-2.5 flex items-center justify-center gap-2 bg-green-50 border-t border-green-100">
               <svg className="w-3 h-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
