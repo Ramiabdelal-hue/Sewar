@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { QRCodeSVG } from "qrcode.react";
 import { useLang } from "@/context/LangContext";
 import { FaQrcode, FaPaypal, FaCreditCard, FaLock, FaUser, FaEnvelope, FaPhone, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import nl from "@/locales/nl.json";
@@ -20,6 +21,7 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
   const [subscribedData, setSubscribedData] = useState<any>(null);
   const [registrationLocked, setRegistrationLocked] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [qrModal, setQrModal] = useState<{ url: string; amount: number } | null>(null);
   const [formData, setFormData] = useState({
     fullName: "", email: "", password: "", confirmPassword: "",
     phone: "", paymentMethod: "bancontact",
@@ -101,8 +103,13 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
       const data = await res.json();
 
       if (data.success && data.checkoutUrl) {
-        // توجيه المستخدم لصفحة دفع Mollie
-        window.location.href = data.checkoutUrl;
+        if (formData.paymentMethod === "qr_scan") {
+          // عرض QR code بدلاً من التوجيه
+          setQrModal({ url: data.checkoutUrl, amount });
+        } else {
+          // توجيه المستخدم لصفحة دفع Mollie
+          window.location.href = data.checkoutUrl;
+        }
       } else if (data.alreadySubscribed) {
         alert(
           lang === "ar"
@@ -301,6 +308,60 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
           </div>
         </div>
       </div>
+
+      {/* Modal - QR Code للدفع */}
+      {qrModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-[99999] p-4"
+          style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(12px)" }}>
+          <div className="w-full max-w-sm rounded-3xl overflow-hidden bg-white text-center"
+            style={{ border: "1px solid #e5e7eb", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
+            {/* Header */}
+            <div className="px-6 pt-6 pb-4"
+              style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)" }}>
+              <div className="text-4xl mb-2">📱</div>
+              <h2 className="text-white font-black text-lg">
+                {lang === "ar" ? "امسح للدفع" : lang === "nl" ? "Scan om te betalen" : lang === "fr" ? "Scanner pour payer" : "Scan to pay"}
+              </h2>
+              <p className="text-white/80 text-sm mt-1">€{qrModal.amount.toFixed(2)}</p>
+            </div>
+
+            {/* QR Code */}
+            <div className="px-8 py-6 flex flex-col items-center gap-4">
+              <div className="p-4 bg-white rounded-2xl shadow-lg border-2 border-amber-200">
+                <QRCodeSVG
+                  value={qrModal.url}
+                  size={200}
+                  level="H"
+                  includeMargin={false}
+                />
+              </div>
+              <p className="text-gray-500 text-xs font-medium text-center">
+                {lang === "ar"
+                  ? "امسح الكود بكاميرا هاتفك أو تطبيق الدفع"
+                  : lang === "nl"
+                  ? "Scan de code met uw telefoon of betaalapp"
+                  : lang === "fr"
+                  ? "Scannez le code avec votre téléphone ou app de paiement"
+                  : "Scan the code with your phone or payment app"}
+              </p>
+
+              {/* زر فتح الرابط مباشرة */}
+              <button
+                onClick={() => window.location.href = qrModal.url}
+                className="w-full py-3 rounded-xl font-black text-sm text-white transition-all active:scale-95"
+                style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)" }}>
+                {lang === "ar" ? "أو افتح رابط الدفع" : lang === "nl" ? "Of open betaallink" : lang === "fr" ? "Ou ouvrir le lien" : "Or open payment link"}
+              </button>
+
+              <button
+                onClick={() => setQrModal(null)}
+                className="w-full py-2.5 rounded-xl font-black text-sm border-2 border-gray-200 text-gray-500 hover:bg-gray-50">
+                {lang === "ar" ? "إلغاء" : lang === "nl" ? "Annuleren" : lang === "fr" ? "Annuler" : "Cancel"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal - اشتراك موجود */}
       {alreadySubscribedModal && subscribedData && (
