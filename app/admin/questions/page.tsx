@@ -938,6 +938,7 @@ export default function AdminQuestionsPage() {
         const text = await res.text();
         console.error("❌ API Error Response:", text);
         alert(`خطأ من السيرفر: ${text}`);
+        setSaving(false);
         return;
       }
 
@@ -946,6 +947,7 @@ export default function AdminQuestionsPage() {
       
       if (!data.success) {
         alert(`فشل حفظ السؤال: ${data.message}`);
+        setSaving(false);
         return;
       }
 
@@ -1040,8 +1042,6 @@ export default function AdminQuestionsPage() {
       setSaving(false);
     }
   };
-
-  const handleDeleteImage = async (questionId: number, imageUrl: string) => {
     if (!confirm("هل تريد حذف هذه الصورة؟")) return;
 
     try {
@@ -2438,6 +2438,7 @@ export default function AdminQuestionsPage() {
                       <div className="flex gap-2 pt-4 border-t border-gray-100">
                         <button
                           onClick={() => {
+                            setSaving(false);
                             setEditingQuestion(q);
                             setEditText(q.text);
                             setEditForm({
