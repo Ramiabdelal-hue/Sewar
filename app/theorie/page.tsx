@@ -397,66 +397,6 @@ export default function TheoriePage() {
               : (lang === "ar" ? "اختر فئة ومدة أولاً" : lang === "nl" ? "Kies een categorie en duur" : "Choisissez une catégorie")}
           </button>
 
-          {/* ── طرق الدفع ── */}
-          <div className="rounded-3xl overflow-hidden mb-6"
-            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)" }}>
-            <div className="px-5 py-4 border-b" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
-              <p className="text-white/60 text-xs font-black uppercase tracking-widest text-center">
-                🔒 {lang === "ar" ? "طرق الدفع الآمنة" : lang === "nl" ? "Veilige betaalmethoden" : lang === "fr" ? "Méthodes de paiement sécurisées" : "Secure payment methods"}
-              </p>
-            </div>
-            <div className="grid grid-cols-3 gap-0">
-              {[
-                {
-                  icon: (
-                    <svg viewBox="0 0 48 48" className="w-8 h-8">
-                      <rect width="48" height="48" rx="8" fill="#005498"/>
-                      <text x="24" y="30" textAnchor="middle" fill="white" fontSize="11" fontWeight="900">BANC</text>
-                      <text x="24" y="40" textAnchor="middle" fill="#f5a623" fontSize="8" fontWeight="700">CONTACT</text>
-                    </svg>
-                  ),
-                  label: "Bancontact",
-                  sub: lang === "ar" ? "بلجيكا" : "België",
-                  color: "#005498",
-                },
-                {
-                  icon: (
-                    <svg viewBox="0 0 48 48" className="w-8 h-8">
-                      <rect width="48" height="48" rx="8" fill="#1a1f71"/>
-                      <text x="24" y="22" textAnchor="middle" fill="white" fontSize="10" fontWeight="900">VISA</text>
-                      <rect x="8" y="26" width="32" height="3" rx="1.5" fill="#f7b731"/>
-                      <text x="24" y="38" textAnchor="middle" fill="white" fontSize="7">Mastercard</text>
-                    </svg>
-                  ),
-                  label: "Visa / MC",
-                  sub: lang === "ar" ? "بطاقة" : "Kaart",
-                  color: "#1a1f71",
-                },
-                {
-                  icon: (
-                    <svg viewBox="0 0 48 48" className="w-8 h-8">
-                      <rect width="48" height="48" rx="8" fill="#f59e0b"/>
-                      <rect x="10" y="14" width="28" height="20" rx="3" fill="white" opacity="0.9"/>
-                      <rect x="10" y="20" width="28" height="4" fill="#f59e0b"/>
-                      <circle cx="24" cy="34" r="3" fill="#f59e0b"/>
-                    </svg>
-                  ),
-                  label: "QR Code",
-                  sub: lang === "ar" ? "مسح" : "Scannen",
-                  color: "#f59e0b",
-                },
-              ].map((m, i) => (
-                <div key={i} className="flex flex-col items-center gap-2 py-4 px-2"
-                  style={{ borderRight: i < 2 ? "1px solid rgba(255,255,255,0.08)" : "none" }}>
-                  {m.icon}
-                  <div className="text-center">
-                    <p className="text-white text-xs font-black">{m.label}</p>
-                    <p className="text-white/40 text-[10px]">{m.sub}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="px-5 py-3 flex items-center justify-center gap-2"
   // ─── شاشة انتهاء الاشتراك ────────────────────────────────────────────────────
   if (isExpired) {
     return (
