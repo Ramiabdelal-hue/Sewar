@@ -103,10 +103,19 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
       if (data.success && data.checkoutUrl) {
         // توجيه المستخدم لصفحة دفع Mollie
         window.location.href = data.checkoutUrl;
+      } else if (data.alreadySubscribed) {
+        alert(
+          lang === "ar"
+            ? `⚠️ لديك اشتراك نشط في هذه الفئة — متبقي ${data.daysLeft} يوم\n\nيمكنك الاشتراك في فئة أو خاصية مختلفة.`
+            : lang === "nl"
+            ? `⚠️ U heeft al een actief abonnement voor deze categorie — nog ${data.daysLeft} dagen geldig\n\nU kunt zich abonneren op een andere categorie of dienst.`
+            : lang === "fr"
+            ? `⚠️ Vous avez déjà un abonnement actif pour cette catégorie — encore ${data.daysLeft} jours\n\nVous pouvez vous abonner à une autre catégorie ou service.`
+            : `⚠️ You already have an active subscription for this category — ${data.daysLeft} days remaining\n\nYou can subscribe to a different category or service.`
+        );
       } else {
         alert(data.message || (lang === "ar" ? "خطأ في إنشاء الدفع" : "Betaling aanmaken mislukt"));
-      }
-    } catch {
+      }    } catch {
       alert(lang === "ar" ? "خطأ في الخادم!" : lang === "nl" ? "Serverfout!" : lang === "fr" ? "Erreur serveur!" : "Server error!");
     } finally {
       setLoading(false);

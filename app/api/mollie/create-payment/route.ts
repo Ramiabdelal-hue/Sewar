@@ -26,6 +26,36 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Mollie not configured" }, { status: 500 });
     }
 
+    // ── فحص الاشتراك النشط قبل إنشاء الدفعة ──────────────────────────────
+    const { prisma } = await import("@/lib/prisma");
+    const category   = body.metadata?.category || "B";
+    const subType    = body.metadata?.subscriptionType || "theorie";
+    const emailNorm  = email.toLowerCase().trim();
+
+    const existingUser = await prisma.user.findUnique({ where: { email: emailNorm } });
+    if (existingUser) {
+      const now = new Date();
+      const activeSub = await prisma.subscription.findUnique({
+        where: {
+          userId_subscriptionType_category: {
+            userId: existingUser.id,
+            subscriptionType: subType,
+            category,
+          },
+        },
+      });
+      if (activeSub && activeSub.isActive && new Date(activeSub.expiryDate) > now) {
+        const daysLeft = Math.ceil((new Date(activeSub.expiryDate).getTime() - now.getTime()) / 86400000);
+        return NextResponse.json({
+          success: false,
+          alreadySubscribed: true,
+          daysLeft,
+          message: `لديك اشتراك نشط في ${subType} فئة ${category} — متبقي ${daysLeft} يوم`,
+        }, { status: 409 });
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
     const mollie = createMollieClient({ apiKey });
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://sewar-1q112.vercel.app";
