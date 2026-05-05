@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { useLang } from "@/context/LangContext";
-import { FaQrcode, FaCreditCard, FaLock, FaUser, FaEnvelope, FaPhone, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaQrcode, FaCreditCard, FaLock, FaUser, FaEnvelope, FaPhone, FaChevronLeft, FaChevronRight, FaEye, FaEyeSlash } from "react-icons/fa";
 import nl from "@/locales/nl.json";
 import fr from "@/locales/fr.json";
 import ar from "@/locales/ar.json";
@@ -16,16 +16,34 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
   const isRtl = lang === "ar";
 
   const [loading, setLoading] = useState(false);
-  const [successMsg, setSuccessMsg] = useState("");
   const [alreadySubscribedModal, setAlreadySubscribedModal] = useState(false);
   const [subscribedData, setSubscribedData] = useState<any>(null);
   const [registrationLocked, setRegistrationLocked] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [qrModal, setQrModal] = useState<{ url: string; amount: number } | null>(null);
+  const [showPass, setShowPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "", email: "", password: "", confirmPassword: "",
     phone: "", paymentMethod: "bancontact",
   });
+
+  // حساب السعر
+  const selectedCatId = selectedData?.catId || "B";
+  const duration = selectedData?.duration || "2w";
+  let subscriptionType = "theorie";
+  if (selectedCatId === "lessons") subscriptionType = "praktijk-lessons";
+  else if (selectedCatId === "exam") subscriptionType = "praktijk-exam";
+  else if (["cat-a","cat-b","cat-c"].includes(selectedCatId)) subscriptionType = "examen";
+  const packagePrices: Record<string, Record<string, number>> = {
+    theorie:            { "2w": 25, "1m": 50 },
+    examen:             { "2w": 25, "1m": 50 },
+    "praktijk-lessons": { "2w": 49, "1m": 49 },
+    "praktijk-exam":    { "2w": 39, "1m": 39 },
+  };
+  const amount = packagePrices[subscriptionType]?.[duration] ?? 25;
+  const BTW = Math.round(amount * 0.21 * 100) / 100;
+  const excl = Math.round((amount - BTW) * 100) / 100;
 
   useEffect(() => {
     const storedData = localStorage.getItem("renewPrefillData");
@@ -38,18 +56,6 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
     fetch("/api/registration-status").then(r => r.json()).then(d => { if (d.locked) setRegistrationLocked(true); }).catch(() => {});
   }, [prefillData]);
 
-  const redirectToContent = (data: any) => {
-    const selectedCatId = selectedData?.catId || "B";
-    const userCategory = data.cat || "B";
-    localStorage.setItem("userEmail", data.email || formData.email);
-    localStorage.setItem("userCategory", userCategory);
-    localStorage.setItem("userExpiry", data.exp?.toString() || "");
-    if (selectedCatId === "lessons") window.location.assign(`/praktical/lessons?email=${encodeURIComponent(data.email)}&exp=${data.exp}`);
-    else if (selectedCatId === "exam") window.location.assign(`/praktical/exam?email=${encodeURIComponent(data.email)}&exp=${data.exp}`);
-    else if (["cat-a","cat-b","cat-c"].includes(selectedCatId)) window.location.assign(`/examen?email=${encodeURIComponent(data.email)}&cat=${userCategory}&exp=${data.exp}`);
-    else window.location.assign(`/lessons?cat=${userCategory}&email=${encodeURIComponent(data.email)}&exp=${data.exp}`);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
@@ -58,28 +64,12 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
     }
     setLoading(true);
     try {
-      const selectedCatId = selectedData?.catId || "B";
-      const duration = selectedData?.duration || "2w";
       let targetCat = "B";
       if (["cat-c","C"].includes(selectedCatId)) targetCat = "C";
       else if (["cat-a","A"].includes(selectedCatId)) targetCat = "A";
-      let subscriptionType = "theorie";
-      if (selectedCatId === "lessons") subscriptionType = "praktijk-lessons";
-      else if (selectedCatId === "exam") subscriptionType = "praktijk-exam";
-      else if (["cat-a","cat-b","cat-c"].includes(selectedCatId)) subscriptionType = "examen";
-
-      // أسعار الاشتراكات
-      const packagePrices: Record<string, Record<string, number>> = {
-        theorie:           { "2w": 25, "1m": 50 },
-        examen:            { "2w": 25, "1m": 50 },
-        "praktijk-lessons":{ "2w": 49, "1m": 49 },
-        "praktijk-exam":   { "2w": 39, "1m": 39 },
-      };
-      const amount = packagePrices[subscriptionType]?.[duration] ?? 25;
 
       localStorage.setItem("renewPrefillData", JSON.stringify({ fullName: formData.fullName, email: formData.email, phone: formData.phone }));
 
-      // إنشاء دفعة Mollie
       const res = await fetch("/api/mollie/create-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -104,25 +94,17 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
 
       if (data.success && data.checkoutUrl) {
         if (formData.paymentMethod === "qr_scan") {
-          // عرض QR code بدلاً من التوجيه
           setQrModal({ url: data.checkoutUrl, amount });
         } else {
-          // توجيه المستخدم لصفحة دفع Mollie
           window.location.href = data.checkoutUrl;
         }
       } else if (data.alreadySubscribed) {
-        alert(
-          lang === "ar"
-            ? `⚠️ لديك اشتراك نشط في هذه الفئة — متبقي ${data.daysLeft} يوم\n\nيمكنك الاشتراك في فئة أو خاصية مختلفة.`
-            : lang === "nl"
-            ? `⚠️ U heeft al een actief abonnement voor deze categorie — nog ${data.daysLeft} dagen geldig\n\nU kunt zich abonneren op een andere categorie of dienst.`
-            : lang === "fr"
-            ? `⚠️ Vous avez déjà un abonnement actif pour cette catégorie — encore ${data.daysLeft} jours\n\nVous pouvez vous abonner à une autre catégorie ou service.`
-            : `⚠️ You already have an active subscription for this category — ${data.daysLeft} days remaining\n\nYou can subscribe to a different category or service.`
-        );
+        setSubscribedData(data);
+        setAlreadySubscribedModal(true);
       } else {
         alert(data.message || (lang === "ar" ? "خطأ في إنشاء الدفع" : "Betaling aanmaken mislukt"));
-      }    } catch {
+      }
+    } catch {
       alert(lang === "ar" ? "خطأ في الخادم!" : lang === "nl" ? "Serverfout!" : lang === "fr" ? "Erreur serveur!" : "Server error!");
     } finally {
       setLoading(false);
@@ -130,272 +112,309 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
   };
 
   const payMethods = [
-    { id: "bancontact", label: "Bancontact", icon: <FaCreditCard />, color: "#6366f1", glow: "rgba(99,102,241,0.4)" },
-    { id: "qr_scan",   label: "QR Code",    icon: <FaQrcode />,     color: "#f59e0b", glow: "rgba(245,158,11,0.4)" },
-    { id: "creditcard", label: "Visa / MC",  icon: <FaCreditCard />, color: "#1a56db", glow: "rgba(26,86,219,0.4)" },
+    {
+      id: "bancontact",
+      label: "Bancontact",
+      sub: lang === "ar" ? "الدفع البلجيكي" : lang === "nl" ? "Belgische betaling" : lang === "fr" ? "Paiement belge" : "Belgian payment",
+      icon: (
+        <svg viewBox="0 0 56 32" className="w-12 h-7">
+          <rect width="56" height="32" rx="5" fill="#005498"/>
+          <text x="28" y="14" textAnchor="middle" fill="white" fontSize="8" fontWeight="900" fontFamily="Arial">BANC</text>
+          <text x="28" y="25" textAnchor="middle" fill="#f5a623" fontSize="6" fontWeight="700" fontFamily="Arial">CONTACT</text>
+        </svg>
+      ),
+      activeBorder: "#005498",
+      activeBg: "rgba(0,84,152,0.12)",
+      bg: "rgba(0,84,152,0.06)",
+      border: "rgba(0,84,152,0.25)",
+    },
+    {
+      id: "creditcard",
+      label: "Visa / Mastercard",
+      sub: lang === "ar" ? "بطاقة ائتمان" : lang === "nl" ? "Kredietkaart" : lang === "fr" ? "Carte de crédit" : "Credit card",
+      icon: (
+        <div className="flex gap-1 items-center">
+          <svg viewBox="0 0 38 24" className="w-9 h-6">
+            <rect width="38" height="24" rx="4" fill="#1a1f71"/>
+            <text x="19" y="16" textAnchor="middle" fill="white" fontSize="9" fontWeight="900" fontFamily="Arial" fontStyle="italic">VISA</text>
+          </svg>
+          <svg viewBox="0 0 38 24" className="w-9 h-6">
+            <rect width="38" height="24" rx="4" fill="#252525"/>
+            <circle cx="15" cy="12" r="7" fill="#eb001b"/>
+            <circle cx="23" cy="12" r="7" fill="#f79e1b"/>
+            <path d="M19 6.8a7 7 0 010 10.4A7 7 0 0119 6.8z" fill="#ff5f00"/>
+          </svg>
+        </div>
+      ),
+      activeBorder: "#4f46e5",
+      activeBg: "rgba(79,70,229,0.12)",
+      bg: "rgba(79,70,229,0.06)",
+      border: "rgba(79,70,229,0.25)",
+    },
+    {
+      id: "qr_scan",
+      label: "QR Code",
+      sub: lang === "ar" ? "امسح للدفع" : lang === "nl" ? "Scan om te betalen" : lang === "fr" ? "Scanner pour payer" : "Scan to pay",
+      icon: (
+        <svg viewBox="0 0 32 32" className="w-8 h-8" fill="none">
+          <rect x="2" y="2" width="12" height="12" rx="2" stroke="#f59e0b" strokeWidth="2"/>
+          <rect x="5" y="5" width="6" height="6" fill="#f59e0b"/>
+          <rect x="18" y="2" width="12" height="12" rx="2" stroke="#f59e0b" strokeWidth="2"/>
+          <rect x="21" y="5" width="6" height="6" fill="#f59e0b"/>
+          <rect x="2" y="18" width="12" height="12" rx="2" stroke="#f59e0b" strokeWidth="2"/>
+          <rect x="5" y="21" width="6" height="6" fill="#f59e0b"/>
+          <rect x="18" y="18" width="4" height="4" fill="#f59e0b"/>
+          <rect x="26" y="18" width="4" height="4" fill="#f59e0b"/>
+          <rect x="18" y="26" width="4" height="4" fill="#f59e0b"/>
+          <rect x="26" y="26" width="4" height="4" fill="#f59e0b"/>
+        </svg>
+      ),
+      activeBorder: "#f59e0b",
+      activeBg: "rgba(245,158,11,0.12)",
+      bg: "rgba(245,158,11,0.06)",
+      border: "rgba(245,158,11,0.25)",
+    },
   ];
 
   const fields = [
-    { key: "fullName",        type: "text",     icon: <FaUser />,     placeholder: lang === "ar" ? "محمد أحمد" : "Jan Janssen",          label: lang === "ar" ? "الاسم الكامل"          : lang === "nl" ? "Volledige naam"       : lang === "fr" ? "Nom complet"            : "Full name" },
-    { key: "email",           type: "email",    icon: <FaEnvelope />, placeholder: lang === "ar" ? "example@email.com" : "jan@email.com", label: lang === "ar" ? "البريد الإلكتروني"    : lang === "nl" ? "E-mailadres"          : lang === "fr" ? "Adresse e-mail"         : "Email address" },
-    { key: "password",        type: "password", icon: <FaLock />,     placeholder: "••••••••",                                            label: lang === "ar" ? "كلمة المرور"          : lang === "nl" ? "Wachtwoord"           : lang === "fr" ? "Mot de passe"           : "Password" },
-    { key: "confirmPassword", type: "password", icon: <FaLock />,     placeholder: "••••••••",                                            label: lang === "ar" ? "تأكيد كلمة المرور"   : lang === "nl" ? "Bevestig wachtwoord"  : lang === "fr" ? "Confirmer le mot de passe" : "Confirm password" },
-    { key: "phone",           type: "tel",      icon: <FaPhone />,    placeholder: "+32 4XX XX XX XX",                                    label: lang === "ar" ? "رقم الهاتف"           : lang === "nl" ? "Telefoonnummer"       : lang === "fr" ? "Numéro de téléphone"    : "Phone number" },
+    { key: "fullName",        type: "text",  icon: <FaUser />,     placeholder: lang === "ar" ? "محمد أحمد" : "Jan Janssen",  label: lang === "ar" ? "الاسم الكامل" : lang === "nl" ? "Volledige naam" : lang === "fr" ? "Nom complet" : "Full name" },
+    { key: "email",           type: "email", icon: <FaEnvelope />, placeholder: "example@email.com",                           label: lang === "ar" ? "البريد الإلكتروني" : lang === "nl" ? "E-mailadres" : lang === "fr" ? "Adresse e-mail" : "Email" },
+    { key: "phone",           type: "tel",   icon: <FaPhone />,    placeholder: "+32 4XX XX XX XX",                            label: lang === "ar" ? "رقم الهاتف" : lang === "nl" ? "Telefoonnummer" : lang === "fr" ? "Téléphone" : "Phone" },
+    { key: "password",        type: showPass ? "text" : "password",        icon: <FaLock />, placeholder: "••••••••", label: lang === "ar" ? "كلمة المرور" : lang === "nl" ? "Wachtwoord" : lang === "fr" ? "Mot de passe" : "Password",         toggle: () => setShowPass(p => !p),        showToggle: showPass },
+    { key: "confirmPassword", type: showConfirmPass ? "text" : "password", icon: <FaLock />, placeholder: "••••••••", label: lang === "ar" ? "تأكيد كلمة المرور" : lang === "nl" ? "Bevestig wachtwoord" : lang === "fr" ? "Confirmer" : "Confirm", toggle: () => setShowConfirmPass(p => !p), showToggle: showConfirmPass },
   ];
 
   return (
-    <div className="min-h-screen flex flex-col md:items-center md:justify-center py-0 md:py-8"
-      dir={isRtl ? "rtl" : "ltr"}
-      style={{ background: "#f0f0f0" }}>
+    <div className="min-h-screen" dir={isRtl ? "rtl" : "ltr"}
+      style={{ background: "linear-gradient(160deg, #0f0c29 0%, #302b63 50%, #24243e 100%)" }}>
 
-      <div className="relative z-10 w-full md:max-w-lg flex-1 md:flex-none flex flex-col">
-        <div className="flex-1 flex flex-col md:rounded-3xl md:overflow-hidden bg-white"
-          style={{ border: "1px solid #e5e7eb", boxShadow: "0 4px 24px rgba(0,0,0,0.08)" }}>
-
-          {/* Header */}
-          <div className="px-5 md:px-6 pt-5 pb-4 flex items-center gap-3 flex-shrink-0"
-            style={{ borderBottom: "1px solid #f3f4f6", background: "linear-gradient(135deg, #7c3aed, #5b21b6)" }}>
-            <button onClick={onBack}
-              className="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-105 active:scale-95 flex-shrink-0"
-              style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)" }}>
-              {isRtl ? <FaChevronRight className="text-white text-sm" /> : <FaChevronLeft className="text-white text-sm" />}
-            </button>
-            <div className="flex-1 min-w-0">
-              <p className="text-white/60 text-[10px] font-black uppercase tracking-widest">
-                {lang === "ar" ? "إتمام الاشتراك" : lang === "nl" ? "Inschrijving voltooien" : lang === "fr" ? "Finaliser l'inscription" : "Complete registration"}
-              </p>
-              <h1 className="text-white font-black text-sm leading-tight truncate">{selectedData?.catName || "Rijbewijs"}</h1>
-            </div>
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <div className="flex gap-0.5 rounded-lg p-1" style={{ background: "rgba(255,255,255,0.1)" }}>
-                {[["nl","NL"],["fr","FR"],["ar","AR"],["en","EN"]].map(([code, label]) => (
-                  <button key={code} type="button" onClick={() => setLang(code as any)}
-                    className="px-2 py-1 rounded-md text-[10px] font-black transition-all"
-                    style={lang === code ? { background: "rgba(255,255,255,0.25)", color: "white" } : { color: "rgba(255,255,255,0.5)" }}>
-                    {label}
-                  </button>
-                ))}
-              </div>
-              <span className="px-2.5 py-1.5 rounded-lg text-[10px] font-black"
-                style={{ background: "rgba(255,255,255,0.15)", color: "white", border: "1px solid rgba(255,255,255,0.2)" }}>
-                {selectedData?.duration === "2w" ? "2W" : "1M"}
-              </span>
-            </div>
-          </div>
-
-          {/* المحتوى */}
-          <div className="flex-1 overflow-y-auto px-5 md:px-6 py-5 pb-8 space-y-4">
-
-            {/* بانر Test Mode */}
-            <div className="px-4 py-3 rounded-xl text-center"
-              style={{ background: "rgba(234,179,8,0.15)", border: "1.5px solid rgba(234,179,8,0.4)" }}>
-              <p className="text-yellow-600 font-black text-xs">
-                🧪 TEST MODE — {lang === "ar" ? "وضع الاختبار: التسجيل مجاني بدون دفع حقيقي" : lang === "nl" ? "Testmodus: gratis registratie zonder echte betaling" : lang === "fr" ? "Mode test: inscription gratuite sans vrai paiement" : "Test mode: free registration without real payment"}
-              </p>
-            </div>
-
-            {/* رسالة القفل */}
-            {registrationLocked && (
-              <div className="px-5 py-4 rounded-2xl text-center"
-                style={{ background: "linear-gradient(135deg, rgba(249,115,22,0.2), rgba(234,88,12,0.2))", border: "1px solid rgba(249,115,22,0.3)" }}>
-                <p className="text-orange-400 font-black text-sm">🔧 {lang === "ar" ? "الموقع تحت الصيانة" : lang === "nl" ? "Website in onderhoud" : "Under maintenance"}</p>
-                <p className="text-orange-400/60 text-xs mt-1">{lang === "ar" ? "يرجى المحاولة لاحقاً 🙏" : lang === "nl" ? "Probeer het later opnieuw 🙏" : "Please try again later 🙏"}</p>
-              </div>
-            )}
-
-            {/* رسالة النجاح */}
-            {successMsg && (
-              <div className="px-5 py-4 rounded-2xl text-center font-black text-sm"
-                style={{ background: "linear-gradient(135deg, rgba(34,197,94,0.2), rgba(22,163,74,0.2))", border: "1px solid rgba(34,197,94,0.3)", color: "#4ade80" }}>
-                {successMsg}
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* حقول الإدخال */}
-              <div className="space-y-3">
-                {fields.map(({ key, type, icon, placeholder, label }) => {
-                  const isFocused = focusedField === key;
-                  return (
-                    <div key={key}>
-                      <label className="block text-[11px] font-black mb-1.5 px-1 uppercase tracking-wider"
-                        style={{ color: isFocused ? "#7c3aed" : "#9ca3af" }}>
-                        {label}
-                      </label>
-                      <div className="relative">
-                        <span className="absolute top-1/2 -translate-y-1/2 text-sm transition-colors"
-                          style={{ [isRtl ? "right" : "left"]: "1rem", color: isFocused ? "#7c3aed" : "#9ca3af" }}>
-                          {icon}
-                        </span>
-                        <input
-                          required type={type} placeholder={placeholder}
-                          value={(formData as any)[key] || ""}
-                          className="w-full py-3.5 text-sm font-medium placeholder-gray-300 rounded-xl outline-none transition-all"
-                          style={{
-                            paddingLeft: isRtl ? "1rem" : "2.75rem",
-                            paddingRight: isRtl ? "2.75rem" : "1rem",
-                            background: isFocused ? "rgba(124,58,237,0.05)" : "#f9fafb",
-                            border: isFocused ? "1.5px solid #7c3aed" : "1.5px solid #e5e7eb",
-                            color: "#1a1a1a",
-                          }}
-                          onFocus={() => setFocusedField(key)}
-                          onBlur={() => setFocusedField(null)}
-                          onChange={e => setFormData({ ...formData, [key]: e.target.value })}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* طريقة الدفع */}
-              <div>
-                <p className="text-[11px] font-black uppercase tracking-wider mb-3 px-1" style={{ color: "#9ca3af" }}>
-                  {t.paymentQuestion}
-                </p>
-                <div className="grid grid-cols-3 gap-2.5">
-                  {payMethods.map(m => {
-                    const active = formData.paymentMethod === m.id;
-                    return (
-                      <button key={m.id} type="button"
-                        onClick={() => setFormData({ ...formData, paymentMethod: m.id })}
-                        className="relative flex flex-col items-center gap-2 py-4 rounded-2xl transition-all active:scale-95 hover:scale-[1.03]"
-                        style={{
-                          background: active ? "rgba(124,58,237,0.08)" : "#f9fafb",
-                          border: active ? "1.5px solid #7c3aed" : "1.5px solid #e5e7eb",
-                        }}>
-                        {active && (
-                          <div className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full" style={{ background: "#7c3aed" }} />
-                        )}
-                        <span className="text-xl transition-colors" style={{ color: active ? "#7c3aed" : "#9ca3af" }}>{m.icon}</span>
-                        <span className="text-[10px] font-black transition-colors" style={{ color: active ? "#7c3aed" : "#9ca3af" }}>{m.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* أمان */}
-              <div className="flex items-center gap-2.5 px-4 py-3 rounded-xl"
-                style={{ background: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.12)" }}>
-                <FaLock className="text-green-400/70 text-xs flex-shrink-0" />
-                <p className="text-[11px] font-bold" style={{ color: "rgba(74,222,128,0.6)" }}>
-                  {lang === "ar" ? "بياناتك محمية ومشفرة بالكامل" : lang === "nl" ? "Uw gegevens zijn beveiligd en versleuteld" : lang === "fr" ? "Vos données sont sécurisées et chiffrées" : "Your data is fully secured and encrypted"}
-                </p>
-              </div>
-
-              {/* زر الإرسال */}
-              <button type="submit" disabled={loading || registrationLocked}
-                className="w-full py-4 rounded-2xl font-black text-base transition-all active:scale-95 hover:scale-[1.02] disabled:opacity-40"
-                style={{
-                  background: loading ? "#e5e7eb" : "linear-gradient(135deg, #d4af37, #f0d060)",
-                  color: loading ? "#9ca3af" : "#0a0a0a",
-                  boxShadow: loading ? "none" : "0 8px 32px rgba(212,175,55,0.35)",
-                }}>
-                {loading ? (
-                  <div className="flex items-center justify-center gap-3">
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span className="text-white/60">{lang === "ar" ? "جاري التوجيه للدفع..." : lang === "nl" ? "Doorsturen naar betaling..." : lang === "fr" ? "Redirection vers paiement..." : "Redirecting to payment..."}</span>
-                  </div>
-                ) : (
-                  <span className="flex items-center justify-center gap-2">
-                    🔒 {lang === "ar" ? "ادفع الآن عبر Mollie" : lang === "nl" ? "Nu betalen via Mollie" : lang === "fr" ? "Payer maintenant via Mollie" : "Pay now via Mollie"}
-                    {isRtl ? <FaChevronLeft className="text-xs" /> : <FaChevronRight className="text-xs" />}
-                  </span>
-                )}
+      {/* Header */}
+      <div style={{ background: "rgba(255,255,255,0.04)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+        <div className="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
+          <button onClick={onBack}
+            className="flex items-center gap-2 font-bold text-sm transition-colors"
+            style={{ color: "rgba(255,255,255,0.6)" }}>
+            {isRtl ? <FaChevronRight /> : <FaChevronLeft />}
+            {lang === "ar" ? "رجوع" : lang === "nl" ? "Terug" : lang === "fr" ? "Retour" : "Back"}
+          </button>
+          <div className="flex gap-1">
+            {[["nl","NL"],["fr","FR"],["ar","AR"],["en","EN"]].map(([code, label]) => (
+              <button key={code} onClick={() => setLang(code as any)}
+                className="px-2.5 py-1 rounded-lg text-[10px] font-black transition-all"
+                style={lang === code ? { background: "rgba(255,255,255,0.2)", color: "white" } : { color: "rgba(255,255,255,0.4)" }}>
+                {label}
               </button>
-            </form>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Modal - QR Code للدفع */}
+      <div className="max-w-lg mx-auto px-4 py-6 pb-12">
+
+        {/* ملخص الطلب */}
+        <div className="rounded-2xl p-5 mb-6"
+          style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs font-black uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.4)" }}>
+              {lang === "ar" ? "ملخص الطلب" : lang === "nl" ? "Besteloverzicht" : lang === "fr" ? "Récapitulatif" : "Order summary"}
+            </p>
+            <span className="px-2.5 py-1 rounded-full text-xs font-black"
+              style={{ background: "rgba(212,175,55,0.2)", color: "#d4af37", border: "1px solid rgba(212,175,55,0.3)" }}>
+              {duration === "2w" ? (lang === "ar" ? "أسبوعان" : lang === "nl" ? "2 Weken" : "2 Semaines") : (lang === "ar" ? "شهر" : lang === "nl" ? "1 Maand" : "1 Mois")}
+            </span>
+          </div>
+          <p className="text-white font-black text-lg mb-3">{selectedData?.catName || "Rijbewijs"}</p>
+          <div className="space-y-1.5 text-sm">
+            <div className="flex justify-between">
+              <span style={{ color: "rgba(255,255,255,0.4)" }}>{lang === "ar" ? "المبلغ بدون ضريبة" : "Excl. BTW"}</span>
+              <span className="text-white font-bold">€{excl.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span style={{ color: "rgba(255,255,255,0.4)" }}>BTW 21%</span>
+              <span className="text-white font-bold">€{BTW.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between pt-2" style={{ borderTop: "1px solid rgba(255,255,255,0.1)" }}>
+              <span className="text-white font-black">{lang === "ar" ? "الإجمالي" : lang === "nl" ? "Totaal" : "Total"}</span>
+              <span className="font-black text-xl" style={{ color: "#d4af37" }}>€{amount.toFixed(2)}</span>
+            </div>
+          </div>
+        </div>
+
+        {registrationLocked && (
+          <div className="px-4 py-3 rounded-xl mb-4 text-center"
+            style={{ background: "rgba(249,115,22,0.15)", border: "1px solid rgba(249,115,22,0.3)" }}>
+            <p className="text-orange-400 font-black text-sm">🔧 {lang === "ar" ? "الموقع تحت الصيانة" : lang === "nl" ? "Website in onderhoud" : "Under maintenance"}</p>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+
+          {/* حقول الإدخال */}
+          <div className="space-y-3">
+            {fields.map(({ key, type, icon, placeholder, label, toggle, showToggle }: any) => {
+              const isFocused = focusedField === key;
+              return (
+                <div key={key}>
+                  <label className="block text-xs font-black mb-1.5 px-1 uppercase tracking-wider"
+                    style={{ color: isFocused ? "#a78bfa" : "rgba(255,255,255,0.4)" }}>
+                    {label}
+                  </label>
+                  <div className="relative">
+                    <span className="absolute top-1/2 -translate-y-1/2 text-sm transition-colors"
+                      style={{ [isRtl ? "right" : "left"]: "1rem", color: isFocused ? "#a78bfa" : "rgba(255,255,255,0.3)" }}>
+                      {icon}
+                    </span>
+                    <input
+                      required type={type} placeholder={placeholder}
+                      value={(formData as any)[key] || ""}
+                      className="w-full py-3.5 text-sm font-medium rounded-xl outline-none transition-all"
+                      style={{
+                        paddingLeft: isRtl ? (toggle ? "3rem" : "1rem") : "2.75rem",
+                        paddingRight: isRtl ? "2.75rem" : (toggle ? "3rem" : "1rem"),
+                        background: isFocused ? "rgba(167,139,250,0.1)" : "rgba(255,255,255,0.06)",
+                        border: isFocused ? "1.5px solid #a78bfa" : "1px solid rgba(255,255,255,0.12)",
+                        color: "white",
+                      }}
+                      onFocus={() => setFocusedField(key)}
+                      onBlur={() => setFocusedField(null)}
+                      onChange={e => setFormData({ ...formData, [key]: e.target.value })}
+                    />
+                    {toggle && (
+                      <button type="button" onClick={toggle}
+                        className="absolute top-1/2 -translate-y-1/2 transition-colors"
+                        style={{ [isRtl ? "left" : "right"]: "1rem", color: "rgba(255,255,255,0.4)" }}>
+                        {showToggle ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* طريقة الدفع */}
+          <div>
+            <p className="text-xs font-black uppercase tracking-widest mb-3 px-1"
+              style={{ color: "rgba(255,255,255,0.4)" }}>
+              🔒 {lang === "ar" ? "طريقة الدفع" : lang === "nl" ? "Betaalmethode" : lang === "fr" ? "Mode de paiement" : "Payment method"}
+            </p>
+            <div className="space-y-2.5">
+              {payMethods.map(m => {
+                const active = formData.paymentMethod === m.id;
+                return (
+                  <button key={m.id} type="button"
+                    onClick={() => setFormData({ ...formData, paymentMethod: m.id })}
+                    className="w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all active:scale-[0.98]"
+                    style={{
+                      background: active ? m.activeBg : m.bg,
+                      border: `1.5px solid ${active ? m.activeBorder : m.border}`,
+                      boxShadow: active ? `0 4px 20px ${m.activeBorder}33` : "none",
+                    }}>
+                    <div className="flex-shrink-0">{m.icon}</div>
+                    <div className={`flex-1 text-${isRtl ? "right" : "left"}`}>
+                      <p className="text-white font-black text-sm">{m.label}</p>
+                      <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>{m.sub}</p>
+                    </div>
+                    <div className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center"
+                      style={{
+                        background: active ? m.activeBorder : "transparent",
+                        border: `2px solid ${active ? m.activeBorder : "rgba(255,255,255,0.2)"}`,
+                      }}>
+                      {active && <div className="w-2 h-2 rounded-full bg-white"></div>}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* أمان */}
+          <div className="flex items-center gap-3 px-4 py-3 rounded-xl"
+            style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.2)" }}>
+            <FaLock className="text-green-400 flex-shrink-0" size={12} />
+            <p className="text-xs font-bold" style={{ color: "rgba(74,222,128,0.8)" }}>
+              {lang === "ar" ? "دفع آمن ومشفر عبر Mollie · فاتورة على بريدك الإلكتروني" : lang === "nl" ? "Veilig & versleuteld via Mollie · Factuur per e-mail" : lang === "fr" ? "Paiement sécurisé via Mollie · Facture par e-mail" : "Secure payment via Mollie · Invoice by email"}
+            </p>
+          </div>
+
+          {/* زر الدفع */}
+          <button type="submit" disabled={loading || registrationLocked}
+            className="w-full py-4 rounded-2xl font-black text-base transition-all active:scale-95 disabled:opacity-40"
+            style={{
+              background: loading ? "rgba(255,255,255,0.1)" : "linear-gradient(135deg, #d4af37, #f0d060, #d4af37)",
+              color: loading ? "rgba(255,255,255,0.4)" : "#0a0a0a",
+              boxShadow: loading ? "none" : "0 8px 32px rgba(212,175,55,0.4)",
+            }}>
+            {loading ? (
+              <div className="flex items-center justify-center gap-3">
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white/80 rounded-full animate-spin" />
+                <span>{lang === "ar" ? "جاري التوجيه للدفع..." : lang === "nl" ? "Doorsturen naar betaling..." : lang === "fr" ? "Redirection..." : "Redirecting..."}</span>
+              </div>
+            ) : (
+              <span className="flex items-center justify-center gap-2">
+                🔒 {lang === "ar" ? `ادفع الآن — €${amount}` : lang === "nl" ? `Nu betalen — €${amount}` : lang === "fr" ? `Payer — €${amount}` : `Pay now — €${amount}`}
+                {isRtl ? <FaChevronLeft size={12} /> : <FaChevronRight size={12} />}
+              </span>
+            )}
+          </button>
+        </form>
+      </div>
+
+      {/* QR Modal */}
       {qrModal && (
         <div className="fixed inset-0 flex items-center justify-center z-[99999] p-4"
           style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(12px)" }}>
-          <div className="w-full max-w-sm rounded-3xl overflow-hidden bg-white text-center"
-            style={{ border: "1px solid #e5e7eb", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
-            {/* Header */}
-            <div className="px-6 pt-6 pb-4"
-              style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)" }}>
+          <div className="w-full max-w-sm rounded-3xl overflow-hidden bg-white text-center">
+            <div className="px-6 pt-6 pb-4" style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)" }}>
               <div className="text-4xl mb-2">📱</div>
-              <h2 className="text-white font-black text-lg">
-                {lang === "ar" ? "امسح للدفع" : lang === "nl" ? "Scan om te betalen" : lang === "fr" ? "Scanner pour payer" : "Scan to pay"}
-              </h2>
+              <h2 className="text-white font-black text-lg">{lang === "ar" ? "امسح للدفع" : lang === "nl" ? "Scan om te betalen" : "Scan to pay"}</h2>
               <p className="text-white/80 text-sm mt-1">€{qrModal.amount.toFixed(2)}</p>
             </div>
-
-            {/* QR Code */}
             <div className="px-8 py-6 flex flex-col items-center gap-4">
               <div className="p-4 bg-white rounded-2xl shadow-lg border-2 border-amber-200">
-                <QRCodeSVG
-                  value={qrModal.url}
-                  size={200}
-                  level="H"
-                  includeMargin={false}
-                />
+                <QRCodeSVG value={qrModal.url} size={200} level="H" includeMargin={false} />
               </div>
-              <p className="text-gray-500 text-xs font-medium text-center">
-                {lang === "ar"
-                  ? "امسح الكود بكاميرا هاتفك أو تطبيق الدفع"
-                  : lang === "nl"
-                  ? "Scan de code met uw telefoon of betaalapp"
-                  : lang === "fr"
-                  ? "Scannez le code avec votre téléphone ou app de paiement"
-                  : "Scan the code with your phone or payment app"}
+              <p className="text-gray-500 text-xs text-center">
+                {lang === "ar" ? "امسح بكاميرا هاتفك أو تطبيق الدفع" : lang === "nl" ? "Scan met uw telefoon of betaalapp" : "Scan with your phone or payment app"}
               </p>
-
-              {/* زر فتح الرابط مباشرة */}
-              <button
-                onClick={() => window.location.href = qrModal.url}
-                className="w-full py-3 rounded-xl font-black text-sm text-white transition-all active:scale-95"
+              <button onClick={() => window.location.href = qrModal.url}
+                className="w-full py-3 rounded-xl font-black text-sm text-white"
                 style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)" }}>
-                {lang === "ar" ? "أو افتح رابط الدفع" : lang === "nl" ? "Of open betaallink" : lang === "fr" ? "Ou ouvrir le lien" : "Or open payment link"}
+                {lang === "ar" ? "أو افتح رابط الدفع" : lang === "nl" ? "Of open betaallink" : "Or open payment link"}
               </button>
-
-              <button
-                onClick={() => setQrModal(null)}
-                className="w-full py-2.5 rounded-xl font-black text-sm border-2 border-gray-200 text-gray-500 hover:bg-gray-50">
-                {lang === "ar" ? "إلغاء" : lang === "nl" ? "Annuleren" : lang === "fr" ? "Annuler" : "Cancel"}
+              <button onClick={() => setQrModal(null)}
+                className="w-full py-2.5 rounded-xl font-black text-sm border-2 border-gray-200 text-gray-500">
+                {lang === "ar" ? "إلغاء" : lang === "nl" ? "Annuleren" : "Cancel"}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Modal - اشتراك موجود */}
+      {/* Modal اشتراك موجود */}
       {alreadySubscribedModal && subscribedData && (
         <div className="fixed inset-0 flex items-end sm:items-center justify-center z-[99999] p-4"
           style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(12px)" }}>
-          <div className="w-full max-w-sm rounded-3xl overflow-hidden bg-white"
-            style={{ border: "1px solid #e5e7eb", boxShadow: "0 20px 60px rgba(0,0,0,0.15)" }}>
+          <div className="w-full max-w-sm rounded-3xl overflow-hidden"
+            style={{ background: "linear-gradient(135deg, #1a1a2e, #16213e)", border: "1px solid rgba(255,255,255,0.1)" }}>
             <div className="px-6 pt-8 pb-6 text-center">
-              <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center"
-                style={{ background: "rgba(249,115,22,0.12)", border: "1px solid rgba(249,115,22,0.25)" }}>
-                <svg className="w-8 h-8 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-              </div>
-              <h2 className="text-lg font-black text-white mb-2">
-                {lang === "ar" ? "🚫 اشتراك نشط موجود!" : lang === "nl" ? "🚫 Al een actief abonnement!" : lang === "fr" ? "🚫 Abonnement actif existant!" : "🚫 Active subscription exists!"}
+              <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center text-3xl"
+                style={{ background: "rgba(249,115,22,0.15)", border: "1px solid rgba(249,115,22,0.3)" }}>⚠️</div>
+              <h2 className="text-white font-black text-lg mb-2">
+                {lang === "ar" ? "اشتراك نشط موجود!" : lang === "nl" ? "Al een actief abonnement!" : "Active subscription exists!"}
               </h2>
-              <p className="text-sm mb-4 leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
-                {lang === "ar" ? "هذا الإيميل لديه اشتراك نشط في نفس التصنيف." : lang === "nl" ? "Dit e-mailadres heeft al een actief abonnement voor dezelfde categorie." : lang === "fr" ? "Cet e-mail a déjà un abonnement actif pour la même catégorie." : "This email already has an active subscription for the same category."}
+              <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.5)" }}>
+                {lang === "ar" ? "لديك اشتراك نشط في هذه الفئة." : lang === "nl" ? "U heeft al een actief abonnement voor deze categorie." : "You already have an active subscription."}
               </p>
-              <div className="px-4 py-3 rounded-xl mb-4 text-start space-y-1.5"
-                style={{ background: "rgba(249,115,22,0.08)", border: "1px solid rgba(249,115,22,0.18)" }}>
-                <p className="text-orange-300 text-xs font-bold break-all">📧 {subscribedData.email}</p>
-                {subscribedData.cat && <p className="text-orange-300 text-xs font-bold">📂 {lang === "ar" ? "التصنيف" : "Categorie"}: {subscribedData.cat}</p>}
-                {subscribedData.daysLeft != null && (
-                  <p className="text-orange-300 text-xs font-bold">
-                    ⏳ {lang === "ar" ? `متبقي ${subscribedData.daysLeft} يوم` : lang === "nl" ? `Nog ${subscribedData.daysLeft} dagen geldig` : `${subscribedData.daysLeft} days remaining`}
-                  </p>
-                )}
-              </div>
+              {subscribedData.daysLeft != null && (
+                <p className="text-orange-400 font-black text-sm mb-4">
+                  ⏳ {lang === "ar" ? `متبقي ${subscribedData.daysLeft} يوم` : `Nog ${subscribedData.daysLeft} dagen geldig`}
+                </p>
+              )}
               <button onClick={() => { setAlreadySubscribedModal(false); setSubscribedData(null); }}
-                className="w-full py-3.5 rounded-xl font-black text-sm transition-all active:scale-95 hover:scale-[1.02]"
-                style={{ background: "linear-gradient(135deg, #8b5cf6, #6366f1)", color: "white", boxShadow: "0 6px 24px rgba(139,92,246,0.35)" }}>
-                {lang === "ar" ? "إغلاق" : lang === "nl" ? "Sluiten" : lang === "fr" ? "Fermer" : "Close"}
+                className="w-full py-3.5 rounded-xl font-black text-sm text-white"
+                style={{ background: "linear-gradient(135deg, #7c3aed, #5b21b6)" }}>
+                {lang === "ar" ? "إغلاق" : lang === "nl" ? "Sluiten" : "Close"}
               </button>
             </div>
           </div>
