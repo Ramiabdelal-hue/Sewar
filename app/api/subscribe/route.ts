@@ -6,8 +6,8 @@ import bcrypt from "bcrypt";
 import { sendSubscriptionConfirmationEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
-  // التحقق من قفل التسجيل - غير إلى false لفتح التسجيل
-  const REGISTRATION_LOCKED = true;
+  // التحقق من قفل التسجيل - غير إلى true لإغلاق التسجيل
+  const REGISTRATION_LOCKED = false;
   if (REGISTRATION_LOCKED || process.env.REGISTRATION_LOCKED === "true") {
     return NextResponse.json({
       success: false,

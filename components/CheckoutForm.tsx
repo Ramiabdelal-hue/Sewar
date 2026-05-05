@@ -146,6 +146,14 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
           {/* المحتوى */}
           <div className="flex-1 overflow-y-auto px-5 md:px-6 py-5 pb-8 space-y-4">
 
+            {/* بانر Test Mode */}
+            <div className="px-4 py-3 rounded-xl text-center"
+              style={{ background: "rgba(234,179,8,0.15)", border: "1.5px solid rgba(234,179,8,0.4)" }}>
+              <p className="text-yellow-600 font-black text-xs">
+                🧪 TEST MODE — {lang === "ar" ? "وضع الاختبار: التسجيل مجاني بدون دفع حقيقي" : lang === "nl" ? "Testmodus: gratis registratie zonder echte betaling" : lang === "fr" ? "Mode test: inscription gratuite sans vrai paiement" : "Test mode: free registration without real payment"}
+              </p>
+            </div>
+
             {/* رسالة القفل */}
             {registrationLocked && (
               <div className="px-5 py-4 rounded-2xl text-center"
