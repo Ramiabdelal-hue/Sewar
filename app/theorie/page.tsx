@@ -125,78 +125,107 @@ export default function TheoriePage() {
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen flex flex-col" dir={isRtl ? "rtl" : "ltr"}
-        style={{ background: "#f0f0f0" }}>
+        style={{ background: "linear-gradient(160deg, #0a0a1a 0%, #0d1b3e 50%, #0a0a1a 100%)" }}>
 
         <Navbar />
 
-        <div className="relative z-10 flex-1 px-4 py-8 max-w-lg mx-auto w-full md:max-w-2xl lg:max-w-3xl">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 text-xs font-bold" style={{ background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.25)", color: "#7c3aed" }}>
-              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#7c3aed" }}></span>
-              {lang === "ar" ? "اشتراك نظري" : lang === "nl" ? "Theorie Abonnement" : "Abonnement Théorie"}
+        <div className="relative z-10 flex-1 px-4 py-8 max-w-lg mx-auto w-full md:max-w-3xl">
+
+          {/* ── Hero Header ── */}
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-5 text-xs font-black uppercase tracking-widest"
+              style={{ background: "rgba(124,58,237,0.2)", border: "1px solid rgba(124,58,237,0.4)", color: "#a78bfa" }}>
+              <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#a78bfa" }}></span>
+              {lang === "ar" ? "🎓 منصة تعليم رخصة القيادة" : lang === "nl" ? "🎓 Rijbewijs Leerplatform" : "🎓 Driving Theory Platform"}
             </div>
-            <h1 className="text-2xl font-black mb-2" style={{ color: "#1a1a1a" }}>
-              {lang === "ar" ? "اختر فئتك" : lang === "nl" ? "Kies je categorie" : "Choisissez votre catégorie"}
+            <h1 className="text-3xl md:text-4xl font-black mb-3 leading-tight"
+              style={{ color: "#ffffff", textShadow: "0 0 40px rgba(124,58,237,0.5)" }}>
+              {lang === "ar" ? "احصل على رخصتك" : lang === "nl" ? "Haal je rijbewijs" : "Obtenez votre permis"}
+              <span style={{ color: "#d4af37" }}> {lang === "ar" ? "من أول مرة" : lang === "nl" ? "in één keer" : "du premier coup"}</span>
             </h1>
-            <p className="text-gray-500 text-sm">
-              {lang === "ar" ? "وصول كامل لجميع الدروس والأسئلة" : lang === "nl" ? "Volledige toegang tot alle lessen en vragen" : "Accès complet à toutes les leçons"}
+            <p className="text-white/50 text-sm max-w-sm mx-auto">
+              {lang === "ar" ? "دروس شاملة + أسئلة تدريبية + امتحانات محاكاة" : lang === "nl" ? "Volledige lessen + oefenvragen + simulatie-examens" : "Leçons complètes + questions d'entraînement + examens"}
             </p>
           </div>
 
-          {/* كروت الفئات */}
-          <div className="space-y-3 md:grid md:grid-cols-3 md:gap-4 md:space-y-0 mb-6">
+          {/* ── مميزات سريعة ── */}
+          <div className="grid grid-cols-3 gap-3 mb-8">
+            {[
+              { icon: "📚", label: lang === "ar" ? "دروس كاملة" : "Alle lessen", sub: lang === "ar" ? "نظري شامل" : "Volledig" },
+              { icon: "🎯", label: lang === "ar" ? "امتحانات" : "Examens", sub: lang === "ar" ? "محاكاة حقيقية" : "Simulatie" },
+              { icon: "🔊", label: lang === "ar" ? "صوت" : "Audio", sub: lang === "ar" ? "قراءة تلقائية" : "Automatisch" },
+            ].map((f, i) => (
+              <div key={i} className="text-center py-4 rounded-2xl"
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                <div className="text-2xl mb-1">{f.icon}</div>
+                <p className="text-white text-xs font-black">{f.label}</p>
+                <p className="text-white/40 text-[10px] mt-0.5">{f.sub}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* ── كروت الفئات ── */}
+          <div className="space-y-4 md:grid md:grid-cols-3 md:gap-4 md:space-y-0 mb-6">
             {categories.map(cat => {
               const durations = getDurations(cat.id);
               const isSelected = globalSelection?.catId === cat.id;
               return (
-                <div key={cat.id} className="rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer bg-white"
+                <div key={cat.id}
+                  className="rounded-3xl overflow-hidden transition-all duration-300 cursor-pointer"
                   style={{
-                    border: isSelected ? `2px solid #7c3aed` : "1px solid #e5e7eb",
-                    boxShadow: isSelected ? `0 12px 40px rgba(124,58,237,0.15)` : "0 2px 8px rgba(0,0,0,0.06)",
-                  }}
-                >
+                    background: isSelected
+                      ? "linear-gradient(135deg, rgba(124,58,237,0.2), rgba(91,33,182,0.2))"
+                      : "rgba(255,255,255,0.04)",
+                    border: isSelected ? "2px solid #7c3aed" : "1px solid rgba(255,255,255,0.1)",
+                    boxShadow: isSelected ? "0 0 40px rgba(124,58,237,0.3)" : "none",
+                  }}>
+
                   {/* رأس الكرت */}
-                  <div className="flex items-center gap-4 px-5 py-5">
-                    <div className="flex-shrink-0 opacity-90">{cat.icon}</div>
+                  <div className="flex items-center gap-3 px-5 py-4">
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
+                      style={{ background: `${cat.color}22`, border: `1px solid ${cat.color}44` }}>
+                      <div style={{ color: cat.color }}>{cat.icon}</div>
+                    </div>
                     <div className="flex-1">
-                      <p className="font-black text-lg" style={{ color: "#1a1a1a" }}>{cat.name}</p>
-                      <p className="text-gray-500 text-sm mt-0.5">{cat.desc}</p>
+                      <p className="font-black text-white text-base">{cat.name}</p>
+                      <p className="text-white/40 text-xs mt-0.5">{cat.desc}</p>
                     </div>
                     {isSelected && (
-                      <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "#7c3aed" }}>
-                        <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ background: "#7c3aed" }}>
+                        <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
                       </div>
                     )}
                   </div>
 
-                  {/* فاصل */}
-                  <div style={{ height: "1px", background: "#f3f4f6", margin: "0 20px" }}></div>
-
                   {/* زر Gratis */}
-                  <div className="px-4 pt-4">
+                  <div className="px-4 pb-3">
                     <button
                       onClick={() => router.push(`/gratis?cat=${cat.id}`)}
-                      className="w-full py-2.5 rounded-xl font-black text-sm transition-all active:scale-95 flex items-center justify-center gap-2"
-                      style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white" }}>
-                      🎁 Gratis proberen
+                      className="w-full py-2 rounded-xl font-black text-xs transition-all active:scale-95 flex items-center justify-center gap-1.5"
+                      style={{ background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.3)", color: "#4ade80" }}>
+                      🎁 {lang === "ar" ? "جرب مجاناً" : "Gratis proberen"}
                     </button>
                   </div>
 
                   {/* أزرار المدة */}
-                  <div className="grid grid-cols-2 gap-2.5 px-4 py-4">
+                  <div className="grid grid-cols-2 gap-2 px-4 pb-4">
                     {durations.map(dur => {
                       const active = isSelected && globalSelection?.duration === dur.key;
                       return (
                         <button key={dur.key}
                           onClick={() => setGlobalSelection({ catId: cat.id, duration: dur.key, catName: cat.name })}
-                          className="py-4 rounded-xl transition-all active:scale-95"
+                          className="py-3 rounded-xl transition-all active:scale-95 relative overflow-hidden"
                           style={{
-                            background: active ? "linear-gradient(135deg,#7c3aed,#5b21b6)" : "#f9fafb",
-                            border: active ? "1.5px solid #7c3aed" : "1.5px solid #e5e7eb",
+                            background: active ? "linear-gradient(135deg,#7c3aed,#5b21b6)" : "rgba(255,255,255,0.06)",
+                            border: active ? "1.5px solid #7c3aed" : "1px solid rgba(255,255,255,0.1)",
+                            boxShadow: active ? "0 4px 20px rgba(124,58,237,0.4)" : "none",
                           }}>
-                          <p className="text-xs font-bold mb-1" style={{ color: active ? "rgba(255,255,255,0.8)" : "#9ca3af" }}>{dur.label}</p>
-                          <p className="text-2xl font-black" style={{ color: active ? "white" : "#1a1a1a" }}>€{dur.price}</p>
+                          {active && <div className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-white/60"></div>}
+                          <p className="text-xs font-bold mb-0.5" style={{ color: active ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.4)" }}>{dur.label}</p>
+                          <p className="text-xl font-black" style={{ color: active ? "white" : "rgba(255,255,255,0.8)" }}>€{dur.price}</p>
                         </button>
                       );
                     })}
@@ -206,34 +235,98 @@ export default function TheoriePage() {
             })}
           </div>
 
-          {/* زر الاشتراك */}
+          {/* ── زر الاشتراك ── */}
           <button
             onClick={() => globalSelection && setShowCheckout(true)}
             disabled={!globalSelection}
-            className="w-full py-4 rounded-2xl font-black text-base transition-all active:scale-95 disabled:opacity-30"
+            className="w-full py-4 rounded-2xl font-black text-base transition-all active:scale-95 disabled:opacity-30 mb-8"
             style={{
-              background: globalSelection ? "linear-gradient(135deg, #d4af37, #f0d060, #d4af37)" : "#e5e7eb",
-              color: globalSelection ? "#0a0a0a" : "#9ca3af",
-              boxShadow: globalSelection ? "0 8px 30px rgba(212,175,55,0.35)" : "none",
+              background: globalSelection ? "linear-gradient(135deg, #d4af37, #f0d060, #d4af37)" : "rgba(255,255,255,0.1)",
+              color: globalSelection ? "#0a0a0a" : "rgba(255,255,255,0.3)",
+              boxShadow: globalSelection ? "0 8px 30px rgba(212,175,55,0.4)" : "none",
             }}>
             {globalSelection
-              ? `${lang === "ar" ? "اشترك في" : lang === "nl" ? "Inschrijven voor" : "S'inscrire pour"} ${globalSelection.catName} — €${getDurations(globalSelection.catId).find(d => d.key === globalSelection.duration)?.price}`
+              ? `🔓 ${lang === "ar" ? "اشترك الآن" : lang === "nl" ? "Nu inschrijven" : "S'inscrire maintenant"} — €${getDurations(globalSelection.catId).find(d => d.key === globalSelection.duration)?.price}`
               : (lang === "ar" ? "اختر فئة ومدة أولاً" : lang === "nl" ? "Kies een categorie en duur" : "Choisissez une catégorie")}
           </button>
 
-          {/* مميزات */}
-          <div className="mt-6 grid grid-cols-3 gap-3 md:gap-4">
-            {[
-              { icon: "📚", label: lang === "ar" ? "دروس كاملة" : lang === "nl" ? "Alle lessen" : lang === "fr" ? "Toutes les leçons" : "All lessons" },
-              { icon: "❓", label: lang === "ar" ? "أسئلة تدريبية" : lang === "nl" ? "Oefenvragen" : lang === "fr" ? "Questions d'entraînement" : "Practice questions" },
-              { icon: "🎯", label: lang === "ar" ? "امتحانات" : lang === "nl" ? "Examens" : lang === "fr" ? "Examens" : "Exams" },
-            ].map((f, i) => (
-              <div key={i} className="text-center py-3 rounded-xl bg-white" style={{ border: "1px solid #e5e7eb" }}>
-                <div className="text-xl mb-1">{f.icon}</div>
-                <p className="text-gray-500 text-[10px] font-bold">{f.label}</p>
-              </div>
-            ))}
+          {/* ── طرق الدفع ── */}
+          <div className="rounded-3xl overflow-hidden mb-6"
+            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)" }}>
+            <div className="px-5 py-4 border-b" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+              <p className="text-white/60 text-xs font-black uppercase tracking-widest text-center">
+                🔒 {lang === "ar" ? "طرق الدفع الآمنة" : lang === "nl" ? "Veilige betaalmethoden" : "Méthodes de paiement sécurisées"}
+              </p>
+            </div>
+            <div className="grid grid-cols-3 gap-0">
+              {[
+                {
+                  icon: (
+                    <svg viewBox="0 0 48 48" className="w-8 h-8">
+                      <rect width="48" height="48" rx="8" fill="#005498"/>
+                      <text x="24" y="30" textAnchor="middle" fill="white" fontSize="11" fontWeight="900">BANC</text>
+                      <text x="24" y="40" textAnchor="middle" fill="#f5a623" fontSize="8" fontWeight="700">CONTACT</text>
+                    </svg>
+                  ),
+                  label: "Bancontact",
+                  sub: lang === "ar" ? "بلجيكا" : "België",
+                  color: "#005498",
+                },
+                {
+                  icon: (
+                    <svg viewBox="0 0 48 48" className="w-8 h-8">
+                      <rect width="48" height="48" rx="8" fill="#1a1f71"/>
+                      <text x="24" y="22" textAnchor="middle" fill="white" fontSize="10" fontWeight="900">VISA</text>
+                      <rect x="8" y="26" width="32" height="3" rx="1.5" fill="#f7b731"/>
+                      <text x="24" y="38" textAnchor="middle" fill="white" fontSize="7">Mastercard</text>
+                    </svg>
+                  ),
+                  label: "Visa / MC",
+                  sub: lang === "ar" ? "بطاقة" : "Kaart",
+                  color: "#1a1f71",
+                },
+                {
+                  icon: (
+                    <svg viewBox="0 0 48 48" className="w-8 h-8">
+                      <rect width="48" height="48" rx="8" fill="#f59e0b"/>
+                      <rect x="10" y="14" width="28" height="20" rx="3" fill="white" opacity="0.9"/>
+                      <rect x="10" y="20" width="28" height="4" fill="#f59e0b"/>
+                      <circle cx="24" cy="34" r="3" fill="#f59e0b"/>
+                    </svg>
+                  ),
+                  label: "QR Code",
+                  sub: lang === "ar" ? "مسح" : "Scannen",
+                  color: "#f59e0b",
+                },
+              ].map((m, i) => (
+                <div key={i} className="flex flex-col items-center gap-2 py-4 px-2"
+                  style={{ borderRight: i < 2 ? "1px solid rgba(255,255,255,0.08)" : "none" }}>
+                  {m.icon}
+                  <div className="text-center">
+                    <p className="text-white text-xs font-black">{m.label}</p>
+                    <p className="text-white/40 text-[10px]">{m.sub}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="px-5 py-3 flex items-center justify-center gap-2"
+              style={{ borderTop: "1px solid rgba(255,255,255,0.08)", background: "rgba(34,197,94,0.05)" }}>
+              <svg className="w-3.5 h-3.5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <p className="text-green-400/80 text-[11px] font-bold">
+                {lang === "ar" ? "دفع آمن ومشفر بالكامل عبر Mollie" : lang === "nl" ? "Veilig & versleuteld betalen via Mollie" : "Paiement sécurisé via Mollie"}
+              </p>
+            </div>
           </div>
+
+          {/* ── ضمان ── */}
+          <div className="text-center pb-8">
+            <p className="text-white/30 text-xs">
+              {lang === "ar" ? "✅ وصول فوري بعد الدفع · 🔒 بيانات محمية · 📧 فاتورة على بريدك" : lang === "nl" ? "✅ Directe toegang · 🔒 Beveiligd · 📧 Factuur per e-mail" : "✅ Accès immédiat · 🔒 Sécurisé · 📧 Facture par e-mail"}
+            </p>
+          </div>
+
         </div>
       </div>
     );
