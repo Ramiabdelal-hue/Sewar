@@ -65,28 +65,52 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
       if (selectedCatId === "lessons") subscriptionType = "praktijk-lessons";
       else if (selectedCatId === "exam") subscriptionType = "praktijk-exam";
       else if (["cat-a","cat-b","cat-c"].includes(selectedCatId)) subscriptionType = "examen";
-      const expiryDate = new Date();
-      duration === "2w" ? expiryDate.setDate(expiryDate.getDate() + 14) : expiryDate.setMonth(expiryDate.getMonth() + 1);
+
+      // أسعار الاشتراكات
+      const packagePrices: Record<string, Record<string, number>> = {
+        theorie:           { "2w": 25, "1m": 50 },
+        examen:            { "2w": 25, "1m": 50 },
+        "praktijk-lessons":{ "2w": 49, "1m": 49 },
+        "praktijk-exam":   { "2w": 39, "1m": 39 },
+      };
+      const amount = packagePrices[subscriptionType]?.[duration] ?? 25;
+
       localStorage.setItem("renewPrefillData", JSON.stringify({ fullName: formData.fullName, email: formData.email, phone: formData.phone }));
-      const res = await fetch("/api/subscribe", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, category: targetCat, subscriptionType, duration, expiry: expiryDate.getTime(), forceRenew: prefillData ? true : false }),
+
+      // إنشاء دفعة Mollie
+      const res = await fetch("/api/mollie/create-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount,
+          description: `Sewar Rijbewijs Online — ${subscriptionType} ${targetCat} (${duration})`,
+          email: formData.email,
+          metadata: {
+            fullName: formData.fullName,
+            email: formData.email,
+            password: formData.password,
+            phone: formData.phone,
+            category: targetCat,
+            subscriptionType,
+            duration,
+            paymentMethod: formData.paymentMethod,
+          },
+        }),
       });
+
       const data = await res.json();
-      if (data.success) {
-        localStorage.setItem("userEmail", formData.email);
-        localStorage.setItem("userCategory", data.cat || selectedData?.catId);
-        localStorage.setItem("userExpiry", data.exp?.toString() || "");
-        setSuccessMsg(lang === "ar" ? "🎉 تم التسجيل بنجاح!" : lang === "nl" ? "🎉 Registratie succesvol!" : "🎉 Inscription réussie!");
-        setTimeout(() => redirectToContent(data), 1500);
+
+      if (data.success && data.checkoutUrl) {
+        // توجيه المستخدم لصفحة دفع Mollie
+        window.location.href = data.checkoutUrl;
       } else {
-        if (data.locked) {
-          alert(lang === "ar" ? "⏳ الموقع تحت الصيانة\n\nنعمل على تحسين الموقع. يرجى المحاولة لاحقاً.\n\nشكراً لصبركم 🙏" : lang === "nl" ? "⏳ Website in onderhoud\n\nWe werken aan verbeteringen. Probeer het later opnieuw.\n\nBedankt voor uw geduld 🙏" : lang === "fr" ? "⏳ Site en maintenance\n\nNous travaillons sur des améliorations. Réessayez plus tard.\n\nMerci de votre patience 🙏" : "⏳ Website under maintenance\n\nWe are working on improvements. Please try again later.\n\nThank you for your patience 🙏");
-        } else if (data.alreadySubscribed) { setSubscribedData(data); setAlreadySubscribedModal(true); }
-        else alert(data.message || "Er is een fout opgetreden");
+        alert(data.message || (lang === "ar" ? "خطأ في إنشاء الدفع" : "Betaling aanmaken mislukt"));
       }
-    } catch { alert(lang === "ar" ? "خطأ في الخادم!" : lang === "nl" ? "Serverfout!" : lang === "fr" ? "Erreur serveur!" : "Server error!"); }
-    finally { setLoading(false); }
+    } catch {
+      alert(lang === "ar" ? "خطأ في الخادم!" : lang === "nl" ? "Serverfout!" : lang === "fr" ? "Erreur serveur!" : "Server error!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const payMethods = [
@@ -255,11 +279,11 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
                 {loading ? (
                   <div className="flex items-center justify-center gap-3">
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span className="text-white/60">{lang === "ar" ? "جاري المعالجة..." : lang === "nl" ? "Verwerken..." : lang === "fr" ? "Traitement..." : "Processing..."}</span>
+                    <span className="text-white/60">{lang === "ar" ? "جاري التوجيه للدفع..." : lang === "nl" ? "Doorsturen naar betaling..." : lang === "fr" ? "Redirection vers paiement..." : "Redirecting to payment..."}</span>
                   </div>
                 ) : (
                   <span className="flex items-center justify-center gap-2">
-                    {t.submitOrder}
+                    🔒 {lang === "ar" ? "ادفع الآن عبر Mollie" : lang === "nl" ? "Nu betalen via Mollie" : lang === "fr" ? "Payer maintenant via Mollie" : "Pay now via Mollie"}
                     {isRtl ? <FaChevronLeft className="text-xs" /> : <FaChevronRight className="text-xs" />}
                   </span>
                 )}
