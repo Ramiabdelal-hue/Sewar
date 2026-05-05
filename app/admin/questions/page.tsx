@@ -1042,6 +1042,8 @@ export default function AdminQuestionsPage() {
       setSaving(false);
     }
   };
+
+  const handleDeleteImage = async (questionId: number, imageUrl: string) => {
     if (!confirm("هل تريد حذف هذه الصورة؟")) return;
 
     try {
