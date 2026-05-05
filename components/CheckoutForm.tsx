@@ -186,14 +186,13 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
 
   return (
     <div className="min-h-screen" dir={isRtl ? "rtl" : "ltr"}
-      style={{ background: "linear-gradient(160deg, #0f0c29 0%, #302b63 50%, #24243e 100%)" }}>
+      style={{ background: "#f0f0f0" }}>
 
       {/* Header */}
-      <div style={{ background: "rgba(255,255,255,0.04)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+      <div style={{ background: "white", borderBottom: "1px solid #e5e7eb" }}>
         <div className="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
           <button onClick={onBack}
-            className="flex items-center gap-2 font-bold text-sm transition-colors"
-            style={{ color: "rgba(255,255,255,0.6)" }}>
+            className="flex items-center gap-2 font-bold text-sm text-gray-500 hover:text-gray-800 transition-colors">
             {isRtl ? <FaChevronRight /> : <FaChevronLeft />}
             {lang === "ar" ? "رجوع" : lang === "nl" ? "Terug" : lang === "fr" ? "Retour" : "Back"}
           </button>
@@ -201,7 +200,9 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
             {[["nl","NL"],["fr","FR"],["ar","AR"],["en","EN"]].map(([code, label]) => (
               <button key={code} onClick={() => setLang(code as any)}
                 className="px-2.5 py-1 rounded-lg text-[10px] font-black transition-all"
-                style={lang === code ? { background: "rgba(255,255,255,0.2)", color: "white" } : { color: "rgba(255,255,255,0.4)" }}>
+                style={lang === code
+                  ? { background: "linear-gradient(135deg,#7c3aed,#5b21b6)", color: "white" }
+                  : { background: "#f3f4f6", color: "#6b7280" }}>
                 {label}
               </button>
             ))}
@@ -212,38 +213,36 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
       <div className="max-w-lg mx-auto px-4 py-6 pb-12">
 
         {/* ملخص الطلب */}
-        <div className="rounded-2xl p-5 mb-6"
-          style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}>
+        <div className="rounded-2xl p-5 mb-6 bg-white" style={{ border: "1px solid #e5e7eb", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
           <div className="flex items-center justify-between mb-3">
-            <p className="text-xs font-black uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.4)" }}>
+            <p className="text-xs font-black uppercase tracking-widest text-gray-400">
               {lang === "ar" ? "ملخص الطلب" : lang === "nl" ? "Besteloverzicht" : lang === "fr" ? "Récapitulatif" : "Order summary"}
             </p>
             <span className="px-2.5 py-1 rounded-full text-xs font-black"
-              style={{ background: "rgba(212,175,55,0.2)", color: "#d4af37", border: "1px solid rgba(212,175,55,0.3)" }}>
+              style={{ background: "rgba(212,175,55,0.15)", color: "#92400e", border: "1px solid rgba(212,175,55,0.3)" }}>
               {duration === "2w" ? (lang === "ar" ? "أسبوعان" : lang === "nl" ? "2 Weken" : "2 Semaines") : (lang === "ar" ? "شهر" : lang === "nl" ? "1 Maand" : "1 Mois")}
             </span>
           </div>
-          <p className="text-white font-black text-lg mb-3">{selectedData?.catName || "Rijbewijs"}</p>
+          <p className="text-gray-900 font-black text-lg mb-3">{selectedData?.catName || "Rijbewijs"}</p>
           <div className="space-y-1.5 text-sm">
             <div className="flex justify-between">
-              <span style={{ color: "rgba(255,255,255,0.4)" }}>{lang === "ar" ? "المبلغ بدون ضريبة" : "Excl. BTW"}</span>
-              <span className="text-white font-bold">€{excl.toFixed(2)}</span>
+              <span className="text-gray-400">{lang === "ar" ? "المبلغ بدون ضريبة" : "Excl. BTW"}</span>
+              <span className="text-gray-700 font-bold">€{excl.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
-              <span style={{ color: "rgba(255,255,255,0.4)" }}>BTW 21%</span>
-              <span className="text-white font-bold">€{BTW.toFixed(2)}</span>
+              <span className="text-gray-400">BTW 21%</span>
+              <span className="text-gray-700 font-bold">€{BTW.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between pt-2" style={{ borderTop: "1px solid rgba(255,255,255,0.1)" }}>
-              <span className="text-white font-black">{lang === "ar" ? "الإجمالي" : lang === "nl" ? "Totaal" : "Total"}</span>
+            <div className="flex justify-between pt-2 border-t border-gray-100">
+              <span className="text-gray-900 font-black">{lang === "ar" ? "الإجمالي" : lang === "nl" ? "Totaal" : "Total"}</span>
               <span className="font-black text-xl" style={{ color: "#d4af37" }}>€{amount.toFixed(2)}</span>
             </div>
           </div>
         </div>
 
         {registrationLocked && (
-          <div className="px-4 py-3 rounded-xl mb-4 text-center"
-            style={{ background: "rgba(249,115,22,0.15)", border: "1px solid rgba(249,115,22,0.3)" }}>
-            <p className="text-orange-400 font-black text-sm">🔧 {lang === "ar" ? "الموقع تحت الصيانة" : lang === "nl" ? "Website in onderhoud" : "Under maintenance"}</p>
+          <div className="px-4 py-3 rounded-xl mb-4 text-center bg-orange-50 border border-orange-200">
+            <p className="text-orange-600 font-black text-sm">🔧 {lang === "ar" ? "الموقع تحت الصيانة" : lang === "nl" ? "Website in onderhoud" : "Under maintenance"}</p>
           </div>
         )}
 
@@ -256,12 +255,12 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
               return (
                 <div key={key}>
                   <label className="block text-xs font-black mb-1.5 px-1 uppercase tracking-wider"
-                    style={{ color: isFocused ? "#a78bfa" : "rgba(255,255,255,0.4)" }}>
+                    style={{ color: isFocused ? "#7c3aed" : "#9ca3af" }}>
                     {label}
                   </label>
                   <div className="relative">
                     <span className="absolute top-1/2 -translate-y-1/2 text-sm transition-colors"
-                      style={{ [isRtl ? "right" : "left"]: "1rem", color: isFocused ? "#a78bfa" : "rgba(255,255,255,0.3)" }}>
+                      style={{ [isRtl ? "right" : "left"]: "1rem", color: isFocused ? "#7c3aed" : "#9ca3af" }}>
                       {icon}
                     </span>
                     <input
@@ -271,9 +270,9 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
                       style={{
                         paddingLeft: isRtl ? (toggle ? "3rem" : "1rem") : "2.75rem",
                         paddingRight: isRtl ? "2.75rem" : (toggle ? "3rem" : "1rem"),
-                        background: isFocused ? "rgba(167,139,250,0.1)" : "rgba(255,255,255,0.06)",
-                        border: isFocused ? "1.5px solid #a78bfa" : "1px solid rgba(255,255,255,0.12)",
-                        color: "white",
+                        background: isFocused ? "rgba(124,58,237,0.04)" : "#f9fafb",
+                        border: isFocused ? "1.5px solid #7c3aed" : "1.5px solid #e5e7eb",
+                        color: "#1a1a1a",
                       }}
                       onFocus={() => setFocusedField(key)}
                       onBlur={() => setFocusedField(null)}
@@ -281,8 +280,8 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
                     />
                     {toggle && (
                       <button type="button" onClick={toggle}
-                        className="absolute top-1/2 -translate-y-1/2 transition-colors"
-                        style={{ [isRtl ? "left" : "right"]: "1rem", color: "rgba(255,255,255,0.4)" }}>
+                        className="absolute top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                        style={{ [isRtl ? "left" : "right"]: "1rem" }}>
                         {showToggle ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
                       </button>
                     )}
@@ -294,8 +293,7 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
 
           {/* طريقة الدفع */}
           <div>
-            <p className="text-xs font-black uppercase tracking-widest mb-3 px-1"
-              style={{ color: "rgba(255,255,255,0.4)" }}>
+            <p className="text-xs font-black uppercase tracking-widest mb-3 px-1 text-gray-400">
               🔒 {lang === "ar" ? "طريقة الدفع" : lang === "nl" ? "Betaalmethode" : lang === "fr" ? "Mode de paiement" : "Payment method"}
             </p>
             <div className="space-y-2.5">
@@ -304,21 +302,21 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
                 return (
                   <button key={m.id} type="button"
                     onClick={() => setFormData({ ...formData, paymentMethod: m.id })}
-                    className="w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all active:scale-[0.98]"
+                    className="w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all active:scale-[0.98] bg-white"
                     style={{
-                      background: active ? m.activeBg : m.bg,
-                      border: `1.5px solid ${active ? m.activeBorder : m.border}`,
-                      boxShadow: active ? `0 4px 20px ${m.activeBorder}33` : "none",
+                      border: `1.5px solid ${active ? m.activeBorder : "#e5e7eb"}`,
+                      boxShadow: active ? `0 4px 16px ${m.activeBorder}22` : "0 1px 4px rgba(0,0,0,0.04)",
+                      background: active ? m.activeBg : "white",
                     }}>
                     <div className="flex-shrink-0">{m.icon}</div>
                     <div className={`flex-1 text-${isRtl ? "right" : "left"}`}>
-                      <p className="text-white font-black text-sm">{m.label}</p>
-                      <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>{m.sub}</p>
+                      <p className="text-gray-900 font-black text-sm">{m.label}</p>
+                      <p className="text-gray-400 text-xs mt-0.5">{m.sub}</p>
                     </div>
                     <div className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center"
                       style={{
                         background: active ? m.activeBorder : "transparent",
-                        border: `2px solid ${active ? m.activeBorder : "rgba(255,255,255,0.2)"}`,
+                        border: `2px solid ${active ? m.activeBorder : "#d1d5db"}`,
                       }}>
                       {active && <div className="w-2 h-2 rounded-full bg-white"></div>}
                     </div>
@@ -329,10 +327,9 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
           </div>
 
           {/* أمان */}
-          <div className="flex items-center gap-3 px-4 py-3 rounded-xl"
-            style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.2)" }}>
-            <FaLock className="text-green-400 flex-shrink-0" size={12} />
-            <p className="text-xs font-bold" style={{ color: "rgba(74,222,128,0.8)" }}>
+          <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-green-50 border border-green-100">
+            <FaLock className="text-green-500 flex-shrink-0" size={12} />
+            <p className="text-green-700 text-xs font-bold">
               {lang === "ar" ? "دفع آمن ومشفر عبر Mollie · فاتورة على بريدك الإلكتروني" : lang === "nl" ? "Veilig & versleuteld via Mollie · Factuur per e-mail" : lang === "fr" ? "Paiement sécurisé via Mollie · Facture par e-mail" : "Secure payment via Mollie · Invoice by email"}
             </p>
           </div>
@@ -341,14 +338,14 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
           <button type="submit" disabled={loading || registrationLocked}
             className="w-full py-4 rounded-2xl font-black text-base transition-all active:scale-95 disabled:opacity-40"
             style={{
-              background: loading ? "rgba(255,255,255,0.1)" : "linear-gradient(135deg, #d4af37, #f0d060, #d4af37)",
-              color: loading ? "rgba(255,255,255,0.4)" : "#0a0a0a",
-              boxShadow: loading ? "none" : "0 8px 32px rgba(212,175,55,0.4)",
+              background: loading ? "#e5e7eb" : "linear-gradient(135deg, #d4af37, #f0d060, #d4af37)",
+              color: loading ? "#9ca3af" : "#0a0a0a",
+              boxShadow: loading ? "none" : "0 8px 32px rgba(212,175,55,0.35)",
             }}>
             {loading ? (
               <div className="flex items-center justify-center gap-3">
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white/80 rounded-full animate-spin" />
-                <span>{lang === "ar" ? "جاري التوجيه للدفع..." : lang === "nl" ? "Doorsturen naar betaling..." : lang === "fr" ? "Redirection..." : "Redirecting..."}</span>
+                <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+                <span className="text-gray-500">{lang === "ar" ? "جاري التوجيه للدفع..." : lang === "nl" ? "Doorsturen naar betaling..." : lang === "fr" ? "Redirection..." : "Redirecting..."}</span>
               </div>
             ) : (
               <span className="flex items-center justify-center gap-2">
@@ -394,20 +391,19 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
       {/* Modal اشتراك موجود */}
       {alreadySubscribedModal && subscribedData && (
         <div className="fixed inset-0 flex items-end sm:items-center justify-center z-[99999] p-4"
-          style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(12px)" }}>
-          <div className="w-full max-w-sm rounded-3xl overflow-hidden"
-            style={{ background: "linear-gradient(135deg, #1a1a2e, #16213e)", border: "1px solid rgba(255,255,255,0.1)" }}>
+          style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(8px)" }}>
+          <div className="w-full max-w-sm rounded-3xl overflow-hidden bg-white"
+            style={{ border: "1px solid #e5e7eb", boxShadow: "0 20px 60px rgba(0,0,0,0.15)" }}>
             <div className="px-6 pt-8 pb-6 text-center">
-              <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center text-3xl"
-                style={{ background: "rgba(249,115,22,0.15)", border: "1px solid rgba(249,115,22,0.3)" }}>⚠️</div>
-              <h2 className="text-white font-black text-lg mb-2">
+              <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center text-3xl bg-orange-50 border border-orange-200">⚠️</div>
+              <h2 className="text-gray-900 font-black text-lg mb-2">
                 {lang === "ar" ? "اشتراك نشط موجود!" : lang === "nl" ? "Al een actief abonnement!" : "Active subscription exists!"}
               </h2>
-              <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.5)" }}>
+              <p className="text-gray-500 text-sm mb-4">
                 {lang === "ar" ? "لديك اشتراك نشط في هذه الفئة." : lang === "nl" ? "U heeft al een actief abonnement voor deze categorie." : "You already have an active subscription."}
               </p>
               {subscribedData.daysLeft != null && (
-                <p className="text-orange-400 font-black text-sm mb-4">
+                <p className="text-orange-500 font-black text-sm mb-4">
                   ⏳ {lang === "ar" ? `متبقي ${subscribedData.daysLeft} يوم` : `Nog ${subscribedData.daysLeft} dagen geldig`}
                 </p>
               )}
