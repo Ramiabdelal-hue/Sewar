@@ -220,7 +220,7 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
             </p>
             <span className="px-2.5 py-1 rounded-full text-xs font-black"
               style={{ background: "rgba(212,175,55,0.15)", color: "#92400e", border: "1px solid rgba(212,175,55,0.3)" }}>
-              {duration === "2w" ? (lang === "ar" ? "أسبوعان" : lang === "nl" ? "2 Weken" : "2 Semaines") : (lang === "ar" ? "شهر" : lang === "nl" ? "1 Maand" : "1 Mois")}
+              {duration === "2w" ? (lang === "ar" ? "أسبوعان" : lang === "nl" ? "2 Weken" : lang === "fr" ? "2 Semaines" : "2 Weeks") : (lang === "ar" ? "شهر" : lang === "nl" ? "1 Maand" : lang === "fr" ? "1 Mois" : "1 Month")}
             </span>
           </div>
           <p className="text-gray-900 font-black text-lg mb-3">{selectedData?.catName || "Rijbewijs"}</p>
@@ -234,7 +234,7 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
               <span className="text-gray-700 font-bold">€{BTW.toFixed(2)}</span>
             </div>
             <div className="flex justify-between pt-2 border-t border-gray-100">
-              <span className="text-gray-900 font-black">{lang === "ar" ? "الإجمالي" : lang === "nl" ? "Totaal" : "Total"}</span>
+              <span className="text-gray-900 font-black">{lang === "ar" ? "الإجمالي" : lang === "nl" ? "Totaal" : lang === "fr" ? "Total" : "Total"}</span>
               <span className="font-black text-xl" style={{ color: "#d4af37" }}>€{amount.toFixed(2)}</span>
             </div>
           </div>
@@ -364,7 +364,7 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
           <div className="w-full max-w-sm rounded-3xl overflow-hidden bg-white text-center">
             <div className="px-6 pt-6 pb-4" style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)" }}>
               <div className="text-4xl mb-2">📱</div>
-              <h2 className="text-white font-black text-lg">{lang === "ar" ? "امسح للدفع" : lang === "nl" ? "Scan om te betalen" : "Scan to pay"}</h2>
+              <h2 className="text-white font-black text-lg">{lang === "ar" ? "امسح للدفع" : lang === "nl" ? "Scan om te betalen" : lang === "fr" ? "Scanner pour payer" : "Scan to pay"}</h2>
               <p className="text-white/80 text-sm mt-1">€{qrModal.amount.toFixed(2)}</p>
             </div>
             <div className="px-8 py-6 flex flex-col items-center gap-4">
@@ -372,16 +372,16 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
                 <QRCodeSVG value={qrModal.url} size={200} level="H" includeMargin={false} />
               </div>
               <p className="text-gray-500 text-xs text-center">
-                {lang === "ar" ? "امسح بكاميرا هاتفك أو تطبيق الدفع" : lang === "nl" ? "Scan met uw telefoon of betaalapp" : "Scan with your phone or payment app"}
+                {lang === "ar" ? "امسح بكاميرا هاتفك أو تطبيق الدفع" : lang === "nl" ? "Scan met uw telefoon of betaalapp" : lang === "fr" ? "Scannez avec votre téléphone ou app de paiement" : "Scan with your phone or payment app"}
               </p>
               <button onClick={() => window.location.href = qrModal.url}
                 className="w-full py-3 rounded-xl font-black text-sm text-white"
                 style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)" }}>
-                {lang === "ar" ? "أو افتح رابط الدفع" : lang === "nl" ? "Of open betaallink" : "Or open payment link"}
+                {lang === "ar" ? "أو افتح رابط الدفع" : lang === "nl" ? "Of open betaallink" : lang === "fr" ? "Ou ouvrir le lien" : "Or open payment link"}
               </button>
               <button onClick={() => setQrModal(null)}
                 className="w-full py-2.5 rounded-xl font-black text-sm border-2 border-gray-200 text-gray-500">
-                {lang === "ar" ? "إلغاء" : lang === "nl" ? "Annuleren" : "Cancel"}
+                {lang === "ar" ? "إلغاء" : lang === "nl" ? "Annuleren" : lang === "fr" ? "Annuler" : "Cancel"}
               </button>
             </div>
           </div>
@@ -397,20 +397,20 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
             <div className="px-6 pt-8 pb-6 text-center">
               <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center text-3xl bg-orange-50 border border-orange-200">⚠️</div>
               <h2 className="text-gray-900 font-black text-lg mb-2">
-                {lang === "ar" ? "اشتراك نشط موجود!" : lang === "nl" ? "Al een actief abonnement!" : "Active subscription exists!"}
+                {lang === "ar" ? "اشتراك نشط موجود!" : lang === "nl" ? "Al een actief abonnement!" : lang === "fr" ? "Abonnement actif existant!" : "Active subscription exists!"}
               </h2>
               <p className="text-gray-500 text-sm mb-4">
-                {lang === "ar" ? "لديك اشتراك نشط في هذه الفئة." : lang === "nl" ? "U heeft al een actief abonnement voor deze categorie." : "You already have an active subscription."}
+                {lang === "ar" ? "لديك اشتراك نشط في هذه الفئة." : lang === "nl" ? "U heeft al een actief abonnement voor deze categorie." : lang === "fr" ? "Vous avez déjà un abonnement actif pour cette catégorie." : "You already have an active subscription."}
               </p>
               {subscribedData.daysLeft != null && (
                 <p className="text-orange-500 font-black text-sm mb-4">
-                  ⏳ {lang === "ar" ? `متبقي ${subscribedData.daysLeft} يوم` : `Nog ${subscribedData.daysLeft} dagen geldig`}
+                  ⏳ {lang === "ar" ? `متبقي ${subscribedData.daysLeft} يوم` : lang === "nl" ? `Nog ${subscribedData.daysLeft} dagen geldig` : lang === "fr" ? `Encore ${subscribedData.daysLeft} jours` : `${subscribedData.daysLeft} days remaining`}
                 </p>
               )}
               <button onClick={() => { setAlreadySubscribedModal(false); setSubscribedData(null); }}
                 className="w-full py-3.5 rounded-xl font-black text-sm text-white"
                 style={{ background: "linear-gradient(135deg, #7c3aed, #5b21b6)" }}>
-                {lang === "ar" ? "إغلاق" : lang === "nl" ? "Sluiten" : "Close"}
+                {lang === "ar" ? "إغلاق" : lang === "nl" ? "Sluiten" : lang === "fr" ? "Fermer" : "Close"}
               </button>
             </div>
           </div>
