@@ -35,7 +35,15 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
   if (selectedCatId === "lessons") subscriptionType = "praktijk-lessons";
   else if (selectedCatId === "exam") subscriptionType = "praktijk-exam";
   else if (["cat-a","cat-b","cat-c"].includes(selectedCatId)) subscriptionType = "examen";
-  const packagePrices: Record<string, Record<string, number>> = {
+  // ترجمة اسم الفئة حسب اللغة
+  const catNames: Record<string, Record<string, string>> = {
+    ar: { A: "الفئة A", B: "الفئة B", C: "الفئة C" },
+    nl: { A: "Categorie A", B: "Categorie B", C: "Categorie C" },
+    fr: { A: "Catégorie A", B: "Catégorie B", C: "Catégorie C" },
+    en: { A: "Category A", B: "Category B", C: "Category C" },
+  };
+  const catLetter = selectedCatId === "cat-a" ? "A" : selectedCatId === "cat-c" ? "C" : selectedCatId === "cat-b" ? "B" : selectedCatId.toUpperCase().slice(-1);
+  const translatedCatName = catNames[lang]?.[catLetter] || selectedData?.catName || "Rijbewijs";
     theorie:            { "2w": 25, "1m": 50 },
     examen:             { "2w": 25, "1m": 50 },
     "praktijk-lessons": { "2w": 49, "1m": 49 },
@@ -223,7 +231,7 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
               {duration === "2w" ? (lang === "ar" ? "أسبوعان" : lang === "nl" ? "2 Weken" : lang === "fr" ? "2 Semaines" : "2 Weeks") : (lang === "ar" ? "شهر" : lang === "nl" ? "1 Maand" : lang === "fr" ? "1 Mois" : "1 Month")}
             </span>
           </div>
-          <p className="text-gray-900 font-black text-lg mb-3">{selectedData?.catName || "Rijbewijs"}</p>
+          <p className="text-gray-900 font-black text-lg mb-3">{translatedCatName}</p>
           <div className="space-y-1.5 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-400">{lang === "ar" ? "المبلغ بدون ضريبة" : "Excl. BTW"}</span>
