@@ -136,24 +136,24 @@ export default function TheoriePage() {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-5 text-xs font-black uppercase tracking-widest"
               style={{ background: "rgba(124,58,237,0.2)", border: "1px solid rgba(124,58,237,0.4)", color: "#a78bfa" }}>
               <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#a78bfa" }}></span>
-              {lang === "ar" ? "🎓 منصة تعليم رخصة القيادة" : lang === "nl" ? "🎓 Rijbewijs Leerplatform" : "🎓 Driving Theory Platform"}
+              {lang === "ar" ? "🎓 منصة تعليم رخصة القيادة" : lang === "nl" ? "🎓 Rijbewijs Leerplatform" : lang === "fr" ? "🎓 Plateforme d'apprentissage" : "🎓 Driving Theory Platform"}
             </div>
             <h1 className="text-3xl md:text-4xl font-black mb-3 leading-tight"
               style={{ color: "#ffffff", textShadow: "0 0 40px rgba(124,58,237,0.5)" }}>
-              {lang === "ar" ? "احصل على رخصتك" : lang === "nl" ? "Haal je rijbewijs" : "Obtenez votre permis"}
-              <span style={{ color: "#d4af37" }}> {lang === "ar" ? "من أول مرة" : lang === "nl" ? "in één keer" : "du premier coup"}</span>
+              {lang === "ar" ? "احصل على رخصتك" : lang === "nl" ? "Haal je rijbewijs" : lang === "fr" ? "Obtenez votre permis" : "Get your license"}
+              <span style={{ color: "#d4af37" }}> {lang === "ar" ? "من أول مرة" : lang === "nl" ? "in één keer" : lang === "fr" ? "du premier coup" : "first time"}</span>
             </h1>
             <p className="text-white/50 text-sm max-w-sm mx-auto">
-              {lang === "ar" ? "دروس شاملة + أسئلة تدريبية + امتحانات محاكاة" : lang === "nl" ? "Volledige lessen + oefenvragen + simulatie-examens" : "Leçons complètes + questions d'entraînement + examens"}
+              {lang === "ar" ? "دروس شاملة + أسئلة تدريبية + امتحانات محاكاة" : lang === "nl" ? "Volledige lessen + oefenvragen + simulatie-examens" : lang === "fr" ? "Leçons complètes + questions d'entraînement + examens" : "Full lessons + practice questions + simulation exams"}
             </p>
           </div>
 
           {/* ── مميزات سريعة ── */}
           <div className="grid grid-cols-3 gap-3 mb-8">
             {[
-              { icon: "📚", label: lang === "ar" ? "دروس كاملة" : "Alle lessen", sub: lang === "ar" ? "نظري شامل" : "Volledig" },
-              { icon: "🎯", label: lang === "ar" ? "امتحانات" : "Examens", sub: lang === "ar" ? "محاكاة حقيقية" : "Simulatie" },
-              { icon: "🔊", label: lang === "ar" ? "صوت" : "Audio", sub: lang === "ar" ? "قراءة تلقائية" : "Automatisch" },
+              { icon: "📚", label: lang === "ar" ? "دروس كاملة" : lang === "nl" ? "Alle lessen" : lang === "fr" ? "Toutes les leçons" : "All lessons", sub: lang === "ar" ? "نظري شامل" : lang === "nl" ? "Volledig" : lang === "fr" ? "Complet" : "Complete" },
+              { icon: "🎯", label: lang === "ar" ? "امتحانات" : lang === "nl" ? "Examens" : lang === "fr" ? "Examens" : "Exams", sub: lang === "ar" ? "محاكاة حقيقية" : lang === "nl" ? "Simulatie" : lang === "fr" ? "Simulation" : "Simulation" },
+              { icon: "🔊", label: lang === "ar" ? "صوت" : lang === "nl" ? "Audio" : lang === "fr" ? "Audio" : "Audio", sub: lang === "ar" ? "قراءة تلقائية" : lang === "nl" ? "Automatisch" : lang === "fr" ? "Automatique" : "Automatic" },
             ].map((f, i) => (
               <div key={i} className="text-center py-4 rounded-2xl"
                 style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
@@ -206,7 +206,7 @@ export default function TheoriePage() {
                       onClick={() => router.push(`/gratis?cat=${cat.id}`)}
                       className="w-full py-2 rounded-xl font-black text-xs transition-all active:scale-95 flex items-center justify-center gap-1.5"
                       style={{ background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.3)", color: "#4ade80" }}>
-                      🎁 {lang === "ar" ? "جرب مجاناً" : "Gratis proberen"}
+                      🎁 {lang === "ar" ? "جرب مجاناً" : lang === "nl" ? "Gratis proberen" : lang === "fr" ? "Essayer gratuitement" : "Try for free"}
                     </button>
                   </div>
 
@@ -255,7 +255,7 @@ export default function TheoriePage() {
             style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)" }}>
             <div className="px-5 py-4 border-b" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
               <p className="text-white/60 text-xs font-black uppercase tracking-widest text-center">
-                🔒 {lang === "ar" ? "طرق الدفع الآمنة" : lang === "nl" ? "Veilige betaalmethoden" : "Méthodes de paiement sécurisées"}
+                🔒 {lang === "ar" ? "طرق الدفع الآمنة" : lang === "nl" ? "Veilige betaalmethoden" : lang === "fr" ? "Méthodes de paiement sécurisées" : "Secure payment methods"}
               </p>
             </div>
             <div className="grid grid-cols-3 gap-0">
