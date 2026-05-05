@@ -60,6 +60,14 @@ export async function POST(req: NextRequest) {
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://sewar-1q112.vercel.app";
 
+    // تحويل طريقة الدفع إلى Mollie method
+    const methodMap: Record<string, string> = {
+      bancontact: "bancontact",
+      creditcard: "creditcard",
+      qr_scan: "bancontact", // QR يستخدم bancontact
+    };
+    const mollieMethod = methodMap[body.metadata?.paymentMethod || "bancontact"] || "bancontact";
+
     const payment = await mollie.payments.create({
       amount: {
         currency: "EUR",
@@ -68,6 +76,7 @@ export async function POST(req: NextRequest) {
       description: description || "Sewar Rijbewijs Online — Abonnement",
       redirectUrl: `${baseUrl}/payment-success?email=${encodeURIComponent(email)}`,
       webhookUrl: `${baseUrl}/api/mollie/webhook`,
+      method: mollieMethod as any,
       metadata: {
         email,
         ...metadata,

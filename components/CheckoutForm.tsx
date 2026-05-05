@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { useLang } from "@/context/LangContext";
-import { FaQrcode, FaPaypal, FaCreditCard, FaLock, FaUser, FaEnvelope, FaPhone, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaQrcode, FaCreditCard, FaLock, FaUser, FaEnvelope, FaPhone, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import nl from "@/locales/nl.json";
 import fr from "@/locales/fr.json";
 import ar from "@/locales/ar.json";
@@ -132,7 +132,7 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
   const payMethods = [
     { id: "bancontact", label: "Bancontact", icon: <FaCreditCard />, color: "#6366f1", glow: "rgba(99,102,241,0.4)" },
     { id: "qr_scan",   label: "QR Code",    icon: <FaQrcode />,     color: "#f59e0b", glow: "rgba(245,158,11,0.4)" },
-    { id: "paypal",    label: "PayPal",      icon: <FaPaypal />,     color: "#22d3ee", glow: "rgba(34,211,238,0.4)" },
+    { id: "creditcard", label: "Visa / MC",  icon: <FaCreditCard />, color: "#1a56db", glow: "rgba(26,86,219,0.4)" },
   ];
 
   const fields = [
