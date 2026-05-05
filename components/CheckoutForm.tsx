@@ -296,29 +296,29 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
             <p className="text-xs font-black uppercase tracking-widest mb-3 px-1 text-gray-400">
               🔒 {lang === "ar" ? "طريقة الدفع" : lang === "nl" ? "Betaalmethode" : lang === "fr" ? "Mode de paiement" : "Payment method"}
             </p>
-            <div className="space-y-2.5">
+            <div className="grid grid-cols-3 gap-2">
               {payMethods.map(m => {
                 const active = formData.paymentMethod === m.id;
                 return (
                   <button key={m.id} type="button"
                     onClick={() => setFormData({ ...formData, paymentMethod: m.id })}
-                    className="w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all active:scale-[0.98] bg-white"
+                    className="flex flex-col items-center gap-2 px-2 py-3.5 rounded-2xl transition-all active:scale-[0.98] bg-white"
                     style={{
                       border: `1.5px solid ${active ? m.activeBorder : "#e5e7eb"}`,
                       boxShadow: active ? `0 4px 16px ${m.activeBorder}22` : "0 1px 4px rgba(0,0,0,0.04)",
                       background: active ? m.activeBg : "white",
                     }}>
                     <div className="flex-shrink-0">{m.icon}</div>
-                    <div className={`flex-1 text-${isRtl ? "right" : "left"}`}>
-                      <p className="text-gray-900 font-black text-sm">{m.label}</p>
-                      <p className="text-gray-400 text-xs mt-0.5">{m.sub}</p>
+                    <div className="text-center">
+                      <p className="text-gray-900 font-black text-xs">{m.label}</p>
+                      <p className="text-gray-400 text-[10px] mt-0.5 leading-tight">{m.sub}</p>
                     </div>
-                    <div className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center"
+                    <div className="w-4 h-4 rounded-full flex items-center justify-center"
                       style={{
                         background: active ? m.activeBorder : "transparent",
                         border: `2px solid ${active ? m.activeBorder : "#d1d5db"}`,
                       }}>
-                      {active && <div className="w-2 h-2 rounded-full bg-white"></div>}
+                      {active && <div className="w-1.5 h-1.5 rounded-full bg-white"></div>}
                     </div>
                   </button>
                 );
