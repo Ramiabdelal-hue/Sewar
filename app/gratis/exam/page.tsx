@@ -295,6 +295,27 @@ function GratisExamContent() {
           >
             {lang === "ar" ? "ابدأ الامتحان" : lang === "nl" ? "Start Examen" : "Start Exam"} 🚀
           </button>
+
+          {/* ملاحظة المحتوى المجاني */}
+          <div className="mt-5 px-4 py-3 rounded-xl text-sm font-bold text-center"
+            style={{ background: "rgba(245,166,35,0.12)", border: "1.5px solid rgba(245,166,35,0.4)", color: "#92400e" }}>
+            🎁 {lang === "ar"
+              ? `هذا الامتحان يحتوي على ${questions.length} سؤال مجاني فقط — للوصول لجميع الأسئلة يجب الاشتراك`
+              : lang === "nl"
+              ? `Dit examen bevat slechts ${questions.length} gratis vragen — Schrijf je in voor alle vragen`
+              : lang === "fr"
+              ? `Cet examen contient seulement ${questions.length} questions gratuites — Abonnez-vous pour toutes les questions`
+              : `This exam contains only ${questions.length} free questions — Subscribe for all questions`}
+          </div>
+
+          {/* زر الاشتراك */}
+          <button
+            onClick={() => router.push("/theorie")}
+            className="mt-3 w-full py-3 rounded-xl font-black text-sm transition-all active:scale-95"
+            style={{ background: "linear-gradient(135deg, #d4af37, #f0d060, #d4af37)", color: "#0a0a0a" }}
+          >
+            🔓 {lang === "ar" ? "اشترك للوصول لكل الأسئلة" : lang === "nl" ? "Inschrijven voor alle vragen" : lang === "fr" ? "S'inscrire pour toutes les questions" : "Subscribe for all questions"}
+          </button>
         </div>
       </div>
     </div>
