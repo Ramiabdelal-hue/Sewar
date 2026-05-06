@@ -44,6 +44,7 @@ export default function CheckoutForm({ selectedData, onBack, prefillData }: any)
   };
   const catLetter = selectedCatId === "cat-a" ? "A" : selectedCatId === "cat-c" ? "C" : selectedCatId === "cat-b" ? "B" : selectedCatId.toUpperCase().slice(-1);
   const translatedCatName = catNames[lang]?.[catLetter] || selectedData?.catName || "Rijbewijs";
+  const packagePrices: Record<string, Record<string, number>> = {
     theorie:            { "2w": 25, "1m": 50 },
     examen:             { "2w": 25, "1m": 50 },
     "praktijk-lessons": { "2w": 49, "1m": 49 },
