@@ -382,9 +382,11 @@ function GratisExamContent() {
                         )}
                       </div>
                       {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
-                        <div className="flex gap-1 p-1 bg-gray-100 items-stretch">
+                        <div className="flex gap-1 p-1 bg-gray-100 items-stretch"
+                          style={{ height: "180px" }}>
                           {q.videoUrls.filter(Boolean).map((url: string, idx: number) => (
-                            <WatermarkedImage key={idx} src={url} alt="" />
+                            <WatermarkedImage key={idx} src={url} alt=""
+                              style={{ height: "164px", flex: 1, minWidth: 0 }} />
                           ))}
                         </div>
                       )}
@@ -513,9 +515,11 @@ function GratisExamContent() {
 
             {/* Images */}
             {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
-              <div className="flex gap-1 p-2 bg-gray-100 items-stretch">
+              <div className="flex gap-1 p-2 bg-gray-100 items-stretch"
+                style={{ height: "291px" }}>
                 {q.videoUrls.filter(Boolean).map((url: string, i: number) => (
-                  <WatermarkedImage key={i} src={url} alt="" />
+                  <WatermarkedImage key={i} src={url} alt=""
+                    style={{ height: "275px", flex: 1, minWidth: 0 }} />
                 ))}
               </div>
             )}

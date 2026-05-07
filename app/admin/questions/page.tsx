@@ -452,6 +452,7 @@ export default function AdminQuestionsPage() {
   };
 
   const [saving, setSaving] = useState(false);
+  const [savingEdit, setSavingEdit] = useState(false);
   
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
@@ -1010,7 +1011,7 @@ export default function AdminQuestionsPage() {
 
       console.log("📤 Sending videoUrls:", form.videoUrls);
 
-      setSaving(true);
+      setSavingEdit(true);
       const res = await fetchWithTimeout(apiUrl, {
         method: "PUT",
         headers: { "Content-Type": "application/json", "x-admin-token": ADMIN_TOKEN },
@@ -1047,7 +1048,7 @@ export default function AdminQuestionsPage() {
       console.error("خطأ في التعديل:", error);
       alert(`❌ ${error.message || "فشل الاتصال بالسيرفر — حاول مرة أخرى"}`);
     } finally {
-      setSaving(false);
+      setSavingEdit(false);
     }
   };
 
@@ -2288,14 +2289,14 @@ export default function AdminQuestionsPage() {
                         </div>
                       )}
                       <div className="flex gap-3">
-                        <button onClick={() => handleEditQuestion(q.id)} disabled={saving} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white", boxShadow: "0 4px 14px rgba(34,197,94,0.35)" }}>
-                          {saving ? (
+                        <button onClick={() => handleEditQuestion(q.id)} disabled={savingEdit} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100" style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white", boxShadow: "0 4px 14px rgba(34,197,94,0.35)" }}>
+                          {savingEdit ? (
                             <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> جاري الحفظ...</>
                           ) : (
                             <><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>حفظ التعديلات</>
                           )}
                         </button>
-                        <button onClick={() => setEditingQuestion(null)} disabled={saving} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-40" style={{ background: "#f1f5f9", color: "#64748b", border: "1.5px solid #e2e8f0" }}>
+                        <button onClick={() => setEditingQuestion(null)} disabled={savingEdit} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-40" style={{ background: "#f1f5f9", color: "#64748b", border: "1.5px solid #e2e8f0" }}>
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                           إلغاء
                         </button>
