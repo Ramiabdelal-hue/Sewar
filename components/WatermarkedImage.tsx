@@ -10,20 +10,13 @@ interface Props {
   priority?: boolean;
 }
 
-function optimizeCloudinaryUrl(url: string): string {
-  if (!url) return url;
-  if (!url.includes("res.cloudinary.com") || !url.includes("/upload/")) return url;
-  if (url.includes("/upload/f_auto")) return url;
-  // نستخدم w_auto بدل w_1200 ثابت — Cloudinary يختار العرض المناسب
-  // q_auto:low للصور العادية، f_auto للصيغة المثلى، c_limit لمنع التكبير
-  return url.replace("/upload/", "/upload/f_auto,q_auto:good,w_800,c_limit/");
-}
-
 export default function WatermarkedImage({ src, alt = "", className, style, priority = false }: Props) {
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
+  // إذا فشل الرابط المُحسَّن نرجع للرابط الأصلي
+  const [useFallback, setUseFallback] = useState(false);
 
-  const optimizedSrc = optimizeCloudinaryUrl(src);
+  const currentSrc = useFallback ? src : src;
 
   return (
     <div
@@ -44,7 +37,7 @@ export default function WatermarkedImage({ src, alt = "", className, style, prio
         </div>
       )}
 
-      {/* حالة الخطأ */}
+      {/* حالة الخطأ النهائية */}
       {imageError && (
         <div
           className="w-full bg-gray-100 flex flex-col items-center justify-center gap-2 rounded"
@@ -57,10 +50,10 @@ export default function WatermarkedImage({ src, alt = "", className, style, prio
         </div>
       )}
 
-      {/* الصورة الرئيسية */}
+      {/* الصورة الرئيسية - الرابط الأصلي مباشرة بدون تحويل */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={optimizedSrc}
+        src={src}
         alt={alt}
         loading={priority ? "eager" : "lazy"}
         decoding="async"

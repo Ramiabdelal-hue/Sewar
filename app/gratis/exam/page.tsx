@@ -381,7 +381,7 @@ function GratisExamContent() {
                           </span>
                         )}
                       </div>
-                      {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
+                      {q.videoUrls && Array.isArray(q.videoUrls) && q.videoUrls.filter(Boolean).length > 0 && (
                         <div className="flex gap-1 p-1 bg-gray-100 items-stretch"
                           style={{ height: "180px" }}>
                           {q.videoUrls.filter(Boolean).map((url: string, idx: number) => (
@@ -514,7 +514,7 @@ function GratisExamContent() {
             </div>
 
             {/* Images */}
-            {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
+            {q.videoUrls && Array.isArray(q.videoUrls) && q.videoUrls.filter(Boolean).length > 0 && (
               <div className="flex gap-1 p-2 bg-gray-100 items-stretch"
                 style={{ height: "291px" }}>
                 {q.videoUrls.filter(Boolean).map((url: string, i: number) => (
