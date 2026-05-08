@@ -10,13 +10,26 @@ interface Props {
   priority?: boolean;
 }
 
+// تحسين رابط Cloudinary: ضغط + تحويل تلقائي للصيغة + تحديد عرض مناسب
+// fl_progressive: تحميل تدريجي | q_auto:good: جودة مثلى | f_auto: صيغة مثلى (webp/avif)
+// w_900: عرض كافٍ للشاشات | c_limit: لا تكبير إذا كانت الصورة أصغر
+// fl_immutable: cache دائم في Cloudinary CDN
+function optimizeCloudinaryUrl(url: string): string {
+  if (!url) return url;
+  if (!url.includes("res.cloudinary.com") || !url.includes("/upload/")) return url;
+  // إذا كان الرابط محسَّناً مسبقاً لا نعدّله
+  if (url.includes("/upload/q_auto")) return url;
+  return url.replace("/upload/", "/upload/q_auto:good,f_auto,w_900,c_limit,fl_progressive/");
+}
+
 export default function WatermarkedImage({ src, alt = "", className, style, priority = false }: Props) {
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
-  // إذا فشل الرابط المُحسَّن نرجع للرابط الأصلي
-  const [useFallback, setUseFallback] = useState(false);
+  // عند فشل الرابط المحسَّن نرجع للرابط الأصلي
+  const [triedFallback, setTriedFallback] = useState(false);
 
-  const currentSrc = useFallback ? src : src;
+  const optimizedSrc = optimizeCloudinaryUrl(src);
+  const displaySrc = triedFallback ? src : optimizedSrc;
 
   return (
     <div
@@ -50,10 +63,10 @@ export default function WatermarkedImage({ src, alt = "", className, style, prio
         </div>
       )}
 
-      {/* الصورة الرئيسية - الرابط الأصلي مباشرة بدون تحويل */}
+      {/* الصورة الرئيسية */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={src}
+        src={displaySrc}
         alt={alt}
         loading={priority ? "eager" : "lazy"}
         decoding="async"
@@ -67,7 +80,17 @@ export default function WatermarkedImage({ src, alt = "", className, style, prio
         }}
         draggable={false}
         onContextMenu={e => e.preventDefault()}
-        onError={() => { setImageError(true); setImageLoading(false); }}
+        onError={() => {
+          if (!triedFallback) {
+            // المحاولة الأولى: ارجع للرابط الأصلي
+            setTriedFallback(true);
+            setImageLoading(true);
+          } else {
+            // المحاولة الثانية فشلت أيضاً
+            setImageError(true);
+            setImageLoading(false);
+          }
+        }}
         onLoad={() => setImageLoading(false)}
       />
 
