@@ -170,7 +170,17 @@ function GratisExamContent() {
       .then(r => r.json())
       .then(d => {
         if (d.success) {
-          const filtered = d.examQuestions.filter((q: any) => q.lessonId === Number(lessonId));
+          const filtered = d.examQuestions
+            .filter((q: any) => q.lessonId === Number(lessonId))
+            .map((q: any) => ({
+              ...q,
+              // ضمان أن videoUrls دائماً array وليس string
+              videoUrls: Array.isArray(q.videoUrls)
+                ? q.videoUrls
+                : typeof q.videoUrls === "string"
+                  ? (() => { try { return JSON.parse(q.videoUrls); } catch { return [q.videoUrls]; } })()
+                  : [],
+            }));
           // خلط الأسئلة عشوائياً في كل مرة
           setQuestions(filtered.sort(() => Math.random() - 0.5));
         }
@@ -521,6 +531,12 @@ function GratisExamContent() {
                   <WatermarkedImage key={i} src={url} alt=""
                     style={{ height: "275px", flex: 1, minWidth: 0 }} />
                 ))}
+              </div>
+            )}
+            {/* DEBUG مؤقت - يُحذف بعد حل المشكلة */}
+            {q.videoUrls && (
+              <div className="px-3 py-1 bg-yellow-50 text-xs text-yellow-800 font-mono break-all">
+                videoUrls type: {typeof q.videoUrls} | isArray: {String(Array.isArray(q.videoUrls))} | length: {Array.isArray(q.videoUrls) ? q.videoUrls.length : "N/A"} | value: {JSON.stringify(q.videoUrls)?.slice(0, 100)}
               </div>
             )}
 
