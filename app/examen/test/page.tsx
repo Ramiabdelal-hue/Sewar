@@ -346,9 +346,13 @@ function ExamenTestContent() {
                         {(userAns === null || userAns === undefined) && <span className="text-xs font-black text-orange-500">⏰ {lang === "ar" ? "انتهى الوقت" : "Tijd verlopen"}</span>}
                       </div>
                       {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
-                        <div className={`flex gap-1 p-1 bg-gray-100 items-stretch`}>
+                        <div style={{ display: "flex", gap: "4px", padding: "4px", background: "#f3f4f6", height: "180px" }}>
                           {q.videoUrls.filter(Boolean).map((url: string, idx: number) => (
-                            <WatermarkedImage key={idx} src={url} />
+                            <div key={idx} style={{ flex: 1, position: "relative", height: "164px", overflow: "hidden" }}>
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={url} alt="" draggable={false} onContextMenu={e => e.preventDefault()}
+                                style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "fill", display: "block" }} />
+                            </div>
                           ))}
                         </div>
                       )}
@@ -457,9 +461,16 @@ function ExamenTestContent() {
             </div>
 
             {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
-              <div className={`flex gap-1 p-2 bg-gray-100 items-stretch`}>
+              <div style={{ display: "flex", gap: "4px", padding: "8px", background: "#f3f4f6", height: "291px" }}>
                 {q.videoUrls.filter(Boolean).map((url: string, i: number) => (
-                  <WatermarkedImage key={i} src={url} className="rounded-xl" />
+                  <div key={i} style={{ flex: 1, position: "relative", height: "275px", overflow: "hidden" }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={url} alt="" draggable={false} onContextMenu={e => e.preventDefault()}
+                      style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "fill", display: "block" }} />
+                    <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(135deg,#0a1628,#003399)", opacity: 0.9, padding: "2px 8px", pointerEvents: "none" }}>
+                      <span style={{ color: "white", fontSize: "9px", fontWeight: "bold" }}>© Sewar Rijbewijs Online</span>
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
