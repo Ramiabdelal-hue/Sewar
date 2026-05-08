@@ -34,14 +34,20 @@ export default function WatermarkedImage({ src, alt = "", className, style, prio
   return (
     <div
       className={`relative select-none ${className || ""}`}
-      style={{ ...style, display: "flex", flexDirection: "column", flex: style?.flex ?? 1, overflow: "hidden" }}
+      style={{
+        ...style,
+        position: "relative",
+        flex: style?.flex ?? 1,
+        overflow: "hidden",
+        // إذا لم يُعطَ ارتفاع صريح نستخدم padding-bottom لنسبة عرض/ارتفاع
+        ...(style?.height ? {} : { minHeight: "180px" }),
+      }}
       onContextMenu={e => e.preventDefault()}
     >
       {/* حالة التحميل */}
       {imageLoading && !imageError && (
         <div
-          className="w-full bg-gray-100 animate-pulse flex items-center justify-center rounded"
-          style={{ flex: 1 }}
+          className="absolute inset-0 bg-gray-100 animate-pulse flex items-center justify-center"
         >
           <svg className="w-8 h-8 text-gray-300 animate-spin" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -53,8 +59,7 @@ export default function WatermarkedImage({ src, alt = "", className, style, prio
       {/* حالة الخطأ النهائية */}
       {imageError && (
         <div
-          className="w-full bg-gray-100 flex flex-col items-center justify-center gap-2 rounded"
-          style={{ flex: 1 }}
+          className="absolute inset-0 bg-gray-100 flex flex-col items-center justify-center gap-2"
         >
           <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -74,19 +79,19 @@ export default function WatermarkedImage({ src, alt = "", className, style, prio
         style={{
           objectFit: "contain",
           objectPosition: "center",
-          flex: 1,
-          minHeight: 0,
-          height: style?.height ? "100%" : "auto",
+          width: "100%",
+          height: "100%",
+          position: "absolute",
+          top: 0,
+          left: 0,
         }}
         draggable={false}
         onContextMenu={e => e.preventDefault()}
         onError={() => {
           if (!triedFallback) {
-            // المحاولة الأولى: ارجع للرابط الأصلي
             setTriedFallback(true);
             setImageLoading(true);
           } else {
-            // المحاولة الثانية فشلت أيضاً
             setImageError(true);
             setImageLoading(false);
           }

@@ -392,7 +392,7 @@ function GratisExamContent() {
                         )}
                       </div>
                       {q.videoUrls && Array.isArray(q.videoUrls) && q.videoUrls.filter(Boolean).length > 0 && (
-                        <div className="flex gap-1 p-1 bg-gray-100 items-stretch"
+                        <div className="flex gap-1 p-1 bg-gray-100"
                           style={{ height: "180px" }}>
                           {q.videoUrls.filter(Boolean).map((url: string, idx: number) => (
                             <WatermarkedImage key={idx} src={url} alt=""
@@ -525,18 +525,12 @@ function GratisExamContent() {
 
             {/* Images */}
             {q.videoUrls && Array.isArray(q.videoUrls) && q.videoUrls.filter(Boolean).length > 0 && (
-              <div className="flex gap-1 p-2 bg-gray-100 items-stretch"
+              <div className="flex gap-1 p-2 bg-gray-100"
                 style={{ height: "291px" }}>
                 {q.videoUrls.filter(Boolean).map((url: string, i: number) => (
                   <WatermarkedImage key={i} src={url} alt=""
                     style={{ height: "275px", flex: 1, minWidth: 0 }} />
                 ))}
-              </div>
-            )}
-            {/* DEBUG مؤقت - يُحذف بعد حل المشكلة */}
-            {q.videoUrls && (
-              <div className="px-3 py-1 bg-yellow-50 text-xs text-yellow-800 font-mono break-all">
-                videoUrls type: {typeof q.videoUrls} | isArray: {String(Array.isArray(q.videoUrls))} | length: {Array.isArray(q.videoUrls) ? q.videoUrls.length : "N/A"} | value: {JSON.stringify(q.videoUrls)?.slice(0, 100)}
               </div>
             )}
 
