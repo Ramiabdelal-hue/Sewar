@@ -8,6 +8,7 @@ import WatermarkedImage from "@/components/WatermarkedImage";
 import Footer from "@/components/Footer";
 import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
 import { speak as ttsSpeak, stopSpeech, whenVoicesReady } from "@/lib/tts";
+import { optimizeExamImage } from "@/lib/cloudinary";
 
 function GratisExamContent() {
   const searchParams = useSearchParams();
@@ -397,7 +398,7 @@ function GratisExamContent() {
                             <div key={idx} style={{ flex: 1, position: "relative", height: "164px", background: "#e5e7eb", overflow: "hidden" }}>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
-                                src={url}
+                                src={optimizeExamImage(url)}
                                 alt=""
                                 draggable={false}
                                 onContextMenu={e => e.preventDefault()}
@@ -407,7 +408,6 @@ function GratisExamContent() {
                                   width: "100%",
                                   height: "100%",
                                   objectFit: "fill",
-                                  objectPosition: "center",
                                   display: "block",
                                 }}
                               />
@@ -545,7 +545,7 @@ function GratisExamContent() {
                   <div key={i} style={{ flex: 1, position: "relative", height: "275px", background: "#e5e7eb", overflow: "hidden" }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={url}
+                      src={optimizeExamImage(url)}
                       alt=""
                       draggable={false}
                       onContextMenu={e => e.preventDefault()}
@@ -555,7 +555,6 @@ function GratisExamContent() {
                         width: "100%",
                         height: "100%",
                         objectFit: "fill",
-                        objectPosition: "center",
                         display: "block",
                       }}
                     />

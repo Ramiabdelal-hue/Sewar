@@ -8,6 +8,7 @@ import WatermarkedImage from "@/components/WatermarkedImage";
 import Footer from "@/components/Footer";
 import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
 import { speak as ttsSpeak, stopSpeech, whenVoicesReady, getFemaleVoice } from "@/lib/tts";
+import { optimizeExamImage } from "@/lib/cloudinary";
 
 function ExamenTestContent() {
   const searchParams = useSearchParams();
@@ -350,7 +351,7 @@ function ExamenTestContent() {
                           {q.videoUrls.filter(Boolean).map((url: string, idx: number) => (
                             <div key={idx} style={{ flex: 1, position: "relative", height: "164px", overflow: "hidden" }}>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={url} alt="" draggable={false} onContextMenu={e => e.preventDefault()}
+                              <img src={optimizeExamImage(url)} alt="" draggable={false} onContextMenu={e => e.preventDefault()}
                                 style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "fill", display: "block" }} />
                             </div>
                           ))}
@@ -465,7 +466,7 @@ function ExamenTestContent() {
                 {q.videoUrls.filter(Boolean).map((url: string, i: number) => (
                   <div key={i} style={{ flex: 1, position: "relative", height: "275px", overflow: "hidden" }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={url} alt="" draggable={false} onContextMenu={e => e.preventDefault()}
+                    <img src={optimizeExamImage(url)} alt="" draggable={false} onContextMenu={e => e.preventDefault()}
                       style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "fill", display: "block" }} />
                     <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(135deg,#0a1628,#003399)", opacity: 0.9, padding: "2px 8px", pointerEvents: "none" }}>
                       <span style={{ color: "white", fontSize: "9px", fontWeight: "bold" }}>© Sewar Rijbewijs Online</span>
