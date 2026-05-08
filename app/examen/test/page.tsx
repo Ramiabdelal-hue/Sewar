@@ -8,7 +8,7 @@ import WatermarkedImage from "@/components/WatermarkedImage";
 import Footer from "@/components/Footer";
 import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
 import { speak as ttsSpeak, stopSpeech, whenVoicesReady, getFemaleVoice } from "@/lib/tts";
-import { optimizeExamImage } from "@/lib/cloudinary";
+import { optimizeExamImage } from "@/lib/cloudinary-utils";
 
 function ExamenTestContent() {
   const searchParams = useSearchParams();

@@ -7,7 +7,7 @@ import Navbar from "@/components/Navbar";
 import WatermarkedImage from "@/components/WatermarkedImage";
 import Footer from "@/components/Footer";
 import { useAutoTranslateList } from "@/hooks/useAutoTranslate";
-import { optimizeExamImage } from "@/lib/cloudinary";
+import { optimizeExamImage } from "@/lib/cloudinary-utils";
 
 
 
