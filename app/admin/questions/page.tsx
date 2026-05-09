@@ -28,6 +28,185 @@ interface Question {
   points?: number;
 }
 
+// Component إضافة سريعة للأسئلة من صفحة الدروس
+function QuickAddQuestions({ lessonId, lessonTitle, category, onClose }: {
+  lessonId: number;
+  lessonTitle: string;
+  category: string;
+  onClose: () => void;
+}) {
+  const ADMIN_TOKEN = process.env.NEXT_PUBLIC_ADMIN_TOKEN || "";
+  const [saving, setSaving] = useState(false);
+  const [questions, setQuestions] = useState<any[]>([]);
+  const [loadingQ, setLoadingQ] = useState(true);
+  const [form, setForm] = useState({
+    textNL: "", answer1: "", answer2: "", answer3: "",
+    correctAnswer: 0, isFree: false, points: 1,
+  });
+
+  const fetchQ = async () => {
+    setLoadingQ(true);
+    try {
+      const res = await fetch(`/api/questions?category=${category}&all=1&admin=1`);
+      const data = await res.json();
+      if (data.success) {
+        setQuestions(data.questions.filter((q: any) => q.lessonId === lessonId));
+      }
+    } catch {}
+    finally { setLoadingQ(false); }
+  };
+
+  useEffect(() => { fetchQ(); }, []);
+
+  const handleAdd = async () => {
+    if (!form.textNL.trim()) return alert("أدخل عنوان النقطة");
+    setSaving(true);
+    try {
+      const res = await fetch("/api/questions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-token": ADMIN_TOKEN },
+        body: JSON.stringify({
+          lessonId, category,
+          text: form.textNL,
+          textNL: form.textNL,
+          answer1: form.answer1 || null,
+          answer2: form.answer2 || null,
+          answer3: form.answer3 || null,
+          correctAnswer: form.correctAnswer || null,
+          videoUrls: [], audioUrl: "",
+          isFree: form.isFree,
+          points: form.points,
+        }),
+      });
+      const data = await res.json();
+      setSaving(false);
+      if (data.success) {
+        setForm({ textNL: "", answer1: "", answer2: "", answer3: "", correctAnswer: 0, isFree: false, points: 1 });
+        fetchQ();
+        setTimeout(() => alert("✅ تم إضافة السؤال"), 50);
+      } else {
+        setTimeout(() => alert("❌ " + (data.message || "خطأ")), 50);
+      }
+    } catch (e) {
+      setSaving(false);
+      setTimeout(() => alert("❌ خطأ في الاتصال"), 50);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm("حذف هذا السؤال؟")) return;
+    try {
+      await fetch(`/api/questions?id=${id}&category=${category}`, {
+        method: "DELETE",
+        headers: { "x-admin-token": ADMIN_TOKEN },
+      });
+      fetchQ();
+    } catch {}
+  };
+
+  return (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+      style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}>
+      <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+        {/* Header */}
+        <div className="px-5 py-4 flex items-center justify-between flex-shrink-0"
+          style={{ background: "linear-gradient(135deg, #003399, #0055cc)" }}>
+          <div>
+            <p className="text-white/60 text-xs font-bold">إضافة أسئلة للدرس</p>
+            <h2 className="text-white font-black text-sm truncate max-w-xs">{lessonTitle}</h2>
+          </div>
+          <button onClick={onClose}
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition-colors">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="overflow-y-auto flex-1 p-5 space-y-5">
+          {/* فورم الإضافة */}
+          <div className="bg-green-50 rounded-xl p-4 border border-green-200">
+            <h3 className="text-sm font-black text-gray-700 mb-3">➕ إضافة سؤال/شرح جديد</h3>
+            <div className="space-y-2">
+              <input type="text" placeholder="📌 عنوان النقطة أو السؤال (هولندي)..."
+                value={form.textNL}
+                onChange={e => setForm(f => ({ ...f, textNL: e.target.value }))}
+                className="w-full px-3 py-2.5 rounded-lg text-sm font-medium focus:outline-none"
+                style={{ border: "1.5px solid #bbf7d0", background: "white" }} />
+              <div className="grid grid-cols-3 gap-2">
+                {["answer1", "answer2", "answer3"].map((k, i) => (
+                  <input key={k} type="text" placeholder={`إجابة ${["A","B","C"][i]} (اختياري)`}
+                    value={(form as any)[k]}
+                    onChange={e => setForm(f => ({ ...f, [k]: e.target.value }))}
+                    className="w-full px-3 py-2 rounded-lg text-xs font-medium focus:outline-none"
+                    style={{ border: "1.5px solid #e5e7eb", background: "white" }} />
+                ))}
+              </div>
+              {(form.answer1 || form.answer2) && (
+                <select value={form.correctAnswer}
+                  onChange={e => setForm(f => ({ ...f, correctAnswer: parseInt(e.target.value) }))}
+                  className="w-full px-3 py-2 rounded-lg text-xs font-medium focus:outline-none"
+                  style={{ border: "1.5px solid #e5e7eb", background: "white" }}>
+                  <option value={0}>الإجابة الصحيحة...</option>
+                  <option value={1}>A</option>
+                  <option value={2}>B</option>
+                  <option value={3}>C</option>
+                </select>
+              )}
+              <div className="flex items-center gap-3">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={form.isFree}
+                    onChange={e => setForm(f => ({ ...f, isFree: e.target.checked }))}
+                    className="w-4 h-4 accent-green-500" />
+                  <span className="text-xs font-black text-gray-600">🎁 مجاني</span>
+                </label>
+              </div>
+              <button onClick={handleAdd} disabled={saving}
+                className="w-full py-2.5 rounded-lg text-sm font-black text-white transition-all active:scale-95 disabled:opacity-50"
+                style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)" }}>
+                {saving ? "جاري الحفظ..." : "💾 حفظ"}
+              </button>
+            </div>
+          </div>
+
+          {/* قائمة الأسئلة الموجودة */}
+          <div>
+            <h3 className="text-sm font-black text-gray-700 mb-2">
+              📋 الأسئلة الموجودة ({questions.length})
+            </h3>
+            {loadingQ ? (
+              <div className="flex justify-center py-4">
+                <div className="w-6 h-6 border-2 border-[#003399] border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : questions.length === 0 ? (
+              <p className="text-gray-400 text-sm text-center py-4">لا توجد أسئلة بعد</p>
+            ) : (
+              <div className="space-y-2">
+                {questions.map((q, idx) => (
+                  <div key={q.id} className="flex items-start gap-2 px-3 py-2.5 rounded-lg bg-gray-50 border border-gray-200">
+                    <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-white flex-shrink-0 mt-0.5"
+                      style={{ background: "#003399" }}>{idx + 1}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-bold text-gray-800 truncate">{q.textNL || q.text}</p>
+                      {q.isFree && <span className="text-[10px] text-green-600 font-bold">🎁 مجاني</span>}
+                    </div>
+                    <button onClick={() => handleDelete(q.id)}
+                      className="w-6 h-6 rounded flex items-center justify-center text-red-400 hover:bg-red-50 flex-shrink-0">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Component إدارة الأسعار
 function PricesManager({ onBack }: { onBack: () => void }) {
   const categories = ["A", "B", "C"];
@@ -193,6 +372,8 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editExamLabel, setEditExamLabel] = useState("");
+  // إضافة أسئلة مباشرة من هنا
+  const [addingQuestionsFor, setAddingQuestionsFor] = useState<{ id: number; title: string } | null>(null);
 
   const ADMIN_TOKEN = process.env.NEXT_PUBLIC_ADMIN_TOKEN || "";
 
@@ -278,6 +459,20 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
         <div className="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #14b8a6, #0d9488)" }}>
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-lg font-black text-white">إدارة عناوين الدروس</h1>
+              <p className="text-white/50 text-xs">إضافة وحذف عناوين الدروس</p>
+            </div>
+          </div>
+          <button onClick={onBack} className="px-4 py-2 rounded-lg text-xs font-black text-white transition-all hover:scale-105" style={{ background: "rgba(255,255,255,0.15)" }}>
+            ← رجوع
+          </button>
+        </div>
+      </div>
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
               </svg>
@@ -407,6 +602,17 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
+                        {/* زر إضافة أسئلة */}
+                        <button
+                          onClick={() => setAddingQuestionsFor({ id: lesson.id, title: lesson.title })}
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-black transition-colors"
+                          style={{ background: "rgba(34,197,94,0.1)", color: "#16a34a", border: "1px solid rgba(34,197,94,0.3)" }}
+                          title="إضافة أسئلة لهذا الدرس">
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                          </svg>
+                          أسئلة
+                        </button>
                         <button onClick={() => { setEditingId(lesson.id); setEditTitle(lesson.title); setEditDescription(lesson.description || ""); setEditExamLabel(lesson.examLabel || ""); }}
                           className="w-8 h-8 rounded-lg flex items-center justify-center text-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-colors">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -428,6 +634,16 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
           )}
         </div>
       </div>
+
+      {/* Modal إضافة أسئلة للدرس */}
+      {addingQuestionsFor && (
+        <QuickAddQuestions
+          lessonId={addingQuestionsFor.id}
+          lessonTitle={addingQuestionsFor.title}
+          category={category}
+          onClose={() => setAddingQuestionsFor(null)}
+        />
+      )}
     </div>
   );
 }
