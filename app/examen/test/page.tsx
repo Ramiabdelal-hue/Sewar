@@ -347,12 +347,12 @@ function ExamenTestContent() {
                         {(userAns === null || userAns === undefined) && <span className="text-xs font-black text-orange-500">⏰ {lang === "ar" ? "انتهى الوقت" : "Tijd verlopen"}</span>}
                       </div>
                       {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
-                        <div style={{ display: "flex", gap: "4px", padding: "4px", background: "#f3f4f6", height: "180px" }}>
+                        <div style={{ display: "flex", gap: "4px", padding: "4px", background: "#f3f4f6" }}>
                           {q.videoUrls.filter(Boolean).map((url: string, idx: number) => (
-                            <div key={idx} style={{ flex: 1, position: "relative", height: "164px", overflow: "hidden" }}>
+                            <div key={idx} style={{ flex: 1, overflow: "hidden" }}>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img src={optimizeExamImage(url)} alt="" draggable={false} onContextMenu={e => e.preventDefault()}
-                                style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "fill", display: "block" }} />
+                                style={{ width: "100%", height: "auto", display: "block" }} />
                             </div>
                           ))}
                         </div>
@@ -462,13 +462,13 @@ function ExamenTestContent() {
             </div>
 
             {q.videoUrls && q.videoUrls.filter(Boolean).length > 0 && (
-              <div style={{ display: "flex", gap: "4px", padding: "8px", background: "#f3f4f6", height: "291px" }}>
+              <div style={{ display: "flex", gap: "4px", padding: "8px", background: "#f3f4f6" }}>
                 {q.videoUrls.filter(Boolean).map((url: string, i: number) => (
-                  <div key={i} style={{ flex: 1, position: "relative", height: "275px", overflow: "hidden" }}>
+                  <div key={i} style={{ flex: 1, overflow: "hidden" }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={optimizeExamImage(url)} alt="" draggable={false} onContextMenu={e => e.preventDefault()}
-                      style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "fill", display: "block" }} />
-                    <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(135deg,#0a1628,#003399)", opacity: 0.9, padding: "2px 8px", pointerEvents: "none" }}>
+                      style={{ width: "100%", height: "auto", display: "block" }} />
+                    <div style={{ background: "linear-gradient(135deg,#0a1628,#003399)", opacity: 0.9, padding: "2px 8px" }}>
                       <span style={{ color: "white", fontSize: "9px", fontWeight: "bold" }}>© Sewar Rijbewijs Online</span>
                     </div>
                   </div>
