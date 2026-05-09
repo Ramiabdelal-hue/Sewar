@@ -473,20 +473,6 @@ function LessonsManager({ onBack }: { onBack: () => void }) {
           </button>
         </div>
       </div>
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-lg font-black text-white">إدارة عناوين الدروس</h1>
-              <p className="text-white/50 text-xs">إضافة وحذف عناوين الدروس</p>
-            </div>
-          </div>
-          <button onClick={onBack} className="px-4 py-2 rounded-lg text-xs font-black text-white transition-all hover:scale-105" style={{ background: "rgba(255,255,255,0.15)" }}>
-            ← رجوع
-          </button>
-        </div>
-      </div>
 
       <div className="max-w-4xl mx-auto px-6 py-8">
         {/* اختيار الفئة */}
