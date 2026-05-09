@@ -1016,30 +1016,26 @@ export default function AdminQuestionsPage() {
       let url = '';
       
       if (questionType === "Praktijk") {
-        // جلب دروس Praktijk
         url = `/api/praktijk/lessons?type=${category}`;
       } else {
-        // جلب دروس Theori/Examen من LessonA/B/C
         url = `/api/lessons?category=${category}`;
       }
       
-      console.log(`🔍 Fetching lessons from: ${url}`);
       const response = await fetch(url);
       const data = await response.json();
       
       if (data.success && data.lessons) {
+        // نحفظ description أيضاً لعرض العناوين الفرعية
         const formattedLessons = data.lessons.map((lesson: any) => ({
           id: lesson.id,
-          name: lesson.title
+          name: lesson.title,
+          description: lesson.description || null,
         }));
         setLessons(formattedLessons);
-        console.log(`✅ Loaded ${formattedLessons.length} lessons`);
       } else {
-        console.error("❌ Failed to fetch lessons:", data.message);
         setLessons([]);
       }
     } catch (error) {
-      console.error("❌ Error fetching data:", error);
       setLessons([]);
     }
   };
@@ -1053,7 +1049,7 @@ export default function AdminQuestionsPage() {
       if (questionType === "Examen") {
         url = `/api/exam-questions?category=${category}&all=1&admin=1`;
       } else if (questionType === "Praktijk") {
-        url = `/api/praktijk/questions?lessonId=${lessonId}&admin=1`;
+        url = `/api/praktijk/questions?lessonId=${lessonId.toString().replace("_sub", "")}&admin=1`;
       } else {
         url = `/api/questions?category=${category}&all=1&admin=1`;
       }
@@ -1105,7 +1101,7 @@ export default function AdminQuestionsPage() {
       }
 
       const payload: any = {
-        lessonId: parseInt(lessonId),
+        lessonId: parseInt(lessonId.toString().replace("_sub", "")),
         category: category,
       };
       
@@ -1312,7 +1308,7 @@ export default function AdminQuestionsPage() {
   const filteredQuestions = questions.filter(q => {
     const matchesSearch = !searchTerm || q.text.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (q.textNL || "").toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesLesson = lessonId ? q.lessonId === parseInt(lessonId) : true;
+    const matchesLesson = lessonId ? q.lessonId === parseInt(lessonId.toString().replace("_sub", "")) : true;
     const matchesFivePoints = !filterFivePoints || q.points === 5;
     const matchesGratis = !filterGratis || q.isFree === true;
     return matchesSearch && matchesLesson && matchesFivePoints && matchesGratis;
@@ -1849,12 +1845,36 @@ export default function AdminQuestionsPage() {
             {lessons.length > 0 && (
               <div>
                 <label className="block text-xs font-bold text-gray-500 mb-1.5">الدرس</label>
-                <select className="w-full px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 focus:outline-none" style={{ background: "#f8fafc", border: "1.5px solid #e2e8f0" }} value={lessonId} onChange={(e) => setLessonId(e.target.value)}>
+                <select
+                  className="w-full px-3 py-2.5 rounded-xl text-sm font-medium text-gray-700 focus:outline-none"
+                  style={{ background: "#f8fafc", border: "1.5px solid #e2e8f0" }}
+                  value={lessonId}
+                  onChange={(e) => setLessonId(e.target.value)}
+                >
                   <option value="">اختر الدرس</option>
                   {lessons.map((lesson) => (
-                    <option key={lesson.id} value={lesson.id}>{lesson.name}</option>
+                    lesson.description ? (
+                      // درس له عنوان فرعي — يظهر كـ optgroup
+                      <optgroup key={lesson.id} label={`📚 ${lesson.name}`}>
+                        <option value={`${lesson.id}`}>
+                          ↳ {lesson.name} (العنوان الأساسي)
+                        </option>
+                        <option value={`${lesson.id}_sub`}>
+                          ↳ {lesson.description} (العنوان الفرعي)
+                        </option>
+                      </optgroup>
+                    ) : (
+                      <option key={lesson.id} value={lesson.id}>{lesson.name}</option>
+                    )
                   ))}
                 </select>
+                {/* عرض العنوان الفرعي المختار */}
+                {lessonId.toString().endsWith("_sub") && (
+                  <p className="mt-1.5 text-xs font-bold px-2 py-1 rounded-lg"
+                    style={{ background: "rgba(124,58,237,0.08)", color: "#7c3aed" }}>
+                    📌 ستُضاف الأسئلة تحت العنوان الفرعي: {lessons.find(l => `${l.id}_sub` === lessonId.toString())?.description}
+                  </p>
+                )}
               </div>
             )}
           </div>
@@ -2267,9 +2287,9 @@ export default function AdminQuestionsPage() {
                   {questionType === "Examen" ? "الأسئلة" : "الشروح"}
                 </span>
                 {/* اسم الدرس المختار */}
-                {lessonId && lessons.find(l => l.id === parseInt(lessonId)) && (
+                {lessonId && lessons.find(l => l.id === parseInt(lessonId.toString().replace("_sub", ""))) && (
                   <span className="px-2 py-0.5 rounded-full text-xs font-black" style={{ background: "rgba(99,102,241,0.1)", color: "#4f46e5", border: "1px solid rgba(99,102,241,0.3)" }}>
-                    📚 {lessons.find(l => l.id === parseInt(lessonId))?.name}
+                    📚 {lessons.find(l => l.id === parseInt(lessonId.toString().replace("_sub", "")))?.name}
                   </span>
                 )}
               </div>
