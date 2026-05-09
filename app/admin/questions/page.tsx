@@ -946,8 +946,8 @@ export default function AdminQuestionsPage() {
       if (!res.ok) {
         const text = await res.text();
         console.error("❌ API Error Response:", text);
-        alert(`خطأ من السيرفر: ${text}`);
         setSaving(false);
+        setTimeout(() => alert(`خطأ من السيرفر: ${text}`), 50);
         return;
       }
 
@@ -955,13 +955,12 @@ export default function AdminQuestionsPage() {
       console.log("📦 Response data:", data);
       
       if (!data.success) {
-        alert(`فشل حفظ السؤال: ${data.message}`);
         setSaving(false);
+        setTimeout(() => alert(`فشل حفظ السؤال: ${data.message}`), 50);
         return;
       }
 
-      alert("✅ تم حفظ السؤال بنجاح!");
-      fetchQuestions();
+      setSaving(false);
       setNewQuestion({ 
         text: "",
         textNL: "",
@@ -980,11 +979,12 @@ export default function AdminQuestionsPage() {
         points: 1,
         freeGroup: null,
       });
+      fetchQuestions();
+      setTimeout(() => alert("✅ تم حفظ السؤال بنجاح!"), 50);
     } catch (err: any) {
       console.error("خطأ عند حفظ السؤال:", err);
-      alert(`❌ ${err.message || "فشل الاتصال بالسيرفر — حاول مرة أخرى"}`);
-    } finally {
       setSaving(false);
+      setTimeout(() => alert(`❌ ${err.message || "فشل الاتصال بالسيرفر — حاول مرة أخرى"}`), 50);
     }
   };
   const handleEditQuestion = async (questionId: number) => {
@@ -1038,17 +1038,18 @@ export default function AdminQuestionsPage() {
 
       const data = await res.json();
       if (data.success) {
-        alert("✅ تم تعديل السؤال بنجاح");
+        setSavingEdit(false);
         setEditingQuestion(null);
         fetchQuestions();
+        setTimeout(() => alert("✅ تم تعديل السؤال بنجاح"), 50);
       } else {
-        alert(data.message || "فشل تعديل السؤال");
+        setSavingEdit(false);
+        setTimeout(() => alert(data.message || "فشل تعديل السؤال"), 50);
       }
     } catch (error: any) {
       console.error("خطأ في التعديل:", error);
-      alert(`❌ ${error.message || "فشل الاتصال بالسيرفر — حاول مرة أخرى"}`);
-    } finally {
       setSavingEdit(false);
+      setTimeout(() => alert(`❌ ${error.message || "فشل الاتصال بالسيرفر — حاول مرة أخرى"}`), 50);
     }
   };
 
@@ -2449,7 +2450,6 @@ export default function AdminQuestionsPage() {
                       <div className="flex gap-2 pt-4 border-t border-gray-100">
                         <button
                           onClick={() => {
-                            setSaving(false);
                             setEditingQuestion(q);
                             setEditText(q.text);
                             setEditForm({
