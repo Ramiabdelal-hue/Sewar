@@ -390,76 +390,51 @@ export default function TheoriePage() {
             </thead>
             <tbody>
               {filtered.map((lesson, i) => (
-                <React.Fragment key={lesson.id}>
-                  {/* صف العنوان الأساسي */}
-                  <tr style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#f5f5f5" }}>
-                    <td className="px-4 py-3 border border-gray-200">
-                      <div className="font-bold text-[#003399] text-sm" style={{ wordBreak: "break-word", whiteSpace: "normal" }}>
-                        {i + 1}. {translatedTitles[lessons.indexOf(lesson)] || lesson.title}
+                <tr key={lesson.id} style={{ backgroundColor: i % 2 === 0 ? "#ffffff" : "#f5f5f5" }}>
+                  <td className="px-4 py-3 border border-gray-200">
+                    <div className="font-bold text-[#003399] text-sm" style={{ wordBreak: "break-word", whiteSpace: "normal" }}>
+                      {i + 1}. {translatedTitles[lessons.indexOf(lesson)] || lesson.title}
+                    </div>
+                    {lesson.description && (
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <span className="w-1 h-3 rounded-full bg-[#3399ff] flex-shrink-0"></span>
+                        <span className="text-xs font-semibold text-[#3399ff]">{lesson.description}</span>
                       </div>
+                    )}
+                  </td>
+                  {i === 0 ? (
+                    <td colSpan={2} className="px-4 py-3 border border-gray-200 text-center">
+                      <button
+                        onClick={() => router.push(`/theorie/lesson?lessonId=${lesson.id}&category=${userCategory}&email=${userEmail}&lesson=${encodeURIComponent(lesson.title)}`)}
+                        className="border-2 px-4 py-1 text-sm font-bold transition-colors w-full"
+                        style={{ background: "#7c3aed", borderColor: "#7c3aed", color: "white" }}
+                      >
+                        ✔ Start nu
+                      </button>
                     </td>
-                    {i === 0 ? (
-                      <td colSpan={2} className="px-4 py-3 border border-gray-200 text-center">
+                  ) : (
+                    <>
+                      <td className="px-4 py-3 border border-gray-200 text-center">
                         <button
                           onClick={() => router.push(`/theorie/lesson?lessonId=${lesson.id}&category=${userCategory}&email=${userEmail}&lesson=${encodeURIComponent(lesson.title)}`)}
-                          className="border-2 px-4 py-1 text-sm font-bold transition-colors w-full"
-                          style={{ background: "#7c3aed", borderColor: "#7c3aed", color: "white" }}
+                          className="bg-white border-2 border-gray-400 px-4 py-1 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors w-full"
                         >
-                          ✔ Start nu
-                        </button>
-                      </td>
-                    ) : (
-                      <>
-                        <td className="px-4 py-3 border border-gray-200 text-center">
-                          <button
-                            onClick={() => router.push(`/theorie/lesson?lessonId=${lesson.id}&category=${userCategory}&email=${userEmail}&lesson=${encodeURIComponent(lesson.title)}`)}
-                            className="bg-white border-2 border-gray-400 px-4 py-1 text-sm font-bold hover:bg-[#3399ff] hover:text-white hover:border-[#3399ff] transition-colors w-full"
-                          >
-                            {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
-                          </button>
-                        </td>
-                        <td className="px-4 py-3 border border-gray-200 text-center">
-                          <button
-                            onClick={() => openExamModal(lesson.id, lesson.title)}
-                            disabled={loadingExam}
-                            className="border-2 px-4 py-1 text-sm font-bold transition-colors disabled:opacity-60 w-full"
-                            style={{ background: "#22c55e", borderColor: "#16a34a", color: "white" }}
-                          >
-                            EXAM
-                          </button>
-                        </td>
-                      </>
-                    )}
-                  </tr>
-                  {/* صف العنوان الفرعي */}
-                  {lesson.description && (
-                    <tr style={{ backgroundColor: i % 2 === 0 ? "#f0f7ff" : "#e8f4ff" }}>
-                      <td className="px-4 py-2 border border-gray-200 border-t-0">
-                        <div className="flex items-center gap-1.5">
-                          <span className="w-1 h-3 rounded-full bg-[#3399ff] flex-shrink-0"></span>
-                          <span className="text-xs font-semibold text-[#3399ff]">{lesson.description}</span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-2 border border-gray-200 border-t-0 text-center">
-                        <button
-                          onClick={() => router.push(`/theorie/lesson?lessonId=${lesson.id}&category=${userCategory}&email=${userEmail}&lesson=${encodeURIComponent(lesson.description)}`)}
-                          className="bg-white border-2 border-[#3399ff] px-4 py-1 text-xs font-bold hover:bg-[#3399ff] hover:text-white transition-colors w-full"
-                          style={{ color: "#3399ff" }}>
                           {lang === "ar" ? "درس" : lang === "nl" ? "Les" : lang === "fr" ? "Leçon" : "Lesson"}
                         </button>
                       </td>
-                      <td className="px-4 py-2 border border-gray-200 border-t-0 text-center">
+                      <td className="px-4 py-3 border border-gray-200 text-center">
                         <button
-                          onClick={() => openExamModal(lesson.id, lesson.description)}
+                          onClick={() => openExamModal(lesson.id, lesson.title)}
                           disabled={loadingExam}
-                          className="border-2 px-4 py-1 text-xs font-bold transition-colors disabled:opacity-60 w-full"
-                          style={{ background: "#3399ff", borderColor: "#2277dd", color: "white" }}>
+                          className="border-2 px-4 py-1 text-sm font-bold transition-colors disabled:opacity-60 w-full"
+                          style={{ background: "#22c55e", borderColor: "#16a34a", color: "white" }}
+                        >
                           EXAM
                         </button>
                       </td>
-                    </tr>
+                    </>
                   )}
-                </React.Fragment>
+                </tr>
               ))}
             </tbody>
           </table>
