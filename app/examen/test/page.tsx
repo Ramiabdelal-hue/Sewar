@@ -352,6 +352,7 @@ function ExamenTestContent() {
                             <div key={idx} style={{ flex: 1, overflow: "hidden" }}>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img src={optimizeExamImage(url)} alt="" draggable={false} onContextMenu={e => e.preventDefault()}
+                                loading="lazy" decoding="async"
                                 style={{ width: "100%", height: "auto", display: "block" }} />
                             </div>
                           ))}
@@ -467,6 +468,7 @@ function ExamenTestContent() {
                   <div key={i} style={{ flex: 1, overflow: "hidden" }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={optimizeExamImage(url)} alt="" draggable={false} onContextMenu={e => e.preventDefault()}
+                      loading="lazy" decoding="async"
                       style={{ width: "100%", height: "auto", display: "block" }} />
                     <div style={{ background: "linear-gradient(135deg,#0a1628,#003399)", opacity: 0.9, padding: "2px 8px" }}>
                       <span style={{ color: "white", fontSize: "9px", fontWeight: "bold" }}>© Sewar Rijbewijs Online</span>

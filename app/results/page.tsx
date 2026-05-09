@@ -448,8 +448,10 @@ export default function ResultsPage() {
                             {answer.videoUrls.map((url, idx) => (
                               <img
                                 key={idx}
-                                src={url}
+                                src={url.includes('res.cloudinary.com') && !url.includes('/upload/q_auto') ? url.replace('/upload/', '/upload/q_auto:good,f_auto,w_600,c_limit/') : url}
                                 alt={`Question ${index + 1} image ${idx + 1}`}
+                                loading="lazy"
+                                decoding="async"
                                 className="w-full h-32 object-cover rounded-xl border-2 border-gray-200"
                               />
                             ))}

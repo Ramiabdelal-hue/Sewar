@@ -401,6 +401,8 @@ function GratisExamContent() {
                                 src={optimizeExamImage(url)}
                                 alt=""
                                 draggable={false}
+                                loading="lazy"
+                                decoding="async"
                                 onContextMenu={e => e.preventDefault()}
                                 style={{ width: "100%", height: "auto", display: "block" }}
                               />
@@ -541,6 +543,8 @@ function GratisExamContent() {
                       src={optimizeExamImage(url)}
                       alt=""
                       draggable={false}
+                      loading="eager"
+                      decoding="async"
                       onContextMenu={e => e.preventDefault()}
                       style={{ width: "100%", height: "auto", display: "block" }}
                     />
