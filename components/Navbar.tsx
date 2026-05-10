@@ -376,15 +376,15 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
             setScreenshotCount(attempts);
           }
 
-          let earliestExpiry = new Date(data.user.expiryDate).getTime();
+          let latestExpiry = new Date(data.user.expiryDate).getTime();
           if (data.subscriptions && data.subscriptions.length > 0) {
             for (const sub of data.subscriptions) {
               const subExpiry = new Date(sub.expiryDate).getTime();
-              if (subExpiry < earliestExpiry) earliestExpiry = subExpiry;
+              if (subExpiry > latestExpiry) latestExpiry = subExpiry; // أبعد تاريخ انتهاء
             }
           }
 
-          const diff = earliestExpiry - Date.now();
+          const diff = latestExpiry - Date.now();
           if (diff <= 0) {
             setIsExpired(true);
             setDaysLeft(0);
