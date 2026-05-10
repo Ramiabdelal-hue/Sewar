@@ -655,6 +655,7 @@ export default function AdminQuestionsPage() {
 
   const [saving, setSaving] = useState(false);
   const [savingEdit, setSavingEdit] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
@@ -1996,6 +1997,7 @@ export default function AdminQuestionsPage() {
                           videoUrls: [...newQuestion.videoUrls, url],
                         });
                       }}
+                      onUploadingChange={setIsUploading}
                       maxSizeMB={100}
                     />
                     {newQuestion.videoUrls.length > 0 && (
@@ -2076,6 +2078,7 @@ export default function AdminQuestionsPage() {
                           videoUrls: [...prev.videoUrls, url],
                         }));
                       }}
+                      onUploadingChange={setIsUploading}
                       maxSizeMB={5}
                     />
                     {newQuestion.videoUrls.length > 0 && (
@@ -2192,9 +2195,11 @@ export default function AdminQuestionsPage() {
                 className="w-full py-3 rounded-xl font-black text-sm transition-all hover:scale-[1.01] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100 flex items-center justify-center gap-2"
                 style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "white", boxShadow: "0 4px 14px rgba(34,197,94,0.35)" }}
                 onClick={handleAddQuestion}
-                disabled={saving}
+                disabled={saving || isUploading}
               >
-                {saving ? (
+                {isUploading ? (
+                  <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> جاري رفع الصورة...</>
+                ) : saving ? (
                   <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> جاري الحفظ...</>
                 ) : "💾 حفظ السؤال"}
               </button>

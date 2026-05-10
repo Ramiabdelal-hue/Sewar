@@ -6,6 +6,7 @@ import { FaUpload, FaSpinner, FaCheckCircle, FaTimesCircle } from "react-icons/f
 interface FileUploaderProps {
   type: "image" | "video" | "audio";
   onUploadComplete: (url: string, publicId: string) => void;
+  onUploadingChange?: (uploading: boolean) => void;
   accept?: string;
   maxSizeMB?: number;
   multiple?: boolean;
@@ -14,6 +15,7 @@ interface FileUploaderProps {
 export default function FileUploader({
   type,
   onUploadComplete,
+  onUploadingChange,
   accept,
   maxSizeMB = 100,
   multiple = false,
@@ -44,6 +46,7 @@ export default function FileUploader({
     setProgress(0);
     setUploadedCount(0);
     setTotalCount(files.length);
+    onUploadingChange?.(true);
 
     try {
       for (let i = 0; i < files.length; i++) {
@@ -91,6 +94,7 @@ export default function FileUploader({
       console.error("❌ خطأ في رفع الملف:", err);
     } finally {
       setUploading(false);
+      onUploadingChange?.(false);
       // reset input
       e.target.value = "";
     }
