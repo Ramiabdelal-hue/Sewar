@@ -659,12 +659,8 @@ export default function AdminQuestionsPage() {
   
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
-  const [isLogged, setIsLogged] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("adminQuestionsLogged") === "true";
-    }
-    return false;
-  });
+  // لا نحفظ حالة تسجيل الدخول في localStorage — يجب إعادة الدخول عند كل refresh
+  const [isLogged, setIsLogged] = useState(false);
   const [showInstallGuide, setShowInstallGuide] = useState(false);
   const [questionType, setQuestionType] = useState<"" | "Theori" | "Praktijk" | "Examen">("");
   const [questionSubType, setQuestionSubType] = useState<"" | "lessons" | "exam">("");
@@ -985,7 +981,6 @@ export default function AdminQuestionsPage() {
       });
       const data = await res.json();
       if (data.success) {
-        localStorage.setItem("adminQuestionsLogged", "true");
         setIsLogged(true);
       } else {
         alert(data.message || t.incorrectCredentials);
@@ -1720,7 +1715,7 @@ export default function AdminQuestionsPage() {
               <div className="flex-1" style={{ background: "#f5a623" }} />
               <div className="flex-1" style={{ background: "#e63946" }} />
             </div>
-            <button onClick={() => { localStorage.removeItem("adminQuestionsLogged"); setIsLogged(false); }}
+            <button onClick={() => { setIsLogged(false); }}
               className="inline-flex items-center gap-2 text-xs font-bold transition-colors px-3 py-1.5 rounded-lg hover:bg-red-50"
               style={{ color: "#ef4444" }}>
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
@@ -1803,7 +1798,7 @@ export default function AdminQuestionsPage() {
             </button>
 
             {/* زر الخروج */}
-            <button onClick={() => { localStorage.removeItem("adminQuestionsLogged"); setIsLogged(false); }}
+            <button onClick={() => { setIsLogged(false); }}
               className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-black transition-all active:scale-95 flex-shrink-0"
               style={{ background: "#fef2f2", color: "#ef4444", border: "1.5px solid #fecaca" }}>
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
