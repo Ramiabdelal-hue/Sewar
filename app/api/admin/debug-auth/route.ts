@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // endpoint مؤقت للتشخيص فقط - يُحذف بعد حل المشكلة
-export async function GET(req: NextRequest) {
+// لا يحتاج admin token
+export async function GET(_req: NextRequest) {
   const adminUser = process.env.ADMIN_USERNAME;
   const adminPass = process.env.ADMIN_PASSWORD;
 

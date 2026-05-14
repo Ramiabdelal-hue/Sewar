@@ -99,7 +99,8 @@ export function proxy(request: NextRequest) {
   }
 
   // 4. Protect /api/admin/* — require admin token
-  if (pathname.startsWith('/api/admin/')) {
+  // استثناء: /api/admin/verify لأنه يتحقق بنفسه من username/password
+  if (pathname.startsWith('/api/admin/') && pathname !== '/api/admin/verify' && pathname !== '/api/admin/debug-auth') {
     if (!isValidAdminToken(request)) return jsonUnauthorized();
   }
 
