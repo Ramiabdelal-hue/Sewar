@@ -433,7 +433,7 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
     fr: "Nous vous informons que louverture officielle du site aura lieu le 20.06.2026. Nous nous rejouissons de vous accueillir a cette occasion speciale. Avec nos cordiales salutations.",
     ar: "نود إعلامكم بأنه سيتم الافتتاح الرسمي للموقع بتاريخ 20.06.2026. نتطلع لاستقبالكم ومشاركتكم هذه المناسبة المميزة، ونتمنى أن يكون هذا المشروع بداية ناجحة ومثمرة للجميع. مع خالص التحيات.",
     en: "We inform you that the official launch of the website will take place on 20.06.2026. We look forward to welcoming you on this special occasion. With kind regards.",
-
+  };
   return (
     <>
       {/* ── Announcement Banner — بعد الـ Navbar ── */}
