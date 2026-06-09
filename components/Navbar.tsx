@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useLang } from "@/context/LangContext";
 import nl from "@/locales/nl.json";
@@ -425,7 +425,7 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
   ];
 
   const [bannerClosed, setBannerClosed] = useState(false);
-  const [bannerLang, setBannerLang] = useState<"nl"|"fr"|"ar"|"en">("nl");
+  const [bannerLang, setBannerLang] = useState<"nl"|"fr"|"ar"|"en">("ar");
 
   const bannerText: Record<string, string> = {
     nl: "🎉 Sewar Rijbewijs Online start officieel op 20 juni 2025! Bereid je voor op de beste theorie-ervaring.",
@@ -436,39 +436,40 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
 
   return (
     <>
-      {/* ── Announcement Banner ── */}
+      {/* ── Announcement Banner — بعد الـ Navbar ── */}
       {!bannerClosed && (
-        <div style={{ background: "linear-gradient(135deg, #003399, #0055cc)", zIndex: 9998 }}
+        <div style={{ background: "linear-gradient(135deg,#5b21b6,#7c3aed)", zIndex: 100 }}
           className="relative w-full">
-          <div className="max-w-5xl mx-auto px-3 py-2.5 flex items-center gap-3">
+          <div className="max-w-3xl mx-auto px-4 pt-4 pb-5">
             {/* أزرار اللغة */}
-            <div className="flex gap-1 flex-shrink-0">
+            <div className="flex justify-center gap-2 mb-3">
               {(["nl","fr","ar","en"] as const).map(l => (
                 <button key={l} onClick={() => setBannerLang(l)}
-                  className="px-2 py-0.5 rounded text-[10px] font-black transition-all"
+                  className="px-3 py-1 rounded-lg text-xs font-black transition-all"
                   style={{
-                    background: bannerLang === l ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.08)",
-                    color: "white",
-                    border: bannerLang === l ? "1px solid rgba(255,255,255,0.5)" : "1px solid rgba(255,255,255,0.15)",
+                    background: bannerLang === l ? "white" : "rgba(255,255,255,0.15)",
+                    color: bannerLang === l ? "#5b21b6" : "white",
+                    border: "1.5px solid rgba(255,255,255,0.35)",
                   }}>
                   {l.toUpperCase()}
                 </button>
               ))}
             </div>
             {/* النص */}
-            <p className="flex-1 text-white text-xs font-bold text-center" dir={bannerLang === "ar" ? "rtl" : "ltr"}>
+            <p className="text-white text-sm font-semibold text-center leading-relaxed"
+              dir={bannerLang === "ar" ? "rtl" : "ltr"}>
               {bannerText[bannerLang]}
             </p>
-            {/* زر الإغلاق */}
-            <button onClick={() => setBannerClosed(true)}
-              className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-colors"
-              style={{ background: "rgba(255,255,255,0.15)", color: "white" }}>
-              <FaTimes size={10} />
-            </button>
           </div>
+          {/* زر الإغلاق */}
+          <button onClick={() => setBannerClosed(true)}
+            className="absolute top-2 right-3 w-7 h-7 rounded-full flex items-center justify-center"
+            style={{ background: "rgba(255,255,255,0.2)", color: "white" }}>
+            <FaTimes size={11} />
+          </button>
         </div>
       )}
-      <header dir={lang === "ar" ? "rtl" : "ltr"}>
+            <header dir={lang === "ar" ? "rtl" : "ltr"}>
         {/* الشريط العلوي - أبيض */}
         <div style={{ background: "#ffffff", borderBottom: "1px solid #e5e7eb" }}>
           <div className="max-w-5xl mx-auto px-3 py-2.5 flex items-center justify-between gap-4">
