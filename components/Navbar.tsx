@@ -425,7 +425,6 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
   ];
 
   const [bannerClosed, setBannerClosed] = useState(false);
-  const [bannerClosed, setBannerClosed] = useState(false);
   const [bannerLang, setBannerLang] = useState<"nl"|"fr"|"ar"|"en">("ar");
 
   const bannerText: Record<string, string> = {
