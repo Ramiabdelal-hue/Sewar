@@ -425,14 +425,14 @@ export default function Navbar({ onOpenLogin, onTheorieClick }: NavbarProps) {
   ];
 
   const [bannerClosed, setBannerClosed] = useState(false);
+  const [bannerClosed, setBannerClosed] = useState(false);
   const [bannerLang, setBannerLang] = useState<"nl"|"fr"|"ar"|"en">("ar");
 
   const bannerText: Record<string, string> = {
-    nl: "🎉 Sewar Rijbewijs Online start officieel op 20 juni 2025! Bereid je voor op de beste theorie-ervaring.",
-    fr: "🎉 Sewar Rijbewijs Online démarre officiellement le 20 juin 2025 ! Préparez-vous à la meilleure expérience théorique.",
-    ar: "🎉 سيبدأ Sewar Rijbewijs Online رسمياً في 20 يونيو 2025! استعد لأفضل تجربة نظرية.",
-    en: "🎉 Sewar Rijbewijs Online officially launches on June 20, 2025! Get ready for the best theory experience.",
-  };
+    nl: "Wij informeren u dat de officiele opening van de website plaatsvindt op 20.06.2026. We kijken ernaar uit u te verwelkomen bij deze bijzondere gelegenheid. Met vriendelijke groeten.",
+    fr: "Nous vous informons que louverture officielle du site aura lieu le 20.06.2026. Nous nous rejouissons de vous accueillir a cette occasion speciale. Avec nos cordiales salutations.",
+    ar: "نود إعلامكم بأنه سيتم الافتتاح الرسمي للموقع بتاريخ 20.06.2026. نتطلع لاستقبالكم ومشاركتكم هذه المناسبة المميزة، ونتمنى أن يكون هذا المشروع بداية ناجحة ومثمرة للجميع. مع خالص التحيات.",
+    en: "We inform you that the official launch of the website will take place on 20.06.2026. We look forward to welcoming you on this special occasion. With kind regards.",
 
   return (
     <>
